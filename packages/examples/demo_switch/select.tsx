@@ -1,7 +1,7 @@
 import React, { FC, memo, useCallback, useMemo } from "react";
 import Creatable from "react-select/creatable";
 import { MultiValue } from "react-select";
-import { SpelConcatPart } from "@react-awesome-query-builder/ui";
+import { SpelConcatPart, ListItem } from "@react-awesome-query-builder/ui";
 
 interface OptionItem {
   id: string
@@ -11,33 +11,27 @@ interface OptionItem {
   __isNew__?: boolean
 }
 
-const options: OptionItem[] = [
-  {
-    id: "foo",
-    label: "Foo",
-    properties: ["REQUIRED", "CREATE", "UPDATE"],
-    type: { format: "INTEGER" },
-  },
-  {
-    id: "bar",
-    label: "Bar",
-    properties: ["REQUIRED", "CREATE", "UPDATE"],
-    type: { format: "INTEGER" },
-  },
-];
-
 
 interface Iprops {
-  k: string
-  value?: SpelConcatPart[]
-  setValue(value: SpelConcatPart[]): void
+  k: string;
+  value?: SpelConcatPart[];
+  setValue(value: SpelConcatPart[]): void;
+  listValues: ListItem[];
 }
 
 const MltSelector: FC<Iprops> = ({
   k,
   value,
   setValue,
+  listValues,
 }) => {
+  const options: OptionItem[] = useMemo(() => listValues?.map(({value, title}) => ({
+    id: value?.toString(),
+    label: title ?? "",
+    properties: ["REQUIRED", "CREATE", "UPDATE"],
+    type: { format: "INTEGER" },
+  })), [listValues]);
+
   const initMltSelectValueHandler = (list: OptionItem[], val: SpelConcatPart[]) => {
     if (val) {
       return val.map((item: SpelConcatPart) => {

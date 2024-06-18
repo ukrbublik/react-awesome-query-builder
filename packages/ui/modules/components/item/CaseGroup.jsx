@@ -30,9 +30,10 @@ class CaseGroup extends BasicGroup {
 
     if (configChanged) {
       const { config } = nextProps;
-      const { renderBeforeCaseValue, renderAfterCaseValue } = config.settings;
+      const { renderBeforeCaseValue, renderAfterCaseValue, renderRuleError } = config.settings;
       this.BeforeCaseValue = getRenderFromConfig(config, renderBeforeCaseValue);
       this.AfterCaseValue = getRenderFromConfig(config, renderAfterCaseValue);
+      this.RuleError = getRenderFromConfig(config, renderRuleError);
     }
   }
 
@@ -109,6 +110,7 @@ class CaseGroup extends BasicGroup {
       <div className={"group--conjunctions"}>
         {this.renderConjs()}
         {this.renderDrag()}
+        {this.renderError()}
       </div>
     );
   }
@@ -120,10 +122,15 @@ class CaseGroup extends BasicGroup {
   }
 
   renderHeaderCenter() {
-    if (this.isDefaultCase())
-      return this.renderValue();
-    else
-      return null;
+    if (this.isDefaultCase()) {
+      return (
+        <div>
+          {this.renderValue()}
+          {this.renderError()}
+        </div>
+      );
+    }
+    return null;
   }
 
   canAddGroup() {
@@ -156,6 +163,17 @@ class CaseGroup extends BasicGroup {
       key="values-after"
       {...this.props}
     />;
+  }
+
+  renderError() {
+    const {config, valueError} = this.props;
+    const { showErrorMessage } = config.settings;
+    const RuleError = this.RuleError;
+    const oneError = [...(valueError?.toArray() || [])].filter(e => !!e).shift() || null;
+    return showErrorMessage && oneError 
+      && <div className="rule--error">
+        {RuleError ? <RuleError error={oneError} /> : oneError}
+      </div>;
   }
 
   renderValue() {

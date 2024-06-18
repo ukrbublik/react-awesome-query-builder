@@ -28,27 +28,27 @@ const ternaryJsonLogic = {
   "if": [
     {
       "and": [
-        {
-          "==": [
-            { "var": "color" },
-            "blue"
-          ]
-        },
-        {
-          "==": [
-            { "var": "color" },
-            "yellow"
-          ]
-        }
+        { ">": [ { "var": "discount" }, 50 ] },
+        { "==": [ { "var": "is_promotion" }, true ] }
       ]
     },
-    "Ukraine",
-    null
+    "Hot",
+    {
+      "if": [
+        { ">": [ { "var": "qty" }, 0 ] },
+        "In stock",
+        "other"
+      ]
+    }
   ]
 };
 const initialTreeFromJsonLogic: ImmutableTree = QbUtils.loadFromJsonLogic(ternaryJsonLogic, config);
+const validationErrors = QbUtils.validateTree(initialTreeFromJsonLogic, config);
+if (validationErrors?.length) {
+  console.warn("Validation errors:", validationErrors);
+}
 
-const ternarySpel = "((color == 'blue' && color == 'yellow') ? 'Ukraine' : null)";
+const ternarySpel = "((discount > 50 && is_promotion == true) ? 'Hot' : (qty > 0 ? 'In stock' : 'other'))";
 const [initialTreeFromSpel, spelLoadingErrors] = QbUtils.loadFromSpel(ternarySpel, config);
 if (spelLoadingErrors?.length) {
   console.warn("Errors while importing from SpEL: ", spelLoadingErrors);
@@ -101,6 +101,7 @@ const Demo: React.FC = () => {
     <Query
       {...config}
       value={state.tree}
+      onInit={onChange}
       onChange={onChange}
       renderBuilder={renderBuilder}
     />

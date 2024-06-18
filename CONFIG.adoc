@@ -315,13 +315,15 @@ Behaviour settings:
 |keepInputOnChangeFieldSrc |true |Keep value entered in RHS after changing source of LHS? 
 |showErrorMessage |false |Show error message in QueryBuilder if `validateValue()` in field config returns false for the value or if input value does not satisfy `max`, `min` constraints in `fieldSettings`
 |canReorder |true |Activate reordering support for rules and groups of rules?
-|canRegroup |true |Allow move rules (or groups) in/out groups during reorder? +
+|canRegroup |true |Allow to move a rule (group) in/out of group during reorder? +
   False - allow "safe" reorder, means only reorder at same level
+|canRegroupCases |false |For ternary mode - Allow to move a rule (group) from one case to another?
 |showNot |true |Show `NOT` together with `AND`/`OR`?
 |forceShowConj |false |Show conjuction for 1 rule in group?
 |maxNumberOfRules | |Maximum number of rules which can be added to the query builder
 |maxNesting | |Max nesting for rule groups. +
   Set `1` if you don't want to use groups at all. This will remove also `Add group` button.
+|maxNumberOfCases | |For ternary mode - maximum number of cases
 |canLeaveEmptyGroup |true |True - leave empty group after deletion of rules, false - automatically remove empty groups + add 1 empty rule to empty root
 |shouldCreateEmptyGroup |false |False - automatically add 1 empty rule into new group
 |immutableGroupsMode |false |Not allow to add/delete rules or groups, but allow change

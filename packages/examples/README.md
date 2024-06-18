@@ -8,16 +8,23 @@ Uses complex config to demonstrate anvanced usage.
 **Uses TypeScript.**
 
 ### Preview
-https://ukrbublik.github.io/react-awesome-query-builder/
+
+Demo: https://ukrbublik.github.io/react-awesome-query-builder/
+
+Demo for ternary mode: https://ukrbublik.github.io/react-awesome-query-builder/#/switch
 
 ### Run
+
 From the root of cloned repository:
 ```sh
 pnpm start
 ```
 
 And open `http://localhost:3001` in a browser.  
-Feel free to play with code in `demo` dir.  
+For ternary mode open `http://localhost:3001/#/switch`  
+
+Feel free to play with code in [`demo`](demo) (advanced demo) and [`demo_switch`](demo_switch) (demo for ternary mode) dirs.  
+
 
 ### Run in sandbox
 [![Open in codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/packages/examples?file=/demo/index.tsx)

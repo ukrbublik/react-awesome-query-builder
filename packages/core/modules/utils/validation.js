@@ -313,10 +313,12 @@ export const _validateTree = (
               str: errorItem.itemPositionStr
             });
           }
-          errorItem.itemPositionStr = translateValidation(constants.ITEM_POSITION_WITH_INDEX_PATH, {
-            ...trArgs,
-            str: errorItem.itemPositionStr
-          });
+          if (flatItem.type !== "case_group") {
+            errorItem.itemPositionStr = translateValidation(constants.ITEM_POSITION_WITH_INDEX_PATH, {
+              ...trArgs,
+              str: errorItem.itemPositionStr
+            });
+          }
         }
       }
     }
@@ -532,7 +534,7 @@ function validateRule (item, path, itemId, meta, c) {
     ].reduce((map, key) => map.delete(key), properties);
     operator = null;
   }
-  if (!fieldSrc && field) {
+  if (!fieldSrc && field && !isCase) {
     fieldSrc = getFieldSrc(field);
     properties = properties.set("fieldSrc", fieldSrc);
   }
@@ -559,7 +561,7 @@ function validateRule (item, path, itemId, meta, c) {
     operator = null;
   }
   const availOps = field ? getOperatorsForField(config, field) : [];
-  if (field) {
+  if (field && !isCase) {
     if (!availOps?.length) {
       _addError(meta, item, path, {
         key: constants.UNSUPPORTED_FIELD_TYPE,
@@ -872,7 +874,8 @@ const validateNormalValue = (field, value, valueSrc, valueType, asyncListValues,
     if (fieldSettings) {
       // validate against list of values
       const realListValues = asyncListValues || listValues;
-      if (realListValues && !fieldSettings.allowCustomValues) {
+      // tip: "case_value" is deprecated, don't apply validation based on listValues
+      if (realListValues && !fieldSettings.allowCustomValues && w !== "case_value") {
         [fixedValue, allErrors] = validateValueInList(
           value, realListValues, canFix, isEndValue, config.settings.removeInvalidMultiSelectValuesOnLoad
         );
@@ -1138,6 +1141,7 @@ export const getNewValueForFieldOp = function (
     keepInputOnChangeFieldSrc, convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp,
   } = config.settings;
   const currentField = current.get("field");
+  const isCase = currentField == "!case_value";
   const currentFieldType = current.get("fieldType");
   const currentFieldSrc = current.get("fieldSrc");
   const currentOperator = current.get("operator");
@@ -1147,10 +1151,11 @@ export const getNewValueForFieldOp = function (
   const currentValueError = current.get("valueError", new Immutable.List());
   const asyncListValues = current.get("asyncListValues");
 
+  const isOkWithoutOperator = isCase;
   const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator);
   const newOperatorConfig = getOperatorConfig(config, newOperator, newField);
-  const currentOperatorCardinality = currentOperator ? getOpCardinality(currentOperatorConfig) : null;
-  const operatorCardinality = newOperator ? getOpCardinality(newOperatorConfig) : null;
+  const currentOperatorCardinality = isCase ? 1 : currentOperator ? getOpCardinality(currentOperatorConfig) : null;
+  const operatorCardinality = isCase ? 1 : newOperator ? getOpCardinality(newOperatorConfig) : null;
   const currentFieldConfig = getFieldConfig(oldConfig, currentField);
   const newFieldConfig = getFieldConfig(config, newField);
   const isOkWithoutField = !currentField && currentFieldType && keepInputOnChangeFieldSrc;
@@ -1164,7 +1169,9 @@ export const getNewValueForFieldOp = function (
 
   let validationErrors = [];
 
-  let canReuseValue = (currentField || isOkWithoutField) && currentOperator && newOperator && currentValue != undefined;
+  let canReuseValue = (currentField || isOkWithoutField)
+    && (currentOperator && newOperator || isOkWithoutOperator)
+    && currentValue != undefined;
   if (
     !(currentType && newType && currentType == newType)
     || changedProp === "field" && hasFieldChanged && clearValueOnChangeField
@@ -1180,7 +1187,7 @@ export const getNewValueForFieldOp = function (
       canReuseValue = false;
     }
   }
-  if (!currentValue?.size && operatorCardinality || currentValue?.size && !operatorCardinality) {
+  if (!isOkWithoutOperator && (!currentValue?.size && operatorCardinality || currentValue?.size && !operatorCardinality)) {
     canReuseValue = false;
   }
 

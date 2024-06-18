@@ -310,6 +310,20 @@ export default (skin: string) => {
     //   }
     //   return true;
     // }
+
+    // // enable ternary mode with number as case value
+    // caseValueField: {
+    //   mainWidgetProps: {
+    //     valueLabel: "Then",
+    //     valuePlaceholder: "Then",
+    //   },
+    //   type: "number",
+    //   fieldSettings: {
+    //     min: 0,
+    //     max: 10,
+    //   },
+    //   valueSources: ["value"],
+    // },
   };
 
   //////////////////////////////////////////////////////////////////////

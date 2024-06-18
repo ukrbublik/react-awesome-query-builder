@@ -905,7 +905,8 @@ const buildCaseValProperties = (config, meta, conv, val) => {
   let valProperties = {
     value: [value],
     valueSrc: [valueSrc ?? "value"],
-    valueType: [valueType ?? widgetDef?.type]
+    valueType: [valueType ?? widgetDef?.type],
+    field: "!case_value",
   };
   return valProperties;
 };

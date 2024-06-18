@@ -1,67 +1,17 @@
 import React from "react";
 import {
-  Utils as QbUtils, BasicFuncs,
-  Widgets, CaseValueWidget, Fields, Config, Settings, SpelConcatPart, WidgetProps, Funcs,
+  BasicFuncs, Widgets, Fields, Config, Settings, Funcs,
 } from "@react-awesome-query-builder/ui";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
-import ReactSelect from "./select";
-
-/**
- * @deprecated
- */
-const jsonLogicFormatConcat = (parts: SpelConcatPart[]) => {
-  if (parts && Array.isArray(parts) && parts.length) {
-    return parts
-      .map(part => part?.value ?? part)
-      .filter(r => r != undefined);
-  } else {
-    return undefined;
-  }
-};
-
-/**
- * @deprecated
- */
-const jsonLogicImportConcat = (val: any): SpelConcatPart[] => {
-  if (val == undefined)
-    return undefined;
-  const errors: string[] = [];
-  const parts = Array.isArray(val) ? val : [val];
-  const res = parts.filter(v => v != undefined).map(v => {
-    return {
-      type: "property", 
-      value: val as string
-    } as SpelConcatPart;
-  });
-  if (errors.length) {
-    throw new Error(errors.join("\n"));
-  }
-  return res;
-};
+import { getCaseValueWidgetConfig } from "./spel_concat";
+import InputAdornment from "@mui/material/InputAdornment";
 
 export default (): Config => {
   const InitialConfig = MuiConfig;
 
-  /**
-   * @deprecated
-   */
-  const caseValueWidgetConfig: CaseValueWidget = {
-    ...InitialConfig.widgets.case_value,
-    spelFormatValue: QbUtils.ExportUtils.spelFormatConcat,
-    spelImportValue: QbUtils.ExportUtils.spelImportConcat,
-    jsonLogic: jsonLogicFormatConcat,
-    jsonLogicImport: jsonLogicImportConcat,
-    factory: ({value, setValue, id}: WidgetProps) => 
-      <ReactSelect 
-        value={value as SpelConcatPart[]}
-        setValue={setValue}
-        k={id!}
-      />
-  };
-
   const widgets: Widgets = {
     ...InitialConfig.widgets,
-    case_value: caseValueWidgetConfig
+    case_value: getCaseValueWidgetConfig(InitialConfig),
   };
 
   const fields: Fields = {
@@ -74,11 +24,36 @@ export default (): Config => {
     qty: {
       label: "Qty",
       type: "number",
+      valueSources: ["value"],
       fieldSettings: {
-        min: 0
+        min: 0,
+        max: 1000,
       },
-      valueSources: ["value", "field"],
       preferWidgets: ["number"]
+    },
+    discount: {
+      label: "Discount",
+      type: "number",
+      valueSources: ["value"],
+      fieldSettings: {
+        min: 0,
+        max: 100,
+        step: 5,
+      },
+      preferWidgets: ["slider", "rangeslider"],
+      widgets: {
+        slider: {
+          widgetProps: {
+            customProps: {
+              input: {
+                InputProps: {
+                  endAdornment: <InputAdornment position="end">%</InputAdornment>
+                }
+              }
+            }
+          }
+        }
+      }
     },
     price: {
       label: "Price",
@@ -105,33 +80,45 @@ export default (): Config => {
       }
     },
     is_promotion: {
-      label: "Promo?",
+      label: "Promotoion",
       type: "boolean",
       operators: ["equal"],
-      valueSources: ["value"]
-    }
+      valueSources: ["value"],
+      mainWidgetProps: {
+        hideOperator: true,
+        operatorInlineLabel: "is",
+      }
+    },
   };
 
   const settings: Settings = {
     ...InitialConfig.settings,
     caseValueField: {
-      // type: "case_value", // >> Uncomment to see using of SpelConcatPart
+      // type: "case_value", // >> Uncomment to see deprecated using of SpelConcatPart ("./spel_concat.tsx")
       type: "select",
+      valueSources: ["value"],
+      fieldSettings: {
+        listValues: [{
+          value: "Hot",
+          title: "Hot"
+        }, {
+          value: "In stock",
+          title: "In stock"
+        }, {
+          value: "other",
+          title: "other"
+        }],
+      },
       mainWidgetProps: {
         valueLabel: "Then",
         valuePlaceholder: "Then",
       },
-      // valueSources: ["value", "func", "field"], // value sources are supported
-      fieldSettings: {
-        listValues: ["Ukraine", "other"],
-        // todo: support validateValue for caseValueField
-      }
     },
-    maxNumberOfCases: 3,
+    maxNumberOfCases: 5,
     canRegroupCases: true,
     maxNesting: 3,
     canLeaveEmptyCase: false,
-    // showErrorMessage: true,
+    showErrorMessage: true,
   };
 
   const funcs: Funcs = {

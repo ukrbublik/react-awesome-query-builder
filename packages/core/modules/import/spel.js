@@ -1261,6 +1261,7 @@ const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
   let valProperties = {};
   let convVal;
   let widget;
+  let widgetConfig;
   const caseValueFieldConfig = getFieldConfig(config, "!case_value");
   if (val?.type === "op-plus" && config.settings.caseValueField?.type === "case_value") {
     /**
@@ -1270,7 +1271,11 @@ const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
     convVal = buildCaseValueConcat(val, conv, config, meta);
   } else {
     widget = caseValueFieldConfig?.mainWidget;
+    widgetConfig = config.widgets[widget];
     convVal = convertArg(val, conv, config, meta, spel);
+    if (convVal && convVal.valueSrc === "value") {
+      convVal.valueType = widgetConfig?.type || caseValueFieldConfig?.type || convVal.valueType;
+    }
   }
   const widgetDef = config.widgets[widget];
   if (widget === "case_value") {
@@ -1285,7 +1290,8 @@ const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
         valProperties = {
           value: [normVal],
           valueSrc: ["value"],
-          valueType: [widgetDef?.type ?? "case_value"]
+          valueType: [widgetDef?.type ?? "case_value"],
+          field: "!case_value",
         };
       }
     }
@@ -1294,6 +1300,7 @@ const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
       value: [convVal.value],
       valueSrc: [convVal.valueSrc],
       valueType: [convVal.valueType],
+      field: "!case_value",
     };
   }
   return valProperties;
