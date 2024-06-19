@@ -75,7 +75,7 @@ export default (props) => {
   const placeholder = !readonly ? aPlaceholder : "";
 
   // For accessibility, always give the input field an aria-label
-  const ariaLabel = config.settings.fieldPlaceholder;
+  const ariaLabel = placeholder || config.settings.fieldPlaceholder;
 
   const hasValue = selectedValue != null;
   // should be simple value to prevent re-render!s
