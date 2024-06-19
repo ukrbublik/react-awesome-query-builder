@@ -99,9 +99,9 @@ export default (props) => {
   const renderInput = (params) => {
     // parity with Antd
     const shouldRenderSelected = !multiple && !open;
-    const selectedTitle = selectedListValue?.title ?? value.toString();
+    const selectedTitle = selectedListValue?.title ?? value?.toString() ?? "";
     const shouldHide = multiple && !open;
-    const renderValue = shouldRenderSelected ? selectedTitle : (shouldHide ? "" : inputValue ?? value.toString());
+    const renderValue = shouldRenderSelected ? selectedTitle : (shouldHide ? "" : inputValue ?? value?.toString() ?? "");
     return (
       <TextField 
         variant="standard"
