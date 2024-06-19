@@ -213,3 +213,69 @@ describe("mui widgets interactions", () => {
   });
 
 });
+
+describe("mui IconButton accessibility - aria-label", () => {
+  // When deleteLabel is defined it is used as the aria-label for icon buttons
+  it("delete button label is used as aria-label", async () => {
+    await with_qb_mui(configs.with_modified_delete_label,
+      inits.with_number,
+      "JsonLogic",
+      () => {
+        const deleteBtn = document.querySelector<HTMLElement>(
+          ".rule--header .MuiIconButton-root" 
+        );
+        expect(deleteBtn, "deleteBtn").to.exist;
+        const ariaLabel = deleteBtn?.getAttribute("aria-label");
+        expect(ariaLabel).to.eq("Delete rule");
+      }
+    );
+  });
+
+  // When deleteLabel is not defined icon buttons do not have an aria-label
+  it("delete button with no label defined has no aria-label", async () => {
+    await with_qb_mui(configs.with_no_delete_label,
+      inits.with_number,
+      "JsonLogic",
+      () => {
+        const deleteBtn = document.querySelector<HTMLElement>(
+          ".rule--header .MuiIconButton-root" 
+        );
+        expect(deleteBtn, "deleteBtn").to.exist;
+        expect(deleteBtn?.hasAttribute("aria-label")).to.eq(false);
+      }
+    );
+  });
+});
+
+describe("mui Autocomplete accessibility - aria-label", () => {
+  // Autocomplete uses fieldPlaceholder from config as the aria-label
+  it("fieldPlaceholder is used as aria-label", async () => {
+    await with_qb_mui(configs.with_modified_field_placeholder,
+      inits.with_number,
+      "JsonLogic",
+      () => {
+        const fieldCombo = document.querySelector<HTMLElement>(
+          ".rule--field .MuiAutocomplete-input"
+        );
+        expect(fieldCombo, "field combobox").to.exist;
+        const ariaLabel = fieldCombo?.getAttribute("aria-label");
+        expect(ariaLabel).to.eq("autocomplete placeholder");
+      }
+    );
+  });
+
+  // When fieldPlaceholder is not defined Autocompletes do not have an aria-label
+  it("select field combobox has no aria-label when fieldPlaceholder is not defined", async () => {
+    await with_qb_mui(configs.with_no_field_placeholder,
+      inits.with_number,
+      "JsonLogic",
+      () => {
+        const fieldCombo = document.querySelector<HTMLElement>(
+          ".rule--field .MuiAutocomplete-input"
+        );
+        expect(fieldCombo, "field combobox").to.exist;
+        expect(fieldCombo?.hasAttribute("aria-label")).to.eq(false);
+      }
+    );
+  });
+});

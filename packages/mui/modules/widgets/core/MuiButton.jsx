@@ -27,12 +27,14 @@ export default memo((props) => {
   const icon = renderIcon?.(iconProps);
 
   if (!label || hideLabelsFor[type]) {
+    // For icons, use the label as aria-label for accessibility
     return (
       <IconButton
         size="small" 
         disabled={readonly} 
         onClick={onClick} 
         color={typeToColor[type]}
+        aria-label={label}
       >{icon}</IconButton>
     );
   } else {
