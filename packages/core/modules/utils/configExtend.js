@@ -51,6 +51,11 @@ export const extendConfig = (config, configId, canCompile = true) => {
   extendFieldsConfig(config.fields, config);
   extendFuncsConfig(config.funcs, config);
 
+  const { caseValueField } = config.settings;
+  if (caseValueField) {
+    extendFieldConfig(caseValueField, config, [], false, true);
+  }
+
   const momentLocale = config.settings.locale.moment;
   if (momentLocale) {
     moment.locale(momentLocale);
@@ -198,7 +203,7 @@ function normalizeFieldSettings(fieldConfig, config, type) {
   }
 }
 
-function extendFieldConfig(fieldConfig, config, path = [], isFuncArg = false) {
+function extendFieldConfig(fieldConfig, config, path = [], isFuncArg = false, isCaseValue = false) {
   let { showLabels, fieldSeparator } = config.settings;
   fieldSeparator = fieldSeparator ?? ".";
   const argKey = path[path.length - 1];
@@ -223,7 +228,7 @@ function extendFieldConfig(fieldConfig, config, path = [], isFuncArg = false) {
     return;
   }
 
-  if (!isFuncArg && !isFunc) {
+  if (!isFuncArg && !isFunc && !isCaseValue) {
     if (!config.__fieldsCntByType[type])
       config.__fieldsCntByType[type] = 0;
     config.__fieldsCntByType[type]++;
@@ -237,6 +242,9 @@ function extendFieldConfig(fieldConfig, config, path = [], isFuncArg = false) {
   if (isFunc) {
     fieldConfig._isFunc = true;
     fieldConfig._funcKey = funcKey;
+  }
+  if (isCaseValue) {
+    fieldConfig._isCaseValue = true;
   }
 
   normalizeFieldSettings(fieldConfig, config, type);
@@ -340,7 +348,7 @@ function extendFieldConfig(fieldConfig, config, path = [], isFuncArg = false) {
     }
   }
 
-  if (!isFuncArg && !isFunc) {
+  if (!isFuncArg && !isFunc && !isCaseValue) {
     const { fieldName, inGroup } = computeFieldName(config, path);
     if (fieldName) {
       fieldConfig.fieldName = fieldName;

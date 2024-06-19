@@ -1,12 +1,15 @@
 # Changelog
 - 6.6.0
   - Optimizations for rendering and export utils (PR #1054) (issue #342)
-  - Add JsonLogic Export for SwitchCase (PR #1013)
-  - Add support of `tooltip` for operator config (PR #1011) (issue #261)
+  - Added support of JsonLogic export for ternary mode (PR #1013) (issue #978)
+  - Added support of JsonLogic import for ternary mode (PR #1062) (issue #978)
+  - Added support of `tooltip` for operator config (PR #1011) (issue #261)
   - Removed `optimizeRenderWithInternals` from `settings` (PR #1054)
   - Fixed `TreeStore` - 2nd arg `action` can be undefined (PR #1054) (issue #1056)
   - Fixed import of negative number in SpEL (PR #1054) (issue #1055)
   - Fixed validation error message for min/max (PR #1058) (issue #1057)
+  - (Ternary mode) Added to `config.settings`: `caseValueField`, `renderBeforeCaseValue`, `renderAfterCaseValue`, `renderSwitchPrefix`, `defaultCaseLabel`, `addCaseLabel`, `addDefaultCaseLabel` (PR #1062)
+  - Use icon button label as the aria-label to improve accessibility (PR #1066) (issue #1038)
 - 6.5.2
   - Updated dependencies. `@babel/runtime` is now dep for core package (PR #1051) (issue #964)
 - 6.5.1

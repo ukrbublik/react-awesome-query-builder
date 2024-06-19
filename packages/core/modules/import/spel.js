@@ -719,7 +719,10 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       valueType,
       value,
     };
-  } else if (spel.type == "op-plus" && parentSpel?.type == "ternary") {
+  } else if (spel.type === "op-plus" && parentSpel?.type === "ternary" && config.settings.caseValueField?.type === "case_value") {
+    /**
+     * @deprecated
+     */
     return buildCaseValueConcat(spel, conv, config, meta);
   }
 
@@ -1227,11 +1230,14 @@ const buildCase = (cond, val, conv, config, meta, spel = null) => {
   return caseI;
 };
 
+/**
+ * @deprecated
+ */
 const buildCaseValueConcat = (spel, conv, config, meta) => {
   let flat = [];
   function _processConcatChildren(children) {
     children.map(child => {
-      if (child.type == "op-plus") {
+      if (child.type === "op-plus") {
         _processConcatChildren(child.children);
       } else {
         const convertedChild = convertArg(child, conv, config, meta, spel);
@@ -1254,25 +1260,48 @@ const buildCaseValueConcat = (spel, conv, config, meta) => {
 const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
   let valProperties = {};
   let convVal;
-  if (val?.type == "op-plus") {
+  let widget;
+  let widgetConfig;
+  const caseValueFieldConfig = getFieldConfig(config, "!case_value");
+  if (val?.type === "op-plus" && config.settings.caseValueField?.type === "case_value") {
+    /**
+     * @deprecated
+     */
+    widget = "case_value";
     convVal = buildCaseValueConcat(val, conv, config, meta);
   } else {
+    widget = caseValueFieldConfig?.mainWidget;
+    widgetConfig = config.widgets[widget];
     convVal = convertArg(val, conv, config, meta, spel);
-  }
-  const widgetDef = config.widgets["case_value"];
-  const importCaseValue = widgetDef?.spelImportValue;
-  if (importCaseValue) {
-    const [normVal, normErrors] = importCaseValue(convVal);
-    normErrors.map(e => meta.errors.push(e));
-    if (normVal) {
-      valProperties = {
-        value: [normVal],
-        valueSrc: ["value"],
-        valueType: ["case_value"]
-      };
+    if (convVal && convVal.valueSrc === "value") {
+      convVal.valueType = widgetConfig?.type || caseValueFieldConfig?.type || convVal.valueType;
     }
-  } else {
-    meta.errors.push("No fucntion to import case value");
+  }
+  const widgetDef = config.widgets[widget];
+  if (widget === "case_value") {
+    /**
+     * @deprecated
+     */
+    const importCaseValue = widgetDef?.spelImportValue;
+    if (importCaseValue) {
+      const [normVal, normErrors] = importCaseValue.call(config.ctx, convVal);
+      normErrors.map(e => meta.errors.push(e));
+      if (normVal != undefined) {
+        valProperties = {
+          value: [normVal],
+          valueSrc: ["value"],
+          valueType: [widgetDef?.type ?? "case_value"],
+          field: "!case_value",
+        };
+      }
+    }
+  } else if (convVal != undefined && convVal?.value != undefined) {
+    valProperties = {
+      value: [convVal.value],
+      valueSrc: [convVal.valueSrc],
+      valueType: [convVal.valueType],
+      field: "!case_value",
+    };
   }
   return valProperties;
 };

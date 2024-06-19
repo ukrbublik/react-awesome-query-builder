@@ -129,16 +129,6 @@ export const spelEscape = (val, numberToFloat = false, arrayToArray = false) => 
   }
 };
 
-export const jsonLogicFormatConcat = (parts) => {
-  if (parts && Array.isArray(parts) && parts.length) {
-    return parts
-      .map(part => part?.value ?? part)
-      .filter(r => r != undefined);
-  } else {
-    return undefined;
-  }
-};
-
 export const spelFormatConcat = (parts) => {
   if (parts && Array.isArray(parts) && parts.length) {
     return parts
@@ -164,9 +154,10 @@ export const spelImportConcat = (val) => {
   if (val == undefined)
     return [undefined, []];
   let errors = [];
-  const parts = val.valueType == "case_value" ? val.value : [val];
-  const res = parts.map(child => {
-    if (child.valueSrc == "value") {
+  const value = val.valueType == "case_value" ? val.value : val;
+  const valueArr = Array.isArray(value) ? value : [value];
+  const res = valueArr.map(child => {
+    if (child.valueSrc === "value") {
       if (child.value === null) {
         return undefined;
       } else {
@@ -175,7 +166,7 @@ export const spelImportConcat = (val) => {
           value: child.value
         };
       }
-    } else if (child.valueSrc == "field") {
+    } else if (child.valueSrc === "field") {
       return {
         type: (child.isVariable ? "variable" : "property"), 
         value: child.value

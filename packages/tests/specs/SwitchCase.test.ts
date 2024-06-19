@@ -19,6 +19,10 @@ describe("query with switch-case", () => {
           ]}
         ]}
     });
+
+    export_checks([configs.with_all_types, configs.with_cases], inits.with_cases, undefined, {
+      "spel": "(str == '222' ? 'is_string' : (num == 4 ? 'is_number' : 'unknown'))",
+    });
   });
 
   describe("1 case and 1 default", () => {
@@ -31,6 +35,10 @@ describe("query with switch-case", () => {
             "bar"
           ]
         }
+    });
+
+    export_checks([configs.with_all_types, configs.with_cases], inits.with_cases_simple, undefined, {
+      spel: "(str == '222' ? 'foo' : 'bar')"
     });
   });
 

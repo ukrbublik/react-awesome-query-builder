@@ -70,6 +70,7 @@ const compileMetaWidget = {
   mongoFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef"] },
   elasticSearchFormatValue: { type: "f", args: ["queryType", "val", "op", "field", "config"] },
   jsonLogic: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef"] },
+  jsonLogicImport: { type: "f", args: ["val"] },
   validateValue: { type: "f", args: ["val", "fieldSettings", "op", "opDef", "rightFieldDef"] }, // obsolete
   toJS: { type: "f", args: ["val"] },
 };
@@ -111,10 +112,26 @@ const compileMetaFunc = {
   spelFormatFunc: { type: "f", args: ["formattedArgs"] },
 };
 
+const compileMetaFieldLike = {
+  ...compileMetaFieldSettings,
+  fieldSettings: compileMetaFieldSettings,
+};
+
+const compileMetaField = {
+  ...compileMetaFieldSettings,
+  fieldSettings: compileMetaFieldSettings,
+  widgets: {
+    x: compileMetaWidgetForType
+  },
+  mainWidgetProps: compileMetaWidget
+};
+
 const compileMetaSettings = {
   locale: {
     mui: { type: "f", args: [], invokeWith: [], ignore: "jl" },
   },
+
+  caseValueField: compileMetaField,
 
   canCompareFieldWithField: { type: "f", args: ["leftField", "leftFieldConfig", "rightField", "rightFieldConfig", "op"] },
   formatReverse: { type: "f", args: ["q", "op", "reversedOp", "operatorDefinition", "revOperatorDefinition", "isForDisplay"] },
@@ -147,18 +164,14 @@ const compileMetaSettings = {
   renderAfterWidget: { type: "rf" },
   renderBeforeActions: { type: "rf" },
   renderAfterActions: { type: "rf" },
+  renderBeforeCaseValue: { type: "rf" },
+  renderAfterCaseValue: { type: "rf" },
   renderRuleError: { type: "rf" },
 };
 
 const compileMeta = {
   fields: {
-    x: {
-      fieldSettings: compileMetaFieldSettings,
-      widgets: {
-        x: compileMetaWidgetForType
-      },
-      mainWidgetProps: compileMetaWidget
-    },
+    x: compileMetaField,
   },
   widgets: {
     x: compileMetaWidget
@@ -178,13 +191,11 @@ const compileMeta = {
   },
   funcs: {
     x: {
+      ...compileMetaFieldLike,
       ...compileMetaFunc,
-      ...compileMetaFieldSettings,
-      fieldSettings: compileMetaFieldSettings,
       args: {
         x: {
-          ...compileMetaFieldSettings,
-          fieldSettings: compileMetaFieldSettings,
+          ...compileMetaFieldLike,
         }
       }
     }

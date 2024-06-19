@@ -24,10 +24,41 @@ const emptyJsonTree: JsonSwitchGroup = {
 };
 const emptyTree: ImmutableTree = QbUtils.loadTree(emptyJsonTree);
 
+const ternaryJsonLogic = {
+  "if": [
+    {
+      "and": [
+        { ">": [ { "var": "discount" }, 50 ] },
+        { "==": [ { "var": "is_promotion" }, true ] }
+      ]
+    },
+    "Hot",
+    {
+      "if": [
+        { ">": [ { "var": "qty" }, 0 ] },
+        "In stock",
+        "other"
+      ]
+    }
+  ]
+};
+const initialTreeFromJsonLogic: ImmutableTree = QbUtils.loadFromJsonLogic(ternaryJsonLogic, config);
+const validationErrors = QbUtils.validateTree(initialTreeFromJsonLogic, config);
+if (validationErrors?.length) {
+  console.warn("Validation errors:", validationErrors);
+}
+
+const ternarySpel = "((discount > 50 && is_promotion == true) ? 'Hot' : (qty > 0 ? 'In stock' : 'other'))";
+const [initialTreeFromSpel, spelLoadingErrors] = QbUtils.loadFromSpel(ternarySpel, config);
+if (spelLoadingErrors?.length) {
+  console.warn("Errors while importing from SpEL: ", spelLoadingErrors);
+}
 
 const Demo: React.FC = () => {
   const [state, setState] = useState({
-    tree: emptyTree,
+    tree: initialTreeFromJsonLogic,
+    // tree: initialTreeFromSpel,
+    // tree: emptyTree,
     config: config,
     spelStr: "",
     spelErrors: [] as string[],
@@ -70,6 +101,7 @@ const Demo: React.FC = () => {
     <Query
       {...config}
       value={state.tree}
+      onInit={onChange}
       onChange={onChange}
       renderBuilder={renderBuilder}
     />

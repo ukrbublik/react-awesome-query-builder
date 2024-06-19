@@ -230,7 +230,7 @@ export const getFlatTree = (tree) => {
     if (!isRoot) {
       position = {};
       position.caseNo = caseNo;
-      position.globalNoByType = globalCountByType[type] || 0;
+      position.globalNoByType = isCaseGroup ? caseNo : globalCountByType[type] || 0;
       position.indexPath = [ ...path.slice(1).map(id => items[id].childNo), childNo ];
       if (isRule) {
         position.globalLeafNo = globalLeafCount;

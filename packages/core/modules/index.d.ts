@@ -125,7 +125,9 @@ export type FlatItem = {
   // unused
   _top: number;
   collapsed: boolean;
-  // @deprecated use isLeaf instead
+  /**
+   * @deprecated use isLeaf instead
+   */
   leaf: boolean;
 };
 export type FlatTree = {
@@ -147,7 +149,7 @@ export type RuleValueI = SimpleValue | FuncValueI | AnyValue;
 export type FieldPath = string;
 export interface FuncArgValue<V = unknown> {
   value: V;
-  valueSrc: ValueSource;
+  valueSrc?: ValueSource;
 }
 export type FuncArgValueI = ObjectToImmOMap<FuncArgValue<RuleValueI>>;
 export interface FuncValue {
@@ -221,7 +223,11 @@ export interface SwitchGroupProperties extends BasicItemProperties {
 }
 
 export interface CaseGroupProperties extends BasicItemProperties {
-  // todo: any properties here?
+  value?: Array<RuleValue>;
+  valueSrc?: Array<ValueSource>;
+  valueType?: Array<string>;
+  valueError?: Array<string | Empty>;
+  field?: string; // todo: only "!case_value" ?
 }
 
 //////
@@ -235,11 +241,19 @@ interface _RulePropertiesI extends Omit<RuleProperties, "field" | "value" | "val
   operatorOptions?: OperatorOptionsI;
 }
 
+interface _CaseGroupPropertiesI extends Omit<CaseGroupProperties, "field" | "value" | "valueSrc" | "valueType" | "valueError"> {
+  field?: string | Empty; // todo: only "!case_value" ?
+  value?: ImmutableList<RuleValueI>;
+  valueSrc?: ImmutableList<ValueSource>;
+  valueType?: ImmutableList<string>;
+  valueError?: ImmutableList<string | Empty>;
+}
+
 // correct unions
 interface _RuleGroupExtPropertiesI extends Pick<RuleGroupExtProperties, "field" | "mode" | "conjunction" | "not">, Omit<_RulePropertiesI, "field"> {}
 interface _AnyRulePropertiesI extends Optional<_RulePropertiesI>, Optional<Pick<_RuleGroupExtPropertiesI, "mode" | "conjunction" | "not">> {}
 interface _ItemPropertiesI extends _AnyRulePropertiesI, Optional<Pick<GroupProperties, "conjunction" | "not">> {}
-interface _ItemOrCasePropertiesI extends _ItemPropertiesI, Optional<CaseGroupProperties> {}
+interface _ItemOrCasePropertiesI extends Omit<_ItemPropertiesI, "field">, Optional<_CaseGroupPropertiesI> {}
 interface _GroupOrSwitchPropertiesI extends Optional<GroupProperties>, Optional<SwitchGroupProperties> {}
 
 export interface BasicItemPropertiesI<P = BasicItemProperties> extends ObjectToImmOMap<P> {}
@@ -276,7 +290,7 @@ export interface OldJsonSwitchGroup extends JsonBasicItem {
 }
 export interface OldJsonCaseGroup extends JsonBasicItem {
   type: "case_group";
-  children1?: {[id: string]: OldJsonGroup} | OldJsonGroup[];
+  children1?: {[id: string]: OldJsonItem} | OldJsonItem[];
   properties?: CaseGroupProperties;
 }
 export interface OldJsonGroup extends JsonBasicItem {
@@ -304,7 +318,7 @@ export interface JsonSwitchGroup extends OldJsonSwitchGroup {
   children1?: JsonCaseGroup[];
 }
 export interface JsonCaseGroup extends OldJsonCaseGroup {
-  children1?: JsonGroup[];
+  children1?: JsonItem[];
 }
 export interface JsonGroup extends OldJsonGroup {
   children1?: JsonItem[];
@@ -396,6 +410,9 @@ export interface ImmutableTree<P = _TreeI> extends ImmutableBasicItem<P> {}
 // Utils
 /////////////////
 
+/**
+ * @deprecated
+ */
 export interface SpelConcatPart {
   value: string;
   type: "property" | "variable" | "const";
@@ -475,9 +492,13 @@ interface Import {
   getTree(tree: ImmutableTree, light: boolean, children1AsArray: false): OldJsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
   loadTree(jsonTree: OldJsonTree): ImmutableTree;
-  // @deprecated Use Utils.sanitizeTree() instead
+  /**
+   * @deprecated Use Utils.sanitizeTree() instead
+   */
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
-  // @deprecated Use Utils.Validation.isValidTree()
+  /**
+   * @deprecated Use Utils.Validation.isValidTree()
+   */
   isValidTree(tree: ImmutableTree, config: Config): boolean;
   isImmutableTree(tree: any): boolean;
   isTree(tree: any): boolean; // is JsonTree ?
@@ -491,7 +512,9 @@ interface Import {
 }
 interface Export {
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
-  // @deprecated
+  /**
+   * @deprecated
+   */
   queryBuilderFormat(tree: ImmutableTree, config: Config): Object | undefined;
   queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean, isDebugMode?: boolean): string | undefined;
   sqlFormat(tree: ImmutableTree, config: Config): string | undefined;
@@ -526,8 +549,13 @@ interface ConfigUtils {
 }
 interface ExportUtils {
   spelEscape(val: any): string;
+  /**
+   * @deprecated
+   */
   spelFormatConcat(parts: SpelConcatParts): string;
-  jsonLogicFormatConcat(parts: SpelConcatParts): any;
+  /**
+   * @deprecated
+   */
   spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>];
 }
 interface ListUtils {
@@ -551,11 +579,13 @@ interface TreeUtils {
   getFlatTree(tree: ImmutableTree): FlatTree;
   getTotalReordableNodesCountInTree(tree: ImmutableTree): number;
   getTotalRulesCountInTree(tree: ImmutableTree): number;
-  // @deprecated
+  /**
+   * @deprecated
+   */
   getTreeBadFields(tree: ImmutableTree, config: Config): Array<FieldPath>;
   isEmptyTree(tree: ImmutableTree): boolean;
   // case mode
-  getSwitchValues(tree: ImmutableTree): Array<SpelConcatParts | null>;
+  getSwitchValues(tree: ImmutableTree): Array<any | null>;
 }
 interface OtherUtils {
   uuid(): string;
@@ -776,6 +806,9 @@ export type SelectWidgetProps<C = Config> = BaseWidgetProps<C, string | number> 
 export type MultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & MultiSelectFieldSettings;
 export type TreeSelectWidgetProps<C = Config> = BaseWidgetProps<C, string | number> & TreeSelectFieldSettings;
 export type TreeMultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & TreeMultiSelectFieldSettings;
+/**
+ * @deprecated
+ */
 export type CaseValueWidgetProps<C = Config> = BaseWidgetProps<C> & CaseValueFieldSettings;
 
 
@@ -825,6 +858,7 @@ export interface FieldProps<C = Config> {
 /////////////////
 
 type SpelImportValue = (val: any, wgtDef?: Widget, args?: TypedMap<any>) => [any, string[] | string | undefined];
+type JsonLogicImportValue = (val: any, wgtDef?: Widget, args?: TypedMap<any>) => any | undefined; // can throw
 
 type FormatValue =                  (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type SqlFormatValue =               (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
@@ -853,6 +887,7 @@ export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   hideOperator?: boolean;
   operatorInlineLabel?: string;
   jsonLogic?: JsonLogicFormatValue | SerializedFunction;
+  jsonLogicImport?: JsonLogicImportValue | SerializedFunction;
   //obsolete:
   validateValue?: ValidateValue | SerializedFunction;
   //@ui
@@ -891,6 +926,9 @@ export type SelectWidget<C = Config, WP = SelectWidgetProps<C>> = BaseWidget<C, 
 export type MultiSelectWidget<C = Config, WP = MultiSelectWidgetProps<C>> = BaseWidget<C, WP> & MultiSelectFieldSettings;
 export type TreeSelectWidget<C = Config, WP = TreeSelectWidgetProps<C>> = BaseWidget<C, WP> & TreeSelectFieldSettings;
 export type TreeMultiSelectWidget<C = Config, WP = TreeMultiSelectWidgetProps<C>> = BaseWidget<C, WP> & TreeMultiSelectFieldSettings;
+/**
+ * @deprecated
+ */
 export type CaseValueWidget<C = Config, WP = CaseValueWidgetProps<C>> = BaseWidget<C, WP> & CaseValueFieldSettings;
 
 // tip: use generic WidgetProps here, TS can't determine correct factory
@@ -1141,6 +1179,9 @@ export interface BooleanFieldSettings<V = boolean> extends BasicFieldSettings<V>
   labelYes?: RenderedReactElement;
   labelNo?: RenderedReactElement;
 }
+/**
+ * @deprecated
+ */
 export interface CaseValueFieldSettings<V = any> extends BasicFieldSettings<V> {
 }
 // tip: use RuleValue here, TS can't determine correct types in `validateValue`
@@ -1338,6 +1379,7 @@ export interface BehaviourSettings {
 }
 
 export interface OtherSettings {
+  caseValueField?: Field;
   fieldSeparator?: string;
   fieldSeparatorDisplay?: string;
   formatReverse?: FormatReverse | SerializedFunction;
@@ -1360,7 +1402,7 @@ type SqlFormatFunc = (formattedArgs: TypedMap<string>) => string;
 type FormatFunc = (formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
 type MongoFormatFunc = (formattedArgs: TypedMap<MongoValue>) => MongoValue;
 type JsonLogicFormatFunc = (formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
-type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
+type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue> | undefined; // can throw
 type SpelImportFunc = (spel: SpelRawValue) => Array<RuleValue>;
 type SpelFormatFunc = (formattedArgs: TypedMap<string>) => string;
 
@@ -1453,6 +1495,9 @@ export interface CoreWidgets<C = Config> extends Widgets<C> {
   boolean: BooleanWidget<C>;
   field: FieldWidget<C>;
   func: FuncWidget<C>;
+  /**
+   * @deprecated
+   */
   case_value: CaseValueWidget<C>;
 }
 

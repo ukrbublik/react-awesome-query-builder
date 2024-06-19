@@ -1483,6 +1483,24 @@ export const spel_with_cases = "(str == '222' ? is_string : (num == 4 ? is_numbe
 export const spel_with_cases_simple = "(str == '222' ? foo : bar)";
 export const spel_with_cases_and_concat = "(str == '222' ? foo : foo + bar)";
 
+export const with_cases = {"if": [
+  {"==":[{"var":"str"},"222"]},
+  "is_string",
+  {"if": [
+    {"==":[{"var":"num"},4]},
+    "is_number",
+    "unknown"
+  ]}
+]};
+
+export const with_cases_simple = {
+  "if": [
+    {"==": [{"var": "str"}, "222"]},
+    "foo",
+    "bar"
+  ]
+};
+
 export const spel_with_lhs_toLowerCase = "str.toLowerCase().startsWith('aaa')";
 export const spel_with_lhs_toLowerCase_toUpperCase = "str.toLowerCase().toUpperCase() == str.toUpperCase()";
 //export const spel_with_new_Date = "datetime == new java.util.Date()";

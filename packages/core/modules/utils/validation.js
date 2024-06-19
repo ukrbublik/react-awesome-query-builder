@@ -313,10 +313,12 @@ export const _validateTree = (
               str: errorItem.itemPositionStr
             });
           }
-          errorItem.itemPositionStr = translateValidation(constants.ITEM_POSITION_WITH_INDEX_PATH, {
-            ...trArgs,
-            str: errorItem.itemPositionStr
-          });
+          if (flatItem.type !== "case_group") {
+            errorItem.itemPositionStr = translateValidation(constants.ITEM_POSITION_WITH_INDEX_PATH, {
+              ...trArgs,
+              str: errorItem.itemPositionStr
+            });
+          }
         }
       }
     }
@@ -400,6 +402,7 @@ function validateGroup (item, path, itemId, meta, c) {
   // tip: for group operators some/none/all children ARE required, for group operator count children are NOT required
   // tip: default case should contain only value
   const childrenAreRequired = isCase ? !isDefaultCase : (isGroupExt ? cardinality == 0 : true);
+  const canHaveValue = isGroupExt || isCase;
 
   if (!id && itemId) {
     id = itemId;
@@ -407,7 +410,7 @@ function validateGroup (item, path, itemId, meta, c) {
     meta.sanitized = true;
   }
 
-  if (isGroupExt) {
+  if (canHaveValue) {
     item = validateRule(item, path, itemId, meta, c);
   }
 
@@ -468,17 +471,26 @@ function validateRule (item, path, itemId, meta, c) {
   const canFix = !showErrorMessage || forceFix;
   const origItem = item;
   let id = item.get("id");
+  const type = item.get("type");
+  const isCase = type === "case_group";
   let properties = item.get("properties");
   if (!properties) {
-    const err = {
-      key: constants.INCOMPLETE_RULE,
-      args: {},
-      fixed: removeIncompleteRules || removeEmptyRules
-    };
-    _addError(meta, item, path, err);
-    return undefined;
+    if (isCase) {
+      properties = new Immutable.Map();
+    } else {
+      const err = {
+        key: constants.INCOMPLETE_RULE,
+        args: {},
+        fixed: removeIncompleteRules || removeEmptyRules
+      };
+      _addError(meta, item, path, err);
+      return undefined;
+    }
   }
   let field = properties.get("field") || null;
+  if (isCase) {
+    field = "!case_value";
+  }
   let fieldSrc = properties.get("fieldSrc") || null;
   let operator = properties.get("operator") || null;
   let operatorOptions = properties.get("operatorOptions");
@@ -520,13 +532,13 @@ function validateRule (item, path, itemId, meta, c) {
     });
     field = null;
   }
-  if (field == null) {
+  if (field == null && !isCase) {
     properties = [
       "operator", "operatorOptions", "valueSrc", "value", "valueError", "fieldError", "field"
     ].reduce((map, key) => map.delete(key), properties);
     operator = null;
   }
-  if (!fieldSrc) {
+  if (!fieldSrc && field && !isCase) {
     fieldSrc = getFieldSrc(field);
     properties = properties.set("fieldSrc", fieldSrc);
   }
@@ -553,7 +565,7 @@ function validateRule (item, path, itemId, meta, c) {
     operator = null;
   }
   const availOps = field ? getOperatorsForField(config, field) : [];
-  if (field) {
+  if (field && !isCase) {
     if (!availOps?.length) {
       _addError(meta, item, path, {
         key: constants.UNSUPPORTED_FIELD_TYPE,
@@ -583,7 +595,7 @@ function validateRule (item, path, itemId, meta, c) {
       }
     }
   }
-  if (operator == null) {
+  if (operator == null && !isCase) {
     // do not unset operator ?
     properties = [
       "operatorOptions", "valueSrc", "value", "valueError"
@@ -629,7 +641,7 @@ function validateRule (item, path, itemId, meta, c) {
   const newSerialized = serializeRule();
   const hasBeenSanitized = !deepEqual(oldSerialized, newSerialized);
   const compl = whatRulePropertiesAreCompleted(properties.toObject(), config);
-  const isCompleted = compl.score >= 3;
+  const isCompleted = isCase ? compl.parts.value : compl.score >= 3;
   if (hasBeenSanitized) {
     meta.sanitized = true;
     item = item.set("properties", properties);
@@ -638,38 +650,42 @@ function validateRule (item, path, itemId, meta, c) {
     _addError(meta, item, path, e)
   );
   if (!isCompleted) {
-    let shoudlRemoveRule = !compl.score ? removeEmptyRules : removeIncompleteRules;
-    // if (shoudlRemoveRule && showErrorMessage) {
-    //   // try to be not so rude about removing incomplete rule with functions
-    //   const complLite = whatRulePropertiesAreCompleted(properties.toObject(), config, true);
-    //   const isCompletedLite = complLite.score >= 3;
-    //   if (isCompletedLite) {
-    //     shoudlRemoveRule = false;
-    //   }
-    // }
-    let incError = { key: constants.INCOMPLETE_RULE, args: {} };
-    if (!compl.parts.field) {
-      incError.key = constants.INCOMPLETE_LHS;
-      incError.side = "lhs";
-    } else if(!compl.parts.value) {
-      incError.key = constants.INCOMPLETE_RHS;
-      incError.side = "rhs";
-      if (
-        newSerialized.valueSrc?.[0] && newSerialized.valueSrc?.[0] != oldSerialized.valueSrc?.[0]
-        && newSerialized.value?.[0] != undefined 
-      ) {
-        // eg. operator `starts_with` supports only valueSrc "value"
-        incError.key = constants.INVALID_VALUE_SRC;
-        incError.args = {
-          valueSrcs: newSerialized.valueSrc
-        };
+    if (isCase) {
+      // todo
+    } else {
+      let shoudlRemoveRule = !compl.score ? removeEmptyRules : removeIncompleteRules;
+      // if (shoudlRemoveRule && showErrorMessage) {
+      //   // try to be not so rude about removing incomplete rule with functions
+      //   const complLite = whatRulePropertiesAreCompleted(properties.toObject(), config, true);
+      //   const isCompletedLite = complLite.score >= 3;
+      //   if (isCompletedLite) {
+      //     shoudlRemoveRule = false;
+      //   }
+      // }
+      let incError = { key: constants.INCOMPLETE_RULE, args: {} };
+      if (!compl.parts.field) {
+        incError.key = constants.INCOMPLETE_LHS;
+        incError.side = "lhs";
+      } else if(!compl.parts.value) {
+        incError.key = constants.INCOMPLETE_RHS;
+        incError.side = "rhs";
+        if (
+          newSerialized.valueSrc?.[0] && newSerialized.valueSrc?.[0] != oldSerialized.valueSrc?.[0]
+          && newSerialized.value?.[0] != undefined 
+        ) {
+          // eg. operator `starts_with` supports only valueSrc "value"
+          incError.key = constants.INVALID_VALUE_SRC;
+          incError.args = {
+            valueSrcs: newSerialized.valueSrc
+          };
+        }
       }
-    }
-    incError.fixed = shoudlRemoveRule;
-    _addError(meta, item, path, incError);
-    if (shoudlRemoveRule) {
-      _setErrorsAsFixed(meta, item);
-      item = undefined;
+      incError.fixed = shoudlRemoveRule;
+      _addError(meta, item, path, incError);
+      if (shoudlRemoveRule) {
+        _setErrorsAsFixed(meta, item);
+        item = undefined;
+      }
     }
   }
 
@@ -862,7 +878,8 @@ const validateNormalValue = (field, value, valueSrc, valueType, asyncListValues,
     if (fieldSettings) {
       // validate against list of values
       const realListValues = asyncListValues || listValues;
-      if (realListValues && !fieldSettings.allowCustomValues) {
+      // tip: "case_value" is deprecated, don't apply validation based on listValues
+      if (realListValues && !fieldSettings.allowCustomValues && w !== "case_value") {
         [fixedValue, allErrors] = validateValueInList(
           value, realListValues, canFix, isEndValue, config.settings.removeInvalidMultiSelectValuesOnLoad
         );
@@ -1127,7 +1144,11 @@ export const getNewValueForFieldOp = function (
   const {
     keepInputOnChangeFieldSrc, convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp,
   } = config.settings;
-  const currentField = current.get("field");
+  const isCase = newField == "!case_value";
+  let currentField = current.get("field");
+  if (!currentField && isCase) {
+    currentField = newField;
+  }
   const currentFieldType = current.get("fieldType");
   const currentFieldSrc = current.get("fieldSrc");
   const currentOperator = current.get("operator");
@@ -1137,10 +1158,11 @@ export const getNewValueForFieldOp = function (
   const currentValueError = current.get("valueError", new Immutable.List());
   const asyncListValues = current.get("asyncListValues");
 
+  const isOkWithoutOperator = isCase;
   const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator);
   const newOperatorConfig = getOperatorConfig(config, newOperator, newField);
-  const currentOperatorCardinality = currentOperator ? getOpCardinality(currentOperatorConfig) : null;
-  const operatorCardinality = newOperator ? getOpCardinality(newOperatorConfig) : null;
+  const currentOperatorCardinality = isCase ? 1 : currentOperator ? getOpCardinality(currentOperatorConfig) : null;
+  const operatorCardinality = isCase ? 1 : newOperator ? getOpCardinality(newOperatorConfig) : null;
   const currentFieldConfig = getFieldConfig(oldConfig, currentField);
   const newFieldConfig = getFieldConfig(config, newField);
   const isOkWithoutField = !currentField && currentFieldType && keepInputOnChangeFieldSrc;
@@ -1154,7 +1176,9 @@ export const getNewValueForFieldOp = function (
 
   let validationErrors = [];
 
-  let canReuseValue = (currentField || isOkWithoutField) && currentOperator && newOperator && currentValue != undefined;
+  let canReuseValue = (currentField || isOkWithoutField)
+    && (currentOperator && newOperator || isOkWithoutOperator)
+    && currentValue != undefined;
   if (
     !(currentType && newType && currentType == newType)
     || changedProp === "field" && hasFieldChanged && clearValueOnChangeField
@@ -1170,7 +1194,7 @@ export const getNewValueForFieldOp = function (
       canReuseValue = false;
     }
   }
-  if (!currentValue?.size && operatorCardinality || currentValue?.size && !operatorCardinality) {
+  if (!isOkWithoutOperator && (!currentValue?.size && operatorCardinality || currentValue?.size && !operatorCardinality)) {
     canReuseValue = false;
   }
 

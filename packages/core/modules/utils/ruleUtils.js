@@ -223,6 +223,7 @@ export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) =
     // todo: aggregation can be not only number?
     fieldType = "number";
   }
+  // const { _isCaseValue } = fieldDefinition;
   if (!valueSrcs)
     valueSrcs = Object.keys(config.settings.valueSourcesInfo);
   return valueSrcs.filter(vs => {
@@ -235,10 +236,12 @@ export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) =
       }
     }
     if (vs === "func") {
-      if (config.__funcsCntByType)
-        canAdd = canAdd && !!config.__funcsCntByType[fieldType];
-      if (fieldDefinition.funcs)
+      if (fieldDefinition.funcs) {
         canAdd = canAdd && fieldDefinition.funcs.length > 0;
+      }
+      if (config.__funcsCntByType) {
+        canAdd = canAdd && config.__funcsCntByType[fieldType] > 0;
+      }
     }
     return canAdd;
   });

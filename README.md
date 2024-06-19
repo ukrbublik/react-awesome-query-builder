@@ -48,6 +48,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [Config format](#config-format)
   * [Validation](#validation)
 * [i18n](#i18n)
+* [Ternary mode](#ternary-mode)
 * [SSR](#ssr)
   * [ctx](#ctx)
 * [Versions](#versions)
@@ -67,33 +68,23 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
 
 ### Features
 [![Screenshot](https://user-images.githubusercontent.com/3238637/209590656-f32497be-6b74-4837-8414-4f44d78215ae.png)](https://ukrbublik.github.io/react-awesome-query-builder)
-- Highly configurable
-- Fields can be of type:
-  - simple (string, number, bool, date/time/datetime, list)
-  - structs (will be displayed in selectbox as tree)
-  - custom type (dev should add its own widget component in config for this)
-- Comparison operators can be:
-  - binary (== != < > ..)
-  - unary (is empty, is null)
-  - 'between' (for numbers, dates, times)
-  - complex operators like 'proximity'
-- RHS can be:
-  - values
-  - another fields (of same type)
-  - functions (arguments also can be values/fields/funcs)
-- LHS can be field or function
-- Reordering (drag-n-drop) support for rules and groups of rules
-- Themes:
-  - [Ant Design](https://ant.design/)
-  - [Material-UI](https://mui.com/)
-  - [Bootstrap](https://reactstrap.github.io/)
-  - [Fluent UI](https://developer.microsoft.com/en-us/fluentui)
-  - vanilla
-  (Using another UI framework and custom widgets is possible, see below)
-- Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
-- Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)
-- TypeScript support (see [types](/packages/core/modules/index.d.ts) and [demo in TS](/packages/examples))
-- Query value and config can be saved/loaded from server
+
+* Highly configurable.
+  You can configure fields, types, operators, functions, widgets, behavior settings etc.
+* Fields can have simple type (string, number, bool, date/time, list), custom or complex (structs, arrays)
+* Aggregation is supported (query like "COUNT OF users WHERE (role == 'Manager' AND department == 'Development') > 5")
+* Fields can be compared with other fields
+* Comparison operators can be: binary (== != < >), unary ('is null'), 'between' or complex operators like 'proximity'
+* Functions are supported in both LHS and RHS.
+  Functions nesting is supported (function argument can be a function)
+* [Ternary mode](#ternary-mode) (if-then-else)
+* Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
+* Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)
+* Reordering (drag-n-drop) support for rules and groups of rules
+* Query value and config can be saved/loaded from server
+* Themes: [Ant Design](https://ant.design/), [Material-UI](https://mui.com/), [Bootstrap](https://reactstrap.github.io/), [Fluent UI](https://developer.microsoft.com/en-us/fluentui), vanilla
+  It is possible to use another UI framework of your choice, see [how-to](/CONTRIBUTING.md#other-ui-frameworks)
+* TypeScript support (see [types](/packages/core/modules/index.d.ts) and [demo in TS](/packages/examples))
 
 
 ## Getting started
@@ -627,6 +618,51 @@ const config = {
 ```
 
 See [example](/packages/examples/demo/index.tsx).
+
+
+## Ternary mode
+
+First you need to configure `caseValueField` in `config.settings`. Example to use tags as case values:
+```js
+const config: Config = {
+  ...InitialConfig,
+  fields,
+  settings: {
+    ...InitialConfig.settings,
+    caseValueField: {
+      type: "select",
+      valueSources: ["value"],
+      fieldSettings: {
+        listValues: [
+          { value: "tag1", title: "Tag #1" },
+          { value: "tag2", title: "Tag #2" },
+        ],
+      },
+      mainWidgetProps: {
+        valueLabel: "Then",
+        valuePlaceholder: "Then",
+      },
+    },
+    canRegroupCases: true,
+    maxNumberOfCases: 10,
+  }
+};
+```
+
+You can use other type/widget (including your custom one) to render case values.  
+Also you can use function (action) by specifying `valueSources: ["func"]` in `caseValueField`. 
+You have to add [funcs](/CONFIG.adoc#configfuncs) to the config (with `returnType` equals `type` in case value field).
+
+Load empty tree in ternary mode:
+```js
+import { Utils as QbUtils, JsonSwitchGroup } from '@react-awesome-query-builder/ui';
+const emptyJson: JsonSwitchGroup = { id: QbUtils.uuid(), type: "switch_group", };
+const tree = QbUtils.loadTree(emptyJson);
+```
+
+See [example](/packages/examples/demo_switch/index.tsx)
+
+![Screenshot](https://github.com/ukrbublik/react-awesome-query-builder/assets/3238637/4bf87da5-47f2-4a64-b1be-8924a62f96ad)
 
 
 ## SSR

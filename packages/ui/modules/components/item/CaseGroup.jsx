@@ -5,7 +5,7 @@ import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
 import {GroupActions} from "./GroupActions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
-import {Col, dummyFn, WithConfirmFn} from "../utils";
+import {Col, dummyFn, WithConfirmFn, getRenderFromConfig} from "../utils";
 import Widget from "../rule/Widget";
 import classNames from "classnames";
 
@@ -23,7 +23,18 @@ class CaseGroup extends BasicGroup {
   }
 
   onPropsChanged(nextProps) {
+    const prevProps = this.props;
+    const configChanged = !this.renderBeforeCaseValue || prevProps?.config !== nextProps?.config;
+
     super.onPropsChanged(nextProps);
+
+    if (configChanged) {
+      const { config } = nextProps;
+      const { renderBeforeCaseValue, renderAfterCaseValue, renderRuleError } = config.settings;
+      this.BeforeCaseValue = getRenderFromConfig(config, renderBeforeCaseValue);
+      this.AfterCaseValue = getRenderFromConfig(config, renderAfterCaseValue);
+      this.RuleError = getRenderFromConfig(config, renderRuleError);
+    }
   }
 
   isDefaultCase() {
@@ -82,7 +93,9 @@ class CaseGroup extends BasicGroup {
     return (
       <div className={"case_group--body"}>
         {this.renderCondition()}
+        {this.renderBeforeValue()}
         {this.renderValue()}
+        {this.renderAfterValue()}
       </div>
     );
   }
@@ -97,6 +110,7 @@ class CaseGroup extends BasicGroup {
       <div className={"group--conjunctions"}>
         {this.renderConjs()}
         {this.renderDrag()}
+        {this.renderError()}
       </div>
     );
   }
@@ -108,10 +122,15 @@ class CaseGroup extends BasicGroup {
   }
 
   renderHeaderCenter() {
-    if (this.isDefaultCase())
-      return this.renderValue();
-    else
-      return null;
+    if (this.isDefaultCase()) {
+      return (
+        <div>
+          {this.renderValue()}
+          {this.renderError()}
+        </div>
+      );
+    }
+    return null;
   }
 
   canAddGroup() {
@@ -126,8 +145,39 @@ class CaseGroup extends BasicGroup {
     return super.canAddRule();
   }
 
+  renderBeforeValue() {
+    const BeforeCaseValue = this.BeforeCaseValue;
+    if (BeforeCaseValue == undefined)
+      return null;
+    return <BeforeCaseValue
+      key="values-before"
+      {...this.props}
+    />;
+  }
+
+  renderAfterValue() {
+    const AfterCaseValue = this.AfterCaseValue;
+    if (AfterCaseValue == undefined)
+      return null;
+    return <AfterCaseValue
+      key="values-after"
+      {...this.props}
+    />;
+  }
+
+  renderError() {
+    const {config, valueError} = this.props;
+    const { showErrorMessage } = config.settings;
+    const RuleError = this.RuleError;
+    const oneError = [...(valueError?.toArray() || [])].filter(e => !!e).shift() || null;
+    return showErrorMessage && oneError 
+      && <div className="rule--error">
+        {RuleError ? <RuleError error={oneError} /> : oneError}
+      </div>;
+  }
+
   renderValue() {
-    const { config, isLocked, value, setValue, id } = this.props;
+    const { config, isLocked, value, valueSrc, valueError, setValue, setValueSrc, setFuncValue, id } = this.props;
     const { immutableValuesMode } = config.settings;
 
     const widget = <Widget
@@ -136,12 +186,13 @@ class CaseGroup extends BasicGroup {
       field={"!case_value"}
       operator={null}
       value={value}
-      valueSrc={"value"}
-      valueError={null}
+      valueSrc={valueSrc ?? "value"}
+      valueError={valueError}
       fieldError={null}
       config={config}
       setValue={!immutableValuesMode ? setValue : dummyFn}
-      setValueSrc={dummyFn}
+      setValueSrc={!immutableValuesMode ? setValueSrc : dummyFn}
+      setFuncValue={!immutableValuesMode ? setFuncValue : dummyFn}
       readonly={immutableValuesMode || isLocked}
       id={id}
       groupId={null}

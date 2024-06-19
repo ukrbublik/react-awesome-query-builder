@@ -26,7 +26,9 @@ const createGroupContainer = (Group, itemType) =>
       fieldSrc: PropTypes.string, // for RuleGroup
       fieldType: PropTypes.string, // for RuleGroup
       parentField: PropTypes.string, //from RuleGroup
-      valueError: PropTypes.any, // for RuleGroup
+      value: PropTypes.any, // for RuleGroup, CaseGroup
+      valueSrc: PropTypes.any,
+      valueError: PropTypes.any,
       isLocked: PropTypes.bool,
       isTrueLocked: PropTypes.bool,
       //connected:
@@ -140,8 +142,13 @@ const createGroupContainer = (Group, itemType) =>
       this.props.actions.setOperator(this.props.path, operator);
     };
 
+    // for RuleGroupExt, CaseGroup
     setValue = (delta, value, type, asyncListValues, _meta) => {
       this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, _meta);
+    };
+
+    setValueSrc = (delta, srcKey, _meta) => {
+      this.props.actions.setValueSrc(this.props.path, delta, srcKey, _meta);
     };
 
     // can be used for both LHS and LHS
@@ -195,8 +202,10 @@ const createGroupContainer = (Group, itemType) =>
               setFuncValue={this.dummyFn}
               setOperator={this.dummyFn}
               setValue={this.dummyFn}
+              setValueSrc={this.dummyFn}
               value={this.props.value || null}
               valueError={this.props.valueError || null}
+              valueSrc={this.props.valueSrc || null}
               config={this.props.config}
               children1={this.props.children1}
               actions={this.props.actions}
@@ -236,8 +245,10 @@ const createGroupContainer = (Group, itemType) =>
               setFuncValue={isInDraggingTempo ? this.dummyFn : this.setFuncValue}
               setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
               setValue={isInDraggingTempo ? this.dummyFn : this.setValue}
+              setValueSrc={isInDraggingTempo ? this.dummyFn : this.setValueSrc}
               value={this.props.value || null}
               valueError={this.props.valueError || null}
+              valueSrc={this.props.valueSrc || null}
               config={this.props.config}
               children1={this.props.children1}
               actions={this.props.actions}
