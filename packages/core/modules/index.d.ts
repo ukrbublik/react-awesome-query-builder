@@ -149,7 +149,7 @@ export type RuleValueI = SimpleValue | FuncValueI | AnyValue;
 export type FieldPath = string;
 export interface FuncArgValue<V = unknown> {
   value: V;
-  valueSrc: ValueSource;
+  valueSrc?: ValueSource;
 }
 export type FuncArgValueI = ObjectToImmOMap<FuncArgValue<RuleValueI>>;
 export interface FuncValue {
