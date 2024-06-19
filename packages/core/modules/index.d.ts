@@ -227,7 +227,7 @@ export interface CaseGroupProperties extends BasicItemProperties {
   valueSrc?: Array<ValueSource>;
   valueType?: Array<string>;
   valueError?: Array<string | Empty>;
-  field?: "!case_value"; // todo
+  field?: string; // todo: only "!case_value" ?
 }
 
 //////
@@ -241,11 +241,19 @@ interface _RulePropertiesI extends Omit<RuleProperties, "field" | "value" | "val
   operatorOptions?: OperatorOptionsI;
 }
 
+interface _CaseGroupPropertiesI extends Omit<CaseGroupProperties, "field" | "value" | "valueSrc" | "valueType" | "valueError"> {
+  field?: string | Empty; // todo: only "!case_value" ?
+  value?: ImmutableList<RuleValueI>;
+  valueSrc?: ImmutableList<ValueSource>;
+  valueType?: ImmutableList<string>;
+  valueError?: ImmutableList<string | Empty>;
+}
+
 // correct unions
 interface _RuleGroupExtPropertiesI extends Pick<RuleGroupExtProperties, "field" | "mode" | "conjunction" | "not">, Omit<_RulePropertiesI, "field"> {}
 interface _AnyRulePropertiesI extends Optional<_RulePropertiesI>, Optional<Pick<_RuleGroupExtPropertiesI, "mode" | "conjunction" | "not">> {}
 interface _ItemPropertiesI extends _AnyRulePropertiesI, Optional<Pick<GroupProperties, "conjunction" | "not">> {}
-interface _ItemOrCasePropertiesI extends _ItemPropertiesI, Optional<CaseGroupProperties> {}
+interface _ItemOrCasePropertiesI extends Omit<_ItemPropertiesI, "field">, Optional<_CaseGroupPropertiesI> {}
 interface _GroupOrSwitchPropertiesI extends Optional<GroupProperties>, Optional<SwitchGroupProperties> {}
 
 export interface BasicItemPropertiesI<P = BasicItemProperties> extends ObjectToImmOMap<P> {}
