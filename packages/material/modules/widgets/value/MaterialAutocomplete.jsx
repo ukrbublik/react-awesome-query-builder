@@ -9,7 +9,7 @@ import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import { Hooks, Utils } from "@react-awesome-query-builder/ui";
+import { Hooks } from "@react-awesome-query-builder/ui";
 const { useListValuesAutocomplete } = Hooks;
 
 const nonCheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" style={{ marginRight: 10, marginTop: 4 }} />;
@@ -58,7 +58,7 @@ export default (props) => {
     uif: "mui"
   });
 
-  // setings
+  // settings
   const {defaultSelectWidth, defaultSearchWidth} = config.settings;
   const {width, ...rest} = customProps || {};
   let customInputProps = rest.input || {};
@@ -73,6 +73,10 @@ export default (props) => {
     minWidth: minWidth
   };
   const placeholder = !readonly ? aPlaceholder : "";
+
+  // For accessibility, always give the input field an aria-label
+  const ariaLabel = config.settings.fieldPlaceholder;
+
   const hasValue = selectedValue != null;
   // should be simple value to prevent re-render!s
   const value = hasValue ? selectedValue : (multiple ? emptyArray : null);
@@ -120,6 +124,7 @@ export default (props) => {
         inputProps={{
           ...params.inputProps,
           value,
+          "aria-label": ariaLabel,
         }}
         InputProps={{
           ...params.InputProps,
@@ -133,6 +138,7 @@ export default (props) => {
         }}
         disabled={readonly}
         placeholder={placeholder}
+        aria-label={placeholder}
         error={!!errorText}
         //onChange={onInputChange}
         {...customInputProps}

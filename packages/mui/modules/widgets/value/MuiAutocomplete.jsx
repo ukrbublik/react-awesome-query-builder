@@ -11,7 +11,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Tooltip from "@mui/material/Tooltip";
 import { Hooks } from "@react-awesome-query-builder/ui";
-import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 const { useListValuesAutocomplete } = Hooks;
 const emptyArray = [];
@@ -63,7 +62,7 @@ export default (props) => {
     isFieldAutocomplete,
   });
 
-  // setings
+  // settings
   const {defaultSelectWidth, defaultSearchWidth} = config.settings;
   const {width, ...rest} = customProps || {};
   let customInputProps = rest.input || {};
@@ -78,6 +77,10 @@ export default (props) => {
     minWidth: minWidth
   };
   const placeholder = !readonly ? aPlaceholder : "";
+
+  // For accessibility, always give the input field an aria-label
+  const ariaLabel = config.settings.fieldPlaceholder;
+
   const hasValue = selectedValue != null;
   // should be simple value to prevent re-render!s
   const value = hasValue ? selectedValue : (multiple ? emptyArray : null);
@@ -106,6 +109,7 @@ export default (props) => {
         inputProps={{
           ...params.inputProps,
           value,
+          "aria-label": ariaLabel,
         }}
         InputProps={{
           ...params.InputProps,

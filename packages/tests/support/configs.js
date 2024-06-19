@@ -1616,3 +1616,42 @@ export const with_no_delete_label = (BasicConfig) => ({
     deleteLabel: null,
   }
 });
+
+
+export const with_modified_field_placeholder = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    num: {
+      label: "Number",
+      type: "number",
+      preferWidgets: ["number"],
+      fieldSettings: {
+        min: -1,
+        max: 5
+      },
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+    fieldPlaceholder: "autocomplete placeholder",
+  }
+});
+
+export const with_no_field_placeholder = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    num: {
+      label: "Number",
+      type: "number",
+      preferWidgets: ["number"],
+      fieldSettings: {
+        min: -1,
+        max: 5
+      },
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+    fieldPlaceholder: null,
+  }
+});
