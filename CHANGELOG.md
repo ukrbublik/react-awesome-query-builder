@@ -10,6 +10,8 @@
   - Fixed validation error message for min/max (PR #1058) (issue #1057)
   - (Ternary mode) Added to `config.settings`: `caseValueField`, `renderBeforeCaseValue`, `renderAfterCaseValue`, `renderSwitchPrefix`, `defaultCaseLabel`, `addCaseLabel`, `addDefaultCaseLabel` (PR #1062)
   - Use icon button label as the aria-label to improve accessibility (PR #1066) (issue #1038)
+  - Show imported value initially in MUI autocomplete inputs (PR #1065)
+  - Make getOptionLabel always return a string (PR #1064)
 - 6.5.2
   - Updated dependencies. `@babel/runtime` is now dep for core package (PR #1051) (issue #964)
 - 6.5.1
