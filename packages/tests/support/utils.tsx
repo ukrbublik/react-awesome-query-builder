@@ -60,7 +60,7 @@ interface MockedConsole extends Console {
   __origConsole: Console;
   __consoleData: ConsoleData;
 }
-type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null;
+type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null | undefined;
 type TreeValue = JsonLogicTree | JsonTree | string | undefined;
 type ConfigFn = (_: Config) => Config;
 type ConfigFns = ConfigFn | ConfigFn[];
