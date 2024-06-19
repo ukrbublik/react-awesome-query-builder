@@ -223,7 +223,11 @@ export interface SwitchGroupProperties extends BasicItemProperties {
 }
 
 export interface CaseGroupProperties extends BasicItemProperties {
-  // todo: any properties here?
+  value?: Array<RuleValue>;
+  valueSrc?: Array<ValueSource>;
+  valueType?: Array<string>;
+  valueError?: Array<string | Empty>;
+  field?: "!case_value"; // todo
 }
 
 //////
@@ -278,7 +282,7 @@ export interface OldJsonSwitchGroup extends JsonBasicItem {
 }
 export interface OldJsonCaseGroup extends JsonBasicItem {
   type: "case_group";
-  children1?: {[id: string]: OldJsonGroup} | OldJsonGroup[];
+  children1?: {[id: string]: OldJsonItem} | OldJsonItem[];
   properties?: CaseGroupProperties;
 }
 export interface OldJsonGroup extends JsonBasicItem {
@@ -306,7 +310,7 @@ export interface JsonSwitchGroup extends OldJsonSwitchGroup {
   children1?: JsonCaseGroup[];
 }
 export interface JsonCaseGroup extends OldJsonCaseGroup {
-  children1?: JsonGroup[];
+  children1?: JsonItem[];
 }
 export interface JsonGroup extends OldJsonGroup {
   children1?: JsonItem[];

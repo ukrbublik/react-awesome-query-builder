@@ -154,8 +154,9 @@ export const spelImportConcat = (val) => {
   if (val == undefined)
     return [undefined, []];
   let errors = [];
-  const parts = val.valueType == "case_value" ? val.value : [val];
-  const res = parts.map(child => {
+  const value = val.valueType == "case_value" ? val.value : val;
+  const valueArr = Array.isArray(value) ? value : [value];
+  const res = valueArr.map(child => {
     if (child.valueSrc === "value") {
       if (child.value === null) {
         return undefined;

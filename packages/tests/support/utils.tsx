@@ -31,6 +31,7 @@ import { FluentUIConfig } from "@react-awesome-query-builder/fluent";
 let currentTestName: string;
 let currentTest: Mocha.Test;
 export const setCurrentTest = (test: Mocha.Test) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   currentTest = test;
 };
 export const setCurrentTestName = (name: string) => {
@@ -40,7 +41,12 @@ export const getCurrentTestName = () => {
   return currentTestName;
 };
 export const setCurrentTestTimeout = (ms: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   currentTest?.timeout?.(ms);
+};
+
+export const getIt = (options?: DoOptions) => {
+  return (options?.insideIt ? ((name: string, func: Function) => { func(); }) : it) as (name: string, func: Function) => void;
 };
 
 const ConsoleMethods = [
@@ -532,7 +538,7 @@ export const empty_value = {id: uuid(), type: "group"};
 // ----------- export checks
 
 const do_export_checks = async (config: Config, tree: ImmutableTree, expects?: ExtectedExports, options?: DoOptions) => {
-  const doIt = options?.insideIt ? ((name: string, func: Function) => { func(); }) : it;
+  const doIt = getIt(options);
 
   if (!expects || Object.values(expects).some(e => e === "?")) {
     const {logic, data, errors} = jsonLogicFormat(tree, config);
@@ -645,7 +651,7 @@ export const export_checks = (
 ) => {
   // tip: No need to make this func async (and wait for do_export_checks),
   //  because `export_checks` should be called only inside `decribe` (insideIt is expected to be false)
-  const doIt = options?.insideIt ? ((name: string, func: Function) => { func(); }) : it;
+  const doIt = getIt(options);
   const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
   const config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
 

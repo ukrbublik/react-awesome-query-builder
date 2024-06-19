@@ -475,13 +475,17 @@ function validateRule (item, path, itemId, meta, c) {
   const isCase = type === "case_group";
   let properties = item.get("properties");
   if (!properties) {
-    const err = {
-      key: constants.INCOMPLETE_RULE,
-      args: {},
-      fixed: removeIncompleteRules || removeEmptyRules
-    };
-    _addError(meta, item, path, err);
-    return undefined;
+    if (isCase) {
+      properties = new Immutable.Map();
+    } else {
+      const err = {
+        key: constants.INCOMPLETE_RULE,
+        args: {},
+        fixed: removeIncompleteRules || removeEmptyRules
+      };
+      _addError(meta, item, path, err);
+      return undefined;
+    }
   }
   let field = properties.get("field") || null;
   if (isCase) {
@@ -1140,8 +1144,11 @@ export const getNewValueForFieldOp = function (
   const {
     keepInputOnChangeFieldSrc, convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp,
   } = config.settings;
-  const currentField = current.get("field");
-  const isCase = currentField == "!case_value";
+  const isCase = newField == "!case_value";
+  let currentField = current.get("field");
+  if (!currentField && isCase) {
+    currentField = newField;
+  }
   const currentFieldType = current.get("fieldType");
   const currentFieldSrc = current.get("fieldSrc");
   const currentOperator = current.get("operator");

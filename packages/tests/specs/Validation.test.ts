@@ -1186,7 +1186,7 @@ describe("sanitizeTree", () => {
           const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(emptyCasesTree, config);
           expect(nonFixedErrors.length).eq(0);
           expect(fixedErrors).to.containSubsetInOrder([{
-            itemPositionStr: "Deleted case #1 (index path: 1)",
+            itemPositionStr: "Deleted case #1",
             errors: [{
               key: "EMPTY_CASE",
               fixed: true,
