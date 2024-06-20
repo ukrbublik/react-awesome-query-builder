@@ -119,7 +119,7 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   else
     resultQuery[conj] = list.toList().toJS();
 
-  // revert
+  // reverse
   if (not) {
     resultQuery = { "!": resultQuery };
   }

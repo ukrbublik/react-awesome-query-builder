@@ -179,3 +179,13 @@ export const spelImportConcat = (val) => {
 };
 
 export const stringifyForDisplay = (v) => (v == null ? "NULL" : v.toString());
+
+export const wrapWithBrackets = (v) => {
+  if (v == undefined)
+    return v;
+  if (v?.[0] === "(" && v?.[v?.length - 1] === ")") {
+    // already wrapped
+    return v;
+  }
+  return "(" + v + ")";
+};

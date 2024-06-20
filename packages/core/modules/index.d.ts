@@ -548,6 +548,7 @@ interface ConfigUtils {
   applyJsonLogic(logic: any, data?: any): any;
 }
 interface ExportUtils {
+  wrapWithBrackets(val: string): string;
   spelEscape(val: any): string;
   /**
    * @deprecated
@@ -1339,6 +1340,8 @@ export interface LocaleSettings {
 
 
 export interface BehaviourSettings {
+  reverseOperatorsForNot?: boolean;
+  canShortMongoQuery?: boolean;
   defaultField?: FieldValue | FieldValueI;
   defaultOperator?: string;
   fieldSources?: Array<FieldSource>;
@@ -1365,7 +1368,6 @@ export interface BehaviourSettings {
   maxNumberOfRules?: Number;
   maxNumberOfCases?: Number;
   showErrorMessage?: boolean;
-  canShortMongoQuery?: boolean;
   convertableWidgets?: TypedMap<Array<string>>;
   removeEmptyGroupsOnLoad?: boolean;
   removeEmptyRulesOnLoad?: boolean;

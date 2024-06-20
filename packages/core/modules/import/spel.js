@@ -483,9 +483,9 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
   }
 
   // between
-  let isBetweenNormal = (op == "and" && spel.children.length == 2 && spel.children[0].type == "op-ge" && spel.children[1].type == "op-le");
-  let isBetweenRev = (op == "or" && spel.children.length == 2 && spel.children[0].type == "op-lt" && spel.children[1].type == "op-gt");
-  let isBetween = isBetweenNormal || isBetweenRev;
+  const isBetweenNormal = (op == "and" && spel.children.length == 2 && spel.children[0].type == "op-ge" && spel.children[1].type == "op-le");
+  const isBetweenRev = (op == "or" && spel.children.length == 2 && spel.children[0].type == "op-lt" && spel.children[1].type == "op-gt");
+  const isBetween = isBetweenNormal || isBetweenRev;
   if (isBetween) {
     const [left, from] = spel.children[0].children;
     const [right, to] = spel.children[1].children;
@@ -596,17 +596,19 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
       }
     }
 
-    let canRev = true;
-    let needWrapReverse = false;
-    if (spel.not && canRev) {
-      const opConfig = config.operators[opKey];
-      if (opConfig.reversedOp) {
+    let opConfig = config.operators[opKey];
+    const reversedOpConfig = config.operators[opConfig?.reversedOp];
+    const opNeedsReverse = opConfig.reversedOp && reversedOpConfig
+      && !reversedOpConfig.spelOp && !!opConfig.spelOp || ["between"].includes(opKey);
+    const canRev = opConfig.reversedOp && (!!config.settings.reverseOperatorsForNot || opNeedsReverse);
+    if (spel.not) {
+      if (canRev) {
         opKey = opConfig.reversedOp;
+        opConfig = config.operators[opKey];
         spel.not = false;
-      } else {
-        needWrapReverse = true;
       }
     }
+    const needWrapReverse = !!spel.not;
     
     if (!fieldObj) {
       // LHS can't be parsed
@@ -1066,17 +1068,20 @@ const buildRule = (config, meta, field, opKey, convertedArgs, spel) => {
     return undefined;
   }
 
-  let canRev = true;
-  let needWrapReverse = false;
-  if (spel?.not && canRev) {
-    const opConfig = config.operators[opKey];
-    if (opConfig.reversedOp) {
+  let opConfig = config.operators[opKey];
+  const reversedOpConfig = config.operators[opConfig?.reversedOp];
+  const opNeedsReverse = opConfig.reversedOp && reversedOpConfig
+    && !reversedOpConfig.spelOp && !!opConfig.spelOp || ["between"].includes(opKey);  
+  const canRev = opConfig.reversedOp && (!!config.settings.reverseOperatorsForNot || opNeedsReverse);
+  if (spel?.not) {
+    if (canRev) {
+      // todo: should be already handled at convertOp ?  or there are special cases to handle here, like rule-group ?
       opKey = opConfig.reversedOp;
+      opConfig = config.operators[opKey];
       spel.not = false;
-    } else {
-      needWrapReverse = true;
     }
   }
+  const needWrapReverse = !!spel?.not;
 
   const widget = getWidgetForFieldOp(config, field, opKey);
   const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
@@ -1103,10 +1108,8 @@ const buildRule = (config, meta, field, opKey, convertedArgs, spel) => {
   };
 
   if (needWrapReverse) {
-    res = wrapInDefaultConj(res, config, spel?.not);
-    if (spel?.not) {
-      spel.not = false;
-    }
+    res = wrapInDefaultConj(res, config, spel.not);
+    // spel.not = !spel.not; // why I added this line?
   }
 
   return res;

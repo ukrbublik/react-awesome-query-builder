@@ -792,6 +792,30 @@ export const with_show_error = (BasicConfig) => ({
   }
 });
 
+export const with_reverse_operators = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    reverseOperatorsForNot: true,
+  }
+});
+
+export const with_short_mongo_query = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    canShortMongoQuery: true,
+  }
+});
+
+export const without_short_mongo_query = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    canShortMongoQuery: false,
+  }
+});
+
 export const with_dont_show_error = (BasicConfig) => ({
   ...BasicConfig,
   settings: {

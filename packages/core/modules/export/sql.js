@@ -74,7 +74,7 @@ const formatGroup = (item, config, meta) => {
     conjunction = defaultConjunction(config);
   const conjunctionDefinition = config.conjunctions[conjunction];
 
-  return conjunctionDefinition.sqlFormatConj(list, conjunction, not);
+  return conjunctionDefinition.sqlFormatConj.call(config.ctx, list, conjunction, not);
 };
 
 const buildFnToFormatOp = (operator, operatorDefinition) => {
@@ -188,7 +188,7 @@ const formatRule = (item, config, meta) => {
   let ret;
   ret = fn.call(config.ctx, ...args);
   if (isRev) {
-    ret = config.settings.sqlFormatReverse(ret);
+    ret = config.settings.sqlFormatReverse.call(config.ctx, ret);
   }
   if (ret === undefined) {
     meta.errors.push(`Operator ${operator} is not supported for value source ${valueSrcs.join(", ")}`);

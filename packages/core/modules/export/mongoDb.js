@@ -70,7 +70,10 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const mode = groupFieldDef.mode; //properties.get("mode");
   const canHaveEmptyChildren = groupField && mode === "array" && groupOperatorCardinality >= 1;
 
-  const not = _not ? !(properties.get("not")) : (properties.get("not"));
+  let not = !!properties.get("not");
+  if (_not) {
+    not = !not;
+  }
   const list = children
     .map((currentChild) => formatItem(
       [...parents, item], currentChild, config, meta, not, mode != "array", mode == "array" ? (f => `$$el${sep}${f}`) : undefined)
@@ -84,9 +87,11 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
     conjunction = defaultConjunction(config);
   let conjunctionDefinition = config.conjunctions[conjunction];
   const reversedConj = conjunctionDefinition.reversedConj;
-  if (not && reversedConj) {
+  const canRev = reversedConj && !!config.settings.reverseOperatorsForNot;
+  if (canRev && not) {
     conjunction = reversedConj;
     conjunctionDefinition = config.conjunctions[conjunction];
+    not = false;
   }
   if (!conjunctionDefinition)
     return undefined;
@@ -128,8 +133,10 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
         return acc;
       }, {});
     }
-    if (!resultQuery) // can't be shorten
+    if (!resultQuery) {
+      // can't be shorten
       resultQuery = { [mongoConj] : rules };
+    }
   }
 
   if (groupField) {
@@ -195,9 +202,10 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   let reversedOp = operatorDefinition.reversedOp;
   let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
   const cardinality = getOpCardinality(operatorDefinition);
+  const canRev = reversedOp && !!config.settings.reverseOperatorsForNot;
 
   let not = _not;
-  if (not && reversedOp) {
+  if (canRev && not) {
     [operator, reversedOp] = [reversedOp, operator];
     [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
     not = false;

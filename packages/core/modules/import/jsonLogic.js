@@ -112,14 +112,14 @@ const convertFromLogic = (logic, conv, config, expectedTypes, meta, not = false,
 
   const {lockedOp} = config.settings.jsonLogic;
   const isEmptyOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && conv.varKeys.includes(Object.keys(vals[0])[0]));
-  const isRev = op == "!" && !isEmptyOp;
+  const isNot = op == "!" && !isEmptyOp;
   const isLocked = lockedOp && op == lockedOp;
   const isSwitch = expectedTypes.includes("switch");
   const isRoot = isSwitch;
   if (isLocked) {
     ret = convertFromLogic(vals[0], conv, config, expectedTypes, meta, not, fieldConfig, widget, parentField, true);
-  } else if (isRev) {
-    // reverse with not
+  } else if (isNot) {
+    // apply not
     ret = convertFromLogic(vals[0], conv, config, expectedTypes, meta, !not, fieldConfig, widget, parentField);
   } else if(expectedTypes.includes("val")) {
     // not is not used here
@@ -557,7 +557,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
 //   return arr;
 // };
 
-const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj) => {
+const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj, not = false) => {
   if (!rule) return undefined;
   return {
     type: "rule_group",
@@ -565,7 +565,7 @@ const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config
     children1: { [rule.id]: rule },
     properties: {
       conjunction: conj || defaultGroupConjunction(config, parentFieldConfig),
-      not: false,
+      not: not,
       field: parentField,
     }
   };
@@ -667,7 +667,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta)
   };
 };
 
-const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
+const convertOp = (op, vals, conv, config, not, meta, parentField = null, parentFieldConfig = null) => {
   if (!op) return undefined;
 
   const arity = vals.length;
@@ -684,16 +684,27 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     }
   }
 
+  if (parentField && !parentFieldConfig) {
+    parentFieldConfig = getFieldConfig(config, parentField);
+  }
+
   const parseRes = parseRule(op, arity, vals, parentField, conv, config, meta);
   if (!parseRes) return undefined;
   let {field, fieldSrc, fieldConfig, opKey, args, having} = parseRes;
   let opConfig = config.operators[opKey];
+  const reversedOpConfig = config.operators[opConfig?.reversedOp];
+  const opNeedsReverse = opConfig.reversedOp && reversedOpConfig && !reversedOpConfig.jsonLogic && !!opConfig.jsonLogic;
 
   // Group component in array mode can show NOT checkbox, so do nothing in this case
-  // Otherwise try to revert
-  const showNot = fieldConfig?.showNot !== undefined ? fieldConfig.showNot : config.settings.showNot; 
-  let canRev = true;
-  // if (fieldConfig.type == "!group" && fieldConfig.mode == "array" && showNot)
+  // Otherwise try to reverse
+  const showNot = fieldConfig?.showNot !== undefined ? fieldConfig.showNot : config.settings.showNot;
+  const isGroupArray = fieldConfig.type == "!group" && fieldConfig.mode == "array";
+  let canRev = opConfig.reversedOp && (
+    !!config.settings.reverseOperatorsForNot
+    || opNeedsReverse
+    || isGroupArray && !having // !(count == 2)  ->  count != 2
+  );
+  // if (isGroupArray && showNot)
   //   canRev = false;
 
   let conj;
@@ -707,7 +718,10 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
 
     // Preprocess "!": Try to reverse op in single rule in having
     // Eg. use `not_equal` instead of `not` `equal`
-    const isEmptyOp = conj == "!" && (havingVals.length == 1 && havingVals[0] && isJsonLogic(havingVals[0]) && conv.varKeys.includes(Object.keys(havingVals[0])[0]));
+    const isEmptyOp = conj == "!" && (
+      havingVals.length == 1 && havingVals[0] && isJsonLogic(havingVals[0])
+      && conv.varKeys.includes(Object.keys(havingVals[0])[0])
+    );
     if (conj == "!" && !isEmptyOp) {
       havingNot = true;
       having = having["!"];
@@ -719,7 +733,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   }
 
   // Use reversed op
-  if (not && canRev && opConfig.reversedOp) {
+  if (not && canRev) {
     not = false;
     opKey = opConfig.reversedOp;
     opConfig = config.operators[opKey];
@@ -745,12 +759,14 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     if (conv.conjunctions[conj] !== undefined) {
       // group
       res = convertConj(conj, havingVals, conv, config, havingNot, meta, field, true);
-      havingNot = false;
     } else {
-      // need to be wrapped in `rule_group`
-      const rule = convertOp(conj, havingVals, conv, config, havingNot, meta, field);
-      havingNot = false;
-      res = wrapInDefaultConjRuleGroup(rule, field, fieldConfig, config, conv.conjunctions["and"]);
+      // rule, need to be wrapped in `rule_group`
+      // tip: `havingNot` should be handled in `convertOp` - eigther op reverse OR wrap in rule_group with not: true
+      res = convertOp(conj, havingVals, conv, config, havingNot, meta, field, fieldConfig);
+      if (res?.type === "rule") {
+        // if rulw was not wrapped in rule_group with not: true after `convertOp`, do it now
+        res = wrapInDefaultConjRuleGroup(res, field, fieldConfig, config, conv.conjunctions["and"]);
+      }
     }
     if (!res)
       return undefined;
@@ -769,6 +785,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       });
     }
     if (not) {
+      // todo: ??? why wrap? why not set prop????????
+      // res.properties.not = not;
       res = wrapInDefaultConj(res, config, not);
     }
   } else if (fieldConfig?.type == "!group" && !having) {
@@ -809,7 +827,11 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     };
     if (not) {
       //meta.errors.push(`No rev op for ${opKey}`);
-      res = wrapInDefaultConj(res, config, not);
+      if (parentFieldConfig?.type == "!group") {
+        res = wrapInDefaultConjRuleGroup(res, parentField, parentFieldConfig, config, conv.conjunctions["and"], not);
+      } else {
+        res = wrapInDefaultConj(res, config, not);
+      }
     }
   }
 

@@ -123,21 +123,68 @@ describe("query with conjunction", () => {
             }
           ]
         }
-      }
+      },
+      "spel": "!(num < 2 || login == 'ukrbublik')",
     });
+
+    describe("reverseOperatorsForNot == true", () => {
+      export_checks([configs.with_number_and_string, configs.with_reverse_operators], inits.with_not_number_and_string, "JsonLogic", {
+        // should be same
+        "spel": "!(num < 2 || login == 'ukrbublik')",
+      }, []);
+
+      describe("canShortMongoQuery == false", () => {
+        export_checks([configs.with_number_and_string, configs.without_short_mongo_query], inits.with_not_number_and_string, "JsonLogic", {
+          "spel": "!(num < 2 || login == 'ukrbublik')",
+          "mongo": {
+            "$or": [
+              {
+                "$not": {
+                  "num": {
+                    "$lt": 2
+                  }
+                }
+              },
+              {
+                "$not": {
+                  "login": "ukrbublik"
+                }
+              }
+            ]
+          }
+        }, []);
+      });
+    });
+
   });
 
   describe("should handle NOT with 1 rule", () => {
-    export_checks(configs.with_number_and_string, inits.spel_with_not, "SpEL", {
-      // will convert `!(num == 2)` to `num != 2`
-      spel: "num != 2"
+    describe("reverseOperatorsForNot == true", () => {
+      export_checks([configs.with_number_and_string, configs.with_reverse_operators], inits.spel_with_not, "SpEL", {
+        // will convert `!(num == 2)` to `num != 2`
+        spel: "num != 2"
+      });
+    });
+
+    describe("reverseOperatorsForNot == false", () => {
+      export_checks(configs.with_number_and_string, inits.spel_with_not, "SpEL", {
+        spel: "!(num == 2)"
+      });
     });
   });
 
   describe("should handle NOT with 1 rule inside NOT with 2 rules", () => {
-    export_checks(configs.with_number_and_string, inits.spel_with_not_not, "SpEL", {
-      // will convert `!(num == 3)` to `num != 3`
-      spel: "!(num == 2 || num != 3)"
+    describe("reverseOperatorsForNot == true", () => {
+      export_checks([configs.with_number_and_string, configs.with_reverse_operators], inits.spel_with_not_not, "SpEL", {
+        // will convert `!(num == 3)` to `num != 3`
+        spel: "!(num == 2 || num != 3)"
+      });
+    });
+
+    describe("reverseOperatorsForNot == false", () => {
+      export_checks([configs.with_number_and_string], inits.spel_with_not_not, "SpEL", {
+        spel: "!(num == 2 || !(num == 3))"
+      });
     });
   });
 

@@ -281,6 +281,8 @@ export default (skin: string) => {
     },
     fieldSources: ["field", "func"],
     keepInputOnChangeFieldSrc: true,
+    reverseOperatorsForNot: false,
+    canShortMongoQuery: true,
     // canReorder: true,
     // canRegroup: true,
     // showLock: true,

@@ -1,4 +1,6 @@
 export const settings = {
+  reverseOperatorsForNot: false,
+  canShortMongoQuery: true,
   formatField: (field, parts, label2, fieldDefinition, config, isForDisplay) => {
     if (isForDisplay)
       return label2;
@@ -22,7 +24,6 @@ export const settings = {
   canDeleteLocked: false,
   canLeaveEmptyGroup: true,
   shouldCreateEmptyGroup: false,
-  canShortMongoQuery: true,
   removeEmptyGroupsOnLoad: true,
   removeEmptyRulesOnLoad: true,
   removeIncompleteRulesOnLoad: false,
