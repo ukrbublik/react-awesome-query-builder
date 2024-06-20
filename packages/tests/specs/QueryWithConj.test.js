@@ -82,7 +82,7 @@ describe("query with conjunction", () => {
     });
   });
 
-  describe("should handle OR with 2 rules with NOT", () => {
+  describe("@todo should handle OR with 2 rules with NOT", () => {
     export_checks(configs.with_number_and_string, inits.with_not_number_and_string, "JsonLogic", {
       "query": "NOT (num < 2 || login == \"ukrbublik\")",
       "queryHuman": "NOT (Number < 2 OR login = ukrbublik)",
