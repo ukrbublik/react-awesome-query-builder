@@ -117,6 +117,16 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   let conjunctionDefinition = config.conjunctions[conjunction];
   if (!conjunctionDefinition)
     return undefined;
+  // rev conj
+  const reversedConj = conjunctionDefinition.reversedConj;
+  const canRev = not && conjunction?.toLowerCase() === "or" && reversedConj && !isRuleGroup && !!config.settings.canShortMongoQuery;
+  if (canRev) {
+    conjunction = reversedConj;
+    conjunctionDefinition = config.conjunctions[conjunction];
+    not = !not;
+    revChildren = true;
+  }
+
   const mongoConj = conjunctionDefinition.mongoConj;
 
   const list = children
