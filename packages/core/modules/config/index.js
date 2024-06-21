@@ -543,6 +543,7 @@ const operators = {
     jsonLogic: "some",
     spelFormatOp: (filteredSize) => `${filteredSize} > 0`,
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$gt", v => 0, false, ...args); },
+    // reversedOp: undefined,
   },
   all: {
     label: "All",
@@ -551,6 +552,7 @@ const operators = {
     jsonLogic: "all",
     spelFormatOp: (filteredSize, op, fullSize) => `${filteredSize} == ${fullSize}`,
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => v, false, ...args); },
+    // reversedOp: "none",
   },
   none: {
     label: "None",
@@ -559,6 +561,7 @@ const operators = {
     jsonLogic: "none",
     spelFormatOp: (filteredSize) => `${filteredSize} == 0`,
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => 0, false, ...args); },
+    // reversedOp: "all",
   }
 };
 

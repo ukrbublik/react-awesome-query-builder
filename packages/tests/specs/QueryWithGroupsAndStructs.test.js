@@ -165,7 +165,7 @@ describe("query with !group", () => {
     });
   });
 
-  describe("should handle select_not_any_in in some (when group mode is array)", () => {
+  describe("@todo should handle select_not_any_in in some (when group mode is array)", () => {
     describe("from JL", () => {
       export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_select_not_any_in_in_some, "JsonLogic", {
         "logic": inits.with_select_not_any_in_in_some,
@@ -181,7 +181,7 @@ describe("query with !group", () => {
     });
   });
 
-  describe("should handle not and in some (when group mode is array)", () => {
+  describe("@todo should handle not and in some (when group mode is array)", () => {
     export_checks(configs.with_group_array_cars, inits.with_not_and_in_some, "JsonLogic", {
       "logic": inits.with_not_and_in_some,
       "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
@@ -222,7 +222,7 @@ describe("query with !group", () => {
       describe("from JL", () => {
         export_checks([configs.with_group_array_cars], inits.with_not_group_count, "JsonLogic", {
           // will convert not == to !=
-          // todo: why?
+          // because of line ` || isGroupArray && !having` (see `canRev = ..` and comment // !(count == 2)  ->  count != 2`
           "logic": inits.with_not_group_count_out,
           "query": "COUNT OF cars != 2"
         });
@@ -257,21 +257,44 @@ describe("query with !group", () => {
   });
 
   describe("@todo should handle not aggregate + not filter (when group mode is array)", () => {
-    export_checks(configs.with_group_array_cars, inits.with_not_group_not_filter, "JsonLogic", {
-      // will convert `not ==` to `!=` inside group filter, but not for group conj
-      // todo: why?
-      "logic": inits.with_not_group_not_filter_out,
-      "query": "NOT (COUNT OF cars WHERE vendor != \"Toyota\" == 6)"
+    describe("reverseOperatorsForNot == false", () => {
+      // will remain
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars], inits.with_not_group_not_filter, "JsonLogic", {
+          "logic": inits.with_not_group_not_filter,
+          "query": "NOT (COUNT OF cars WHERE NOT (vendor == \"Toyota\") == 6)"
+        });
+      });
+
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars], inits.spel_with_not_group_not_filter, "SpEL", {
+          "spel": inits.spel_with_not_group_not_filter,
+          "query": "NOT (COUNT OF cars WHERE NOT (vendor == \"Toyota\") == 6)"
+        });
+      });
     });
 
-    export_checks(configs.with_group_array_cars, inits.spel_with_not_group_not_filter, "SpEL", {
-      // will convert both `not ==` to `!=`
-      "spel": inits.spel_with_not_group_not_filter_out,
-      "query": "COUNT OF cars WHERE vendor != \"Toyota\" != 6"
+    describe("reverseOperatorsForNot == true", () => {
+      // will convert
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_group_not_filter, "JsonLogic", {
+          // will convert `not ==` to `!=` inside group filter, but not for group conj
+          "logic": inits.with_not_group_not_filter_out,
+          "query": "NOT (COUNT OF cars WHERE vendor != \"Toyota\" == 6)"
+        });
+      });
+
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.spel_with_not_group_not_filter, "SpEL", {
+          // will convert both `not ==` to `!=`
+          "spel": inits.spel_with_not_group_not_filter_out,
+          "query": "COUNT OF cars WHERE vendor != \"Toyota\" != 6"
+        });
+      });
     });
   });
 
-  describe("should handle not is_null in not some (when group mode is array)", () => {
+  describe("@todo should handle not is_null in not some (when group mode is array)", () => {
     describe("reverseOperatorsForNot == false", () => {
       // should preserve
       describe("from JL", () => {
@@ -325,7 +348,7 @@ describe("query with !group", () => {
     });
   });
 
-  describe("should handle not contains in not some (when group mode is array)", () => {
+  describe("@todo should handle not contains in not some (when group mode is array)", () => {
     export_checks(configs.with_group_array, inits.spel_with_not_some_not_contains, "SpEL", {
       "spel": inits.spel_with_not_some_not_contains_out, // same
       "query": "NOT (SOME OF results HAVE grade Not Contains \"Toy\")"

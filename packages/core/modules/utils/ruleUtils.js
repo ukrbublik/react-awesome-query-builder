@@ -451,3 +451,17 @@ export const completeValue = (value, valueSrc, config) => {
   else
     return value;
 };
+
+// item - Immutable
+export const getOneChildOrDescendant = (item) => {
+  const children = item.get("children1");
+  if (children?.size == 1) {
+    const child = children.first();
+    const childType = child.get("type");
+    if (childType === "group") {
+      return getOneChildOrDescendant(child);
+    }
+    return child;
+  }
+  return null;
+};

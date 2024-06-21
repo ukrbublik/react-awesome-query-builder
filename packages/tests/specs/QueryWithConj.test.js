@@ -135,7 +135,7 @@ describe("query with conjunction", () => {
       });
     });
 
-    describe("reverseOperatorsForNot == true and canShortMongoQuery == true", () => {
+    describe("@todo reverseOperatorsForNot == true and canShortMongoQuery == true", () => {
       export_checks([configs.with_number_and_string, configs.with_reverse_operators, configs.with_short_mongo_query], inits.with_not_number_and_string, "JsonLogic", {
         // should be same
         "spel": "!(num < 2 || login == 'ukrbublik')",
@@ -153,9 +153,11 @@ describe("query with conjunction", () => {
         // should be simplified
         "mongo": {
           "num": {
-            "$lt": 2
+            "$gte": 2
           },
-          "login": "ukrbublik"
+          "login": {
+            "$ne": "ukrbublik"
+          },
         },
       }, []);
 

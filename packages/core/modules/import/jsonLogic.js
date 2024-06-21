@@ -691,9 +691,10 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, parent
   const parseRes = parseRule(op, arity, vals, parentField, conv, config, meta);
   if (!parseRes) return undefined;
   let {field, fieldSrc, fieldConfig, opKey, args, having} = parseRes;
+
   let opConfig = config.operators[opKey];
   const reversedOpConfig = config.operators[opConfig?.reversedOp];
-  const opNeedsReverse = opConfig.reversedOp && reversedOpConfig && !reversedOpConfig.jsonLogic && !!opConfig.jsonLogic;
+  const opNeedsReverse = !opConfig.jsonLogic && !!reversedOpConfig?.jsonLogic;
 
   // Group component in array mode can show NOT checkbox, so do nothing in this case
   // Otherwise try to reverse
@@ -706,6 +707,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, parent
   );
   // if (isGroupArray && showNot)
   //   canRev = false;
+  const needRev = not && canRev || opNeedsReverse;
 
   let conj;
   let havingVals;
@@ -733,8 +735,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, parent
   }
 
   // Use reversed op
-  if (not && canRev) {
-    not = false;
+  if (needRev) {
+    not = !not;
     opKey = opConfig.reversedOp;
     opConfig = config.operators[opKey];
   }
@@ -763,7 +765,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, parent
       // rule, need to be wrapped in `rule_group`
       // tip: `havingNot` should be handled in `convertOp` - eigther op reverse OR wrap in rule_group with not: true
       res = convertOp(conj, havingVals, conv, config, havingNot, meta, field, fieldConfig);
-      if (res?.type === "rule") {
+      if (res?.type === "rule" || res?.type === "rule_group") {
         // if rule was not wrapped in rule_group with not: true after `convertOp`, do it now
         res = wrapInDefaultConjRuleGroup(res, field, fieldConfig, config, conv.conjunctions["and"]);
       }
