@@ -764,12 +764,14 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
     } else {
       // rule, need to be wrapped in `rule_group`
       res = convertOp(conj, havingVals, conv, config, havingNot, meta, field, fieldConfig, true);
-      if (res.type === "rule_group" && res.properties?.field !== field) {
-        res = wrapInDefaultConjRuleGroup(res, field, fieldConfig, config);
+      if (res) {
+        if (res.type === "rule_group" && res.properties?.field !== field) {
+          res = wrapInDefaultConjRuleGroup(res, field, fieldConfig, config);
+        }
+        Object.assign(res.properties, {
+          conjunction: defaultGroupConjunction(config, fieldConfig),
+        });
       }
-      Object.assign(res.properties, {
-        conjunction: defaultGroupConjunction(config, fieldConfig),
-      });
     }
     if (!res)
       return undefined;

@@ -165,7 +165,7 @@ describe("query with !group", () => {
     });
   });
 
-  describe("@todo should handle select_not_any_in in some (when group mode is array)", () => {
+  describe("should handle select_not_any_in in some (when group mode is array)", () => {
     describe("reverseOperatorsForNot == true", () => {
       describe("from JL", () => {
         export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_select_not_any_in_in_some, "JsonLogic", {
@@ -192,7 +192,7 @@ describe("query with !group", () => {
     });
   });
 
-  describe("@todo should handle not and in some (when group mode is array)", () => {
+  describe("should handle not and in some (when group mode is array)", () => {
     describe("reverseOperatorsForNot == true", () => {
       describe("from JL", () => {
         export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_and_in_some, "JsonLogic", {
@@ -273,7 +273,7 @@ describe("query with !group", () => {
     });
   });
 
-  describe("@todo should handle not aggregate + not filter (when group mode is array)", () => {
+  describe("should handle not aggregate + not filter (when group mode is array)", () => {
     describe("reverseOperatorsForNot == false", () => {
       // will remain
       describe("from JL", () => {
@@ -311,7 +311,7 @@ describe("query with !group", () => {
     });
   });
 
-  describe("@todo should handle not is_null in not some (when group mode is array)", () => {
+  describe("should handle not is_null in not some (when group mode is array)", () => {
     describe("reverseOperatorsForNot == false", () => {
       // should preserve
       describe("from JL", () => {
@@ -365,7 +365,7 @@ describe("query with !group", () => {
     });
   });
 
-  describe("@todo should handle not contains in not some (when group mode is array)", () => {
+  describe("should handle not contains in not some (when group mode is array)", () => {
     describe("reverseOperatorsForNot == false", () => {
       describe("from SpEL", () => {
         export_checks(configs.with_group_array, inits.spel_with_not_some_not_contains, "SpEL", {
@@ -433,7 +433,7 @@ describe("query with nested !group", () => {
     });
   });
 
-  describe("@todo with two separate group rules", () => {
+  describe("with two separate group rules", () => {
     export_checks(configs.with_nested_group, inits.two_rules_with_nested_group, "JsonLogic", {
       "query": "(results.score == 11 && results.user.name == \"aaa\")",
       "queryHuman": "(Results.score = 11 AND Results.user.name = aaa)",
