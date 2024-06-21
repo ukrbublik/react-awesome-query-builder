@@ -764,7 +764,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, parent
       // tip: `havingNot` should be handled in `convertOp` - eigther op reverse OR wrap in rule_group with not: true
       res = convertOp(conj, havingVals, conv, config, havingNot, meta, field, fieldConfig);
       if (res?.type === "rule") {
-        // if rulw was not wrapped in rule_group with not: true after `convertOp`, do it now
+        // if rule was not wrapped in rule_group with not: true after `convertOp`, do it now
         res = wrapInDefaultConjRuleGroup(res, field, fieldConfig, config, conv.conjunctions["and"]);
       }
     }

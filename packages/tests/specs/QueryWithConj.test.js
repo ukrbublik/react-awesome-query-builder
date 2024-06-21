@@ -82,76 +82,100 @@ describe("query with conjunction", () => {
     });
   });
 
-  describe("@todo should handle OR with 2 rules with NOT", () => {
-    export_checks(configs.with_number_and_string, inits.with_not_number_and_string, "JsonLogic", {
-      "query": "NOT (num < 2 || login == \"ukrbublik\")",
-      "queryHuman": "NOT (Number < 2 OR login = ukrbublik)",
-      "sql": "NOT (num < 2 OR login = 'ukrbublik')",
-      "mongo": {
-        "num": {
-          "$gte": 2
-        },
-        "login": {
-          "$ne": "ukrbublik"
-        }
-      },
-      "logic": {
-        "!": {
-          "or": [
-            {
-              "<": [ {"var": "num"}, 2 ]
-            }, {
-              "==": [ {"var": "login"}, "ukrbublik" ]
-            }
-          ]
-        }
-      },
-      "elasticSearch": {
-        "bool": {
-          "should_not": [
-            {
-              "range": {
+  describe("should handle OR with 2 rules with NOT", () => {
+    describe("reverseOperatorsForNot == false", () => {
+      export_checks(configs.with_number_and_string, inits.with_not_number_and_string, "JsonLogic", {
+        "query": "NOT (num < 2 || login == \"ukrbublik\")",
+        "queryHuman": "NOT (Number < 2 OR login = ukrbublik)",
+        "sql": "NOT (num < 2 OR login = 'ukrbublik')",
+        "mongo": {
+          "$not": {
+            "$or": [
+              {
                 "num": {
-                  "lt": "2"
+                  "$lt": 2
                 }
-              }
-            },
-            {
-              "term": {
+              },
+              {
                 "login": "ukrbublik"
               }
-            }
-          ]
-        }
-      },
-      "spel": "!(num < 2 || login == 'ukrbublik')",
+            ]
+          }
+        },
+        "logic": {
+          "!": {
+            "or": [
+              {
+                "<": [ {"var": "num"}, 2 ]
+              }, {
+                "==": [ {"var": "login"}, "ukrbublik" ]
+              }
+            ]
+          }
+        },
+        "elasticSearch": {
+          "bool": {
+            "should_not": [
+              {
+                "range": {
+                  "num": {
+                    "lt": "2"
+                  }
+                }
+              },
+              {
+                "term": {
+                  "login": "ukrbublik"
+                }
+              }
+            ]
+          }
+        },
+        "spel": "!(num < 2 || login == 'ukrbublik')",
+      });
     });
 
-    describe("reverseOperatorsForNot == true", () => {
-      export_checks([configs.with_number_and_string, configs.with_reverse_operators], inits.with_not_number_and_string, "JsonLogic", {
+    describe("reverseOperatorsForNot == true and canShortMongoQuery == true", () => {
+      export_checks([configs.with_number_and_string, configs.with_reverse_operators, configs.with_short_mongo_query], inits.with_not_number_and_string, "JsonLogic", {
         // should be same
         "spel": "!(num < 2 || login == 'ukrbublik')",
+        "logic": {
+          "!": {
+            "or": [
+              {
+                "<": [ {"var": "num"}, 2 ]
+              }, {
+                "==": [ {"var": "login"}, "ukrbublik" ]
+              }
+            ]
+          }
+        },
+        // should be simplified
+        "mongo": {
+          "num": {
+            "$lt": 2
+          },
+          "login": "ukrbublik"
+        },
       }, []);
 
       describe("canShortMongoQuery == false", () => {
         export_checks([configs.with_number_and_string, configs.without_short_mongo_query], inits.with_not_number_and_string, "JsonLogic", {
           "spel": "!(num < 2 || login == 'ukrbublik')",
           "mongo": {
-            "$or": [
-              {
-                "$not": {
+            "$not": {
+              "$or": [
+                {
                   "num": {
                     "$lt": 2
                   }
-                }
-              },
-              {
-                "$not": {
+                },
+                {
                   "login": "ukrbublik"
                 }
-              }
-            ]
-          }
+              ]
+            }
+          },
         }, []);
       });
     });

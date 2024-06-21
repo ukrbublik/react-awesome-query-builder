@@ -70,18 +70,8 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const mode = groupFieldDef.mode; //properties.get("mode");
   const canHaveEmptyChildren = groupField && mode === "array" && groupOperatorCardinality >= 1;
 
+  // try to reverse conj
   let not = !!properties.get("not");
-  if (_not) {
-    not = !not;
-  }
-  const list = children
-    .map((currentChild) => formatItem(
-      [...parents, item], currentChild, config, meta, not, mode != "array", mode == "array" ? (f => `$$el${sep}${f}`) : undefined)
-    )
-    .filter((currentChild) => typeof currentChild !== "undefined");
-  if (!canHaveEmptyChildren && !list.size)
-    return undefined;
-
   let conjunction = properties.get("conjunction");
   if (!conjunction)
     conjunction = defaultConjunction(config);
@@ -96,6 +86,16 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   if (!conjunctionDefinition)
     return undefined;
   const mongoConj = conjunctionDefinition.mongoConj;
+
+  // format children
+  const list = children
+    .map((currentChild) => formatItem(
+      [...parents, item], currentChild, config, meta, _not, mode != "array", mode == "array" ? (f => `$$el${sep}${f}`) : undefined)
+    )
+    .filter((currentChild) => typeof currentChild !== "undefined");
+  if (!canHaveEmptyChildren && !list.size) {
+    return undefined;
+  }
 
   let resultQuery;
   if (list.size == 1) {
@@ -171,6 +171,11 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
       resultQuery = { [groupFieldName]: {"$elemMatch": resultQuery} };
     }
   }
+
+  if (not) {
+    resultQuery = { "$not": resultQuery };
+  }
+
   return resultQuery;
 };
 

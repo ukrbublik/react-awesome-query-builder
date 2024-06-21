@@ -599,7 +599,8 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
     let opConfig = config.operators[opKey];
     const reversedOpConfig = config.operators[opConfig?.reversedOp];
     const opNeedsReverse = opConfig.reversedOp && reversedOpConfig
-      && !reversedOpConfig.spelOp && !!opConfig.spelOp || ["between"].includes(opKey);
+      && !reversedOpConfig.spelOp && !!opConfig.spelOp
+      || ["between"].includes(opKey);
     const canRev = opConfig.reversedOp && (!!config.settings.reverseOperatorsForNot || opNeedsReverse);
     if (spel.not) {
       if (canRev) {
@@ -1071,7 +1072,8 @@ const buildRule = (config, meta, field, opKey, convertedArgs, spel) => {
   let opConfig = config.operators[opKey];
   const reversedOpConfig = config.operators[opConfig?.reversedOp];
   const opNeedsReverse = opConfig.reversedOp && reversedOpConfig
-    && !reversedOpConfig.spelOp && !!opConfig.spelOp || ["between"].includes(opKey);  
+    && !reversedOpConfig.spelOp && !!opConfig.spelOp
+    || ["between"].includes(opKey);  
   const canRev = opConfig.reversedOp && (!!config.settings.reverseOperatorsForNot || opNeedsReverse);
   if (spel?.not) {
     if (canRev) {
