@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/mui",
-  "version": "6.6.0",
+  "version": "6.6.1",
   "description": "User-friendly query builder for React. MUI 5 widgets",
   "keywords": [
     "query-builder",
