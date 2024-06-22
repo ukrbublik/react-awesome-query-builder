@@ -790,8 +790,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
       });
     }
     if (not) {
-      // todo: ??? why wrap? why not set prop????????
-      // res.properties.not = not;
+      // tip: don't set not to properties, only havingNot should affect it
       res = wrapInDefaultConj(res, config, not);
     }
   } else if (fieldConfig?.type == "!group" && !having) {
