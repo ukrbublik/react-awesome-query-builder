@@ -152,12 +152,8 @@ describe("query with conjunction", () => {
         },
         // should be simplified
         "mongo": {
-          "num": {
-            "$gte": 2
-          },
-          "login": {
-            "$ne": "ukrbublik"
-          },
+          "num": { "$gte": 2 },
+          "login": { "$ne": "ukrbublik" },
         },
       }, []);
 
@@ -167,14 +163,8 @@ describe("query with conjunction", () => {
           "mongo": {
             "$not": {
               "$or": [
-                {
-                  "num": {
-                    "$lt": 2
-                  }
-                },
-                {
-                  "login": "ukrbublik"
-                }
+                { "num": { "$lt": 2 } },
+                { "login": "ukrbublik" }
               ]
             }
           },

@@ -1307,19 +1307,19 @@ const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
   return valProperties;
 };
 
-const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj) => {
-  if (!rule) return undefined;
-  return {
-    type: "rule_group",
-    id: uuid(),
-    children1: { [rule.id]: rule },
-    properties: {
-      conjunction: conj || defaultGroupConjunction(config, parentFieldConfig),
-      not: false,
-      field: parentField,
-    }
-  };
-};
+// const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj) => {
+//   if (!rule) return undefined;
+//   return {
+//     type: "rule_group",
+//     id: uuid(),
+//     children1: { [rule.id]: rule },
+//     properties: {
+//       conjunction: conj || defaultGroupConjunction(config, parentFieldConfig),
+//       not: false,
+//       field: parentField,
+//     }
+//   };
+// };
 
 const wrapInDefaultConj = (rule, config, not = false) => {
   return {

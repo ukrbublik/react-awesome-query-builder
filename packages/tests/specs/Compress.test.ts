@@ -53,12 +53,6 @@ describe("Compressed config", () => {
         const decConfig = ConfigUtils.decompressConfig(zipConfig, BaseConfig);
         export_checks(() => decConfig, inits.with_ops, "JsonLogic", {}, [], {
           withRender: configKey !== "CoreConfig",
-          ignoreLog: (errText) => {
-            // tip: It's the issue with antd's Select component in "multiple" mode for React 17 (in React 18 it's fine)
-            return configKey === "AntdConfig" && errText.includes("Can't perform a React state update on an unmounted component")
-              && errText.includes("a useEffect cleanup function") && errText.includes("at Overflow")
-            ;
-          }
         });
       });
     });

@@ -695,14 +695,14 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
 
   // Group component in array mode can show NOT checkbox, so do nothing in this case
   // Otherwise try to reverse
-  const showNot = fieldConfig?.showNot !== undefined ? fieldConfig.showNot : config.settings.showNot;
-  const isGroupArray = fieldConfig.type == "!group" && fieldConfig.mode == "array";
+  // const showNot = fieldConfig?.showNot !== undefined ? fieldConfig.showNot : config.settings.showNot;
   const isRuleGroup = fieldConfig.type == "!group";
+  // const isGroupArray = isRuleGroup && fieldConfig.mode == "array";
   const isInRuleGroup = parentFieldConfig?.type == "!group";
   let canRev = opConfig.reversedOp && (
     !!config.settings.reverseOperatorsForNot
     || opNeedsReverse
-    || isGroupArray && !having // !(count == 2)  ->  count != 2
+    || isRuleGroup && !having // !(count == 2)  ->  count != 2  // because "NOT" is not visible inside rule_group if there are no children
     || !isRuleGroup && isInRuleGroup && !_isOneRuleInRuleGroup // 2+ rules in rule-group should be flat. see inits.with_not_and_in_some in test
   );
   // if (isGroupArray && showNot)
@@ -801,7 +801,9 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
       children1: {},
       properties: {
         conjunction: defaultGroupConjunction(config, fieldConfig),
-        not: not,
+        // tip: `not: true` have no effect if there are no children! "NOT" is hidden in UI and is ignored during export
+        // So it's better to reverse group op (see `canRev =`), or wrap in conj with NOT as a last resort
+        not: false,
         mode: fieldConfig.mode,
         field: field,
         operator: opKey,
@@ -813,6 +815,9 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
         valueSrc: convertedArgs.map(v => v.valueSrc),
         valueType: convertedArgs.map(v => v.valueType),
       });
+    }
+    if (not) {
+      res = wrapInDefaultConj(res, config, not);
     }
   } else {
     const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);

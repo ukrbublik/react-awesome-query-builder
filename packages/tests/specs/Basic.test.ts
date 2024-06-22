@@ -112,7 +112,7 @@ describe("basic query", () => {
         },
       }, []);
 
-      // canShortMongoQuery should not affect
+      // canShortMongoQuery should not affect on between op
       describe("canShortMongoQuery == false", () => {
         export_checks([configs.simple_with_number, configs.without_short_mongo_query], inits.spel_with_between, "SpEL", {
           mongo: {
@@ -164,7 +164,7 @@ describe("basic query", () => {
         });
       });
 
-      // canShortMongoQuery should not affect
+      // canShortMongoQuery should not affect on not_between op
       describe("canShortMongoQuery == false", () => {
         export_checks([configs.simple_with_number, configs.without_short_mongo_query], inits.spel_with_not_between, "SpEL", {
           mongo: {

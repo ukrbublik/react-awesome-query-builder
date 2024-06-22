@@ -239,7 +239,7 @@ describe("query with !group", () => {
       describe("from JL", () => {
         export_checks([configs.with_group_array_cars], inits.with_not_group_count, "JsonLogic", {
           // will convert not == to !=
-          // because of line ` || isGroupArray && !having` (see `canRev = ..` and comment // !(count == 2)  ->  count != 2`
+          // because of line `|| isRuleGroup && !having` (see `canRev = ..` and comment // !(count == 2)  ->  count != 2`
           "logic": inits.with_not_group_count_out,
           "query": "COUNT OF cars != 2"
         });
