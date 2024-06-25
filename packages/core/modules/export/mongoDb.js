@@ -91,7 +91,8 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   }
   let reversedGroupOp = groupOperatorDef?.reversedOp;
   let reversedGroupOpDef = getOperatorConfig(config, reversedGroupOp, groupField);
-  const groupOpNeedsReverse = !groupOperatorDef?.jsonLogic && !!reversedGroupOpDef?.jsonLogic;
+  const groupOpNeedsReverse = !groupOperatorDef?.mongoFormatOp && !!reversedGroupOpDef?.mongoFormatOp;
+  const groupOpCanReverse = !!reversedGroupOpDef?.mongoFormatOp;
   const oneChildType = getOneChildOrDescendant(item)?.get("type");
   const canRevChildren = !!config.settings.reverseOperatorsForNot
     && (!isRuleGroup && not && oneChildType === "rule" || filterNot && children?.size === 1);
@@ -103,7 +104,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
     }
     revChildren = true;
   }
-  let canRevGroupOp = not && isRuleGroup && reversedGroupOp && (!!config.settings.reverseOperatorsForNot || groupOpNeedsReverse);
+  let canRevGroupOp = not && isRuleGroup && groupOpCanReverse && (!!config.settings.reverseOperatorsForNot || groupOpNeedsReverse);
   if (canRevGroupOp) {
     not = !not;
     [groupOperator, reversedGroupOp] = [reversedGroupOp, groupOperator];
@@ -259,7 +260,8 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   // try reverse
   let not = _not;
   const opNeedsReverse = !operatorDefinition?.mongoFormatOp && !!revOperatorDefinition?.mongoFormatOp;
-  let canRev = reversedOp && (!!config.settings.reverseOperatorsForNot || opNeedsReverse);
+  const opCanReverse = !!revOperatorDefinition?.mongoFormatOp;
+  let canRev = opCanReverse && (!!config.settings.reverseOperatorsForNot || opNeedsReverse);
   const needRev = canRev && not || opNeedsReverse;
   let isRev = false;
   if (needRev) {

@@ -345,7 +345,7 @@ export const with_bad_subfield_in_group = {
   ]
 };
 
-export const with_select_any_in_in_some = {
+export const with_nested_and_select_any_in_in_some = {
   "and": [
     { "some": [
       { "var": "vehicles.cars" },
@@ -378,6 +378,36 @@ export const with_empty_group_some = {
   }]
 };
 
+export const spel_with_not_select_not_any_in_in_some = "cars.?[!(!({'Ford', 'Toyota'}.?[true].contains(vendor)))].size() > 0";
+export const with_not_select_not_any_in_in_some = {
+  "and": [
+    {
+      "some": [
+        { "var": "cars" },
+        {
+          "!": {
+            "!": {
+              "in": [
+                { "var": "vendor" },
+                [ "Ford", "Toyota" ]
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+};
+
+export const with_select_any_in_in_some = {
+  "and": [
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] }
+  ]
+};
+export const spel_with_select_any_in_in_some = "cars.?[{'Ford', 'Toyota'}.?[true].contains(vendor)].size() > 0";
 
 export const with_not_and_in_some = {
   "and": [

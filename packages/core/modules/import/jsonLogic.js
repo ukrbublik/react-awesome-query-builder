@@ -691,7 +691,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
 
   let opConfig = config.operators[opKey];
   const reversedOpConfig = config.operators[opConfig?.reversedOp];
-  const opNeedsReverse = !opConfig.jsonLogic && !!reversedOpConfig?.jsonLogic;
+  const opNeedsReverse = false;
+  const opCanReverse = !!reversedOpConfig;
 
   // Group component in array mode can show NOT checkbox, so do nothing in this case
   // Otherwise try to reverse
@@ -699,7 +700,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
   const isRuleGroup = fieldConfig.type == "!group";
   // const isGroupArray = isRuleGroup && fieldConfig.mode == "array";
   const isInRuleGroup = parentFieldConfig?.type == "!group";
-  let canRev = opConfig.reversedOp && (
+  let canRev = opCanReverse && (
     !!config.settings.reverseOperatorsForNot
     || opNeedsReverse
     || isRuleGroup && !having // !(count == 2)  ->  count != 2  // because "NOT" is not visible inside rule_group if there are no children
@@ -720,17 +721,21 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
 
     // Preprocess "!": Try to reverse op in single rule in having
     // Eg. use `not_equal` instead of `not` `equal`
-    const isEmptyOp = conj == "!" && (
-      havingVals.length == 1 && havingVals[0] && isJsonLogic(havingVals[0])
-      && conv.varKeys.includes(Object.keys(havingVals[0])[0])
-    );
-    if (conj == "!" && !isEmptyOp) {
-      havingNot = true;
+    while (conj == "!") {
+      const isEmptyOp = conj == "!" && (
+        havingVals.length == 1 && havingVals[0] && isJsonLogic(havingVals[0])
+        && conv.varKeys.includes(Object.keys(havingVals[0])[0])
+      );
+      if (isEmptyOp) {
+        break;
+      }
+      havingNot = !havingNot;
       having = having["!"];
       conj = Object.keys(having)[0];
       havingVals = having[conj];
-      if (!Array.isArray(havingVals))
-        havingVals = [ havingVals ];
+    }
+    if (!Array.isArray(havingVals)) {
+      havingVals = [ havingVals ];
     }
   }
 
@@ -763,7 +768,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
       res = convertConj(conj, havingVals, conv, config, havingNot, meta, field, true);
     } else {
       // rule, need to be wrapped in `rule_group`
-      res = convertOp(conj, havingVals, conv, config, havingNot, meta, field, fieldConfig, true);
+      res = convertOp(conj, havingVals, conv, config, havingNot, meta, field, true);
       if (res) {
         if (res.type === "rule_group" && res.properties?.field !== field) {
           res = wrapInDefaultConjRuleGroup(res, field, fieldConfig, config);

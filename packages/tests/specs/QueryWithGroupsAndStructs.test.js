@@ -117,9 +117,9 @@ describe("query with !struct and !group", () => {
   });
 
   describe("should handle some-in when it's not related to multiselect_contains op", () => {
-    export_checks(configs.with_group_inside_struct, inits.with_select_any_in_in_some, "JsonLogic", {
+    export_checks(configs.with_group_inside_struct, inits.with_nested_and_select_any_in_in_some, "JsonLogic", {
       "query": "vehicles.cars.vendor IN (\"Ford\", \"Toyota\")",
-      logic: inits.with_select_any_in_in_some,
+      logic: inits.with_nested_and_select_any_in_in_some,
     });
   });
 
@@ -173,9 +173,17 @@ describe("query with !group", () => {
           "query": "SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
         });
       });
+
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.spel_with_select_not_any_in_in_some, "SpEL", {
+          "spel": inits.spel_with_select_not_any_in_in_some,
+          "query": "SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
+        });
+      });
     });
   
     describe("reverseOperatorsForNot == false", () => {
+      // will use "NOT (vendor IN ..)"  because of `_isOneRuleInRuleGroup` in code
       describe("from JL", () => {
         export_checks([configs.with_group_array_cars], inits.with_select_not_any_in_in_some, "JsonLogic", {
           "logic": inits.with_select_not_any_in_in_some,
@@ -184,9 +192,28 @@ describe("query with !group", () => {
       });
 
       describe("from SpEL", () => {
+        // will use "vendor NOT IN .." instead of "NOT (vendor IN ..)"
         export_checks([configs.with_group_array_cars], inits.spel_with_select_not_any_in_in_some, "SpEL", {
           "spel": inits.spel_with_select_not_any_in_in_some,
-          "query": "SOME OF cars HAVE NOT (vendor IN (\"Ford\", \"Toyota\"))"
+          "query": "SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
+        });
+      });
+    });
+  });
+
+  describe("should handle ! select_not_any_in in some (when group mode is array)", () => {
+    describe("reverseOperatorsForNot == false", () => {
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars], inits.with_not_select_not_any_in_in_some, "JsonLogic", {
+          "logic": inits.with_select_any_in_in_some,
+          "query": "SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
+        });
+      });
+
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars], inits.spel_with_not_select_not_any_in_in_some, "SpEL", {
+          "spel": inits.spel_with_select_any_in_in_some,
+          "query": "SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
         });
       });
     });
@@ -203,6 +230,22 @@ describe("query with !group", () => {
 
       describe("from SpEL", () => {
         export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.spel_with_not_and_in_some, "SpEL", {
+          "spel": inits.spel_with_not_and_in_some,
+          "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
+        });
+      });
+    });
+
+    describe("reverseOperatorsForNot == false", () => {
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars], inits.with_not_and_in_some, "JsonLogic", {
+          "logic": inits.with_not_and_in_some,
+          "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
+        });
+      });
+
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars], inits.spel_with_not_and_in_some, "SpEL", {
           "spel": inits.spel_with_not_and_in_some,
           "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
         });
@@ -370,7 +413,16 @@ describe("query with !group", () => {
       describe("from SpEL", () => {
         export_checks(configs.with_group_array, inits.spel_with_not_some_not_contains, "SpEL", {
           "spel": inits.spel_with_not_some_not_contains, // same
-          "query": "NOT (SOME OF results HAVE NOT (grade Contains \"Toy\"))"
+          "query": "NOT (SOME OF results HAVE grade Not Contains \"Toy\")"
+        });
+      });
+    });
+
+    describe("reverseOperatorsForNot == true", () => {
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array, configs.with_reverse_operators], inits.spel_with_not_some_not_contains, "SpEL", {
+          "spel": inits.spel_with_not_some_not_contains, // same
+          "query": "NOT (SOME OF results HAVE grade Not Contains \"Toy\")"
         });
       });
     });
