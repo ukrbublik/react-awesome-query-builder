@@ -1,4 +1,7 @@
 # Changelog
+- 6.6.1
+  - Operators reverse on "NOT" is now optional, disabled by default to preserve orignal query (PR #1068) (issue #1059)
+    Added settings `reverseOperatorsForNot` and `canShortMongoQuery`
 - 6.6.0
   - Optimizations for rendering and export utils (PR #1054) (issue #342)
   - Added support of JsonLogic export for ternary mode (PR #1013) (issue #978)

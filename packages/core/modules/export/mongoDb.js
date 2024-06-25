@@ -2,7 +2,7 @@ import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../u
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
 } from "../utils/configUtils";
-import {getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue} from "../utils/ruleUtils";
+import {getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue, getOneChildOrDescendant} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
 import pick from "lodash/pick";
 import {List, Map} from "immutable";
@@ -51,6 +51,7 @@ const formatItem = (parents, item, config, meta, _not = false, _canWrapExpr = tr
 const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = true, _formatFieldName = undefined, _value = undefined) => {
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
+  const origNot = !!properties.get("not");
   const children = item.get("children1") || new List();
   const {canShortMongoQuery, fieldSeparator} = config.settings;
   const sep = fieldSeparator;
@@ -62,35 +63,82 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
     .slice(-1).pop();
   const realParentPath = hasParentRuleGroup && parentPath;
 
-  const groupField = type === "rule_group" ? properties.get("field") : null;
-  const groupOperator = type === "rule_group" ? properties.get("operator") : null;
-  const groupOperatorCardinality = groupOperator ? config.operators[groupOperator]?.cardinality ?? 1 : undefined;
+  const isRuleGroup = (type === "rule_group");
+  const groupField = isRuleGroup ? properties.get("field") : null;
+  let groupOperator = isRuleGroup ? properties.get("operator") : null;
+  let groupOperatorDef = groupOperator && getOperatorConfig(config, groupOperator, groupField) || null;
+  const groupOperatorCardinality = groupOperator ? groupOperatorDef?.cardinality ?? 1 : undefined;
   const groupFieldName = formatFieldName(groupField, config, meta, realParentPath);
   const groupFieldDef = getFieldConfig(config, groupField) || {};
   const mode = groupFieldDef.mode; //properties.get("mode");
   const canHaveEmptyChildren = groupField && mode === "array" && groupOperatorCardinality >= 1;
+  const isRuleGroupArray = isRuleGroup && mode != "struct";
+  const isRuleGroupWithChildren = isRuleGroup && children?.size > 0;
+  const isRuleGroupWithoutChildren = isRuleGroup && !children?.size;
 
-  const not = _not ? !(properties.get("not")) : (properties.get("not"));
-  const list = children
-    .map((currentChild) => formatItem(
-      [...parents, item], currentChild, config, meta, not, mode != "array", mode == "array" ? (f => `$$el${sep}${f}`) : undefined)
-    )
-    .filter((currentChild) => typeof currentChild !== "undefined");
-  if (!canHaveEmptyChildren && !list.size)
-    return undefined;
+  // rev
+  let revChildren = false;
+  let not = origNot;
+  let filterNot = false;
+  if (isRuleGroupWithChildren) {
+    // for rule_group `not` there should be 2 NOTs: from properties (for children) and from parent group (_not)
+    filterNot = origNot;
+    not = _not;
+  } else {
+    if (_not) {
+      not = !not;
+    }
+  }
+  let reversedGroupOp = groupOperatorDef?.reversedOp;
+  let reversedGroupOpDef = getOperatorConfig(config, reversedGroupOp, groupField);
+  const groupOpNeedsReverse = !groupOperatorDef?.mongoFormatOp && !!reversedGroupOpDef?.mongoFormatOp;
+  const groupOpCanReverse = !!reversedGroupOpDef?.mongoFormatOp;
+  const oneChildType = getOneChildOrDescendant(item)?.get("type");
+  const canRevChildren = !!config.settings.reverseOperatorsForNot
+    && (!isRuleGroup && not && oneChildType === "rule" || filterNot && children?.size === 1);
+  if (canRevChildren) {
+    if (isRuleGroupWithChildren) {
+      filterNot = !filterNot;
+    } else {
+      not = !not;
+    }
+    revChildren = true;
+  }
+  let canRevGroupOp = not && isRuleGroup && groupOpCanReverse && (!!config.settings.reverseOperatorsForNot || groupOpNeedsReverse);
+  if (canRevGroupOp) {
+    not = !not;
+    [groupOperator, reversedGroupOp] = [reversedGroupOp, groupOperator];
+    [groupOperatorDef, reversedGroupOpDef] = [reversedGroupOpDef, groupOperatorDef];
+  }
 
+  // conj
   let conjunction = properties.get("conjunction");
   if (!conjunction)
     conjunction = defaultConjunction(config);
   let conjunctionDefinition = config.conjunctions[conjunction];
-  const reversedConj = conjunctionDefinition.reversedConj;
-  if (not && reversedConj) {
-    conjunction = reversedConj;
-    conjunctionDefinition = config.conjunctions[conjunction];
-  }
   if (!conjunctionDefinition)
     return undefined;
+  // rev conj
+  const reversedConj = conjunctionDefinition.reversedConj;
+  const canRev = not && conjunction?.toLowerCase() === "or" && reversedConj && !isRuleGroup
+    && !!config.settings.canShortMongoQuery && !!config.settings.reverseOperatorsForNot;
+  if (canRev) {
+    conjunction = reversedConj;
+    conjunctionDefinition = config.conjunctions[conjunction];
+    not = !not;
+    revChildren = true;
+  }
+
   const mongoConj = conjunctionDefinition.mongoConj;
+
+  const list = children
+    .map((currentChild) => formatItem(
+      [...parents, item], currentChild, config, meta, revChildren, mode != "array", mode == "array" ? (f => `$$el${sep}${f}`) : undefined)
+    )
+    .filter((formattedChild) => typeof formattedChild !== "undefined");
+  if (!canHaveEmptyChildren && !list.size) {
+    return undefined;
+  }
 
   let resultQuery;
   if (list.size == 1) {
@@ -128,8 +176,10 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
         return acc;
       }, {});
     }
-    if (!resultQuery) // can't be shorten
+    if (!resultQuery) {
+      // can't be shorten
       resultQuery = { [mongoConj] : rules };
+    }
   }
 
   if (groupField) {
@@ -157,13 +207,18 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
         }
       } : totalQuery;
       resultQuery = formatItem(
-        parents, item.set("type", "rule"), config, meta, false, false, (_f => filterQuery), totalQuery
+        parents, item.set("type", "rule"), config, meta, filterNot, false, (_f => filterQuery), totalQuery
       );
       resultQuery = { "$expr": resultQuery };
     } else {
       resultQuery = { [groupFieldName]: {"$elemMatch": resultQuery} };
     }
   }
+
+  if (not) {
+    resultQuery = { "$not": resultQuery };
+  }
+
   return resultQuery;
 };
 
@@ -190,17 +245,30 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   if (field == null || operator == null || iValue === undefined)
     return undefined;
 
-  const fieldDef = getFieldConfig(config, field) || {};
-  let operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  let reversedOp = operatorDefinition.reversedOp;
-  let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
-  const cardinality = getOpCardinality(operatorDefinition);
+  const fieldDef = getFieldConfig(config, field);
 
+  // check op
+  let operatorDefinition = getOperatorConfig(config, operator, field);
+  let reversedOp = operatorDefinition?.reversedOp;
+  let revOperatorDefinition = getOperatorConfig(config, reversedOp, field);
+  const cardinality = getOpCardinality(operatorDefinition);
+  if (!operatorDefinition?.mongoFormatOp && !revOperatorDefinition?.mongoFormatOp) {
+    meta.errors.push(`Operator ${operator} is not supported`);
+    return undefined;
+  }
+
+  // try reverse
   let not = _not;
-  if (not && reversedOp) {
+  const opNeedsReverse = !operatorDefinition?.mongoFormatOp && !!revOperatorDefinition?.mongoFormatOp;
+  const opCanReverse = !!revOperatorDefinition?.mongoFormatOp;
+  let canRev = opCanReverse && (!!config.settings.reverseOperatorsForNot || opNeedsReverse);
+  const needRev = canRev && not || opNeedsReverse;
+  let isRev = false;
+  if (needRev) {
     [operator, reversedOp] = [reversedOp, operator];
     [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
-    not = false;
+    not = !not;
+    isRev = true;
   }
 
   let formattedField;
@@ -246,11 +314,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   const wrapExpr = useExpr && _canWrapExpr;
 
   //build rule
-  const fn = operatorDefinition.mongoFormatOp;
-  if (!fn) {
-    meta.errors.push(`Operator ${operator} is not supported`);
-    return undefined;
-  }
+  const fn = operatorDefinition?.mongoFormatOp;
   const args = [
     formattedField,
     operator,
@@ -290,7 +354,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
       const args = [
         currentValue,
         {
-          ...pick(fieldDef, ["fieldSettings", "listValues"]),
+          ...(fieldDef ? pick(fieldDef, ["fieldSettings", "listValues"]) : {}),
           asyncListValues
         },
         //useful options: valueFormat for date/time

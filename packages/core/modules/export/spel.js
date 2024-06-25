@@ -172,7 +172,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
   }
 
   const omitBrackets = isRuleGroup;
-  const filter = list.size ? conjunctionDefinition.spelFormatConj(list, conjunction, not, omitBrackets) : null;
+  const filter = list.size ? conjunctionDefinition.spelFormatConj.call(config.ctx, list, conjunction, not, omitBrackets) : null;
 
   // build result
   let ret;
@@ -257,7 +257,7 @@ const formatExpression = (meta, config, properties, formattedField, formattedVal
 
   //rev
   if (isRev) {
-    ret = config.settings.spelFormatReverse(ret);
+    ret = config.settings.spelFormatReverse.call(config.ctx, ret);
   }
 
   if (ret === undefined) {

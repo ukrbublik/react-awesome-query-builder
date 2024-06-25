@@ -404,19 +404,15 @@ const buildConv = (config) => {
 
 const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
   if (!spel) return undefined;
+  spel._groupField = spel._groupField ?? parentSpel?._groupField;
 
   let res, canParseAsArg = true;
   if (spel.type.indexOf("op-") === 0 || spel.type === "matches") {
     res = convertOp(spel, conv, config, meta, parentSpel);
   } else if (spel.type == "!aggr") {
-    const groupFieldValue = convertToTree(spel.source, conv, config, meta, {
-      ...spel, 
-      _groupField: parentSpel?._groupField
-    });
-    let groupFilter = convertToTree(spel.filter, conv, config, meta, {
-      ...spel, 
-      _groupField: groupFieldValue?.value
-    });
+    const groupFieldValue = convertToTree(spel.source, conv, config, meta, spel);
+    spel._groupField = groupFieldValue?.value;
+    let groupFilter = convertToTree(spel.filter, conv, config, meta, spel);
     if (groupFilter?.type == "rule") {
       groupFilter = wrapInDefaultConj(groupFilter, config, spel.filter.not);
     }
@@ -483,13 +479,13 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
   }
 
   // between
-  let isBetweenNormal = (op == "and" && spel.children.length == 2 && spel.children[0].type == "op-ge" && spel.children[1].type == "op-le");
-  let isBetweenRev = (op == "or" && spel.children.length == 2 && spel.children[0].type == "op-lt" && spel.children[1].type == "op-gt");
-  let isBetween = isBetweenNormal || isBetweenRev;
+  const isBetweenNormal = (op == "and" && spel.children.length == 2 && spel.children[0].type == "op-ge" && spel.children[1].type == "op-le");
+  const isBetweenRev = (op == "or" && spel.children.length == 2 && spel.children[0].type == "op-lt" && spel.children[1].type == "op-gt");
+  const isBetween = isBetweenNormal || isBetweenRev;
   if (isBetween) {
     const [left, from] = spel.children[0].children;
     const [right, to] = spel.children[1].children;
-    const isSameSource = compareArgs(left, right,  spel, conv, config, meta, parentSpel);
+    const isSameSource = compareArgs(left, right, spel, conv, config, meta, parentSpel);
     if (isSameSource) {
       const _fromValue = from.val;
       const _toValue = to.val;
@@ -502,6 +498,7 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
         ],
         not: isBetweenRev,
       };
+      oneSpel._groupField = parentSpel?._groupField;
       return convertOp(oneSpel, conv, config, meta, parentSpel);
     }
   }
@@ -523,17 +520,13 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
   // convert children
   const convertChildren = () => {
     let newChildren = spel.children.map(child =>
-      convertToTree(child, conv, config, meta, {
-        ...spel,
-        _groupField: parentSpel?._groupField
-      })
+      convertToTree(child, conv, config, meta, spel)
     );
     if (newChildren.length >= 2 && newChildren?.[0]?.type == "!compare") {
       newChildren = newChildren[0].children;
     }
     return newChildren;
   };
-
   if (op == "and" || op == "or") {
     const children1 = {};
     const vals = convertChildren();
@@ -596,17 +589,19 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
       }
     }
 
-    let canRev = true;
-    let needWrapReverse = false;
-    if (spel.not && canRev) {
-      const opConfig = config.operators[opKey];
-      if (opConfig.reversedOp) {
-        opKey = opConfig.reversedOp;
-        spel.not = false;
-      } else {
-        needWrapReverse = true;
-      }
+    let opConfig = config.operators[opKey];
+    const reversedOpConfig = config.operators[opConfig?.reversedOp];
+    const opNeedsReverse = spel.not && ["between"].includes(opKey);
+    const opCanReverse = !!reversedOpConfig;
+    const canRev = opCanReverse && (!!config.settings.reverseOperatorsForNot || opNeedsReverse);
+    const needRev = spel.not && canRev || opNeedsReverse;
+    if (needRev) {
+      opKey = opConfig.reversedOp;
+      opConfig = config.operators[opKey];
+      spel.not = !spel.not;
     }
+    const needWrapWithNot = !!spel.not;
+    spel.not = false; // handled with needWrapWithNot
     
     if (!fieldObj) {
       // LHS can't be parsed
@@ -623,12 +618,12 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
         meta.errors.push(`Expected field/func at LHS, but got ${JSON.stringify(fieldObj)}`);
       }
       const field = fieldObj.value;
-      res = buildRule(config, meta, field, opKey, convertedArgs);
+      res = buildRule(config, meta, field, opKey, convertedArgs, spel);
     }
 
-    if (needWrapReverse) {
+    if (needWrapWithNot) {
       if (res.type !== "group") {
-        res = wrapInDefaultConj(res, config, spel.not);
+        res = wrapInDefaultConj(res, config, true);
       } else {
         res.properties.not = !res.properties.not;
       }
@@ -658,14 +653,15 @@ const convertPath = (parts, meta = {}, expectingField = false) => {
   return !isError ? res : undefined;
 };
 
-const convertArg = (spel, conv, config, meta, parentSpel) => {
+const convertArg = (spel, conv, config, meta, parentSpel = null) => {
   if (spel == undefined)
     return undefined;
   const {fieldSeparator} = config.settings;
+  spel._groupField = spel._groupField ?? parentSpel?._groupField;
 
   if (spel.type == "variable" || spel.type == "property") {
     // normal field
-    const field = normalizeField(config, spel.val, parentSpel?._groupField);
+    const field = normalizeField(config, spel.val, spel._groupField);
     const fieldConfig = getFieldConfig(config, field);
     const isVariable = spel.type == "variable";
     return {
@@ -678,7 +674,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
     // complex field
     const parts = convertPath(spel.children, meta);
     if (parts) {
-      const field = normalizeField(config, parts.join(fieldSeparator), parentSpel?._groupField);
+      const field = normalizeField(config, parts.join(fieldSeparator), spel._groupField);
       const fieldConfig = getFieldConfig(config, field);
       const isVariable = spel.children?.[0]?.type == "variable";
       return {
@@ -821,12 +817,9 @@ const _buildFuncSignatures = (spel, brns) => {
   return [s, params];
 };
 
-const convertFunc = (spel, conv, config, meta, parentSpel) => {
+const convertFunc = (spel, conv, config, meta, parentSpel = null) => {
   // Build signatures
-  const convertFuncArg = v => convertToTree(v, conv, config, meta, {
-    ...spel,
-    _groupField: parentSpel?._groupField
-  });
+  const convertFuncArg = v => convertToTree(v, conv, config, meta, spel);
   const fsigns = buildFuncSignatures(spel);
   const firstSign = fsigns?.[0]?.s;
   if (fsigns.length)
@@ -1066,17 +1059,28 @@ const buildRule = (config, meta, field, opKey, convertedArgs, spel) => {
     return undefined;
   }
 
-  let canRev = true;
-  let needWrapReverse = false;
-  if (spel?.not && canRev) {
-    const opConfig = config.operators[opKey];
-    if (opConfig.reversedOp) {
-      opKey = opConfig.reversedOp;
-      spel.not = false;
-    } else {
-      needWrapReverse = true;
-    }
+  const parentFieldConfig = getFieldConfig(config, spel?._groupField);
+  const isRuleGroup = fieldConfig.type == "!group";
+  const isGroupArray = isRuleGroup && fieldConfig.mode == "array";
+  const isInRuleGroup = parentFieldConfig?.type == "!group";
+
+  let opConfig = config.operators[opKey];
+  const reversedOpConfig = config.operators[opConfig?.reversedOp];
+  const opNeedsReverse = spel?.not && ["between"].includes(opKey);
+  const opCanReverse = !!reversedOpConfig;
+  const canRev = opCanReverse && (
+    !!config.settings.reverseOperatorsForNot
+    || opNeedsReverse
+    || !isRuleGroup && isInRuleGroup // 2+ rules in rule-group should be flat. see inits.with_not_and_in_some in test
+  );
+  const needRev = spel?.not && canRev || opNeedsReverse;
+  if (needRev) {
+    // todo: should be already handled at convertOp ?  or there are special cases to handle here, like rule-group ?
+    opKey = opConfig.reversedOp;
+    opConfig = config.operators[opKey];
+    spel.not = !spel.not;
   }
+  const needWrapWithNot = !!spel?.not;
 
   const widget = getWidgetForFieldOp(config, field, opKey);
   const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
@@ -1102,11 +1106,9 @@ const buildRule = (config, meta, field, opKey, convertedArgs, spel) => {
     }
   };
 
-  if (needWrapReverse) {
-    res = wrapInDefaultConj(res, config, spel?.not);
-    if (spel?.not) {
-      spel.not = false;
-    }
+  if (needWrapWithNot) {
+    res = wrapInDefaultConj(res, config, spel.not);
+    // spel.not = !spel.not; // why I added this line?
   }
 
   return res;
@@ -1161,20 +1163,14 @@ const buildRuleGroup = ({groupFilter, groupFieldValue}, opKey, convertedArgs, co
 };
 
 
-const compareArgs = (left, right,  spel, conv, config, meta, parentSpel = null) => {
+const compareArgs = (left, right,  spel, conv, config, meta) => {
   if (left.type == right.type) {
     if (left.type == "!aggr") {
-      const [leftSource, rightSource] = [left.source, right.source].map(v => convertArg(v, conv, config, meta, {
-        ...spel,
-        _groupField: parentSpel?._groupField
-      }));
+      const [leftSource, rightSource] = [left.source, right.source].map(v => convertArg(v, conv, config, meta, spel));
       //todo: check same filter
       return leftSource.value == rightSource.value;
     } else {
-      const [leftVal, rightVal] = [left, right].map(v => convertArg(v, conv, config, meta, {
-        ...spel,
-        _groupField: parentSpel?._groupField
-      }));
+      const [leftVal, rightVal] = [left, right].map(v => convertArg(v, conv, config, meta, spel));
       return leftVal.value == rightVal.value;
     }
   }
@@ -1306,19 +1302,19 @@ const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
   return valProperties;
 };
 
-const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj) => {
-  if (!rule) return undefined;
-  return {
-    type: "rule_group",
-    id: uuid(),
-    children1: { [rule.id]: rule },
-    properties: {
-      conjunction: conj || defaultGroupConjunction(config, parentFieldConfig),
-      not: false,
-      field: parentField,
-    }
-  };
-};
+// const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj) => {
+//   if (!rule) return undefined;
+//   return {
+//     type: "rule_group",
+//     id: uuid(),
+//     children1: { [rule.id]: rule },
+//     properties: {
+//       conjunction: conj || defaultGroupConjunction(config, parentFieldConfig),
+//       not: false,
+//       field: parentField,
+//     }
+//   };
+// };
 
 const wrapInDefaultConj = (rule, config, not = false) => {
   return {

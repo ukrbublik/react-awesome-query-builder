@@ -349,6 +349,8 @@ Behaviour settings:
 |useConfigCompress |false |Set to `true` if you use `Utils.decompressConfig()`
 |fieldItemKeysForSearch |`["label", "path", "altLabel", "grouplabel"]` |Keys in field item (see {d_ts}[type] `FieldItem`) available for search. Available keys: "key", "path", "label", "altLabel" (label2), "tooltip", "grouplabel" (label of parent group, for subfields of complex fields)
 |listKeysForSearch |`["title", "value"]` |Keys in list item (see {d_ts}[type] `ListItem`) available for search. Available keys: "title", "value", "groupTitle"
+|reverseOperatorsForNot |false |True to convert "!(x == 1)" to "x != 1" on import and export
+|canShortMongoQuery |true |True to simplify exported MongoDb query eg. `{$and: [ {num:{$gt:1}}, {num:{$ne:5} } ]}` to `{ num: {$gt: 1, $ne: 5} }`
 |===
 
 TIP: For fully read-only mode use these settings:

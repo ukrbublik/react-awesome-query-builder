@@ -117,9 +117,9 @@ describe("query with !struct and !group", () => {
   });
 
   describe("should handle some-in when it's not related to multiselect_contains op", () => {
-    export_checks(configs.with_group_inside_struct, inits.with_select_any_in_in_some, "JsonLogic", {
+    export_checks(configs.with_group_inside_struct, inits.with_nested_and_select_any_in_in_some, "JsonLogic", {
       "query": "vehicles.cars.vendor IN (\"Ford\", \"Toyota\")",
-      logic: inits.with_select_any_in_in_some,
+      logic: inits.with_nested_and_select_any_in_in_some,
     });
   });
 
@@ -166,26 +166,90 @@ describe("query with !group", () => {
   });
 
   describe("should handle select_not_any_in in some (when group mode is array)", () => {
-    export_checks(configs.with_group_array_cars, inits.with_select_not_any_in_in_some, "JsonLogic", {
-      "logic": inits.with_select_not_any_in_in_some,
-      "query": "SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
-    });
+    describe("reverseOperatorsForNot == true", () => {
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_select_not_any_in_in_some, "JsonLogic", {
+          "logic": inits.with_select_not_any_in_in_some,
+          "query": "SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
+        });
+      });
 
-    export_checks(configs.with_group_array_cars, inits.spel_with_select_not_any_in_in_some, "SpEL", {
-      "spel": inits.spel_with_select_not_any_in_in_some,
-      "query": "SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.spel_with_select_not_any_in_in_some, "SpEL", {
+          "spel": inits.spel_with_select_not_any_in_in_some,
+          "query": "SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
+        });
+      });
+    });
+  
+    describe("reverseOperatorsForNot == false", () => {
+      // will use "NOT (vendor IN ..)"  because of `_isOneRuleInRuleGroup` in code
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars], inits.with_select_not_any_in_in_some, "JsonLogic", {
+          "logic": inits.with_select_not_any_in_in_some,
+          "query": "SOME OF cars HAVE NOT (vendor IN (\"Ford\", \"Toyota\"))"
+        });
+      });
+
+      describe("from SpEL", () => {
+        // will use "vendor NOT IN .." instead of "NOT (vendor IN ..)"
+        export_checks([configs.with_group_array_cars], inits.spel_with_select_not_any_in_in_some, "SpEL", {
+          "spel": inits.spel_with_select_not_any_in_in_some,
+          "query": "SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
+        });
+      });
+    });
+  });
+
+  describe("should handle ! select_not_any_in in some (when group mode is array)", () => {
+    describe("reverseOperatorsForNot == false", () => {
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars], inits.with_not_select_not_any_in_in_some, "JsonLogic", {
+          "logic": inits.with_select_any_in_in_some,
+          "query": "SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
+        });
+      });
+
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars], inits.spel_with_not_select_not_any_in_in_some, "SpEL", {
+          "spel": inits.spel_with_select_any_in_in_some,
+          "query": "SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
+        });
+      });
     });
   });
 
   describe("should handle not and in some (when group mode is array)", () => {
-    export_checks(configs.with_group_array_cars, inits.with_not_and_in_some, "JsonLogic", {
-      "logic": inits.with_not_and_in_some,
-      "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
+    describe("reverseOperatorsForNot == true", () => {
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_and_in_some, "JsonLogic", {
+          "logic": inits.with_not_and_in_some,
+          "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
+        });
+      });
+
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.spel_with_not_and_in_some, "SpEL", {
+          "spel": inits.spel_with_not_and_in_some,
+          "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
+        });
+      });
     });
 
-    export_checks(configs.with_group_array_cars, inits.spel_with_not_and_in_some, "SpEL", {
-      "spel": inits.spel_with_not_and_in_some,
-      "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
+    describe("reverseOperatorsForNot == false", () => {
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars], inits.with_not_and_in_some, "JsonLogic", {
+          "logic": inits.with_not_and_in_some,
+          "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
+        });
+      });
+
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars], inits.spel_with_not_and_in_some, "SpEL", {
+          "spel": inits.spel_with_not_and_in_some,
+          "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
+        });
+      });
     });
   });
 
@@ -214,50 +278,153 @@ describe("query with !group", () => {
   });
 
   describe("should handle not and count w/o children (when group mode is array)", () => {
-    export_checks(configs.with_group_array_cars, inits.with_not_group_count, "JsonLogic", {
-      // will convert not == to !=
-      "logic": inits.with_not_group_count_out,
-      "query": "COUNT OF cars != 2"
+    describe("reverseOperatorsForNot == false", () => {
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars], inits.with_not_group_count, "JsonLogic", {
+          // will convert not == to !=
+          // because of line `|| isRuleGroup && !having` (see `canRev = ..` and comment // !(count == 2)  ->  count != 2`
+          "logic": inits.with_not_group_count_out,
+          "query": "COUNT OF cars != 2"
+        });
+      });
+
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars], inits.spel_with_not_group_count, "SpEL", {
+          "spel": inits.spel_with_not_group_count,
+          "query": "NOT (COUNT OF cars == 2)"
+        });
+      });
     });
 
-    export_checks(configs.with_group_array_cars, inits.spel_with_not_group_count, "SpEL", {
-      // will convert not == to !=
-      "spel": inits.spel_with_not_group_count_out,
-      "query": "COUNT OF cars != 2"
+    describe("reverseOperatorsForNot == true", () => {
+      //will convert
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_group_count, "JsonLogic", {
+          // will convert not == to !=
+          "logic": inits.with_not_group_count_out,
+          "query": "COUNT OF cars != 2"
+        });
+      });
+
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.spel_with_not_group_count, "SpEL", {
+          // will convert not == to !=
+          "spel": inits.spel_with_not_group_count_out,
+          "query": "COUNT OF cars != 2"
+        });
+      });
     });
   });
 
   describe("should handle not aggregate + not filter (when group mode is array)", () => {
-    export_checks(configs.with_group_array_cars, inits.with_not_group_not_filter, "JsonLogic", {
-      // will convert `not ==` to `!=` inside group filter, but not for group conj
-      // todo: why?
-      "logic": inits.with_not_group_not_filter_out,
-      "query": "NOT (COUNT OF cars WHERE vendor != \"Toyota\" == 6)"
+    describe("reverseOperatorsForNot == false", () => {
+      // will remain
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars], inits.with_not_group_not_filter, "JsonLogic", {
+          "logic": inits.with_not_group_not_filter,
+          "query": "NOT (COUNT OF cars WHERE NOT (vendor == \"Toyota\") == 6)"
+        });
+      });
+
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars], inits.spel_with_not_group_not_filter, "SpEL", {
+          "spel": inits.spel_with_not_group_not_filter,
+          "query": "NOT (COUNT OF cars WHERE NOT (vendor == \"Toyota\") == 6)"
+        });
+      });
     });
 
-    export_checks(configs.with_group_array_cars, inits.spel_with_not_group_not_filter, "SpEL", {
-      // will convert both `not ==` to `!=`
-      "spel": inits.spel_with_not_group_not_filter_out,
-      "query": "COUNT OF cars WHERE vendor != \"Toyota\" != 6"
+    describe("reverseOperatorsForNot == true", () => {
+      // will convert
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_group_not_filter, "JsonLogic", {
+          // will convert `not ==` to `!=` inside group filter, but not for group conj
+          "logic": inits.with_not_group_not_filter_out,
+          "query": "NOT (COUNT OF cars WHERE vendor != \"Toyota\" == 6)"
+        });
+      });
+
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.spel_with_not_group_not_filter, "SpEL", {
+          // will convert both `not ==` to `!=`
+          "spel": inits.spel_with_not_group_not_filter_out,
+          "query": "COUNT OF cars WHERE vendor != \"Toyota\" != 6"
+        });
+      });
     });
   });
 
   describe("should handle not is_null in not some (when group mode is array)", () => {
-    export_checks(configs.with_group_array_cars, inits.with_not_some_not_is_null, "JsonLogic", {
-      "logic": inits.with_not_some_not_is_null_out,
-      "query": "NOT (SOME OF cars HAVE !!vendor)"
+    describe("reverseOperatorsForNot == false", () => {
+      // should preserve
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars], inits.with_not_some_not_is_null, "JsonLogic", {
+          "logic": inits.with_not_some_not_is_null,
+          "query": "NOT (SOME OF cars HAVE NOT (!vendor))"
+        });
+      });
+  
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars], inits.spel_with_not_some_not_is_null, "SpEL", {
+          "spel": inits.spel_with_not_some_not_is_null,
+          "query": "NOT (SOME OF cars HAVE NOT (!vendor))"
+        });
+      });
     });
 
-    export_checks(configs.with_group_array_cars, inits.spel_with_not_some_not_is_null, "SpEL", {
-      "spel": inits.spel_with_not_some_not_is_null_out,
-      "query": "NOT (SOME OF cars HAVE !!vendor)"
+    describe("reverseOperatorsForNot == true", () => {
+      // should convert
+      describe("from JL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_some_not_is_null, "JsonLogic", {
+          "logic": inits.with_not_some_not_is_null_out,
+          "query": "NOT (SOME OF cars HAVE !!vendor)"
+        });
+      });
+  
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.spel_with_not_some_not_is_null, "SpEL", {
+          "spel": inits.spel_with_not_some_not_is_null_out,
+          "query": "NOT (SOME OF cars HAVE !!vendor)"
+        });
+      });
+    });
+  });
+
+  describe("should handle is_not_null in not some (when group mode is array)", () => {
+    describe("reverseOperatorsForNot == false", () => {
+      describe("from JL", () => {
+        export_checks(configs.with_group_array_cars, inits.with_not_some_not_is_null_out, "JsonLogic", {
+          "logic": inits.with_not_some_not_is_null_out,
+          "query": "NOT (SOME OF cars HAVE !!vendor)"
+        });
+      });
+
+      describe("from SpEL", () => {
+        export_checks(configs.with_group_array_cars, inits.spel_with_not_some_not_is_null_out, "SpEL", {
+          "spel": inits.spel_with_not_some_not_is_null_out,
+          "query": "NOT (SOME OF cars HAVE !!vendor)"
+        });
+      });
     });
   });
 
   describe("should handle not contains in not some (when group mode is array)", () => {
-    export_checks(configs.with_group_array, inits.spel_with_not_some_not_contains, "SpEL", {
-      "spel": inits.spel_with_not_some_not_contains_out, // same
-      "query": "NOT (SOME OF results HAVE grade Not Contains \"Toy\")"
+    describe("reverseOperatorsForNot == false", () => {
+      describe("from SpEL", () => {
+        export_checks(configs.with_group_array, inits.spel_with_not_some_not_contains, "SpEL", {
+          "spel": inits.spel_with_not_some_not_contains, // same
+          "query": "NOT (SOME OF results HAVE grade Not Contains \"Toy\")"
+        });
+      });
+    });
+
+    describe("reverseOperatorsForNot == true", () => {
+      describe("from SpEL", () => {
+        export_checks([configs.with_group_array, configs.with_reverse_operators], inits.spel_with_not_some_not_contains, "SpEL", {
+          "spel": inits.spel_with_not_some_not_contains, // same
+          "query": "NOT (SOME OF results HAVE grade Not Contains \"Toy\")"
+        });
+      });
     });
   });
 });

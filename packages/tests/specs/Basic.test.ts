@@ -106,27 +106,74 @@ describe("basic query", () => {
             }
           ]
         },
-        spel: "num >= 1 && num <= 2"
+        spel: "num >= 1 && num <= 2",
+        mongo: {
+          num: { $gte: 1, $lte: 2 }
+        },
       }, []);
+
+      // canShortMongoQuery should not affect on between op
+      describe("canShortMongoQuery == false", () => {
+        export_checks([configs.simple_with_number, configs.without_short_mongo_query], inits.spel_with_between, "SpEL", {
+          mongo: {
+            num: { $gte: 1, $lte: 2 }
+          },
+        });
+      });
     });
 
     describe("should work with not_between op in SpEL format", () => {
-      export_checks(configs.simple_with_number, inits.spel_with_not_between, "SpEL", {
-        logic: {
-          "and": [
-            {
-              "!": {
-                "<=": [
-                  1,
-                  { "var": "num" },
-                  2
-                ]
+      describe("reverseOperatorsForNot == true", () => {
+        export_checks([configs.simple_with_number, configs.with_reverse_operators], inits.spel_with_not_between, "SpEL", {
+          logic: {
+            "and": [
+              {
+                "!": {
+                  "<=": [ 1, { "var": "num" }, 2 ]
+                }
               }
+            ]
+          },
+          spel: "(num < 1 || num > 2)",
+          mongo: {
+            num: {
+              $not: { $gte: 1, $lte: 2 }
             }
-          ]
-        },
-        spel: "(num < 1 || num > 2)"
-      }, []);
+          },
+        }, []);
+      });
+
+      // reverseOperatorsForNot should not affect
+      describe("reverseOperatorsForNot == false", () => {
+        export_checks([configs.simple_with_number], inits.spel_with_not_between, "SpEL", {
+          logic: {
+            "and": [
+              {
+                "!": {
+                  "<=": [ 1, { "var": "num" }, 2 ]
+                }
+              }
+            ]
+          },
+          spel: "(num < 1 || num > 2)",
+          mongo: {
+            num: {
+              $not: { $gte: 1, $lte: 2 }
+            }
+          },
+        });
+      });
+
+      // canShortMongoQuery should not affect on not_between op
+      describe("canShortMongoQuery == false", () => {
+        export_checks([configs.simple_with_number, configs.without_short_mongo_query], inits.spel_with_not_between, "SpEL", {
+          mongo: {
+            num: {
+              $not: { $gte: 1, $lte: 2 }
+            }
+          },
+        });
+      });
     });
 
     describe("should work with simple value in JsonLogic format not in group", () => {
@@ -185,7 +232,7 @@ describe("basic query", () => {
   });
 
   describe("export", () => {
-    export_checks(configs.simple_with_number, inits.tree_with_number, "default", {
+    export_checks([configs.simple_with_number], inits.tree_with_number, "default", {
       spel: "num == 2",
       query: "num == 2",
       queryHuman: "Number = 2",
@@ -198,4 +245,5 @@ describe("basic query", () => {
       },
     });
   });
+
 });

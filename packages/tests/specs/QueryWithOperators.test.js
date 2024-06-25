@@ -5,8 +5,8 @@ import { Utils } from "@react-awesome-query-builder/core";
 import { BasicConfig } from "@react-awesome-query-builder/ui";
 
 describe("query with ops", () => {
-  describe("export", () => {
-    export_checks(configs.with_all_types, inits.with_ops, "JsonLogic", {
+  describe("reverseOperatorsForNot == true", () => {
+    export_checks([configs.with_all_types, configs.with_reverse_operators], inits.with_ops, "JsonLogic", {
       "spel": "(text == 'Long\nText' && num != 2 && str.contains('abc') && !(str.contains('xyz')) && num >= 1 && num <= 2 && (num < 3 || num > 4) && num == null && {'yellow'}.?[true].contains(color) && !({'green'}.?[true].contains(color)) && !(multicolor.equals({'yellow'})))",
       "query": "(text == \"Long\\nText\" && num != 2 && str Contains \"abc\" && str Not Contains \"xyz\" && num >= 1 && num <= 2 && (num < 3 || num > 4) && !num && color IN (\"yellow\") && color NOT IN (\"green\") && multicolor != [\"yellow\"])",
       "queryHuman": "(Textarea = Long\nText AND Number != 2 AND String Contains abc AND String Not Contains xyz AND Number BETWEEN 1 AND 2 AND Number NOT BETWEEN 3 AND 4 AND Number IS NULL AND Color IN (Yellow) AND Color NOT IN (Green) AND Colors != [Yellow])",
@@ -168,6 +168,353 @@ describe("query with ops", () => {
           ]
         }
       }
+    });
+  });
+
+  describe("reverseOperatorsForNot == false", () => {
+    export_checks([configs.with_all_types], inits.with_ops, "JsonLogic", {
+      "spel": "(text == 'Long\nText' && num != 2 && str.contains('abc') && !(str.contains('xyz')) && num >= 1 && num <= 2 && !(num >= 3 && num <= 4) && num == null && {'yellow'}.?[true].contains(color) && !({'green'}.?[true].contains(color)) && !(multicolor.equals({'yellow'})))",
+      "query": "(text == \"Long\\nText\" && num != 2 && str Contains \"abc\" && NOT (str Contains \"xyz\") && num >= 1 && num <= 2 && NOT (num >= 3 && num <= 4) && !num && color IN (\"yellow\") && NOT (color IN (\"green\")) && NOT (multicolor == [\"yellow\"]))",
+      "queryHuman": "(Textarea = Long\nText AND Number != 2 AND String Contains abc AND NOT (String Contains xyz) AND Number BETWEEN 1 AND 2 AND NOT (Number BETWEEN 3 AND 4) AND Number IS NULL AND Color IN (Yellow) AND NOT (Color IN (Green)) AND NOT (Colors = [Yellow]))",
+      "sql": "(text = 'Long\\nText' AND num <> 2 AND str LIKE '%abc%' AND NOT (str LIKE '%xyz%') AND num BETWEEN 1 AND 2 AND NOT (num BETWEEN 3 AND 4) AND num IS NULL AND color IN ('yellow') AND NOT (color IN ('green')) AND NOT (multicolor = 'yellow'))",
+      "mongo": {
+        "$and": [
+          {
+            "text": "Long\nText"
+          },
+          {
+            "num": {
+              "$ne": 2
+            }
+          },
+          {
+            "str": {
+              "$regex": "abc"
+            }
+          },
+          {
+            "$not": {
+              "str": {
+                "$regex": "xyz"
+              }
+            }
+          },
+          {
+            "num": {
+              "$gte": 1,
+              "$lte": 2
+            }
+          },
+          {
+            "$not": {
+              "num": {
+                "$gte": 3,
+                "$lte": 4
+              }
+            }
+          },
+          {
+            "num": null
+          },
+          {
+            "color": {
+              "$in": [
+                "yellow"
+              ]
+            }
+          },
+          {
+            "$not": {
+              "color": {
+                "$in": [
+                  "green"
+                ]
+              }
+            }
+          },
+          {
+            "$not": {
+              "multicolor": [
+                "yellow"
+              ]
+            }
+          }
+        ]
+      },
+      "logic": {
+        "and": [
+          {
+            "==": [
+              {
+                "var": "text"
+              },
+              "Long\nText"
+            ]
+          },
+          {
+            "!=": [
+              {
+                "var": "num"
+              },
+              2
+            ]
+          },
+          {
+            "in": [
+              "abc",
+              {
+                "var": "str"
+              }
+            ]
+          },
+          {
+            "!": {
+              "in": [
+                "xyz",
+                {
+                  "var": "str"
+                }
+              ]
+            }
+          },
+          {
+            "<=": [
+              1,
+              {
+                "var": "num"
+              },
+              2
+            ]
+          },
+          {
+            "!": {
+              "<=": [
+                3,
+                {
+                  "var": "num"
+                },
+                4
+              ]
+            }
+          },
+          {
+            "==": [
+              {
+                "var": "num"
+              },
+              null
+            ]
+          },
+          {
+            "in": [
+              {
+                "var": "color"
+              },
+              [
+                "yellow"
+              ]
+            ]
+          },
+          {
+            "!": {
+              "in": [
+                {
+                  "var": "color"
+                },
+                [
+                  "green"
+                ]
+              ]
+            }
+          },
+          {
+            "!": {
+              "all": [
+                {
+                  "var": "multicolor"
+                },
+                {
+                  "in": [
+                    {
+                      "var": ""
+                    },
+                    [
+                      "yellow"
+                    ]
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "elasticSearch": {
+        "bool": {
+          "must": [
+            {
+              "term": {
+                "text": "Long\nText"
+              }
+            },
+            {
+              "bool": {
+                "must_not": {
+                  "term": {
+                    "num": 2
+                  }
+                }
+              }
+            },
+            {
+              "regexp": {
+                "str": {
+                  "value": "abc"
+                }
+              }
+            },
+            {
+              "bool": {
+                "must_not": [
+                  {
+                    "regexp": {
+                      "str": {
+                        "value": "xyz"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "range": {
+                "num": {
+                  "gte": "1",
+                  "lte": "2"
+                }
+              }
+            },
+            {
+              "bool": {
+                "must_not": [
+                  {
+                    "range": {
+                      "num": {
+                        "gte": "3",
+                        "lte": "4"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "bool": {
+                "must_not": {
+                  "exists": {
+                    "field": "num"
+                  }
+                }
+              }
+            },
+            {
+              "term": {
+                "color": "yellow"
+              }
+            },
+            {
+              "bool": {
+                "must_not": [
+                  {
+                    "term": {
+                      "color": "green"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "bool": {
+                "must_not": [
+                  {
+                    "term": {
+                      "multicolor": "yellow"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }    
+    });
+  });
+
+  describe("canShortMongoQuery == false", () => {
+    export_checks([configs.with_all_types, configs.without_short_mongo_query], inits.with_ops, "JsonLogic", {
+      "mongo": {
+        "$and": [
+          {
+            "text": "Long\nText"
+          },
+          {
+            "num": {
+              "$ne": 2
+            }
+          },
+          {
+            "str": {
+              "$regex": "abc"
+            }
+          },
+          {
+            "$not": {
+              "str": {
+                "$regex": "xyz"
+              }
+            }
+          },
+          {
+            "num": {
+              "$gte": 1,
+              "$lte": 2
+            }
+          },
+          {
+            "$not": {
+              "num": {
+                "$gte": 3,
+                "$lte": 4
+              }
+            }
+          },
+          {
+            "num": null
+          },
+          {
+            "color": {
+              "$in": [
+                "yellow"
+              ]
+            }
+          },
+          {
+            "$not": {
+              "color": {
+                "$in": [
+                  "green"
+                ]
+              }
+            }
+          },
+          {
+            "$not": {
+              "multicolor": [
+                "yellow"
+              ]
+            }
+          }
+        ]
+      },
     });
   });
 

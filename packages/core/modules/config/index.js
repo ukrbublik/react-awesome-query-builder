@@ -14,21 +14,36 @@ const conjunctions = {
     spelConj: "and",
     spelConjs: ["and", "&&"],
     reversedConj: "OR",
-    formatConj: (children, conj, not, isForDisplay) => {
-      return children.size > 1
-        ? (not ? "NOT " : "") + "(" + children.join(" " + (isForDisplay ? "AND" : "&&") + " ") + ")"
-        : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
+    formatConj: function (children, conj, not, isForDisplay) {
+      let ret = children.size > 1 ? children.join(" " + (isForDisplay ? "AND" : "&&") + " ") : children.first();
+      if (children.size > 1 || not) {
+        ret = this.utils.wrapWithBrackets(ret);
+      }
+      if (not) {
+        ret = "NOT " + ret;
+      }
+      return ret;
     },
-    sqlFormatConj: (children, conj, not) => {
-      return children.size > 1
-        ? (not ? "NOT " : "") + "(" + children.join(" " + "AND" + " ") + ")"
-        : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
+    sqlFormatConj: function (children, conj, not) {
+      let ret = children.size > 1 ? children.join(" " + "AND" + " ") : children.first();
+      if (children.size > 1 || not) {
+        ret = this.utils.wrapWithBrackets(ret);
+      }
+      if (not) {
+        ret = "NOT " + ret;
+      }
+      return ret;
     },
-    spelFormatConj: (children, conj, not, omitBrackets) => {
+    spelFormatConj: function (children, conj, not, omitBrackets) {
       if (not) omitBrackets = false;
-      return children.size > 1
-        ? (not ? "!" : "") + (omitBrackets ? "" : "(") + children.join(" " + "&&" + " ") + (omitBrackets ? "" : ")")
-        : (not ? "!(" : "") + children.first() + (not ? ")" : "");
+      let ret = children.size > 1 ? children.join(" " + "&&" + " ") : children.first();
+      if ((children.size > 1 || not) && !omitBrackets) {
+        ret = this.utils.wrapWithBrackets(ret);
+      }
+      if (not) {
+        ret = "!" + ret;
+      }
+      return ret;
     },
   },
   OR: {
@@ -528,6 +543,7 @@ const operators = {
     jsonLogic: "some",
     spelFormatOp: (filteredSize) => `${filteredSize} > 0`,
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$gt", v => 0, false, ...args); },
+    // reversedOp: undefined,
   },
   all: {
     label: "All",
@@ -536,6 +552,7 @@ const operators = {
     jsonLogic: "all",
     spelFormatOp: (filteredSize, op, fullSize) => `${filteredSize} == ${fullSize}`,
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => v, false, ...args); },
+    // reversedOp: "none",
   },
   none: {
     label: "None",
@@ -544,6 +561,7 @@ const operators = {
     jsonLogic: "none",
     spelFormatOp: (filteredSize) => `${filteredSize} == 0`,
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => 0, false, ...args); },
+    // reversedOp: "all",
   }
 };
 
@@ -1272,20 +1290,20 @@ const settings = {
     }
     return fieldName;
   },
-  sqlFormatReverse: (q) => {
+  sqlFormatReverse: function (q) {
     if (q == undefined) return undefined;
-    return "NOT(" + q + ")";
+    return "NOT" + this.utils.wrapWithBrackets(q);
   },
-  spelFormatReverse: (q) => {
+  spelFormatReverse: function (q) {
     if (q == undefined) return undefined;
-    return "!(" + q + ")";
+    return "!" + this.utils.wrapWithBrackets(q);
   },
-  formatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay) => {
+  formatReverse: function (q, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay) {
     if (q == undefined) return undefined;
     if (isForDisplay)
-      return "NOT (" + q + ")";
+      return "NOT " + this.utils.wrapWithBrackets(q);
     else
-      return "!(" + q + ")";
+      return "!" + this.utils.wrapWithBrackets(q);
   },
   formatAggr: (whereStr, aggrField, operator, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay, aggrFieldDef) => {
     const {labelForFormat, cardinality} = opDef;

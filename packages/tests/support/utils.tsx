@@ -108,9 +108,12 @@ interface DoOptions {
 const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
 
 const globalIgnoreFn: ConsoleIgnoreFn = (errText) => {
-  // todo: issue after updating antd
-  return errText.includes("The node you're attempting to unmount was rendered by another copy of React.")
-    || errText.includes("Fixed operator is_empty to is_null for num");
+  return errText.includes("Fixed operator is_empty to is_null for num")
+    // todo: issue after updating antd
+    || errText.includes("The node you're attempting to unmount was rendered by another copy of React.")
+    // tip: It's the issue with antd's Select component in "multiple" mode for React 17 (in React 18 it's fine)
+    || errText.includes("Can't perform a React state update on an unmounted component")
+      && errText.includes("a useEffect cleanup function") && errText.includes("at Overflow");
 };
 
 const mockConsole = (options?: DoOptions, _configName?: string) => {

@@ -70,7 +70,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
     conjunction = defaultConjunction(config);
   const conjunctionDefinition = config.conjunctions[conjunction];
 
-  const conjStr = list.size ? conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay) : null;
+  const conjStr = list.size ? conjunctionDefinition.formatConj.call(config.ctx, list, conjunction, not, isForDisplay) : null;
   
   let ret;
   if (groupField) {
@@ -81,9 +81,9 @@ const formatGroup = (item, config, meta, parentField = null) => {
         conjStr,
         ...aggrArgs
       ];
-      ret = config.settings.formatAggr(...args);
+      ret = config.settings.formatAggr.call(config.ctx, ...args);
       if (isRev) {
-        ret = config.settings.formatReverse(ret, null, null, null, null, isForDisplay);
+        ret = config.settings.formatReverse.call(config.ctx, ret, null, null, null, null, isForDisplay);
       }
     }
   } else {
@@ -249,7 +249,7 @@ const formatRule = (item, config, meta, parentField = null, returnArgs = false) 
 
     //rev
     if (isRev) {
-      ret = config.settings.formatReverse(ret, operator, reversedOp, operatorDef, revOperatorDef, isForDisplay);
+      ret = config.settings.formatReverse.call(config.ctx, ret, operator, reversedOp, operatorDef, revOperatorDef, isForDisplay);
     }
 
     return ret;

@@ -2,7 +2,7 @@ import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../u
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts
 } from "../utils/configUtils";
-import {getWidgetForFieldOp, formatFieldName, completeValue} from "../utils/ruleUtils";
+import {getWidgetForFieldOp, formatFieldName, completeValue, getOneChildOrDescendant} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 import pick from "lodash/pick";
@@ -18,7 +18,7 @@ export const jsonLogicFormat = (item, config) => {
   };
 
   const extendedConfig = extendConfig(config, undefined, false);
-  const logic = formatItem(item, extendedConfig, meta, true);
+  const logic = formatItem(item, extendedConfig, meta, false, true);
 
   // build empty data
   const {errors, usedFields} = meta;
@@ -57,7 +57,7 @@ export const jsonLogicFormat = (item, config) => {
 };
 
 
-const formatItem = (item, config, meta, isRoot, parentField = null) => {
+const formatItem = (item, config, meta, _not = false, isRoot = false, parentField = null) => {
   if (!item) return undefined;
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
@@ -65,13 +65,13 @@ const formatItem = (item, config, meta, isRoot, parentField = null) => {
   const {lockedOp} = config.settings.jsonLogic;
   let ret;
   if (type === "group" || type === "rule_group") {
-    ret = formatGroup(item, config, meta, isRoot, parentField);
+    ret = formatGroup(item, config, meta, _not, isRoot, parentField);
   } else if (type === "rule") {
-    ret = formatRule(item, config, meta, parentField);
+    ret = formatRule(item, config, meta, _not, parentField);
   } else if (type == "switch_group") {
-    ret = formatSwitch(item, config, meta);
+    ret = formatSwitch(item, config, meta, _not);
   } else if (type == "case_group") {
-    ret = formatCase(item, config, meta, parentField);
+    ret = formatCase(item, config, meta, _not, parentField);
   }
   if (isLocked && ret && lockedOp) {
     ret = { [lockedOp] : ret };
@@ -79,32 +79,71 @@ const formatItem = (item, config, meta, isRoot, parentField = null) => {
   return ret;
 };
 
-const formatGroup = (item, config, meta, isRoot, parentField = null) => {
+const formatGroup = (item, config, meta, _not = false, isRoot = false, parentField = null) => {
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const mode = properties.get("mode");
   const children = item.get("children1") || new List();
   const field = properties.get("field");
+  const fieldDefinition = getFieldConfig(config, field);
 
   let conjunction = properties.get("conjunction");
   if (!conjunction)
     conjunction = defaultConjunction(config);
   const conjunctionDefinition = config.conjunctions[conjunction];
   const conj = conjunctionDefinition.jsonLogicConj || conjunction.toLowerCase();
-  const not = properties.get("not");
+  const origNot = !!properties.get("not");
 
   const isRuleGroup = (type === "rule_group" && !isRoot);
-  const groupField = isRuleGroup && mode != "struct" ? field : parentField;
-  const groupOperator = properties.get("operator");
-  const groupOperatorDefinition = groupOperator && getOperatorConfig(config, groupOperator, field) || null;
+  const isRuleGroupArray = isRuleGroup && mode != "struct";
+  const groupField = isRuleGroupArray ? field : parentField;
+  let groupOperator = properties.get("operator");
+  let groupOperatorDef = groupOperator && getOperatorConfig(config, groupOperator, field) || null;
   const formattedValue = formatItemValue(config, properties, meta, groupOperator, parentField);
-  const isGroup0 = isRuleGroup && (!groupOperator || groupOperatorDefinition.cardinality == 0);
+  const isGroup0 = isRuleGroup && (!groupOperator || groupOperatorDef?.cardinality == 0);
+  const isRuleGroupWithChildren = isRuleGroup && children?.size > 0;
+  const isRuleGroupWithoutChildren = isRuleGroup && !children?.size;
+
+  // rev
+  let not = origNot;
+  let filterNot = false;
+  if (isRuleGroupWithChildren) {
+    // for rule_group `not` there should be 2 NOTs: from properties (for children) and from parent group (_not)
+    filterNot = origNot;
+    not = _not;
+  } else {
+    if (_not) {
+      not = !not;
+    }
+  }
+  let revChildren = false;
+  let reversedGroupOp = groupOperatorDef?.reversedOp;
+  let reversedGroupOpDef = getOperatorConfig(config, reversedGroupOp, field);
+  const groupOpNeedsReverse = !groupOperatorDef?.jsonLogic && !!reversedGroupOpDef?.jsonLogic;
+  const groupOpCanReverse = !!reversedGroupOpDef?.jsonLogic;
+  const oneChildType = getOneChildOrDescendant(item)?.get("type");
+  const canRevChildren = !!config.settings.reverseOperatorsForNot
+    && (!isRuleGroup && not && oneChildType === "rule" || filterNot && children?.size === 1);
+  if (canRevChildren) {
+    if (isRuleGroupWithChildren) {
+      filterNot = !filterNot;
+    } else {
+      not = !not;
+    }
+    revChildren = true;
+  }
+  let canRevGroupOp = not && isRuleGroup && groupOpCanReverse && (!!config.settings.reverseOperatorsForNot || groupOpNeedsReverse);
+  if (canRevGroupOp) {
+    not = !not;
+    [groupOperator, reversedGroupOp] = [reversedGroupOp, groupOperator];
+    [groupOperatorDef, reversedGroupOpDef] = [reversedGroupOpDef, groupOperatorDef];
+  }
 
   const list = children
-    .map((currentChild) => formatItem(currentChild, config, meta, false, groupField))
+    .map((currentChild) => formatItem(currentChild, config, meta, revChildren, false, groupField))
     .filter((currentChild) => typeof currentChild !== "undefined");
 
-  if (isRuleGroup && mode != "struct" && !isGroup0) {
+  if (isRuleGroupArray && !isGroup0) {
     // "count" rule can have no "having" children, but should have number value
     if (formattedValue == undefined)
       return undefined;
@@ -119,13 +158,13 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   else
     resultQuery[conj] = list.toList().toJS();
 
-  // revert
-  if (not) {
+  // reverse filter
+  if (filterNot) {
     resultQuery = { "!": resultQuery };
   }
 
   // rule_group (issue #246)
-  if (isRuleGroup && mode != "struct") {
+  if (isRuleGroupArray) {
     const formattedField = formatField(meta, config, field, parentField);
     if (isGroup0) {
       // config.settings.groupOperators
@@ -153,15 +192,20 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
           0
         ]
       };
-      resultQuery = formatLogic(config, properties, count, formattedValue, groupOperator);
+      resultQuery = formatLogic(config, properties, count, formattedValue, groupOperator, null, fieldDefinition);
     }
+  }
+
+  // reverse
+  if (not) {
+    resultQuery = { "!": resultQuery };
   }
 
   return resultQuery;
 };
 
 
-const formatRule = (item, config, meta, parentField = null) => {
+const formatRule = (item, config, meta, _not = false, parentField = null) => {
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
   const fieldSrc = properties.get("fieldSrc");
@@ -175,19 +219,25 @@ const formatRule = (item, config, meta, parentField = null) => {
   if (field == null || operator == null)
     return undefined;
 
-  const fieldDefinition = getFieldConfig(config, field) || {};
-  let operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  let reversedOp = operatorDefinition.reversedOp;
-  let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
+  const fieldDefinition = getFieldConfig(config, field);
+  let operatorDefinition = getOperatorConfig(config, operator, field);
+  let reversedOp = operatorDefinition?.reversedOp;
+  let revOperatorDefinition = getOperatorConfig(config, reversedOp, field);
 
   // check op
-  let isRev = false;
-  if (!operatorDefinition.jsonLogic && !revOperatorDefinition.jsonLogic) {
+  if (!operatorDefinition?.jsonLogic && !revOperatorDefinition?.jsonLogic) {
     meta.errors.push(`Operator ${operator} is not supported`);
     return undefined;
   }
-  if (!operatorDefinition.jsonLogic && revOperatorDefinition.jsonLogic) {
-    isRev = true;
+
+  // try reverse
+  let not = _not;
+  const opNeedsReverse = !operatorDefinition?.jsonLogic && !!revOperatorDefinition?.jsonLogic;
+  const opCanReverse = !!revOperatorDefinition?.jsonLogic;
+  let canRev = opCanReverse && (!!config.settings.reverseOperatorsForNot || opNeedsReverse);
+  const needRev = not && canRev || opNeedsReverse;
+  if (needRev) {
+    not = !not;
     [operator, reversedOp] = [reversedOp, operator];
     [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
   }
@@ -203,15 +253,15 @@ const formatRule = (item, config, meta, parentField = null) => {
   if (formattedField === undefined)
     return undefined;
 
-  return formatLogic(config, properties, formattedField, formattedValue, operator, operatorOptions, fieldDefinition, isRev);
+  return formatLogic(config, properties, formattedField, formattedValue, operator, operatorOptions, fieldDefinition, not);
 };
 
-const formatSwitch = (item, config, meta) => {
+const formatSwitch = (item, config, meta, _not = false) => {
   const children = item.get("children1");
   if (!children)
     return undefined;
   const cases = children
-    .map((currentChild) => formatCase(currentChild, config, meta, null))
+    .map((currentChild) => formatCase(currentChild, config, meta, _not, null))
     .filter((currentChild) => typeof currentChild !== "undefined")
     .valueSeq().toArray();
 
@@ -262,7 +312,7 @@ const formatSwitch = (item, config, meta) => {
   return ret;
 };
 
-const formatCase = (item, config, meta, parentField = null) => {
+const formatCase = (item, config, meta, _not = false, parentField = null) => {
   const type = item.get("type");
   if (type != "case_group") {
     meta.errors.push(`Unexpected child of type ${type} inside switch`);
@@ -270,7 +320,7 @@ const formatCase = (item, config, meta, parentField = null) => {
   }
   const properties = item.get("properties") || new Map();
 
-  const cond = formatGroup(item, config, meta, parentField);
+  const cond = formatGroup(item, config, meta, _not, parentField);
 
   const formattedItem = formatItemValue(
     config, properties, meta, null, parentField, "!case_value"
@@ -285,8 +335,8 @@ const formatItemValue = (config, properties, meta, operator, parentField, expect
   if (expectedValueType == "!case_value" || iValueType && iValueType.get(0) == "case_value") {
     field = "!case_value";
   }
-  const fieldDefinition = getFieldConfig(config, field) || {};
-  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
+  const fieldDefinition = getFieldConfig(config, field);
+  const operatorDefinition = getOperatorConfig(config, operator, field);
   const cardinality = getOpCardinality(operatorDefinition);
   const iValue = properties.get("value");
   const asyncListValues = properties.get("asyncListValues");
@@ -333,7 +383,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
     const args = [
       currentValue,
       {
-        ...pick(fieldDef, ["fieldSettings", "listValues"]),
+        ...(fieldDef ? pick(fieldDef, ["fieldSettings", "listValues"]) : {}),
         asyncListValues
       },
       //useful options: valueFormat for date/time
