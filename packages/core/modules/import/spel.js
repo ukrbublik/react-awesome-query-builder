@@ -404,12 +404,12 @@ const buildConv = (config) => {
 
 const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
   if (!spel) return undefined;
+  spel._groupField = spel._groupField ?? parentSpel?._groupField;
 
   let res, canParseAsArg = true;
   if (spel.type.indexOf("op-") === 0 || spel.type === "matches") {
     res = convertOp(spel, conv, config, meta, parentSpel);
   } else if (spel.type == "!aggr") {
-    spel._groupField = parentSpel?._groupField;
     const groupFieldValue = convertToTree(spel.source, conv, config, meta, spel);
     spel._groupField = groupFieldValue?.value;
     let groupFilter = convertToTree(spel.filter, conv, config, meta, spel);
@@ -485,7 +485,6 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
   if (isBetween) {
     const [left, from] = spel.children[0].children;
     const [right, to] = spel.children[1].children;
-    spel._groupField = parentSpel?._groupField;
     const isSameSource = compareArgs(left, right, spel, conv, config, meta, parentSpel);
     if (isSameSource) {
       const _fromValue = from.val;
@@ -499,6 +498,7 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
         ],
         not: isBetweenRev,
       };
+      oneSpel._groupField = parentSpel?._groupField;
       return convertOp(oneSpel, conv, config, meta, parentSpel);
     }
   }
@@ -518,7 +518,6 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
   }
 
   // convert children
-  spel._groupField = parentSpel?._groupField;
   const convertChildren = () => {
     let newChildren = spel.children.map(child =>
       convertToTree(child, conv, config, meta, spel)
@@ -654,14 +653,15 @@ const convertPath = (parts, meta = {}, expectingField = false) => {
   return !isError ? res : undefined;
 };
 
-const convertArg = (spel, conv, config, meta, parentSpel) => {
+const convertArg = (spel, conv, config, meta, parentSpel = null) => {
   if (spel == undefined)
     return undefined;
   const {fieldSeparator} = config.settings;
+  spel._groupField = spel._groupField ?? parentSpel?._groupField;
 
   if (spel.type == "variable" || spel.type == "property") {
     // normal field
-    const field = normalizeField(config, spel.val, parentSpel?._groupField);
+    const field = normalizeField(config, spel.val, spel._groupField);
     const fieldConfig = getFieldConfig(config, field);
     const isVariable = spel.type == "variable";
     return {
@@ -674,7 +674,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
     // complex field
     const parts = convertPath(spel.children, meta);
     if (parts) {
-      const field = normalizeField(config, parts.join(fieldSeparator), parentSpel?._groupField);
+      const field = normalizeField(config, parts.join(fieldSeparator), spel._groupField);
       const fieldConfig = getFieldConfig(config, field);
       const isVariable = spel.children?.[0]?.type == "variable";
       return {
@@ -817,9 +817,8 @@ const _buildFuncSignatures = (spel, brns) => {
   return [s, params];
 };
 
-const convertFunc = (spel, conv, config, meta, parentSpel) => {
+const convertFunc = (spel, conv, config, meta, parentSpel = null) => {
   // Build signatures
-  spel._groupField = parentSpel?._groupField;
   const convertFuncArg = v => convertToTree(v, conv, config, meta, spel);
   const fsigns = buildFuncSignatures(spel);
   const firstSign = fsigns?.[0]?.s;
@@ -1032,7 +1031,6 @@ const convertFuncToOp = (spel, conv, config, meta, parentSpel, fsigns, convertFu
         errs.push(`Op supports types ${valueTypes}, but got ${valueType}`);
       }
       if (!errs.length) {
-        spel._groupField = parentSpel?._groupField;
         return buildRule(config, meta, field, opKey, convertedArgs, spel);
       }
     }
@@ -1165,7 +1163,7 @@ const buildRuleGroup = ({groupFilter, groupFieldValue}, opKey, convertedArgs, co
 };
 
 
-const compareArgs = (left, right,  spel, conv, config, meta, parentSpel = null) => {
+const compareArgs = (left, right,  spel, conv, config, meta) => {
   if (left.type == right.type) {
     if (left.type == "!aggr") {
       const [leftSource, rightSource] = [left.source, right.source].map(v => convertArg(v, conv, config, meta, spel));
