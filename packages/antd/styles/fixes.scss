@@ -1,66 +1,83 @@
+/* don't trigger tooltips during drag-n-drop */
 body.qb-dragging {
+  /* v4 */
   .ant-tooltip {
+    display: none;
+  }
+  /* v5 */
+  .ant-popover {
     display: none;
   }
 }
 
 /* slider */
-.ant-tooltip-inner {
-  min-height: 18px;
-}
-.ant-slider {
-  margin-bottom: 4px !important;
-  margin-top: 4px;
-}
-.ant-slider.ant-slider-with-marks {
-  margin-bottom: 10px !important;
-  margin-left: 10px;
-  margin-top: 4px;
-}
-.ant-slider-track {
-  visibility: visible !important;
+.query-builder {
+  /* v4 fix */
+  .ant-tooltip-inner {
+    min-height: 18px;
+  }
+
+  .widget--widget {
+    .ant-slider {
+      margin-bottom: 4px !important;
+      margin-top: 4px;
+    }
+    .ant-slider.ant-slider-with-marks {
+      margin-bottom: 10px !important;
+      margin-left: 10px;
+      margin-top: 4px;
+    }
+    .ant-slider-track {
+      visibility: visible !important;
+    }
+  }
 }
 
-/* tree */
-.ant-select-tree-dropdown > div[role="listbox"] {
-  outline: none;
-}
-ul.ant-select-selection__rendered {
-  margin-right: 11px;
+/* tree v4 ? */
+.query-builder {
+  .ant-select-tree-dropdown > div[role="listbox"] {
+    outline: none;
+  }
+  ul.ant-select-selection__rendered {
+    margin-right: 11px;
+  }
 }
 
 /* for antd v4 default is 32 - too big */
-.ant-select-item {
-  min-height: 22px;
-}
-
-
-.widget--valuesrc, .rule--fieldsrc {
-  .anticon {
-    height: 100%;
-    svg {
-      height: 100%;
-    }
-  }
-  span .anticon-ellipsis {
-    transform: rotate(90deg);
+.query-builder {
+  .ant-select-item {
+    min-height: 22px;
   }
 }
 
+/* should be outside of .query-builder */
 .customSelectOption {
   color: lightcoral;
 }
 
+.query-builder {
+  .widget--valuesrc, .rule--fieldsrc {
+    .anticon {
+      height: 100%;
+      svg {
+        height: 100%;
+      }
+    }
+    span .anticon-ellipsis {
+      transform: rotate(90deg);
+    }
+  }
 
-.widget--valuesrc {
-  margin-left: 3px;
-  margin-right: 3px;
-}
-.rule--value .rule--widget .widget--valuesrc {
-  margin-top: 2px;
-}
-.rule--fieldsrc {
-  margin-left: 3px;
-  margin-right: 3px;
-  margin-bottom: 4px;
+  .widget--valuesrc {
+    margin-left: 3px;
+    margin-right: 3px;
+  }
+  .rule--value .rule--widget .widget--valuesrc {
+    margin-top: 2px;
+  }
+  .rule--fieldsrc {
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-bottom: 4px;
+  }
 }
