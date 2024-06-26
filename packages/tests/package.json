@@ -48,7 +48,7 @@
     "@react-awesome-query-builder/material": "workspace:^",
     "@react-awesome-query-builder/mui": "workspace:^",
     "@react-awesome-query-builder/ui": "workspace:^",
-    "antd": "^5.17.2",
+    "antd": "^5.18.3",
     "bootstrap": "^5.3.3",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
