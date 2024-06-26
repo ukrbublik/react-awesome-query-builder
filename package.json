@@ -102,7 +102,7 @@
   },
   "engines": {
     "node": ">=18",
-    "pnpm": ">=7"
+    "pnpm": ">=8"
   },
   "pnpm": {
     "allowedDeprecatedVersions": {
