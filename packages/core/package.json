@@ -55,7 +55,7 @@
     "sqlstring": "^2.3.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.24.5",
+    "@babel/cli": "^7.24.7",
     "@babel/core": "^7.24.5",
     "@babel/plugin-transform-class-properties": "^7.24.1",
     "@babel/plugin-transform-modules-commonjs": "^7.24.1",

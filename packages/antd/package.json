@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@ant-design/icons": "^5.3.7",
-    "@babel/cli": "^7.24.5",
+    "@babel/cli": "^7.24.7",
     "@babel/core": "^7.24.5",
     "@babel/plugin-transform-class-properties": "^7.24.1",
     "@babel/plugin-transform-modules-commonjs": "^7.24.1",
@@ -67,7 +67,7 @@
     "@babel/runtime": "^7.24.5",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
-    "antd": "^5.17.2",
+    "antd": "^5.18.3",
     "less": "^4.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
