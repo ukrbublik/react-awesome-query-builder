@@ -1,7 +1,8 @@
 # Changelog
 - 6.6.1
-  - Operators reverse on "NOT" is now optional, disabled by default to preserve orignal query (PR #1068) (issue #1059)
+  - Operators reverse on "NOT" is now optional, disabled by default to preserve orignal query (PR #1068) (issue #1059).  
     Added settings `reverseOperatorsForNot` and `canShortMongoQuery`
+  - Scope CSS classes to `.query-builder` (PR #1070) (issue #1018)
 - 6.6.0
   - Optimizations for rendering and export utils (PR #1054) (issue #342)
   - Added support of JsonLogic export for ternary mode (PR #1013) (issue #978)
@@ -25,7 +26,7 @@
   - Breaking: `Utils.sanitizeTree` returns object `{fixedTree, fixedErrors}` (PR #1034)
   - Breaking: `removeIncompleteRulesOnLoad` by default is false
   - Added config `removeEmptyRulesOnLoad` (default true) (PR #1034)
-  - Deprecated `Utils.validateAndFixTree` and `Utils.checkTree` (and removed type defs). 
+  - Deprecated `Utils.validateAndFixTree` and `Utils.checkTree` (and removed type defs).  
     Use `Utils.sanitizeTree().fixedTree` instead (PR #1034)
   - `Utils.validateTree` now checks LHS and RHS are completed (issues #977, #781) (PR #1034)
   - Fixed import of `select_any_in` operator from JsonLogic (issue #1005) (PR #1034)
@@ -57,7 +58,7 @@
   - Fixed import of fields with dot from JsonLogic (issue #786) (PR #960)
   - Fixes export to SpEL to respect `fieldSeparator` (issue #958) (PR #960)
 - 6.4.0
-  - Functions can be used in LHS with `fieldSources: ["field", "func"]` in `settings`
+  - Functions can be used in LHS with `fieldSources: ["field", "func"]` in `settings`  
     Thanks @rhallerman1 (PR #900, #896) (issues #287, #250, #344, #336)
   - Support import/export of functions for SpEL (PR #900) (issue #754)
   - Fix issue with `fieldName` (PR #900) (issues #929, #609)
@@ -87,7 +88,7 @@
 - 6.2.0
   - Fixed type `Config`: should have render settings like `renderSize` (PR #909) (issue #879)
   - Fixed type for `renderBeforeWidget`: `RuleProps` instead of wrong `FieldProps` (PR #909) (issue #879)
-  - Breaking change in types: `listValues` renamed to `treeValues` in `TreeSelectFieldSettings`
+  - Breaking change in types: `listValues` renamed to `treeValues` in `TreeSelectFieldSettings`  
     But old `listValues` is still supported in JS (PR #909)
   - Add support for ElasticSearch 7 term syntax (PR #906) (issue #904)
   - Fix mongodbFormat to work with mode = array (PR #908) (issue #907)
@@ -111,7 +112,7 @@
     - Breaking: Removed icon in "Add sub rule" button
   - Added `@react-awesome-query-builder/fluent` package (PR #727)
   - Fix import of `is_null` and `is_not_null` ops from SpEL (PR #831) (issue #794)
-  - Fix import of NOT from SpEL (PR #852) (issue #834)
+  - Fix import of NOT from SpEL (PR #852) (issue #834)  
     Also fixes export of aggregation expression w/o children filter like `cars.size() == 2`
   - Support antd 5 (PR #853) (issue #812)
 - 6.0.0
@@ -135,14 +136,14 @@
   - ES: Fix `greater` op (PR #749) (issue #744)
   - ES: Fix NOT (PR #750) (issue #723)
 - 5.2.0
-  - ! Breaking change: `children1` is now array in result of `getTree()` to preserve items order (PR #672) (issues #589, #670)
+  - ! Breaking change: `children1` is now array in result of `getTree()` to preserve items order (PR #672) (issues #589, #670)  
     `Utils.getTree(tree, true, false)` will behave same as before this change.
   - Support React 18. Migrate to x-date-pickers. (PR #734) (issues #710, #732)
   - Add path property at `index.d.ts` (PR #671) (issue #669)
   - Fixed `getTotalRulesCountInTree()` == 1 (should be 0) for clear tree (PR #673) (issue #583)
-  - Handle validation of bad multiselect value correctly (PR #733) (issue #674)
-    Remove bad values from list, don't unset whole value.
-    Added config `removeInvalidMultiSelectValuesOnLoad` (true by default, false for AntDesign)
+  - Handle validation of bad multiselect value correctly (PR #733) (issue #674)  
+    Remove bad values from list, don't unset whole value.  
+    Added config `removeInvalidMultiSelectValuesOnLoad` (true by default, false for AntDesign)  
     ! Breaking change: `removeIncompleteRulesOnLoad` and `removeEmptyGroupsOnLoad` now default to `true`, set them to `false` in your `settings` to preserve the current behaviour
   - Fix `loadFromSpel` for `select_equals` op (PR #740) (issue #704)
   - Fix `loadFromSpel` for `is_empty` and `is_not_empty` ops (PR #713) (issues #714, #699)
@@ -161,7 +162,7 @@
   - Fix validation of multiselect func arg (PR #656) (issue #587)
 - 5.0.0
   - Support of SpEL for import and export. See `loadFromSpel` and `spelFormat` in `Utils` (PR #613)
-  - Added `excludeOperators` for type config (PR #613)
+  - Added `excludeOperators` for type config (PR #613)  
     See `excludeOperators: ["proximity"]` in demo
   - Changed export of `not_between` op for text format (`!(num >= 3 && num <= 4)` -> `(num < 3 || num > 4)`) (PR #613)
   - Rename `Like` -> `Contains`. Moved `is_empty`, `is_null` to end of operators list (PR #613)
@@ -172,13 +173,18 @@
   - Support Bootstrap (via `reactstrap`) (PR #604)
 - 4.9.0
   - Added `is_null` and `is_not_null` operators (issue #494) (PR #522)
-  - ! Breaking change for operators `is_empty` and `is_not_empty`. Left for text type only, for other types will be auto converted to `is_null`/`is_not_null`. Changed meaning of `is_empty` - now it's just strict comparing with empty string. Before change meaning was similar to `is_null` (and export to SQL was wrong because of non-existent operator `IS EMPTY`). (issue #494) (PR #573)
+  - ! Breaking change for operators `is_empty` and `is_not_empty` (issue #494) (PR #573)  
+    Left for text type only, for other types will be auto converted to `is_null`/`is_not_null`.  
+    Changed meaning of `is_empty` - now it's just strict comparing with empty string.  
+    Before change meaning was similar to `is_null` (and export to SQL was wrong because of non-existent operator `IS EMPTY`).
   - Fixed order of operators for field when merging operators from 2+ widgets (PR #573)
   - Added last param `fieldDef` for functions to format operators (PR #573)
   - Added `jsonLogic` to widget TS def (PR #572)
   - Export `TreeUtils` (PR #597)
 - 4.8.0
-  - Added read-only mode switch for rules and groups. See `showLock` and `canDeleteLocked` config options, custom JsonLogic op `locked`, `setLock` action, `lockLabel` and `lockedLabel`. Added Switch components, see `renderSwitch`. (issue #377) (PR #490)
+  - Added read-only mode switch for rules and groups.  
+    See `showLock` and `canDeleteLocked` config options, custom JsonLogic op `locked`, `setLock` action, `lockLabel` and `lockedLabel`.  
+    Added Switch components, see `renderSwitch`. (issue #377) (PR #490)
   - Fixed issue with frozen config (`Object.freeze`) by using `clone` (issue #345) (PR #490)
   - Fix: Filter value sources for func args correctly. LHS field can be used as arg in RHS function. (PR #490)
   - MUI - Support showSearch (autocomplete) for field select widget (issue #479 #521) (PR #563)
