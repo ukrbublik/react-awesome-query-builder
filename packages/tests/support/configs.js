@@ -1175,6 +1175,28 @@ export  const with_dropdown = (AntdConfig) => {
   };
 };
 
+export const with_prox1 = (BasicConfig) => ({
+  ...BasicConfig,
+  types: {
+    ...BasicConfig.types,
+    text: {
+      ...BasicConfig.types.text,
+      excludeOperators: ["proximity"]
+    }
+  },
+  fields: {
+    str: {
+      label: "String",
+      type: "text",
+    },
+    prox1: {
+      label: "Prox1",
+      type: "text",
+      operators: ["proximity"],
+    }
+  },
+});
+
 export const with_prox = (BasicConfig) => ({
   ...BasicConfig,
   fields: {

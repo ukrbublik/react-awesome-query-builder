@@ -1203,6 +1203,39 @@ export const with_prox = {
   }
 };
 
+export const with_prox1 = {
+  type: "group",
+  children1: [
+    {
+      type: "rule",
+      properties: {
+        field: "prox1",
+        operator: "proximity",
+        value: [ "a", "b" ],
+        operatorOptions: {
+          proximity: 3
+        }
+      }
+    },
+  ],
+};
+
+export const with_prox1_no_values = {
+  type: "group",
+  children1: [
+    {
+      type: "rule",
+      properties: {
+        field: "prox1",
+        operator: "proximity",
+        operatorOptions: {
+          proximity: 3
+        }
+      }
+    },
+  ],
+};
+
 export const with_jl_value = {
   "==": [
     { "var": "num" },  { "+": [1, 2] }
