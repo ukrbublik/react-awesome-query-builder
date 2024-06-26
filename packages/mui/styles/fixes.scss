@@ -1,7 +1,10 @@
-.MuiIconButton-sizeSmall {
-  padding: 3px; // smaller button
+.query-builder {
+  .MuiIconButton-sizeSmall {
+    padding: 3px; // smaller button
+  }
 }
 
+/* should be outside of .query-builder */
 .customSelectOption {
   color: lightcoral;
 }

@@ -36,10 +36,6 @@ $rule-group-actions-offset-left: 10px !default;
 
 
 
-/******************************************************************************/
-/** MAIN ********************************************************************/
-/******************************************************************************/
-
 @mixin clearfix {
   &:after {
     content: "";
@@ -76,592 +72,613 @@ $rule-group-actions-offset-left: 10px !default;
 }
 
 
-.group {
-  background: $group-background;
-  border: $item-border solid $group-border-color;
-}
+.query-builder {
+  .group {
+    background: $group-background;
+    border: $item-border solid $group-border-color;
+  }
 
-.rule {
-  background-color: $rule-background;
-  border: $item-border solid $rule-border-color;
-  padding: $rule-padding;
-}
+  .rule {
+    background-color: $rule-background;
+    border: $item-border solid $rule-border-color;
+    padding: $rule-padding;
+  }
 
-.rule-with-error .rule {
-  border-color: $rule-with-error-border-color;
-}
+  .rule-with-error .rule {
+    border-color: $rule-with-error-border-color;
+  }
 
-.group-with-error > .group {
-  border-color: $group-with-error-border-color;
-}
+  .group-with-error > .group {
+    border-color: $group-with-error-border-color;
+  }
 
-.rule--body {
-  display: flex;
-  flex-wrap: wrap;
-  text-align: center;
-}
+  .rule--body {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+  }
 
-.rule--body--wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
+  .rule--body--wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
 
-.rule--error {
-  color: $rule-error-color;
-  margin-bottom: -5px;
-  margin-top: 5px;
-}
+  .rule--error {
+    color: $rule-error-color;
+    margin-bottom: -5px;
+    margin-top: 5px;
+  }
 
-.rule_group--error {
-  color: $rule-error-color;
-  margin-bottom: -5px;
-  margin-top: 5px;
-  width: 100%;
-}
+  .rule_group--error {
+    color: $rule-error-color;
+    margin-bottom: -5px;
+    margin-top: 5px;
+    width: 100%;
+  }
 
-.group-or-rule {
-  border-radius: $item-radius;
-  position: relative;
-}
+  .group-or-rule {
+    border-radius: $item-radius;
+    position: relative;
+  }
 
-.rule_group {
-  background: $rulegroup-background;
-  border: $item-border solid $rulegroup-border-color;
-}
+  .rule_group {
+    background: $rulegroup-background;
+    border: $item-border solid $rulegroup-border-color;
+  }
 
-.rule_group_ext {
-  background: $rulegroupext-background;
-  border: $item-border solid $rulegroupext-border-color;
-}
+  .rule_group_ext {
+    background: $rulegroupext-background;
+    border: $item-border solid $rulegroupext-border-color;
+  }
 
-.locked {
-  border: $item-border dashed $locked-border-color;
-}
+  .locked {
+    border: $item-border dashed $locked-border-color;
+  }
 
-.qb-placeholder {
-  border: $item-border dashed $placeholder-border-color;
-}
-
-
-
-/******************************************************************************/
-/** DRAG *********************************************************************/
-/******************************************************************************/
+  .qb-placeholder {
+    border: $item-border dashed $placeholder-border-color;
+  }
 
 
-.query-builder.qb-dragging {
-  cursor: -webkit-grabbing !important;
-  cursor: grabbing !important;
-  button {
+  /******************************************************************************/
+  /** DRAG *********************************************************************/
+  /******************************************************************************/
+
+
+  &.qb-dragging {
+    cursor: -webkit-grabbing !important;
+    cursor: grabbing !important;
+    button {
+      pointer-events: none;
+    }
+  }
+
+  .qb-draggable {
+    @extend %noselect;
     pointer-events: none;
-  }
-}
-
-.qb-draggable {
-  @extend %noselect;
-  pointer-events: none;
-  position: absolute;
-  opacity: 0.7;
-  z-index: 1000;
-
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.qb-drag-handler {
-  @extend %noselect;
-  cursor: -webkit-grabbing;
-  cursor: grabbing;
-}
-
-
-/******************************************************************************/
-/** TREE LINES *********************************************************************/
-/******************************************************************************/
-
-@mixin line_position_for_item($item-border, $item-offset-left, $item-offset) {
-  &::before {
-    top: calc(-1 * $item-border);
-    height: calc(50% + $treeline-thick / 2 + $item-border);
-  }
-
-  &::after {
-    top: calc(50% + $treeline-thick / 2 );
-    height: calc(50% - $treeline-thick / 2 + $item-offset + $item-border * 2);
-  }
-
-  &::before, &::after {
-    left: calc(-1 * ($item-offset-left / 2 + $treeline-thick / 2 + $item-border));
-    width: calc($item-offset-left / 2 + $treeline-thick / 2);
-  }
-}
-
-@mixin line_position_for_header($treeline-offset-from-conjs, $item-offset-left) {
-  &::before {
-    top: calc($treeline-offset-from-conjs);
-    height: calc(100% + $item-offset - $treeline-offset-from-conjs);
-    left: calc(+1 * ($item-offset-left / 2 - $treeline-thick / 2));
-    width: calc($item-offset-left / 2 + $treeline-thick / 2);
-  }
-}
-
-@mixin hide_conjs($item-border, $item-offset) {
-  & > .group-or-rule-container:first-child > .group-or-rule {
-    &::before {
-      display: none;
-    }
-    &::after {
-      border-radius: $treeline-radius 0 0 0;
-      border-width: $treeline-thick 0 0 $treeline-thick;
-    }
-    &::after {
-      top: calc(50% - $treeline-thick / 2 );
-      height: calc(50% + $treeline-thick / 2 + $item-offset + $item-border * 2);
-    }
-  }
-}
-
-// line between conjs and children
-.group--header:not(.no--children):not(.hide--conjs) {
-  position: relative;
-
-  &::before {
-    z-index: 0;
-    content: '';
     position: absolute;
-    border-width: 0 0 0 $treeline-thick;
-    border-color: $treeline-color;
-    border-style: solid;
+    opacity: 0.7;
+    z-index: 1000;
+
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
 
-  &.hide--line {
+  .qb-drag-handler {
+    @extend %noselect;
+    cursor: -webkit-grabbing;
+    cursor: grabbing;
+  }
+
+
+  /******************************************************************************/
+  /** TREE LINES *********************************************************************/
+  /******************************************************************************/
+
+
+  @mixin line_position_for_item($item-border, $item-offset-left, $item-offset) {
     &::before {
-      border-color: $treeline-disabled-color;
+      top: calc(-1 * $item-border);
+      height: calc(50% + $treeline-thick / 2 + $item-border);
+    }
+
+    &::after {
+      top: calc(50% + $treeline-thick / 2 );
+      height: calc(50% - $treeline-thick / 2 + $item-offset + $item-border * 2);
+    }
+
+    &::before, &::after {
+      left: calc(-1 * ($item-offset-left / 2 + $treeline-thick / 2 + $item-border));
+      width: calc($item-offset-left / 2 + $treeline-thick / 2);
     }
   }
 
-  @include line_position_for_header($treeline-offset-from-conjs, $item-offset-left);
-}
-
-// lines between items
-.group--children {
-  & > .group-or-rule-container > .group-or-rule {
+  @mixin line_position_for_header($treeline-offset-from-conjs, $item-offset-left) {
     &::before {
-      border-width: 0 0 $treeline-thick $treeline-thick;
+      top: calc($treeline-offset-from-conjs);
+      height: calc(100% + $item-offset - $treeline-offset-from-conjs);
+      left: calc(+1 * ($item-offset-left / 2 - $treeline-thick / 2));
+      width: calc($item-offset-left / 2 + $treeline-thick / 2);
     }
-  
-    &::after {
-      border-width: 0 0 0 $treeline-thick;
+  }
+
+  @mixin hide_conjs($item-border, $item-offset) {
+    & > .group-or-rule-container:first-child > .group-or-rule {
+      &::before {
+        display: none;
+      }
+      &::after {
+        border-radius: $treeline-radius 0 0 0;
+        border-width: $treeline-thick 0 0 $treeline-thick;
+      }
+      &::after {
+        top: calc(50% - $treeline-thick / 2 );
+        height: calc(50% + $treeline-thick / 2 + $item-offset + $item-border * 2);
+      }
     }
-  
-    &::before, &::after {
+  }
+
+  // line between conjs and children
+  .group--header:not(.no--children):not(.hide--conjs) {
+    position: relative;
+
+    &::before {
+      z-index: 0;
       content: '';
       position: absolute;
+      border-width: 0 0 0 $treeline-thick;
       border-color: $treeline-color;
-      border-style: solid;    
+      border-style: solid;
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box;
     }
 
-    @include line_position_for_item($item-border, $item-offset-left, $item-offset);
+    &.hide--line {
+      &::before {
+        border-color: $treeline-disabled-color;
+      }
+    }
+
+    @include line_position_for_header($treeline-offset-from-conjs, $item-offset-left);
   }
 
-  & > .group-or-rule-container:last-child > .group-or-rule {
-    &::before {
-      border-radius: 0 0 0 $treeline-radius;
+  // lines between items
+  .group--children {
+    & > .group-or-rule-container > .group-or-rule {
+      &::before {
+        border-width: 0 0 $treeline-thick $treeline-thick;
+      }
+    
+      &::after {
+        border-width: 0 0 0 $treeline-thick;
+      }
+    
+      &::before, &::after {
+        content: '';
+        position: absolute;
+        border-color: $treeline-color;
+        border-style: solid;    
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+
+      @include line_position_for_item($item-border, $item-offset-left, $item-offset);
     }
-    &::after {
+
+    & > .group-or-rule-container:last-child > .group-or-rule {
+      &::before {
+        border-radius: 0 0 0 $treeline-radius;
+      }
+      &::after {
+        display: none;
+      }
+    }
+
+    // don't connect line to conjs
+    &.hide--conjs {
+      @include hide_conjs($item-border, $item-offset);
+    }
+
+    // gray line
+    &.hide--line {
+      & > .group-or-rule-container > .group-or-rule {
+        &::before, &::after {
+          border-color: $treeline-disabled-color;
+        }
+      }
+    }
+
+  }
+
+  // rule_group
+  .rule_group--children {
+    @include hide_conjs($item-border, $rulegroup-offset);
+    & > .group-or-rule-container > .group-or-rule {
+      @include line_position_for_item($item-border, $rulegroup-offset-left, $rulegroup-offset)
+    }
+  }
+
+  // switch
+  .switch_group {
+    & > .group--children {
+      & > .group-or-rule-container > .group-or-rule {
+        @include line_position_for_item($case-border, $item-offset-left, $item-offset);
+      }
+    }
+    & > .group--header:not(.no--children):not(.hide--conjs) {
+      @include line_position_for_header($treeline-offset-from-switch, $item-offset-left);
+    }
+  }
+
+  .qb-draggable {
+    &::before, &::after {
       display: none;
     }
   }
 
-  // don't connect line to conjs
-  &.hide--conjs {
-    @include hide_conjs($item-border, $item-offset);
+
+  /******************************************************************************/
+  /** GROUP *********************************************************************/
+  /******************************************************************************/
+
+
+  .group--header,
+  .group--footer {
+    display: flex;
+    align-items: stretch;
+
+    padding: {
+      left: $item-offset;
+      right: $item-offset;
+    }
+    margin: {
+      top: $item-offset;
+      bottom: $item-offset;
+    }
   }
 
-  // gray line
-  &.hide--line {
-    & > .group-or-rule-container > .group-or-rule {
-      &::before, &::after {
-        border-color: $treeline-disabled-color;
+  .group-or-rule-container {
+    margin-top: $item-offset;
+    margin-bottom: $item-offset;
+    padding-right: $item-offset;
+    &:first-child {
+      margin-top: 0px !important;
+    }
+    &:last-child {
+      margin-bottom: 0px !important;
+    }
+  }
+
+  .group--drag-handler {
+    margin-right: $drag-offset-right;
+    margin-top: 3px;
+    position: relative;
+    align-self: center;
+  }
+  .group--conjunctions {
+    flex-shrink: 0;
+    display: flex;
+
+    .group--drag-handler {
+      margin-left: $group-drag-offset-left;
+    }
+  }
+
+
+  .group--children {
+    padding-left: $item-offset-left;
+    margin-top: $item-offset;
+    margin-bottom: $item-offset;
+
+    .group--field--count--rule {
+      display: flex;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+  }
+
+
+  .group--conjunctions.hide--conj {
+    opacity: 0.3;
+  }
+
+  .group--actions {
+    align-self: center;
+    margin-left: $group-actions-offset-left;
+    flex: 1;
+    display: flex;
+
+    &--tl,
+    &--bl{
+      justify-content: flex-start;
+    }
+
+    &--tl{
+      margin-left: calc($group-actions-offset-left * 2);
+    }
+
+    &--tc,
+    &--bc {
+      justify-content: center;
+    }
+
+    &--tr,
+    &--br{
+      justify-content: flex-end;
+    }
+
+    // .action--DELETE {
+    //   margin-top: -1px;
+    // }
+  }
+
+  /******************************************************************************/
+  /** CASE_GROUP *********************************************************************/
+  /******************************************************************************/
+
+  .case_group {
+    border-width: $case-border;
+
+    .case_group--body {
+      display: flex;
+      flex-direction: row;
+      margin-top: $item-offset;
+      margin-bottom: $item-offset;
+    
+      .case_group--children {
+        flex: auto;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+      }
+    }
+
+    .case_group--value {
+      margin-top: 0;
+      margin-bottom: 0;
+      margin-left: $item-offset;
+      margin-right: $item-offset;
+    }
+  }
+
+  /******************************************************************************/
+  /** RULE_GROUP *********************************************************************/
+  /******************************************************************************/
+
+  .rule_group {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: $rule-padding;
+
+    .group--field {
+      margin-top: $item-offset;
+      margin-bottom: $item-offset;
+      align-self: center;
+    }
+    .group--actions {
+      margin-left: $rule-group-actions-offset-left;
+      align-self: center;
+      flex: 0;
+    }
+
+    .rule_group--children {
+      flex: 1;
+
+      margin-top: $rulegroup-offset;
+      margin-bottom: $rulegroup-offset;
+      .group-or-rule-container {
+        margin-bottom: $rulegroup-offset;
+        margin-top: $rulegroup-offset;
+        padding-right: $rulegroup-offset;
+      }
+
+      padding-left: $rulegroup-offset-left;
+      &.one--child {
+        padding-left: calc($rulegroup-offset-left / 2);
+      }
+
+    }
+  }
+
+  /******************************************************************************/
+  /** RULE_GROUP_EXT *********************************************************************/
+  /******************************************************************************/
+
+  .rule_group_ext .group--actions {
+    flex: none;
+  }
+
+  .group--header.hide--drag.with--conjs {
+    & > .group--field--count--rule {
+      margin-left: 20px;
+    }
+  }
+
+  /******************************************************************************/
+  /** RULE **********************************************************************/
+  /******************************************************************************/
+
+  .rule {
+    flex: 1;
+    display: flex;
+  }
+
+  //"remove" button
+  .rule--header {
+    @extend %clearfix;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+  }
+
+  .rule--drag-handler {
+    display: flex;
+    align-items: center;
+    margin-right: $drag-offset-right;
+  }
+
+  $rule_items: ".rule--field", ".rule--fieldsrc", ".group--field", ".rule--operator", ".rule--value", ".rule--operator-options", ".rule--widget", 
+  ".widget--widget", ".widget--valuesrc", ".widget--sep", ".operator--options--sep",
+  ".rule--before-widget", ".rule--after-widget";
+  
+  $seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before", ".rule--func--bracket-after", ".rule--func--arg-sep";
+
+  #{$rule_items} {
+    display: inline-block;
+  }
+
+  // seps
+  #{$seps} {
+    vertical-align: bottom;
+    align-self: flex-end;
+    margin-bottom: $seps-offset-bottom;
+  }
+  .rule--func--arg-sep {
+    margin-bottom: calc($seps-offset-bottom - 5px);
+  }
+  .widget--sep {
+    margin-left: $rule-parts-distance;
+    margin-right: $rule-parts-distance;
+  }
+  .widget--sep.widget--sep-first {
+    margin-right: $rule-parts-distance;
+    margin-left: 0;
+  }
+  .rule--operator {
+    // more distinction between LHS and RHS
+    margin-left: calc($rule-parts-distance * 2);
+    margin-right: calc($rule-parts-distance * 2);
+  }
+  .operator--options--sep {
+    margin-right: $rule-parts-distance;
+  }
+  .rule--func--arg-sep {
+    margin-left: 3px;
+    margin-right: 6px;
+  }
+  .rule--func--bracket-after {
+    margin-left: calc($rule-parts-distance / 2);
+    margin-right: 2px; // small
+  }
+  .rule--func--bracket-before {
+    margin-left: calc($rule-parts-distance / 2);
+    margin-right: calc($rule-parts-distance / 2);
+  }
+
+
+  // .rule--func--arg-label-sep {
+  //   margin-left: 1px;
+  //   margin-right: 6px;
+  // }
+
+  // valuesrc
+  .widget--valuesrc {
+    //margin-left: calc(-1 * $rule-parts-distance + 2px); // be closer to widget
+    //margin-right: calc(-1 * $rule-parts-distance + 2px); // be closer to widget
+    vertical-align: top;
+  }
+  .rule--fieldsrc {
+    // margin-right: calc(-1 * $rule-parts-distance + 2px); // be closer to widget
+    vertical-align: top;
+  }
+
+  .operator--options {
+    display: flex;
+  }
+
+
+  .rule--operator-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .rule--operator-text-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  div.tooltip-inner {
+    max-width: 500px;
+  }
+
+  .rule--label {
+    display: block;
+    font-weight: bold;
+  }
+
+
+  /******************************************************************************/
+  /** FUNC **********************************************************************/
+  /******************************************************************************/
+
+
+  $rule_func_items: ".rule--func--wrapper", ".rule--func", ".rule--func--args", ".rule--func--arg", ".rule--func--arg-value", 
+    ".rule--func--bracket-before", ".rule--func--bracket-after", ".rule--func--arg-sep",
+    ".rule--func--arg-label", ".rule--func--arg-label-sep";
+
+  #{$rule_func_items} {
+    display: inline-block;
+  }
+
+  .rule--func--wrapper {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .rule--func--args {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .rule--func--arg {
+    display: flex;
+  }
+
+
+  // containers
+  .rule--field-wrapper,
+  .rule--field--func, 
+  .rule--func--wrapper, 
+  .rule--func--args, 
+  .rule--func--arg, 
+  .rule--func--arg-value, 
+  .rule--func--arg-value > .rule--widget,
+  .widget--func {
+    display: contents;
+  }
+
+  // multiline distance
+  .rule--func, .widget--widget {
+    margin-bottom: 2px;
+  }
+  .rule--body--wrapper {
+    margin-bottom: -2px;
+  }
+
+
+  /******************************************************************************/
+  /** Shrink textarea ***********************************************************/
+  /******************************************************************************/
+
+
+  .rule--body.can--shrink--value {
+    //align-items: center;
+    .rule--value {
+      flex: 1;
+      & > .rule--widget {
+        width: 100%;
+        display: flex;
+        & .widget--widget {
+          flex: 1;
+        }
       }
     }
   }
-
 }
 
-// rule_group
-.rule_group--children {
-  @include hide_conjs($item-border, $rulegroup-offset);
-  & > .group-or-rule-container > .group-or-rule {
-    @include line_position_for_item($item-border, $rulegroup-offset-left, $rulegroup-offset)
-  }
-}
-
-// switch
-.switch_group {
-  & > .group--children {
-    & > .group-or-rule-container > .group-or-rule {
-      @include line_position_for_item($case-border, $item-offset-left, $item-offset);
-    }
-  }
-  & > .group--header:not(.no--children):not(.hide--conjs) {
-    @include line_position_for_header($treeline-offset-from-switch, $item-offset-left);
-  }
-}
-
-.qb-draggable {
-  &::before, &::after {
-    display: none;
-  }
-}
-
-
-/******************************************************************************/
-/** GROUP *********************************************************************/
-/******************************************************************************/
-.group--header,
-.group--footer {
-  display: flex;
-  align-items: stretch;
-
-  padding: {
-    left: $item-offset;
-    right: $item-offset;
-  }
-  margin: {
-    top: $item-offset;
-    bottom: $item-offset;
-  }
-}
-
-.group-or-rule-container {
-  margin-top: $item-offset;
-  margin-bottom: $item-offset;
-  padding-right: $item-offset;
-  &:first-child {
-    margin-top: 0px !important;
-  }
-  &:last-child {
-    margin-bottom: 0px !important;
-  }
-}
-
-.group--drag-handler {
-  margin-right: $drag-offset-right;
-  margin-top: 3px;
-  position: relative;
-  align-self: center;
-}
-.group--conjunctions {
-  flex-shrink: 0;
-  display: flex;
-
-  .group--drag-handler {
-    margin-left: $group-drag-offset-left;
-  }
-}
-
-
-.group--children {
-  padding-left: $item-offset-left;
-  margin-top: $item-offset;
-  margin-bottom: $item-offset;
-
-  .group--field--count--rule {
-    display: flex;
-    flex-wrap: wrap;
-    flex: 1;
-  }
-}
-
-
-.group--conjunctions.hide--conj {
-  opacity: 0.3;
-}
-
-.group--actions {
-  align-self: center;
-  margin-left: $group-actions-offset-left;
-  flex: 1;
-  display: flex;
-
-  &--tl,
-  &--bl{
-    justify-content: flex-start;
-  }
-
-  &--tl{
-    margin-left: calc($group-actions-offset-left * 2);
-  }
-
-  &--tc,
-  &--bc {
-    justify-content: center;
-  }
-
-  &--tr,
-  &--br{
-    justify-content: flex-end;
-  }
-
-  // .action--DELETE {
-  //   margin-top: -1px;
-  // }
-}
-
-/******************************************************************************/
-/** CASE_GROUP *********************************************************************/
-/******************************************************************************/
-
-.case_group {
-  border-width: $case-border;
-
-  .case_group--body {
-    display: flex;
-    flex-direction: row;
-    margin-top: $item-offset;
-    margin-bottom: $item-offset;
-  
-    .case_group--children {
-      flex: auto;
-      margin-top: 0 !important;
-      margin-bottom: 0 !important;
-    }
-  }
-
-  .case_group--value {
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: $item-offset;
-    margin-right: $item-offset;
-  }
-}
-
-/******************************************************************************/
-/** RULE_GROUP *********************************************************************/
-/******************************************************************************/
-
-.rule_group {
-  display: flex;
-  flex-wrap: wrap;
-  padding-left: $rule-padding;
-
-  .group--field {
-    margin-top: $item-offset;
-    margin-bottom: $item-offset;
-    align-self: center;
-  }
-  .group--actions {
-    margin-left: $rule-group-actions-offset-left;
-    align-self: center;
-    flex: 0;
-  }
-
-  .rule_group--children {
-    flex: 1;
-
-    margin-top: $rulegroup-offset;
-    margin-bottom: $rulegroup-offset;
-    .group-or-rule-container {
-      margin-bottom: $rulegroup-offset;
-      margin-top: $rulegroup-offset;
-      padding-right: $rulegroup-offset;
-    }
-
-    padding-left: $rulegroup-offset-left;
-    &.one--child {
-      padding-left: calc($rulegroup-offset-left / 2);
-    }
-
-  }
-}
-
-/******************************************************************************/
-/** RULE_GROUP_EXT *********************************************************************/
-/******************************************************************************/
-
-
-.rule_group_ext .group--actions {
-  flex: none;
-}
-
-.group--header.hide--drag.with--conjs {
-  & > .group--field--count--rule {
-    margin-left: 20px;
-  }
-}
-
-/******************************************************************************/
-/** RULE **********************************************************************/
-/******************************************************************************/
-
-.rule {
-  flex: 1;
-  display: flex;
-}
-
-//"remove" button
-.rule--header {
-  @extend %clearfix;
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  padding-left: 10px;
-}
-
-.rule--drag-handler {
-  display: flex;
-  align-items: center;
-  margin-right: $drag-offset-right;
-}
-
-$rule_items: ".rule--field", ".rule--fieldsrc", ".group--field", ".rule--operator", ".rule--value", ".rule--operator-options", ".rule--widget", 
- ".widget--widget", ".widget--valuesrc", ".widget--sep", ".operator--options--sep",
- ".rule--before-widget", ".rule--after-widget";
- 
-$seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before", ".rule--func--bracket-after", ".rule--func--arg-sep";
-
-#{$rule_items} {
-  display: inline-block;
-}
-
-// seps
-#{$seps} {
-  vertical-align: bottom;
-  align-self: flex-end;
-  margin-bottom: $seps-offset-bottom;
-}
-.rule--func--arg-sep {
-  margin-bottom: calc($seps-offset-bottom - 5px);
-}
-.widget--sep {
-  margin-left: $rule-parts-distance;
-  margin-right: $rule-parts-distance;
-}
-.widget--sep.widget--sep-first {
-  margin-right: $rule-parts-distance;
-  margin-left: 0;
-}
-.rule--operator {
-  // more distinction between LHS and RHS
-  margin-left: calc($rule-parts-distance * 2);
-  margin-right: calc($rule-parts-distance * 2);
-}
-.operator--options--sep {
-  margin-right: $rule-parts-distance;
-}
-.rule--func--arg-sep {
-  margin-left: 3px;
-  margin-right: 6px;
-}
-.rule--func--bracket-after {
-  margin-left: calc($rule-parts-distance / 2);
-  margin-right: 2px; // small
-}
-.rule--func--bracket-before {
-  margin-left: calc($rule-parts-distance / 2);
-  margin-right: calc($rule-parts-distance / 2);
-}
-
-
-// .rule--func--arg-label-sep {
-//   margin-left: 1px;
-//   margin-right: 6px;
-// }
-
-// valuesrc
-.widget--valuesrc {
-  //margin-left: calc(-1 * $rule-parts-distance + 2px); // be closer to widget
-  //margin-right: calc(-1 * $rule-parts-distance + 2px); // be closer to widget
-  vertical-align: top;
-}
-.rule--fieldsrc {
-  // margin-right: calc(-1 * $rule-parts-distance + 2px); // be closer to widget
-  vertical-align: top;
-}
-
-.operator--options {
-  display: flex;
-}
-
-
-.rule--operator-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.rule--operator-text-wrapper {
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-div.tooltip-inner {
-  max-width: 500px;
-}
-
-.rule--label {
-  display: block;
-  font-weight: bold;
-}
-
-
-
-/******************************************************************************/
-/** FUNC **********************************************************************/
-/******************************************************************************/
-
-$rule_func_items: ".rule--func--wrapper", ".rule--func", ".rule--func--args", ".rule--func--arg", ".rule--func--arg-value", 
- ".rule--func--bracket-before", ".rule--func--bracket-after", ".rule--func--arg-sep",
- ".rule--func--arg-label", ".rule--func--arg-label-sep";
-
-#{$rule_func_items} {
-  display: inline-block;
-}
-
-.rule--func--wrapper {
-  display: flex;
-  flex-wrap: wrap;
-}
-.rule--func--args {
-  display: flex;
-  flex-wrap: wrap;
-}
-.rule--func--arg {
-  display: flex;
-}
-
-
-
-
-
-// containers
-.rule--field-wrapper,
-.rule--field--func, 
-.rule--func--wrapper, 
-.rule--func--args, 
-.rule--func--arg, 
-.rule--func--arg-value, 
-.rule--func--arg-value > .rule--widget,
-.widget--func {
-  display: contents;
-}
-
-// multiline distance
-.rule--func, .widget--widget {
-  margin-bottom: 2px;
-}
-.rule--body--wrapper {
-  margin-bottom: -2px;
-}
 
 /******************************************************************************/
 /** Minimalism ****************************************************************/
@@ -740,7 +757,7 @@ $active_conjs: false !default;
 $rule_actions: (".rule--fieldsrc", ".widget--valuesrc", ".rule--drag-handler", ".rule--header") !default;
 
 
-.qb-lite {
+.query-builder.qb-lite {
   @include visible_only_for_hovered_group($group_actions);
   @include display_only_for_hovered_group($inactive_conjs, $active_conjs);
   @include show_only_for_hovered_rule($rule_actions);
@@ -750,24 +767,3 @@ $rule_actions: (".rule--fieldsrc", ".widget--valuesrc", ".rule--drag-handler", "
     @include force_not_display($inactive_conjs);
   }
 }
-
-
-
-/******************************************************************************/
-/** Shrink textarea ***********************************************************/
-/******************************************************************************/
-
-.rule--body.can--shrink--value {
-  //align-items: center;
-  .rule--value {
-    flex: 1;
-    & > .rule--widget {
-      width: 100%;
-      display: flex;
-      & .widget--widget {
-        flex: 1;
-      }
-    }
-  }
-}
-

@@ -10,8 +10,9 @@ $rule-group-actions-offset-left: 5px !default;
 
 @import './styles.scss';
 
-
-.group--conjunctions {
-  margin-left: -1px !important;
-  margin-top: -1px !important;
+.query-builder {
+  .group--conjunctions {
+    margin-left: -1px !important;
+    margin-top: -1px !important;
+  }
 }
