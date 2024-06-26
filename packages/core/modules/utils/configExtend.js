@@ -258,7 +258,11 @@ function extendFieldConfig(fieldConfig, config, path = [], isFuncArg = false, is
   });
 
   // copy/merge widgets
-  const excludeOperatorsForType = typeConfig.excludeOperators || [];
+  let excludeOperatorsForType = (typeConfig.excludeOperators || []);
+  if (fieldConfig.operators) {
+    // `operators` from field can override `excludeOperators` from type, see `prox1` at examples
+    excludeOperatorsForType = excludeOperatorsForType.filter(op => !fieldConfig.operators.includes(op));
+  }
   if (!fieldConfig.widgets)
     fieldConfig.widgets = {};
   for (let widget in typeConfig.widgets) {
