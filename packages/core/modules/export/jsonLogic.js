@@ -143,17 +143,19 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
     .map((currentChild) => formatItem(currentChild, config, meta, revChildren, false, groupField))
     .filter((currentChild) => typeof currentChild !== "undefined");
 
+  // allows for unnecessary (ie. empty or only one rule) groups to be exported
+  const shouldPreserveGroups = !!config.settings.jsonLogicExportPreserveGroups;
   if (isRuleGroupArray && !isGroup0) {
     // "count" rule can have no "having" children, but should have number value
     if (formattedValue == undefined)
       return undefined;
   } else {
-    if (!list.size)
+    if (!list.size && !shouldPreserveGroups)
       return undefined;
   }
 
   let resultQuery = {};
-  if (list.size == 1 && !isRoot)
+  if (list.size == 1 && !isRoot && !shouldPreserveGroups)
     resultQuery = list.first();
   else
     resultQuery[conj] = list.toList().toJS();

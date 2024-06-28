@@ -1369,6 +1369,7 @@ export interface BehaviourSettings {
   maxNumberOfCases?: Number;
   showErrorMessage?: boolean;
   convertableWidgets?: TypedMap<Array<string>>;
+  jsonLogicExportPreserveGroups?: boolean;
   removeEmptyGroupsOnLoad?: boolean;
   removeEmptyRulesOnLoad?: boolean;
   removeIncompleteRulesOnLoad?: boolean;
