@@ -144,7 +144,7 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
     .filter((currentChild) => typeof currentChild !== "undefined");
 
   // allows for unnecessary (ie. empty or only one rule) groups to be exported
-  const shouldPreserveGroups = !!config.settings.jsonLogicExportPreserveGroups;
+  const shouldPreserveGroups = !!config.settings.exportPreserveGroups;
   if (isRuleGroupArray && !isGroup0) {
     // "count" rule can have no "having" children, but should have number value
     if (formattedValue == undefined)

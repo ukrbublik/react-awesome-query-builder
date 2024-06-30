@@ -342,6 +342,7 @@ Behaviour settings:
   NOTE: To preserve read-only state of rules in JsonLogic, please use `jsonLogic.add_operation("locked", v => v);` in your code
 |canDeleteLocked |false |Show "Delete" button for locked rule?
 |removeIncompleteRulesOnLoad |false |Remove incomplete rules (without field, operator, value, or if not all required args are present for functin) during initial validation of `value` prop passed to `<Query>`
+|exportPreserveGroups |false |Preserve unnecessary groups (ie. groups with only one rule or empty groups) during JsonLogic export
 |removeEmptyRulesOnLoad |true |Remove empty rules during initial validation of `value` prop passed to `<Query>`
 |removeEmptyGroupsOnLoad |true |Remove empty groups during initial validation of `value` prop passed to `<Query>`
 |removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during initial validation of `value` prop passed to `<Query>`? +

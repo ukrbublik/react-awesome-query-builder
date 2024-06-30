@@ -24,7 +24,7 @@ export const settings = {
   canDeleteLocked: false,
   canLeaveEmptyGroup: true,
   shouldCreateEmptyGroup: false,
-  jsonLogicExportPreserveGroups: false,
+  exportPreserveGroups: false,
   removeEmptyGroupsOnLoad: true,
   removeEmptyRulesOnLoad: true,
   removeIncompleteRulesOnLoad: false,

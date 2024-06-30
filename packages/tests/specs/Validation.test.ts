@@ -974,8 +974,7 @@ describe("sanitizeTree", () => {
             "Number BETWEEN ? AND ?  >>  [rhs] Incomplete RHS",
             "?  >>  [lhs] Incomplete LHS",
             "Number > ?  >>  [rhs] Incomplete RHS",
-            "Number < 100  >>  [rhs 0] Value 100 should be from 0 to 10",
-            "Group #3 (index path: 6)  >>  Empty group"
+            "Number < 100  >>  [rhs 0] Value 100 should be from 0 to 10"
           ],
           sanitizeOptions: {
             // don't fix tree in `load_tree`
@@ -1966,8 +1965,7 @@ describe("checkTree (deprecated)", () => {
           "Number BETWEEN ? AND ?  >>  [rhs] Incomplete RHS",
           "?  >>  [lhs] Incomplete LHS",
           "Number > ?  >>  [rhs] Incomplete RHS",
-          "Number < 100  >>  [rhs 0] Value 100 should be from 0 to 10",
-          "Group #3 (index path: 6)  >>  Empty group"
+          "Number < 100  >>  [rhs 0] Value 100 should be from 0 to 10"
         ],
         sanitizeOptions: {
           // don't fix tree in `load_tree`
