@@ -547,6 +547,24 @@ interface ConfigUtils {
   cleanJSX(jsx: any): Object;
   applyJsonLogic(logic: any, data?: any): any;
 }
+interface DefaultUtils {
+  getDefaultField(config: Config, canGetFirst: boolean, parentRuleGroupPath: IdPath | null): Field;
+  getDefaultSubField(config: Config, parentRuleGroupPath: IdPath | null): Field;
+  getDefaultFieldSrc(config: Config, canGetFirst: boolean): string;
+  getDefaultOperator(config: Config, field: Field, canGetFirst: boolean): string;
+  defaultOperatorOptions(config: Config, field: Field, canGetFirst: boolean): string;
+  emptyProperties<K, V>(): ImmutableMap<K, V>;
+  createListFromArray<TItem>(array: TItem[]): ImmutableList<TItem>;
+  defaultRule<K, V>(id: string, config: Config): Record<string, ImmutableMap<K, V>>;
+  defaultRoot<K, V>(config: Config, canAddDefaultRule: boolean): ImmutableMap<K, V>;
+  createListWithOneElement<TItem>(el: TItem): ImmutableList<TItem>;
+  defaultItemProperties(config: Config, item: JsonRule): ImmutableRuleProperties | ImmutableGroupProperties;
+  defaultGroupProperties(config: Config, fieldConfig:  Field | Func | null): ImmutableGroupProperties;
+  defaultRuleProperties(config: Config, parentRuleGroupPath: IdPath | null, item: JsonRule | null, canUseDefaultFieldAndOp: boolean, canGetFirst: boolean): ImmutableRuleProperties;
+  defaultConjunction(config: Config): string;
+  defaultOperatorOptions(config: Config, operator: string, field: Field): string;
+  defaultGroupConjunction(config: Config, fieldConfig: Field | Func | null): string;
+}
 interface ExportUtils {
   wrapWithBrackets(val: string): string;
   spelEscape(val: any): string;
