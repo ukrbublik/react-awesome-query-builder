@@ -401,7 +401,7 @@ function validateGroup (item, path, itemId, meta, c) {
   const cardinality = operator ? config.operators[operator]?.cardinality ?? 1 : undefined;
   // tip: for group operators some/none/all children ARE required, for group operator count children are NOT required
   // tip: default case should contain only value
-  const childrenAreRequired = isCase ? !isDefaultCase : (isGroupExt ? cardinality == 0 : true);
+  const childrenAreRequired = isCase ? !isDefaultCase : (isGroupExt ? cardinality == 0 : removeEmptyGroups);
   const canHaveValue = isGroupExt || isCase;
 
   if (!id && itemId) {

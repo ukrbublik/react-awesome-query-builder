@@ -866,6 +866,16 @@ export const with_groups = {
   ]
 };
 
+export const with_empty_and_single_rule_groups = {
+  "or": [
+    { "and": [
+      {
+        "==": [ { "var": "num" }, 1 ]
+      }
+    ]}, { "and": []}
+  ]
+};
+
 export const with_nested = {
   "and": [
     { "==": [ { "var": "user.info.firstName" }, "abc" ] },

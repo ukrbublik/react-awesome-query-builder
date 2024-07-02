@@ -24,6 +24,7 @@ export const settings = {
   canDeleteLocked: false,
   canLeaveEmptyGroup: true,
   shouldCreateEmptyGroup: false,
+  exportPreserveGroups: false,
   removeEmptyGroupsOnLoad: true,
   removeEmptyRulesOnLoad: true,
   removeIncompleteRulesOnLoad: false,
