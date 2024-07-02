@@ -38,18 +38,8 @@ const initLogic: JsonLogicTree | undefined = loadedInitLogic && Object.keys(load
   ? loadedInitLogic as JsonLogicTree
   : undefined;
 let initTree: ImmutableTree = loadTree(emptyInitValue);
-//initTree = loadTree(initValue);
-const with_empty_and_single_rule_groups = {
-  "or": [
-    { "and": [
-      {
-        "==": [ { "var": "num" }, 1 ]
-      }
-    ]}, { "and": []}
-  ]
-};
-
-initTree = loadFromJsonLogic(with_empty_and_single_rule_groups, loadedConfig)!; // <- this will work same
+initTree = loadTree(initValue);
+//initTree = loadFromJsonLogic(initLogic, loadedConfig)!; // <- this will work same
 
 const {fixedTree, fixedErrors, nonFixedErrors} = sanitizeTree(initTree, loadedConfig, {
   ...validationTranslateOptions,
