@@ -162,6 +162,7 @@ export type FuncValueI = ObjectToImmOMap<{
 }>;
 export type FieldValue = FieldPath | FuncValue;
 export type FieldValueI = FieldPath | FuncValueI;
+export type AnyFieldValue = FieldValue | FieldValueI;
 
 export type ValueSource = "value" | "field" | "func" | "const";
 export type FieldSource = "field" | "func";
@@ -537,33 +538,32 @@ interface ConfigUtils {
   decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
   compileConfig(config: Config): Config;
   extendConfig(config: Config): Config;
-  getFieldConfig(config: Config, field: FieldValue | FieldValueI): Field | Func | null;
+  getFieldConfig(config: Config, field: AnyFieldValue): FieldConfig;
   getFuncConfig(config: Config, func: string): Func | null;
   getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
-  getOperatorConfig(config: Config, operator: string, field?: FieldValue | FieldValueI): Operator | null;
-  getFieldWidgetConfig(config: Config, field: FieldValue | FieldValueI, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
+  getOperatorConfig(config: Config, operator: string, field?: AnyFieldValue): Operator | null;
+  getFieldWidgetConfig(config: Config, field: AnyFieldValue, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
   isJSX(jsx: any): boolean;
   isDirtyJSX(jsx: any): boolean;
   cleanJSX(jsx: any): Object;
   applyJsonLogic(logic: any, data?: any): any;
 }
 interface DefaultUtils {
-  getDefaultField(config: Config, canGetFirst?: boolean, parentRuleGroupPath?: IdPath): Field;
-  getDefaultSubField(config: Config, parentRuleGroupPath?: IdPath | null): Field;
+  getDefaultField(config: Config, canGetFirst?: boolean, parentRuleGroupPath?: IdPath): FieldValueI | null;
+  getDefaultSubField(config: Config, parentRuleGroupPath?: IdPath): FieldValueI | null;
   getDefaultFieldSrc(config: Config, canGetFirst?: boolean): string;
   getDefaultOperator(config: Config, field: Field, canGetFirst?: boolean): string;
-  defaultOperatorOptions(config: Config, field: Field, canGetFirst?: boolean): string;
-  emptyProperties<K, V>(): ImmutableMap<K, V>;
-  createListFromArray<TItem>(array: TItem[]): ImmutableList<TItem>;
-  defaultRule<K, V>(id: string, config: Config): Record<string, ImmutableMap<K, V>>;
-  defaultRoot<K, V>(config: Config, canAddDefaultRule?: boolean): ImmutableMap<K, V>;
-  createListWithOneElement<TItem>(el: TItem): ImmutableList<TItem>;
-  defaultItemProperties(config: Config, item: JsonRule): ImmutableRuleProperties | ImmutableGroupProperties;
-  defaultGroupProperties(config: Config, fieldConfig:  Field | Func | null): ImmutableGroupProperties;
-  defaultRuleProperties(config: Config, parentRuleGroupPath?: IdPath, item?: JsonRule, canUseDefaultFieldAndOp?: boolean, canGetFirst?: boolean): ImmutableRuleProperties;
+  defaultRule(id: string, config: Config): Record<string, ImmutableRule>;
+  defaultRoot(config: Config, canAddDefaultRule?: boolean): ImmutableGroup;
+  defaultItemProperties(config: Config, item: JsonItem): ImmutableItemProperties;
+  defaultGroupProperties(config: Config, fieldConfig?: FieldValueOrConfig): ImmutableGroupProperties;
+  defaultRuleProperties(config: Config, parentRuleGroupPath?: IdPath, item?: JsonItem, canUseDefaultFieldAndOp?: boolean, canGetFirst?: boolean): ImmutableRuleProperties;
   defaultConjunction(config: Config): string;
-  defaultOperatorOptions(config: Config, operator: string, field: Field): string;
-  defaultGroupConjunction(config: Config, fieldConfig: Field | Func | null): string;
+  defaultOperatorOptions(config: Config, operator: string, field: Field): OperatorOptionsI | null;
+  defaultGroupConjunction(config: Config, fieldConfig?: FieldValueOrConfig): string;
+
+  // createListWithOneElement<TItem>(el: TItem): ImmutableList<TItem>;
+  // createListFromArray<TItem>(array: TItem[]): ImmutableList<TItem>;
 }
 interface ExportUtils {
   wrapWithBrackets(val: string): string;
@@ -1280,6 +1280,9 @@ export type Field = SimpleField;
 export type FieldOrGroup = FieldStruct | FieldGroup | FieldGroupExt | Field;
 export type Fields = TypedMap<FieldOrGroup>;
 
+export type FieldConfig = Field | Func | null;
+export type FieldValueOrConfig = FieldConfig | AnyFieldValue;
+
 export type NumberField = SimpleField<NumberFieldSettings>;
 export type DateTimeField = SimpleField<DateTimeFieldSettings>;
 export type SelectField = SimpleField<SelectFieldSettings>;
@@ -1361,7 +1364,7 @@ export interface LocaleSettings {
 export interface BehaviourSettings {
   reverseOperatorsForNot?: boolean;
   canShortMongoQuery?: boolean;
-  defaultField?: FieldValue | FieldValueI;
+  defaultField?: AnyFieldValue;
   defaultOperator?: string;
   fieldSources?: Array<FieldSource>;
   valueSourcesInfo?: ValueSourcesInfo;
