@@ -547,6 +547,24 @@ interface ConfigUtils {
   cleanJSX(jsx: any): Object;
   applyJsonLogic(logic: any, data?: any): any;
 }
+interface DefaultUtils {
+  getDefaultField(config: Config, canGetFirst?: boolean, parentRuleGroupPath?: IdPath): Field;
+  getDefaultSubField(config: Config, parentRuleGroupPath?: IdPath | null): Field;
+  getDefaultFieldSrc(config: Config, canGetFirst?: boolean): string;
+  getDefaultOperator(config: Config, field: Field, canGetFirst?: boolean): string;
+  defaultOperatorOptions(config: Config, field: Field, canGetFirst?: boolean): string;
+  emptyProperties<K, V>(): ImmutableMap<K, V>;
+  createListFromArray<TItem>(array: TItem[]): ImmutableList<TItem>;
+  defaultRule<K, V>(id: string, config: Config): Record<string, ImmutableMap<K, V>>;
+  defaultRoot<K, V>(config: Config, canAddDefaultRule?: boolean): ImmutableMap<K, V>;
+  createListWithOneElement<TItem>(el: TItem): ImmutableList<TItem>;
+  defaultItemProperties(config: Config, item: JsonRule): ImmutableRuleProperties | ImmutableGroupProperties;
+  defaultGroupProperties(config: Config, fieldConfig:  Field | Func | null): ImmutableGroupProperties;
+  defaultRuleProperties(config: Config, parentRuleGroupPath?: IdPath, item?: JsonRule, canUseDefaultFieldAndOp?: boolean, canGetFirst?: boolean): ImmutableRuleProperties;
+  defaultConjunction(config: Config): string;
+  defaultOperatorOptions(config: Config, operator: string, field: Field): string;
+  defaultGroupConjunction(config: Config, fieldConfig: Field | Func | null): string;
+}
 interface ExportUtils {
   wrapWithBrackets(val: string): string;
   spelEscape(val: any): string;
@@ -616,6 +634,7 @@ export interface Utils extends Omit<Import, "isValidTree">, Export,
   Autocomplete: Autocomplete;
   Validation: Validation;
   ConfigUtils: ConfigUtils;
+  DefaultUtils: DefaultUtils;
   ExportUtils: ExportUtils;
   ListUtils: ListUtils;
   TreeUtils: TreeUtils;
@@ -933,7 +952,7 @@ export type TreeMultiSelectWidget<C = Config, WP = TreeMultiSelectWidgetProps<C>
 export type CaseValueWidget<C = Config, WP = CaseValueWidgetProps<C>> = BaseWidget<C, WP> & CaseValueFieldSettings;
 
 // tip: use generic WidgetProps here, TS can't determine correct factory
-export type TypedWidget<C = Config> = 
+export type TypedWidget<C = Config> =
   TextWidget<C, WidgetProps<C>>
   | DateTimeWidget<C, WidgetProps<C>>
   | BooleanWidget<C, WidgetProps<C>>
@@ -945,7 +964,7 @@ export type TypedWidget<C = Config> =
   | TreeMultiSelectWidget<C, WidgetProps<C>>
   | CaseValueWidget<C, WidgetProps<C>>;
 
-export type Widget<C = Config> = 
+export type Widget<C = Config> =
   FieldWidget<C>
   | FuncWidget<C>
   | TypedWidget<C>
