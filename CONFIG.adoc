@@ -223,7 +223,7 @@ Example:
 |fieldSettings.validateValue | | |Function to validate input value. +
   Simple way: return true/false. Advanced: if value is valid, return `null`, otherwise return error string or object `{error, fixedValue?}`. +
   `error` can be a string or an object `{key, args}` to use {i18n}[i18n]. +
-  `(val: any, fieldSettings: Object) => boolean \| string \| {error: string | Object, fixedValue?: any} \| null`
+  `(val: any, fieldSettings: Object) => boolean \| string \| {error: string \| Object, fixedValue?: any} \| null`
 |fieldSettings.allowCustomValues |- for `multiselect` widget |false |If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
 |fieldSettings.showSearch |- for (multi)select, tree (multi)select|false |Show search (autocomplete)?
 |fieldSettings.treeExpandAll |- for `treeselect/treemultiselect` widgets|false |Whether to expand all nodes by default
