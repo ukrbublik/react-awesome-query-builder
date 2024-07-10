@@ -1,10 +1,15 @@
 # Changelog
+- 6.6.2
+  - Fixed issue with rendering func select inside func (PR #1086) (issue #1085)
+  - Added `DefaultUtils` typings to `index.d.ts` (PR #1078) (issue #1079)
+  - Added config option `exportPreserveGroups` (PR #1077) (issue #1074)
 - 6.6.1
   - Operators reverse on "NOT" is now optional, disabled by default to preserve orignal query (PR #1068) (issue #1059).  
     Added settings `reverseOperatorsForNot` and `canShortMongoQuery`
   - Scope CSS classes to `.query-builder` (PR #1070) (issue #1018)
   - Update packages (PR #1071)
   - Fixed issue with `excludeOperators` (affects `prox1` at example) (PR #1072)
+  - Use pnpm 9 (PR #1073)
 - 6.6.0
   - Optimizations for rendering and export utils (PR #1054) (issue #342)
   - Added support of JsonLogic export for ternary mode (PR #1013) (issue #978)
