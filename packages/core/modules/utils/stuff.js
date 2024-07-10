@@ -139,8 +139,12 @@ export const isImmutable = (v) => {
   return typeof v === "object" && v !== null && typeof v.toJS === "function";
 };
 
+export const isImmutableList = (v) => {
+  return isImmutable(v) && Immutable.isList(v); // Immutable.isIndexed(v)
+};
+
 export function toImmutableList(v) {
-  return (isImmutable(v) ? v : new Immutable.List(v));
+  return (isImmutableList(v) ? v : new Immutable.List(v));
 }
 
 export function applyToJS(v) {
