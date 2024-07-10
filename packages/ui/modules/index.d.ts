@@ -300,7 +300,7 @@ export interface RuleProps {
   //actions
   setField(field: FieldValueI): undefined;
   setFieldSrc(fieldSrc: FieldSource): undefined;
-  setFuncValue(delta: number, parentFuncs: string[], argKey: string | null, value: SimpleValue, type: string | "!valueSrc"): undefined;
+  setFuncValue(delta: number, parentFuncs: Array<[string, string]>, argKey: string | null, value: SimpleValue, type: string | "!valueSrc"): undefined;
   setOperator(operator: string): undefined;
   setOperatorOption(name: string, value: SimpleValue): undefined;
   setLock(lock: boolean): undefined;

@@ -3,7 +3,7 @@ import uuid from "./uuid";
 import {getFieldConfig, getOperatorConfig, getFieldParts, getFirstField} from "./configUtils";
 import {getFirstOperator} from "../utils/ruleUtils";
 import {getNewValueForFieldOp} from "../utils/validation";
-import { isImmutable } from "./stuff";
+import { isImmutable, isImmutableList } from "./stuff";
 import { jsToImmutable } from "../import";
 
 
@@ -149,14 +149,14 @@ export const defaultRoot = (config, canAddDefaultRule = true) => {
 };
 
 export const createListWithOneElement = (el) => {
-  if (isImmutable(el))
-    return el; // already Immutable
+  if (isImmutableList(el))
+    return el; // already Immutable list
   return createListFromArray([el]);
 };
 
 export const createListFromArray = (arr) => {
-  if (isImmutable(arr))
-    return arr; // already Immutable
+  if (isImmutableList(arr))
+    return arr; // already Immutable list
   return new Immutable.List(arr);
 };
 

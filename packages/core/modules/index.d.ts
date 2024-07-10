@@ -720,7 +720,7 @@ export interface Actions {
   setFieldSrc(path: IdPath, fieldSrc: FieldSource): undefined;
   setOperator(path: IdPath, operator: string): undefined;
   setValue(path: IdPath, delta: number, value: RuleValueI, valueType: string): undefined; // todo: try to support RuleValue
-  setFuncValue(path: IdPath, delta: number, parentFuncs: string[], argKey: string | null, value: SimpleValue, valueType: string | "!valueSrc"): undefined;
+  setFuncValue(path: IdPath, delta: number, parentFuncs: Array<[string, string]>, argKey: string | null, value: SimpleValue, valueType: string | "!valueSrc"): undefined;
   setValueSrc(path: IdPath, delta: number, valueSrc: ValueSource): undefined;
   setOperatorOption(path: IdPath, name: string, value: SimpleValue): undefined;
   moveItem(fromPath: IdPath, toPath: IdPath, placement: Placement): undefined;
@@ -757,7 +757,7 @@ export interface TreeActions {
     setValue(config: Config, path: IdPath, delta: number, value: RuleValueI, valueType: string): InputAction; // todo: try to support RuleValue
     setValueSrc(config: Config, path: IdPath, delta: number, valueSrc: ValueSource): InputAction;
     setOperatorOption(config: Config, path: IdPath, name: string, value: SimpleValue): InputAction;
-    setFuncValue(config: Config, path: IdPath, delta: number, parentFuncs: string[], argKey: string | null, value: SimpleValue, valueType: string | "!valueSrc"): InputAction;
+    setFuncValue(config: Config, path: IdPath, delta: number, parentFuncs: Array<[string, string]>, argKey: string | null, value: SimpleValue, valueType: string | "!valueSrc"): InputAction;
   };
 }
 
