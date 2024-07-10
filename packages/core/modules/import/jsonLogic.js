@@ -12,6 +12,8 @@ import moment from "moment";
 // helpers
 const arrayUniq = (arr) => Array.from(new Set(arr));
 const arrayToObject = (arr) => arr.reduce((acc, [f, fc]) => ({ ...acc, [f]: fc }), {});
+// Checks if operator is not_like, multiselect_not_contains or select_not_any_in as these need special handling. see issue #1084
+const isExclamationOperator = (op, vals) => op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && ["in", "all", "some"].includes(Object.keys(vals[0])[0]));
 
 const createMeta = (parentMeta) => {
   return {
@@ -48,11 +50,12 @@ export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
 
 const buildConv = (config) => {
   let operators = {};
+  let combinationOperators = {};
   for (let opKey in config.operators) {
     const opConfig = config.operators[opKey];
     if (typeof opConfig.jsonLogic == "string") {
       // example: "</2", "#in/1"
-      const opk = (opConfig._jsonLogicIsRevArgs ? "#" : "") + opConfig.jsonLogic + "/" + getOpCardinality(opConfig);
+      const opk = opConfig.jsonLogic + "/" + getOpCardinality(opConfig);
       if (!operators[opk])
         operators[opk] = [];
       operators[opk].push(opKey);
@@ -62,6 +65,12 @@ const buildConv = (config) => {
       if (!operators[opk])
         operators[opk] = [];
       operators[opk].push(opKey);
+
+      combinationOperators[opKey].push({
+        "template": opConfig.jsonLogic({"var": null}, null, null), 
+        "jsonLogic2": opConfig.jsonLogic2,
+        "_jsonLogicIsExclamationOp": !!opConfig._jsonLogicIsExclamationOp
+      });
     }
   }
 
@@ -94,6 +103,7 @@ const buildConv = (config) => {
     conjunctions,
     funcs,
     varKeys: ["var", groupVarKey, altVarKey],
+    combinationOperators,
   };
 };
 
@@ -112,7 +122,8 @@ const convertFromLogic = (logic, conv, config, expectedTypes, meta, not = false,
 
   const {lockedOp} = config.settings.jsonLogic;
   const isEmptyOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && conv.varKeys.includes(Object.keys(vals[0])[0]));
-  const isNot = op == "!" && !isEmptyOp;
+  // If isExclamationOperator returns true then "!" needs to be handled as part of the operator and not as negation
+  const isNot = op == "!" && !isEmptyOp && !isExclamationOperator(op, vals);
   const isLocked = lockedOp && op == lockedOp;
   const isSwitch = expectedTypes.includes("switch");
   const isRoot = isSwitch;
@@ -670,8 +681,20 @@ const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta)
 const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOneRuleInRuleGroup = false) => {
   if (!op) return undefined;
 
+  // Check if the current operation is an exception ie !->all or !->in
+  if (isExclamationOperator(op, vals)) {
+    const firstVal = vals[0];
+    if (typeof firstVal === 'object' && isJsonLogic(vals[0])) {
+      const keys = Object.keys(firstVal);
+      if (keys.length === 1) {
+        vals = firstVal[keys[0]]; // Update 'vals' to be the value of this key
+        op = "!" + keys[0]; // Thus making !->all into !all and !->in into !in
+      }
+    }
+  }
+
   const arity = vals.length;
-  if ((op === "all" || op === "some") && isJsonLogic(vals[1])) {
+  if ((op === "!all" || op === "all" || op === "!some" || op === "some") && isJsonLogic(vals[1])) {
     // special case for "all-in" and "some-in"
     const op2 = Object.keys(vals[1])[0];
     const isEmptyVar = vals[1][op2][0]?.["var"] === "";
@@ -721,7 +744,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
 
     // Preprocess "!": Try to reverse op in single rule in having
     // Eg. use `not_equal` instead of `not` `equal`
-    while (conj == "!") {
+    while (conj == "!" && !isExclamationOperator(conj, havingVals)) {
       const isEmptyOp = conj == "!" && (
         havingVals.length == 1 && havingVals[0] && isJsonLogic(havingVals[0])
         && conv.varKeys.includes(Object.keys(havingVals[0])[0])
@@ -732,7 +755,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
       havingNot = !havingNot;
       having = having["!"];
       conj = Object.keys(having)[0];
-      havingVals = having[conj];
+      havingVals = [ having[conj] ];
     }
     if (!Array.isArray(havingVals)) {
       havingVals = [ havingVals ];

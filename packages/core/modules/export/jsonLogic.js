@@ -154,12 +154,21 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
       return undefined;
   }
 
+  // with certain rules we cannot ever remove a negation single rule group because then it would be identical to
+  // the negation of that rule. see issue #1084
+  const firstEntry = list.first();
+  const isExceptionOperator = firstEntry 
+    && (firstEntry["all"]
+    || firstEntry["in"]
+    || firstEntry["some"]);
+  const cannotRemoveSingleRuleGroup = origNot && isExceptionOperator;
+
   let resultQuery = {};
-  if (list.size == 1 && !isRoot && !shouldPreserveGroups)
+  if (list.size == 1 && !isRoot && !shouldPreserveGroups && !cannotRemoveSingleRuleGroup)
     resultQuery = list.first();
   else
     resultQuery[conj] = list.toList().toJS();
-
+  
   // reverse filter
   if (filterNot) {
     resultQuery = { "!": resultQuery };
