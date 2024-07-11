@@ -5,7 +5,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"; // TODO: set moment to dayjs
 import xdpPackage from "@mui/x-date-pickers/package.json"; // to determine version
 
-const xdpVersion = xdpPackage?.version?.split(".")?.[0];
+const xdpVersion = parseInt(xdpPackage?.version?.split(".")?.[0] ?? "0");
 
 // value widgets
 import MuiTextWidget from "./value/MuiText";
@@ -50,7 +50,7 @@ const MuiProvider = ({config, children}) => {
     }
   });
 
-  const locProviderProps = xdpVersion === "6" ? {
+  const locProviderProps = xdpVersion >= 6 ? {
     locale: momentLocale,
   } : {
     adapterLocale: momentLocale,
