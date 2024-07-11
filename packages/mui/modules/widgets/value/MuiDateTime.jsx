@@ -5,7 +5,7 @@ import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { moment } = Utils;
-const xdpVersion = xdpPackage?.version?.split(".")?.[0];
+const xdpVersion = parseInt(xdpPackage?.version?.split(".")?.[0] ?? "0");
 
 export default (props) => {
   const {value, setValue, use12Hours, readonly, placeholder, dateFormat, timeFormat, valueFormat, customProps} = props;
@@ -29,7 +29,7 @@ export default (props) => {
 
   const desktopModeMediaQuery = "@media (pointer: fine), (pointer: none)";
 
-  const pickerProps = xdpVersion === "6" ? {
+  const pickerProps = xdpVersion >= 6 ? {
     format: dateTimeFormat,
     slotProps: {
       textField: {
@@ -46,7 +46,7 @@ export default (props) => {
     toolbarPlaceholder: !readonly ? placeholder : "",
   };
 
-  const aValue = value ? (xdpVersion === "6" ? moment(value, valueFormat) : value) : null;
+  const aValue = value ? (xdpVersion >= 6 ? moment(value, valueFormat) : value) : null;
 
   return (
     <FormControl>
