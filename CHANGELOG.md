@@ -3,6 +3,7 @@
   - Fixed issue with rendering func select inside func (PR #1086) (issue #1085)
   - Added `DefaultUtils` typings to `index.d.ts` (PR #1078) (issue #1079)
   - Added config option `exportPreserveGroups` (PR #1077) (issue #1074)
+  - Support `@mui/x-date-pickers` v7 (PR #1088) (issue #1087)
 - 6.6.1
   - Operators reverse on "NOT" is now optional, disabled by default to preserve orignal query (PR #1068) (issue #1059).  
     Added settings `reverseOperatorsForNot` and `canShortMongoQuery`

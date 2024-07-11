@@ -39,7 +39,7 @@
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
     "@mui/system": "^5.15.15",
-    "@mui/x-date-pickers": "^6.19.12",
+    "@mui/x-date-pickers": "^7.9.0",
     "@react-awesome-query-builder/core": "workspace:^",
     "@react-awesome-query-builder/mui": "workspace:^",
     "@upstash/redis": "^1.31.1",
