@@ -270,7 +270,7 @@ const operators = {
       "and"
     ],
     reversedOp: "between",
-    jsonLogic:  (field, op, val) => ({"!": { "<=": [val ? val[0] : null, field, val ? val[1] : null,] }}),
+    jsonLogic:  (field, op, val) => ({"!": { "<=": [Array.isArray(val) ? val[0] : val, field, Array.isArray(val) ? val[1] : val] }}),
     jsonLogic2: "!<=",
     _jsonLogicIsExclamationOp: true,
     validateValues: (values) => {

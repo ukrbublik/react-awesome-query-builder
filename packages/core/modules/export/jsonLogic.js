@@ -155,7 +155,8 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
   }
 
   // with certain rules we cannot ever remove a negation single rule group because then it would be identical to
-  // the negation of that rule. see issue #1084
+  // the negation of that rule. see issue #1084. TODO: replace with solution that just looks at childs operator 
+  // that would be better
   const firstEntry = list.first();
   const isExceptionOperator = firstEntry 
     && (firstEntry["all"]
