@@ -27,48 +27,35 @@
     },
     "test": {
       "name": "test",
-      "command": "pnpm test",
-      "runAtStart": false
+      "command": "pnpm test"
     },
     "test-dev": {
       "name": "test-dev",
-      "command": "pnpm test-dev",
-      "runAtStart": false
+      "command": "pnpm test-dev"
     },
     "lint": {
       "name": "lint",
-      "command": "pnpm lint",
-      "runAtStart": false
+      "command": "pnpm lint"
     },
     "lint-fix": {
       "name": "lint-fix",
-      "command": "pnpm lint-fix",
-      "runAtStart": false
+      "command": "pnpm lint-fix"
     },
     "build": {
       "name": "build",
-      "command": "pnpm build",
-      "runAtStart": false
+      "command": "pnpm build"
     },
     "build-examples": {
       "name": "build-examples",
-      "command": "pnpm build-examples",
-      "runAtStart": false
+      "command": "pnpm build-examples"
     },
     "build-libs": {
       "name": "build-libs",
-      "command": "pnpm build-libs",
-      "runAtStart": false
-    },
-    "check-hot": {
-      "name": "check-hot",
-      "command": "pnpm check-hot",
-      "runAtStart": false
+      "command": "pnpm build-libs"
     },
     "sandbox-js": {
       "name": "sandbox-js",
       "command": "pnpm sandbox-js",
-      "runAtStart": false,
       "preview": {
         "port": 5174
       }
@@ -76,7 +63,6 @@
     "sandbox-next": {
       "name": "sandbox-next",
       "command": "pnpm sandbox-next",
-      "runAtStart": false,
       "preview": {
         "port": 3002
       }
@@ -84,25 +70,21 @@
     "sandbox-ts": {
       "name": "sandbox-ts",
       "command": "pnpm sandbox-ts",
-      "runAtStart": false,
       "preview": {
         "port": 5175
       }
     },
     "clean": {
       "name": "clean",
-      "command": "pnpm clean",
-      "runAtStart": false
+      "command": "pnpm clean"
     },
     "smoke": {
       "name": "smoke",
-      "command": "pnpm smoke",
-      "runAtStart": false
+      "command": "pnpm smoke"
     },
     "resmoke": {
       "name": "resmoke",
-      "command": "pnpm resmoke",
-      "runAtStart": false
+      "command": "pnpm resmoke"
     }
   }
 }
