@@ -16,9 +16,9 @@
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./specs/ ./support/",
     "lint": "npm run eslint && npm run tsc",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./specs/ ./support/",
-    "test": "source ./scripts/install-chrome.sh && karma start ./karma.conf.js",
-    "test-debug": "source ./scripts/install-chrome.sh && TEST_WATCH=1 TEST_DEBUG=1 karma start ./karma.conf.js --debug",
-    "test-dev": "source ./scripts/install-chrome.sh && TEST_WATCH=1 karma start ./karma.conf.js",
+    "test": ". ./scripts/install-chrome.sh && karma start ./karma.conf.js",
+    "test-debug": ". ./scripts/install-chrome.sh && TEST_WATCH=1 TEST_DEBUG=1 karma start ./karma.conf.js --debug",
+    "test-dev": ". ./scripts/install-chrome.sh && TEST_WATCH=1 karma start ./karma.conf.js",
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
