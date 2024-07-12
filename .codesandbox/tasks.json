@@ -1,0 +1,90 @@
+{
+  // These tasks will run in order when initializing your CodeSandbox project.
+  "setupTasks": [
+    {
+      "name": "Install pnpm 9",
+      "command": "npm i -g pnpm@9"
+    },
+    {
+      "name": "Install dependencies",
+      "command": "pnpm install --frozen-lockfile"
+    },
+    {
+      "name": "Install Chrome",
+      "command": "export CHROME_BIN=$(./packages/tests/node_modules/.bin/puppeteer browsers install chrome@115 | cut -d' ' -f2)"
+    }
+  ],
+
+  // These tasks can be run from CodeSandbox. Running one will open a log in the app.
+  "tasks": {
+    "start": {
+      "name": "start",
+      "command": "pnpm start",
+      "runAtStart": true,
+      "preview": {
+        "port": 3001
+      }
+    },
+    "test": {
+      "name": "test",
+      "command": "pnpm test"
+    },
+    "test-dev": {
+      "name": "test-dev",
+      "command": "pnpm test-dev"
+    },
+    "lint": {
+      "name": "lint",
+      "command": "pnpm lint"
+    },
+    "lint-fix": {
+      "name": "lint-fix",
+      "command": "pnpm lint-fix"
+    },
+    "build": {
+      "name": "build",
+      "command": "pnpm build"
+    },
+    "build-examples": {
+      "name": "build-examples",
+      "command": "pnpm build-examples"
+    },
+    "build-libs": {
+      "name": "build-libs",
+      "command": "pnpm build-libs"
+    },
+    "sandbox-js": {
+      "name": "sandbox-js",
+      "command": "pnpm sandbox-js",
+      "preview": {
+        "port": 5174
+      }
+    },
+    "sandbox-next": {
+      "name": "sandbox-next",
+      "command": "pnpm sandbox-next",
+      "preview": {
+        "port": 3002
+      }
+    },
+    "sandbox-ts": {
+      "name": "sandbox-ts",
+      "command": "pnpm sandbox-ts",
+      "preview": {
+        "port": 5175
+      }
+    },
+    "clean": {
+      "name": "clean",
+      "command": "pnpm clean"
+    },
+    "smoke": {
+      "name": "smoke",
+      "command": "pnpm smoke"
+    },
+    "resmoke": {
+      "name": "resmoke",
+      "command": "pnpm resmoke"
+    }
+  }
+}
