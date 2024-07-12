@@ -1,0 +1,100 @@
+{
+  // These tasks will run in order when initializing your CodeSandbox project.
+  "setupTasks": [
+    {
+      "name": "Install Dependencies",
+      "command": "pnpm install --frozen-lockfile"
+    },
+    {
+      "name": "Install Chrome",
+      "command": "export CHROME_BIN=$(./packages/tests/node_modules/.bin/puppeteer browsers install chrome@115 | cut -d' ' -f2)"
+    }
+  ],
+
+  // These tasks can be run from CodeSandbox. Running one will open a log in the app.
+  "tasks": {
+    "start": {
+      "name": "start",
+      "command": "pnpm start",
+      "runAtStart": true,
+      "preview": {
+        "port": 3001
+      }
+    },
+    "test": {
+      "name": "test",
+      "command": "pnpm test",
+      "runAtStart": false
+    },
+    "test-dev": {
+      "name": "test-dev",
+      "command": "pnpm test-dev",
+      "runAtStart": false
+    },
+    "lint": {
+      "name": "lint",
+      "command": "pnpm lint",
+      "runAtStart": false
+    },
+    "lint-fix": {
+      "name": "lint-fix",
+      "command": "pnpm lint-fix",
+      "runAtStart": false
+    },
+    "build": {
+      "name": "build",
+      "command": "pnpm build",
+      "runAtStart": false
+    },
+    "build-examples": {
+      "name": "build-examples",
+      "command": "pnpm build-examples",
+      "runAtStart": false
+    },
+    "build-libs": {
+      "name": "build-libs",
+      "command": "pnpm build-libs",
+      "runAtStart": false
+    },
+    "check-hot": {
+      "name": "check-hot",
+      "command": "pnpm check-hot",
+      "runAtStart": false
+    },
+    "sandbox": {
+      "name": "sandbox",
+      "command": "pnpm sandbox",
+      "runAtStart": false
+    },
+    "sandbox-js": {
+      "name": "sandbox-js",
+      "command": "pnpm sandbox-js",
+      "runAtStart": false
+    },
+    "sandbox-next": {
+      "name": "sandbox-next",
+      "command": "pnpm sandbox-next",
+      "runAtStart": false
+    },
+    "sandbox-ts": {
+      "name": "sandbox-ts",
+      "command": "pnpm sandbox-ts",
+      "runAtStart": false
+    },
+    "clean": {
+      "name": "clean",
+      "command": "pnpm clean",
+      "runAtStart": false
+    },
+    "smoke": {
+      "name": "smoke",
+      "command": "pnpm smoke",
+      "runAtStart": false
+    },
+    "resmoke": {
+      "name": "resmoke",
+      "command": "pnpm resmoke",
+      "runAtStart": false
+    }
+  }
+}
