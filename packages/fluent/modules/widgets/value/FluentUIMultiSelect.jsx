@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Dropdown } from "@fluentui/react";
 import { Utils } from "@react-awesome-query-builder/ui";
-import { SearchableDropdown } from "../SearchableDropdown"
+import { SearchableDropdown } from "../SearchableDropdown";
 
 const { mapListValues } = Utils.ListUtils;
 
@@ -13,10 +13,10 @@ export default (props) => {
     readonly,
     placeholder,
     showSearch,
-  } = props
+  } = props;
   const [selectedKeys, setSelectedKeys] = useState(value ?? []);
 
-  console.log('proppies', props)
+  console.log("proppies", props);
 
   const renderOptions = () =>
     mapListValues(listValues, ({ title, value }) => {
@@ -27,14 +27,14 @@ export default (props) => {
     if (item) {
       const newSelectedItems = item.selected
         ? [...selectedKeys, item.key]
-        : selectedKeys.filter((key) => key !== item.key)
+        : selectedKeys.filter((key) => key !== item.key);
 
       setSelectedKeys(newSelectedItems);
       setValue(newSelectedItems);
     }
   };
 
-  const DropdownType = showSearch ? SearchableDropdown : Dropdown
+  const DropdownType = showSearch ? SearchableDropdown : Dropdown;
 
   return (
     <DropdownType

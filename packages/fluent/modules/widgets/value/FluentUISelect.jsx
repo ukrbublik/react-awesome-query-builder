@@ -1,6 +1,7 @@
 import React from "react";
 import { Dropdown } from "@fluentui/react";
 import { Utils } from "@react-awesome-query-builder/ui";
+import { SearchableDropdown } from "../SearchableDropdown";
 const { mapListValues } = Utils.ListUtils;
 
 export default ({
@@ -29,7 +30,7 @@ export default ({
     return options;
   };
 
-  const DropdownType = showSearch ? SearchableDropdown : Dropdown
+  const DropdownType = showSearch ? SearchableDropdown : Dropdown;
 
   return (
     <DropdownType
