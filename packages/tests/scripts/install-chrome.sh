@@ -1,6 +1,7 @@
 #!/bin/bash
 
 if [ "$CSB" = "true" ]; then
+  echo "CHROME_BIN=$CHROME_BIN"
   PUPPETEER_VERSION=$(./node_modules/.bin/puppeteer --version)
   echo "puppeteer version: $PUPPETEER_VERSION"
   INSTALL_RES=$(./node_modules/.bin/puppeteer browsers install chrome@115)

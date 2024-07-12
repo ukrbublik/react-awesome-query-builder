@@ -65,25 +65,29 @@
       "command": "pnpm check-hot",
       "runAtStart": false
     },
-    "sandbox": {
-      "name": "sandbox",
-      "command": "pnpm sandbox",
-      "runAtStart": false
-    },
     "sandbox-js": {
       "name": "sandbox-js",
       "command": "pnpm sandbox-js",
-      "runAtStart": false
+      "runAtStart": false,
+      "preview": {
+        "port": 5174
+      }
     },
     "sandbox-next": {
       "name": "sandbox-next",
       "command": "pnpm sandbox-next",
-      "runAtStart": false
+      "runAtStart": false,
+      "preview": {
+        "port": 3002
+      }
     },
     "sandbox-ts": {
       "name": "sandbox-ts",
       "command": "pnpm sandbox-ts",
-      "runAtStart": false
+      "runAtStart": false,
+      "preview": {
+        "port": 5175
+      }
     },
     "clean": {
       "name": "clean",
