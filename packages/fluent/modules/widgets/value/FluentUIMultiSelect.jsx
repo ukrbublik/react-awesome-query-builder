@@ -16,8 +16,6 @@ export default (props) => {
   } = props;
   const [selectedKeys, setSelectedKeys] = useState(value ?? []);
 
-  console.log("proppies", props);
-
   const renderOptions = () =>
     mapListValues(listValues, ({ title, value }) => {
       return { key: value, text: title };
