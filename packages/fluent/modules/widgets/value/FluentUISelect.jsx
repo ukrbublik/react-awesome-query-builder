@@ -1,7 +1,7 @@
 import React from "react";
 import { Dropdown } from "@fluentui/react";
 import { Utils } from "@react-awesome-query-builder/ui";
-import { SearchableDropdown } from "../SearchableDropdown";
+import SearchableDropdown from "../SearchableDropdown";
 const { mapListValues } = Utils.ListUtils;
 
 export default ({
