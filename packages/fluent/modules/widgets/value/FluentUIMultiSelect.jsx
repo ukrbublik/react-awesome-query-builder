@@ -1,34 +1,32 @@
-import React, { useState } from "react";
+import React from "react";
 import { Dropdown } from "@fluentui/react";
 import { Utils } from "@react-awesome-query-builder/ui";
 import SearchableDropdown from "../SearchableDropdown";
 
 const { mapListValues } = Utils.ListUtils;
 
-export default (props) => {
-  const {
-    listValues,
-    value,
-    setValue,
-    readonly,
-    placeholder,
-    showSearch,
-  } = props;
-  const [selectedKeys, setSelectedKeys] = useState(value ?? []);
+export default ({
+  listValues,
+  value,
+  setValue,
+  readonly,
+  placeholder,
+  showSearch,
+}) => {
 
   const renderOptions = () =>
     mapListValues(listValues, ({ title, value }) => {
       return { key: value, text: title };
     });
 
-  const onChange = (e, item) => {
+  const onChange = (_, item) => {
     if (item) {
-      const newSelectedItems = item.selected
-        ? [...selectedKeys, item.key]
-        : selectedKeys.filter((key) => key !== item.key);
+      const currentItems = value ?? []
+      const selectedItems = item.selected
+        ? [...currentItems, item.key]
+        : currentItems.filter((key) => key !== item.key);
 
-      setSelectedKeys(newSelectedItems);
-      setValue(newSelectedItems);
+      setValue(selectedItems);
     }
   };
 
@@ -37,6 +35,7 @@ export default (props) => {
   return (
     <DropdownType
       placeholder={placeholder || "Select options"}
+      selectedKeys={value}
       // eslint-disable-next-line react/jsx-no-bind
       onChange={onChange}
       multiSelect
