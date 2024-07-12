@@ -2,7 +2,11 @@
   // These tasks will run in order when initializing your CodeSandbox project.
   "setupTasks": [
     {
-      "name": "Install Dependencies",
+      "name": "Install pnpm 9",
+      "command": "npm i -g pnpm@9"
+    },
+    {
+      "name": "Install dependencies",
       "command": "pnpm install --frozen-lockfile"
     },
     {
