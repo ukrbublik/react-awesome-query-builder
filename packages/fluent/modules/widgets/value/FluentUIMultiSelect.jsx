@@ -21,19 +21,18 @@ export default ({
 
   const onChange = (e, item) => {
     if (item) {
-      setSelectedKeys(
-        item.selected
-          ? [...selectedKeys, item.key]
-          : selectedKeys.filter((key) => key !== item.key)
-      );
-      setValue(selectedKeys);
+      const newSelectedItems = item.selected
+        ? [...selectedKeys, item.key]
+        : selectedKeys.filter((key) => key !== item.key)
+
+      setSelectedKeys(newSelectedItems);
+      setValue(newSelectedItems);
     }
   };
 
   return (
     <Dropdown
       placeholder={placeholder || "Select options"}
-      selectedKeys={selectedKeys}
       // eslint-disable-next-line react/jsx-no-bind
       onChange={onChange}
       multiSelect
