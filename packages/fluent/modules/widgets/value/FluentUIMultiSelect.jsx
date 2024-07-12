@@ -21,7 +21,7 @@ export default ({
 
   const onChange = (_, item) => {
     if (item) {
-      const currentItems = value ?? []
+      const currentItems = value ?? [];
       const selectedItems = item.selected
         ? [...currentItems, item.key]
         : currentItems.filter((key) => key !== item.key);
