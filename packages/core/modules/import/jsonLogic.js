@@ -18,9 +18,6 @@ const arrayToObject = (arr) => arr.reduce((acc, [f, fc]) => ({ ...acc, [f]: fc }
 const jlFieldMarker = "jlField";
 const jlArgsMarker = "jlArgs";
 
-// Checks if operator is not_like, multiselect_not_contains or select_not_any_in as these need special handling. see issue #1084
-//const isExclamationOperator = (op, vals) => op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && ["in", "all", "some"].includes(Object.keys(vals[0])[0]));
-
 const createMeta = (parentMeta) => {
   return {
     errors: [],
@@ -141,8 +138,6 @@ const matchAgainstTemplates = (jsonlogic, conv, meta, operatorsToCheck = null) =
           else meta.errors.push(`Operator matched against 2 templates: ${response.newOp} and ${key}`);
           // New op that is used to represent operator that is combosed of multiple operators
           response["newOp"] = value.jsonLogic2;
-          console.log("Match found!!! response:", response, "template that was matched:", conv.combinationOperators[key]);
-          console.log("Jsonlogic against which match found:", jsonlogic);
         }
       }
     }
