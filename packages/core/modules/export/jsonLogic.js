@@ -154,18 +154,24 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
       return undefined;
   }
 
-  // with certain rules we cannot ever remove a negation single rule group because then it would be identical to
-  // the negation of that rule. see issue #1084. TODO: replace with solution that just looks at childs operator 
-  // that would be better
-  const firstEntry = list.first();
-  const isExceptionOperator = firstEntry 
-    && (firstEntry["all"]
-    || firstEntry["in"]
-    || firstEntry["some"]);
-  const cannotRemoveSingleRuleGroup = origNot && isExceptionOperator;
+  // I any of these conditions are true then we cannot remove group
+  let cannotRemoveSingleRuleGroup = isRoot || shouldPreserveGroups || list.size != 1;
+
+  // If cannotRemoveSingleRuleGroup is already true then there is no point to even check also if its not a negation group 
+  // then this does not matter
+  if (!cannotRemoveSingleRuleGroup && origNot) {
+    // We check all children even thuogh there should be only one in case the formatting of one of them failed.
+    // From config we see if exclamation is part of reverse operator definition and if so then we cannot ever remove a negation single 
+    // rule group because then this combination would be identical to that reverse operator. see issue #1084
+    cannotRemoveSingleRuleGroup = children.some((currentChild) => {
+      const op = currentChild.get("properties")?.get("operator");
+      const revOp  = config["operators"]?.[op]?.reversedOp;
+      return config.operators?.[revOp]?._jsonLogicIsExclamationOp ?? false;
+    });
+  }
 
   let resultQuery = {};
-  if (list.size == 1 && !isRoot && !shouldPreserveGroups && !cannotRemoveSingleRuleGroup)
+  if (!cannotRemoveSingleRuleGroup)
     resultQuery = list.first();
   else
     resultQuery[conj] = list.toList().toJS();

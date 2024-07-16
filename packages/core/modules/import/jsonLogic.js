@@ -785,33 +785,8 @@ const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta)
 
 const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOneRuleInRuleGroup = false) => {
   if (!op) return undefined;
-  /*
-  // Check if the current operation is an exception ie !->all or !->in
-  if (isExclamationOperator(op, vals)) {
-    const firstVal = vals[0];
-    if (typeof firstVal === 'object' && isJsonLogic(vals[0])) {
-      const keys = Object.keys(firstVal);
-      if (keys.length === 1) {
-        vals = firstVal[keys[0]]; // Update 'vals' to be the value of this key
-        op = "!" + keys[0]; // Thus making !->all into !all and !->in into !in
-      }
-    }
-  }
-  */
+  
   const arity = vals.length;
-  /*
-  if ((op === "!all" || op === "all" || op === "!some" || op === "some") && isJsonLogic(vals[1])) {
-    // special case for "all-in" and "some-in"
-    const op2 = Object.keys(vals[1])[0];
-    const isEmptyVar = vals[1][op2][0]?.["var"] === "";
-    if (op2 === "in" && isEmptyVar) {
-      vals = [
-        vals[0],
-        vals[1][op2][1]
-      ];
-      op = op + "-" + op2; // "all-in" and "some-in"
-    }
-  }*/
 
   const parseRes = parseRule(op, arity, vals, parentField, conv, config, meta);
   if (!parseRes) return undefined;
@@ -865,6 +840,12 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
       having = having["!"];
       conj = Object.keys(having)[0];
       havingVals = having[conj];
+      // Negation group with single rule is to be treated the same as !
+      /*if ((conj == "and" || conj == "or") && havingVals.length == 1) {
+        having = having[conj][0];
+        conj = Object.keys(having)[0];
+        havingVals = having[conj];
+      }*/
       // Another template matching
       const matchTemp = matchAgainstTemplates(having, conv, meta);
       match = matchTemp ? matchTemp : match;
