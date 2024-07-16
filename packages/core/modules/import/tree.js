@@ -1,13 +1,10 @@
 import Immutable, { fromJS, Map } from "immutable";
-import {checkTree, isValidTree} from "../utils/validation";
 import {getLightTree, _fixImmutableValue, fixPathsInTree} from "../utils/treeUtils";
 import {isJsonLogic} from "../utils/stuff";
 import uuid from "../utils/uuid";
 
 export {
   isJsonLogic,
-  // for backward compatibility:
-  checkTree, isValidTree
 };
 
 export const getTree = (immutableTree, light = true, children1AsArray = true) => {

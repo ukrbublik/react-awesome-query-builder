@@ -1,13 +1,10 @@
 import Immutable  from "immutable";
 import {toImmutableList, isImmutable, applyToJS as immutableToJs} from "./stuff";
-import {getTreeBadFields} from "./validation";
 import {jsToImmutable} from "../import/tree";
 import uuid from "./uuid";
 
 export {
   toImmutableList, jsToImmutable, immutableToJs, isImmutable,
-  // for backward compatibility
-  getTreeBadFields
 };
 
 /**
