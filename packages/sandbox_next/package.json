@@ -18,6 +18,7 @@
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix ./pages/ ./components/ ./lib/",
     "preview": "PORT=3002 next start",
     "start": "PORT=3002 next dev",
+    "start-prod": "npm run build && npm run preview",
     "tsc": "tsc -p . --noEmit"
   },
   "browserslist": {

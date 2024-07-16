@@ -1,7 +1,5 @@
 export {
   getTree, loadTree,
-  // for backward compatibility:
-  checkTree, isValidTree,
   // candidates for moving to utils
   isImmutableTree, isTree, isJsonLogic, jsToImmutable
 } from "./tree";

@@ -11,12 +11,14 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "main": "src/index.tsx",
   "scripts": {
-    "build": "tsc && vite build --mode dev --debug",
+    "build": "tsc && vite build --mode dev",
+    "build-prod": "tsc && vite build --mode production",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts ./src/",
     "preinstall": "node ./scripts/patch-versions.js",
     "lint": "npm run eslint && npm run tsc",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix ./src/",
     "preview": "vite preview",
+    "start-prod": "npm run build-prod && npm run preview",
     "start": "vite",
     "tsc": "tsc -p . --noEmit"
   },
