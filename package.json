@@ -84,7 +84,8 @@
     "start": "pnpm run examples",
     "test": "pnpm --filter @react-awesome-query-builder/tests run test",
     "test-debug": "pnpm --filter @react-awesome-query-builder/tests run test-debug",
-    "test-dev": "pnpm --filter @react-awesome-query-builder/tests run test-dev"
+    "test-dev": "pnpm --filter @react-awesome-query-builder/tests run test-dev",
+    "fix-pnpm-lock-6": "sed -r -i '' 's@, tarball: https://.+}@}@g' ./pnpm-lock.yaml"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.7",
