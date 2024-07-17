@@ -469,13 +469,14 @@ $rule-group-actions-offset-left: 10px !default;
 
       margin-top: $rulegroup-offset;
       margin-bottom: $rulegroup-offset;
+      padding-left: $rulegroup-offset-left;
+
       .group-or-rule-container {
         margin-bottom: $rulegroup-offset;
         margin-top: $rulegroup-offset;
         padding-right: $rulegroup-offset;
       }
 
-      padding-left: $rulegroup-offset-left;
       &.one--child {
         padding-left: calc($rulegroup-offset-left / 2);
       }
