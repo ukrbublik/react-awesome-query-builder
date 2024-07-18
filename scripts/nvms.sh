@@ -12,12 +12,24 @@
 ## Run a command with nvm/nvs:
 ## path/to/nvms.sh command arg1 arg2 arg3
 
+echo "(before) node: $(node -v)"
+echo "(before) pnpm: $(pnpm -v)"
+
 if [ -f ~/.nvm/nvm.sh ]; then
     . ~/.nvm/nvm.sh
     nvm use
 else
     . ~/.nvs/nvs.sh
     nvs use
+fi
+
+echo "Now node: $(node -v)"
+echo "Now pnpm: $(pnpm -v)"
+
+if [[ "$(pnpm -v)" != "8."* ]]; then
+    echo "Installing pnpm..."
+    npm i -g pnpm@8
+    echo "Now pnpm: $(pnpm -v)"
 fi
 
 if [ $# -gt 0 ]; then

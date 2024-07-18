@@ -1,29 +1,31 @@
 {
 	"version": "2.0.0",
 	"tasks": [
-		{
-			"label": "install-pnpm8",
-			"type": "shell",
-			"command": "npm install -g pnpm@8",
-			"group": "build",
-			"detail": "install pnpm 8",
-            "presentation": {
-                "reveal": "always",
-                "panel": "dedicated",
-                "clear": true,
-            },
-            "options": {
-                "shell": {
-                    "executable": "${workspaceFolder}/scripts/nvms.sh"
-                },
-                "statusbar": {
-                    "label": "i-pnpm8",
-                    "running": {
-                        "backgroundColor": "statusBarItem.errorBackground"
-                    }
-                }
-            }
-		},
+		// {
+		// 	"label": "install-pnpm",
+		// 	"type": "shell",
+		// 	"command": "npm install -g pnpm@8",
+		// 	"group": "build",
+		// 	"detail": "install pnpm",
+        //     "presentation": {
+        //         "reveal": "silent",
+        //         "panel": "dedicated",
+        //         "clear": true,
+        //     },
+        //     "hide": true,
+        //     "options": {
+        //         "shell": {
+        //             "executable": "${workspaceFolder}/scripts/nvms.sh"
+        //         },
+        //         "statusbar": {
+        //             "label": "i-pnpm",
+        //             "hide": true,
+        //             "running": {
+        //                 "backgroundColor": "statusBarItem.errorBackground"
+        //             }
+        //         }
+        //     }
+		// },
 		{
 			"label": "install",
 			"type": "npm",
