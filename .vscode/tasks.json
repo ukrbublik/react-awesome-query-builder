@@ -1,0 +1,340 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		// {
+		// 	"label": "install-pnpm",
+		// 	"type": "shell",
+		// 	"command": "npm install -g pnpm@8",
+		// 	"group": "build",
+		// 	"detail": "install pnpm",
+        //     "presentation": {
+        //         "reveal": "silent",
+        //         "panel": "dedicated",
+        //         "clear": true,
+        //     },
+        //     "hide": true,
+        //     "options": {
+        //         "shell": {
+        //             "executable": "${workspaceFolder}/scripts/nvms.sh"
+        //         },
+        //         "statusbar": {
+        //             "label": "i-pnpm",
+        //             "hide": true,
+        //             "running": {
+        //                 "backgroundColor": "statusBarItem.errorBackground"
+        //             }
+        //         }
+        //     }
+		// },
+		{
+			"label": "install",
+			"type": "npm",
+			"script": "install",
+			"group": "build",
+			"detail": "install all dependencies (and rebuild libs)",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "label": "i",
+                    "running": {
+                        "backgroundColor": "statusBarItem.errorBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "install-noscripts",
+			"type": "npm",
+			"script": "install-noscripts",
+			"group": "build",
+			"detail": "install all dependencies, ignore scripts",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "label": "i-ns",
+                    "running": {
+                        "backgroundColor": "statusBarItem.errorBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "install-frozen",
+			"type": "npm",
+			"script": "install-frozen",
+			"group": "build",
+			"detail": "install all dependencies, frozen lockfile",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "label": "i-f",
+                    "hide": true,
+                    "running": {
+                        "backgroundColor": "statusBarItem.errorBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "install-frozen-noscripts",
+			"type": "npm",
+			"script": "install-frozen-noscripts",
+			"group": "build",
+			"detail": "install all dependencies, frozen lockfile, ignore scripts",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "label": "i-f-ns",
+                    "hide": true,
+                    "running": {
+                        "backgroundColor": "statusBarItem.errorBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "build-libs",
+			"type": "npm",
+			"script": "build-libs",
+			"group": "build",
+			"detail": "build all libraries",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "label": "build",
+                    "running": {
+                        "backgroundColor": "statusBarItem.errorBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "build-examples",
+			"type": "npm",
+			"script": "build-examples",
+			"group": "build",
+			"detail": "build all examples",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "hide": true,
+                    "running": {
+                        "backgroundColor": "statusBarItem.errorBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "lint",
+			"type": "npm",
+			"script": "lint",
+			"group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "running": {
+                        "backgroundColor": "statusBarItem.errorBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "lint-fix",
+			"type": "npm",
+			"script": "lint-fix",
+			"group": "build",
+            "hide": true,
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "running": {
+                        "backgroundColor": "statusBarItem.errorBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "test",
+			"type": "npm",
+			"script": "test",
+			"group": "test",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "running": {
+                        "backgroundColor": "statusBarItem.errorBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "test-dev",
+			"type": "npm",
+			"script": "test-dev",
+			"group": "test",
+			"isBackground": true,
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "running": {
+                        "backgroundColor": "statusBarItem.warningBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "examples",
+			"type": "npm",
+			"script": "start",
+			"group": "none",
+			"isBackground": true,
+            "presentation": {
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "running": {
+                        "backgroundColor": "statusBarItem.warningBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "sandbox-js",
+			"type": "npm",
+			"script": "sandbox-js-start",
+			"group": "none",
+			"isBackground": true,
+            "presentation": {
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "running": {
+                        "backgroundColor": "statusBarItem.warningBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "sandbox-ts",
+			"type": "npm",
+			"script": "sandbox-ts-start",
+			"group": "none",
+			"isBackground": true,
+            "presentation": {
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "running": {
+                        "backgroundColor": "statusBarItem.warningBackground"
+                    }
+                }
+            }
+		},
+		{
+			"label": "sandbox-next",
+			"type": "npm",
+			"script": "sandbox-next-start",
+			"group": "none",
+			"isBackground": true,
+            "presentation": {
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "running": {
+                        "backgroundColor": "statusBarItem.warningBackground"
+                    }
+                }
+            }
+		},
+	]
+}

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$CSB" = "true" ]; then
+if [[ "$CSB" == "true" || "$CODESPACES" == "true" ]]; then
   echo "CHROME_BIN=$CHROME_BIN"
   PUPPETEER_VERSION=$(./node_modules/.bin/puppeteer --version)
   echo "puppeteer version: $PUPPETEER_VERSION"
