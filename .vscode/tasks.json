@@ -2,11 +2,11 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "install-pnpm",
+			"label": "install-pnpm8",
 			"type": "shell",
 			"command": "npm install -g pnpm@8",
 			"group": "build",
-			"detail": "install pnpm 8 & all dependencies",
+			"detail": "install pnpm 8",
             "presentation": {
                 "reveal": "always",
                 "panel": "dedicated",
@@ -17,7 +17,7 @@
                     "executable": "${workspaceFolder}/scripts/nvms.sh"
                 },
                 "statusbar": {
-                    "label": "i-pnpm",
+                    "label": "i-pnpm8",
                     "running": {
                         "backgroundColor": "statusBarItem.errorBackground"
                     }
