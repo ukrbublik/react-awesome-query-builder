@@ -58,6 +58,9 @@
     "packages/sandbox_next"
   ],
   "scripts": {
+    "install-frozen": "pnpm install --frozen-lockfile",
+    "install-noscripts": "pnpm install --ignore-scripts",
+    "install-frozen-noscripts": "pnpm install --frozen-lockfile --ignore-scripts",
     "build": "pnpm run build-libs && pnpm run build-examples",
     "build-examples": "pnpm --filter !@react-awesome-query-builder/examples^... run build",
     "build-libs": "pnpm --filter @react-awesome-query-builder/examples^... run build",
