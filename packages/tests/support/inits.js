@@ -982,6 +982,21 @@ export const with_func_tolower_from_field = {
   ]
 };
 
+export const with_func_tolower_and_contains_op = {
+  "and": [
+    {
+      "in": [
+        "aa",
+        {
+          "toLowerCase": [
+            "AAA"
+          ]
+        }
+      ]
+    }
+  ]
+};
+
 export const with_func_linear_regression_tree = {
   type: "group",
   children1: [

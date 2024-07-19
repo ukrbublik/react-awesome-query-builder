@@ -71,7 +71,7 @@ const buildConv = (config) => {
       if (!combinationOperators[opKey])
         combinationOperators[opKey] = {};
       combinationOperators[opKey] = {
-        "template": opConfig.jsonLogic({"var": jlFieldMarker}, null, jlArgsMarker), 
+        "template": opConfig.jsonLogic(jlFieldMarker, opKey, jlArgsMarker), 
         "jsonLogic2": opConfig.jsonLogic2,
         "_jsonLogicIsExclamationOp": !!opConfig._jsonLogicIsExclamationOp
       };
@@ -141,7 +141,6 @@ const matchAgainstTemplates = (jsonlogic, conv, meta, operatorsToCheck = null) =
       }
     }
   }
-  if (!response) console.log("No match found for: ", jsonlogic);
   // Returns undefined if no matches found
   return response;
 };
@@ -157,7 +156,7 @@ const matchAgainstTemplates = (jsonlogic, conv, meta, operatorsToCheck = null) =
  * @returns {Object} The updated response object after checking the current template level. It includes whether the current level 
  * matches (match: true/false), any identified fields (jlField), and any arguments (jlArgs).
  */
-const isTemplateMatch = (template, jsonlogic, response={"match": true, "jlField": null, "jlArgs": []}) => {
+const isTemplateMatch = (template, jsonlogic, response = {"match": true, "jlField": null, "jlArgs": []}) => {
   if (template == undefined || jsonlogic == undefined) {
     response.match = false;
     return response;    
@@ -177,9 +176,9 @@ const isTemplateMatch = (template, jsonlogic, response={"match": true, "jlField"
       // Checks that both have exact same key at exact same place. Kind of pointless for arrays but whatever
       response.match = false;
       return response;
-    } else if (value === jlFieldMarker) {
-      // If jlFieldMarker is found in template we take the value from corresponding place in jsonlogic
-      response.jlField = {"var": jsonlogic[key]};
+    } else if (value === jlFieldMarker && isJsonLogic(jsonlogic[key])) {
+      // If jlFieldMarker is found in template AND it's field or func we take the value from corresponding place in jsonlogic
+      response.jlField = jsonlogic[key];
     } else if (value === jlArgsMarker) {
       // If jlArgsMarker is found in template we take the value from corresponding place in jsonlogic
       response.jlArgs.push(jsonlogic[key]);

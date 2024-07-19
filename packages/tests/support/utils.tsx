@@ -545,7 +545,7 @@ const do_export_checks = async (config: Config, tree: ImmutableTree, expects?: E
 
   if (!expects || Object.values(expects).some(e => e === "?")) {
     const {logic, data, errors} = jsonLogicFormat(tree, config);
-    const correct = {
+    const correct = Object.fromEntries(Object.entries({
       query: queryString(tree, config),
       queryHuman: queryString(tree, config, true),
       sql: sqlFormat(tree, config),
@@ -553,7 +553,7 @@ const do_export_checks = async (config: Config, tree: ImmutableTree, expects?: E
       mongo: mongodbFormat(tree, config),
       logic: logic,
       elasticSearch: elasticSearchFormat(tree, config),
-    };
+    }).filter(([k, _]) => expects ? expects[k as keyof ExtectedExports] === "?" : false));
     console.log(getCurrentTestName(), stringify(correct, undefined, 2));
   } else {
     if (expects["query"] !== undefined) {

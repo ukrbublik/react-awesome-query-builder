@@ -39,6 +39,14 @@ describe("query with func", () => {
     });
   });
 
+  describe("can import tree with func LOWER and operator 'contains'", () => {
+    export_checks([with_all_types, with_funcs], inits.with_func_tolower_and_contains_op, "JsonLogic", {
+      sql: "LOWER('AAA') LIKE '%aa%'",
+      spel: "'AAA'.toLowerCase().contains('aa')",
+      logic: inits.with_func_tolower_and_contains_op
+    });
+  });
+
   it("should render func with antd", async () => {
     await with_qb_ant([with_all_types, with_funcs], inits.with_func_tolower_from_field, "JsonLogic", (qb, {expect_jlogic}) => {
       expect(qb.find("FuncWidget")).to.have.length(1);
