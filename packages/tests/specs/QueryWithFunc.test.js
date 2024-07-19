@@ -5,6 +5,7 @@ const {
   with_all_types,
   with_funcs,
 } = configs;
+import { expect } from "chai";
 
 describe("query with func", () => {
 

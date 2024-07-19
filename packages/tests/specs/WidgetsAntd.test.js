@@ -3,6 +3,7 @@ import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_ant } from "../support/utils";
 import { getAutocompleteUtils } from "../support/autocomplete";
+import { expect } from "chai";
 
 
 describe("antdesign widgets render", () => {

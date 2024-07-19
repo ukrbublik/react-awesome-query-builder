@@ -13,7 +13,8 @@ module.exports = {
         "bundle.js",
         "*.bundle.js",
         "webpack.config.js",
-        "vite.config.ts"
+        "vite.config.ts",
+        ".eslintrc.js"
     ],
     "extends": [
         "eslint:recommended",
@@ -137,12 +138,13 @@ module.exports = {
         "files": ["packages/tests/**/*"],
         "env": {
             "mocha": true,
-            "jasmine": true,
+            // "jasmine": true,
         },
         "settings": {
             "import/core-modules": [
                 "sinon",
-                "chai"
+                "chai",
+                "mocha"
             ],
             // "import/resolver": {
             //     "webpack": {

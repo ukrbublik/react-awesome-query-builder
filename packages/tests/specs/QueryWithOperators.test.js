@@ -3,6 +3,7 @@ import * as inits from "../support/inits";
 import { export_checks } from "../support/utils";
 import { Utils } from "@react-awesome-query-builder/core";
 import { BasicConfig } from "@react-awesome-query-builder/ui";
+import { expect } from "chai";
 
 describe("query with ops", () => {
   describe("reverseOperatorsForNot == true", () => {

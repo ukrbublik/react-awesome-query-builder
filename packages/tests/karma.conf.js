@@ -7,10 +7,10 @@ process.env.BABEL_ENV = "test";
 const isCI = !!process.env.CI;
 const isDebug = process.env.TEST_DEBUG === "1";
 const isWatch = process.env.TEST_WATCH === "1";
-const filterIndex = process.argv.findIndex(arg => arg.includes('--filter'));
+const filterIndex = process.argv.findIndex(arg => arg.includes("--filter"));
 let filterArgs = filterIndex === -1 ? [] : process.argv.slice(filterIndex+1);
 if (filterArgs.length === 1) {
-  filterArgs = filterArgs[0].split(" ").filter(a => !!a)
+  filterArgs = filterArgs[0].split(" ").filter(a => !!a);
 }
 const hasFilterArgs = filterArgs?.length > 0;
 const useCoverage = !isDebug && !isWatch; // && !hasFilterArgs
@@ -58,7 +58,8 @@ module.exports = function(config) {
     reporters,
 
     mochaReporter: {
-      showDiff: true
+      showDiff: true,
+      ignoreSkipped: true,
     },
 
     junitReporter: {

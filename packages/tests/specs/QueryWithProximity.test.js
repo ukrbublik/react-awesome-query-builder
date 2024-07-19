@@ -1,6 +1,7 @@
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb, export_checks } from "../support/utils";
+import { expect } from "chai";
 
 
 describe("proximity", () => {

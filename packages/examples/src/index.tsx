@@ -16,6 +16,7 @@ console.log("React version:", React.version);
 const rootElement = window.document.getElementById("root")!;
 //const root = createRoot(rootElement);
 //const render = (app: React.ReactElement) => { root.render(app); };
+// eslint-disable-next-line react/no-deprecated
 const render = (app: React.ReactElement) => { ReactDOM.render(app, rootElement); };
 
 render(
