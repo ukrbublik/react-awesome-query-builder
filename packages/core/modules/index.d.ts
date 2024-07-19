@@ -1061,7 +1061,8 @@ export interface BaseOperator {
   spelOps?: string[];
   spelFormatOp?: SpelFormatOperator | SerializedFunction;
   jsonLogic?: string | JsonLogicFormatOperator | JsonLogicFunction;
-  _jsonLogicIsRevArgs?: boolean;
+  jsonLogic2?: string;
+  _jsonLogicIsExclamationOp?: boolean;
   elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType | JsonLogicFunction;
   valueSources?: Array<ValueSource>;
   valueTypes?: Array<string>;

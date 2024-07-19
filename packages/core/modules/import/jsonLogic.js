@@ -6,7 +6,6 @@ import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
 
 import moment from "moment";
-import { forEach } from "lodash";
 
 // http://jsonlogic.com/
 

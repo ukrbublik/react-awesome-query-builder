@@ -541,7 +541,6 @@ const formatField = (meta, config, field, parentField = null) => {
 const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formattedValue) => {
   let formatteOp = operator;
   const cardinality = getOpCardinality(operatorDefinition);
-  const isReverseArgs = operatorDefinition._jsonLogicIsRevArgs ?? false;
   if (typeof operatorDefinition.jsonLogic == "string")
     formatteOp = operatorDefinition.jsonLogic;
   const rangeOps = ["<", "<=", ">", ">="];
@@ -551,8 +550,6 @@ const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formatt
       return { [formatteOp]: [formattedField, null] };
     else if (cardinality == 0)
       return { [formatteOp]: formattedField };
-    else if (cardinality == 1 && isReverseArgs)
-      return { [formatteOp]: [formattedValue, formattedField] };
     else if (cardinality == 1)
       return { [formatteOp]: [formattedField, formattedValue] };
     else if (cardinality == 2 && rangeOps.includes(formatteOp))
