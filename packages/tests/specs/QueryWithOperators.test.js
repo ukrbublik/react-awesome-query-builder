@@ -488,7 +488,7 @@ describe("query with exclamation operators", () => {
     });
   });
   describe("reverseOperatorsForNot == true", () => {
-    export_checks([configs.with_all_types], inits.exclamation_operators_and_negation_groups, "JsonLogic", {
+    export_checks([configs.with_all_types, configs.with_reverse_operators], inits.exclamation_operators_and_negation_groups, "JsonLogic", {
       "logic": inits.exclamation_operators_and_negation_groups
     });
   });
@@ -501,7 +501,7 @@ describe("query with exclamation operators in array group", () => {
     });
   });
   describe("reverseOperatorsForNot == true", () => {
-    export_checks([configs.with_group_array_cars], inits.with_not_and_neg_in_some, "JsonLogic", {
+    export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_and_neg_in_some, "JsonLogic", {
       "logic": inits.with_not_and_neg_in_some
     });
   });
