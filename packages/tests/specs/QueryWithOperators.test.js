@@ -497,6 +497,7 @@ describe("query with exclamation operators", () => {
 describe("query with exclamation operators in array group", () => {
   describe("reverseOperatorsForNot == false", () => {
     export_checks([configs.with_group_array_cars], inits.with_not_and_neg_in_some, "JsonLogic", {
+      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
       "logic": {
         "and": [
           { "some": [
@@ -518,6 +519,10 @@ describe("query with exclamation operators in array group", () => {
           { "some": [
             { "var": "cars" },
             { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
           ] }
         ]
       },
@@ -525,6 +530,7 @@ describe("query with exclamation operators in array group", () => {
   });
   describe("reverseOperatorsForNot == true", () => {
     export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_and_neg_in_some, "JsonLogic", {
+      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
       "logic": inits.with_not_and_neg_in_some_reversed
     });
   });

@@ -834,11 +834,11 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
       conj = Object.keys(having)[0];
       havingVals = having[conj];
       // Negation group with single rule is to be treated the same as !
-      /*if ((conj == "and" || conj == "or") && havingVals.length == 1) {
+      if ((conj == "and" || conj == "or") && havingVals.length == 1) {
         having = having[conj][0];
         conj = Object.keys(having)[0];
         havingVals = having[conj];
-      }*/
+      }
       // Another template matching
       const matchTemp = matchAgainstTemplates(having, conv, meta);
       match = matchTemp ? matchTemp : match;

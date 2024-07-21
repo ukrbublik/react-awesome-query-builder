@@ -443,6 +443,10 @@ export const with_not_and_neg_in_some = {
     { "some": [
       { "var": "cars" },
       { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } } }
     ] }
   ]
 };
@@ -468,6 +472,10 @@ export const with_not_and_neg_in_some_reversed = {
     { "some": [
       { "var": "cars" },
       { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
     ] }
   ]
 };
