@@ -489,7 +489,7 @@ describe("query with exclamation operators", () => {
   });
   describe("reverseOperatorsForNot == true", () => {
     export_checks([configs.with_all_types, configs.with_reverse_operators], inits.exclamation_operators_and_negation_groups, "JsonLogic", {
-      "logic": inits.exclamation_operators_and_negation_groups
+      "logic": inits.exclamation_operators_and_negation_groups_reversed
     });
   });
 });
@@ -497,12 +497,35 @@ describe("query with exclamation operators", () => {
 describe("query with exclamation operators in array group", () => {
   describe("reverseOperatorsForNot == false", () => {
     export_checks([configs.with_group_array_cars], inits.with_not_and_neg_in_some, "JsonLogic", {
-      "logic": inits.with_not_and_neg_in_some
+      "logic": {
+        "and": [
+          { "some": [
+            { "var": "cars" },
+            { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+          ] },
+          { "all": [
+            { "var": "cars" },
+            { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+          ] },
+          { "all": [
+            { "var": "cars" },
+            { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+          ] }
+        ]
+      },
     });
   });
   describe("reverseOperatorsForNot == true", () => {
     export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_and_neg_in_some, "JsonLogic", {
-      "logic": inits.with_not_and_neg_in_some
+      "logic": inits.with_not_and_neg_in_some_reversed
     });
   });
 });

@@ -431,6 +431,43 @@ export const with_not_and_neg_in_some = {
     { "all": [
       { "var": "cars" },
       { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+    ] },
+    { "all": [
+      { "var": "cars" },
+      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+    ] }
+  ]
+};
+
+export const with_not_and_neg_in_some_reversed = {
+  "and": [
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] },
+    { "all": [
+      { "var": "cars" },
+      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+    ] },
+    { "all": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
     ] }
   ]
 };
@@ -866,6 +903,22 @@ export const exclamation_operators_and_negation_groups = {
     {"!": {"and": [{"all": [{"var": "multicolor"}, {"in": [{"var": ""}, ["yellow"]]}]}]}},
     {"!": {"all": [{"var": "multicolor"}, {"in": [{"var": ""}, ["yellow"]]}]}},
     {"!": {"and": [{"some": [{"var": "multicolor"}, {"in": [{"var": ""}, ["green"]]}]}]}},
+    {"!": {"some": [{"var": "multicolor"}, {"in": [{"var": ""}, ["green"]]}]}},
+    {"==": [{"var": "str"}, null]}
+  ]
+};
+
+export const exclamation_operators_and_negation_groups_reversed = {
+  "and": [
+    {"and": [{"!": {"in": ["abc3", {"var": "str"}]}}]},
+    {"!": {"in": ["xyz", {"var": "str"}]}},
+    {"and": [{"!": {"<=": [1, {"var": "num"}, 2]}}]},
+    {"!": {"<=": [3, {"var": "num"}, 4]}},
+    {"and": [{"!": {"in": [{"var": "color"}, ["yellow"]]}}]},
+    {"!": {"in": [{"var": "color"}, ["green"]]}},
+    {"and": [{"!": {"all": [{"var": "multicolor"}, {"in": [{"var": ""}, ["yellow"]]}]}}]},
+    {"!": {"all": [{"var": "multicolor"}, {"in": [{"var": ""}, ["yellow"]]}]}},
+    {"and": [{"!": {"some": [{"var": "multicolor"}, {"in": [{"var": ""}, ["green"]]}]}}]},
     {"!": {"some": [{"var": "multicolor"}, {"in": [{"var": ""}, ["green"]]}]}},
     {"==": [{"var": "str"}, null]}
   ]
