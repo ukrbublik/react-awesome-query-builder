@@ -11,11 +11,16 @@ import moment from "moment";
 
 // helpers
 const arrayUniq = (arr) => Array.from(new Set(arr));
-const arrayToObject = (arr) => arr.reduce((acc, [f, fc]) => ({ ...acc, [f]: fc }), {});
 
 // constants
 const jlFieldMarker = "jlField";
 const jlArgsMarker = "jlArgs";
+const jlEqOps = ["==", "!="];
+const jlRangeOps = ["<", "<=", ">", ">="];
+const multiselectOps = [
+  "multiselect_equals", "multiselect_not_equals",
+  "multiselect_contains", "multiselect_not_contains"
+];
 
 const createMeta = (parentMeta) => {
   return {
@@ -692,11 +697,7 @@ const wrapInDefaultConj = (rule, config, not = false) => {
 
 const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
   const submeta = createMeta(meta);
-  let res = _parseRule(op, arity, vals, parentField, conv, config, false, submeta);
-  /*  if (!res) {
-    // try reverse
-    res = _parseRule(op, arity, vals, parentField, conv, config, true, createMeta(meta));
-  }*/
+  let res = _parseRule(op, arity, vals, parentField, conv, config, submeta);
   if (!res) {
     meta.errors.push(submeta.errors.join("; ") || `Unknown op ${op}/${arity}`);
     return undefined;
@@ -705,40 +706,31 @@ const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
   return res;
 };
 
-const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta) => {
+const _parseRule = (op, arity, vals, parentField, conv, config, meta) => {
   // config.settings.groupOperators are used for group count (cardinality = 0 is exception)
   // but don't confuse with "all-in" or "some-in" for multiselect
-  let opsToCheck = ["multiselect_equals", "multiselect_not_equals", "multiselect_contains", "multiselect_not_contains"];
-  opsToCheck = opsToCheck.map( opName => config.operators.opName?.jsonLogic2);
-  const isAllOrSomeInForMultiselect = (opsToCheck.includes(op));
-  /*  = (op === "all" || op === "some")
-    && isJsonLogic(vals[1])
-    && Object.keys(vals[1])[0] == "in"
-    && vals[1]["in"][0]?.["var"] === "";*/
-  const isGroup0 = !isAllOrSomeInForMultiselect && config.settings.groupOperators.includes(op);
-  const eqOps = ["==", "!="];
+  const isAllOrSomeInForMultiselect = multiselectOps
+    .map((opName) => config.operators[opName]?.jsonLogic2)
+    .includes(op);
+  const isGroup0 = config.settings.groupOperators.includes(op) && !isAllOrSomeInForMultiselect;
   let cardinality = isGroup0 ? 0 : arity - 1;
   if (isGroup0)
     cardinality = 0;
-  else if (eqOps.includes(op) && cardinality == 1 && vals[1] === null) {
+  else if (jlEqOps.includes(op) && cardinality == 1 && vals[1] === null) {
     arity = 1;
     cardinality = 0;
     vals = [vals[0]];
   }
 
   const opk = op + "/" + cardinality;
-  let opKeys = conv.operators[(isRevArgs ? "#" : "") + opk];
+  let opKeys = conv.operators[opk];
   if (!opKeys)
     return;
   
   let jlField, jlArgs = [];
-  const rangeOps = ["<", "<=", ">", ">="];
-  if (rangeOps.includes(op) && arity == 3) {
+  if (jlRangeOps.includes(op) && arity == 3) {
     jlField = vals[1];
     jlArgs = [ vals[0], vals[2] ];
-  } else if (isRevArgs) {
-    jlField = vals[1];
-    jlArgs = [ vals[0] ];
   } else {
     [jlField, ...jlArgs] = vals;
   }
@@ -779,6 +771,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta)
 const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOneRuleInRuleGroup = false) => {
   if (!op) return undefined;
   
+  const jlConjs = Object.values(config.conjunctions).map(({jsonLogicConj}) => jsonLogicConj);
   const arity = vals.length;
 
   const parseRes = parseRule(op, arity, vals, parentField, conv, config, meta);
@@ -806,10 +799,11 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
   // if (isGroupArray && showNot)
   //   canRev = false;
   const needRev = not && canRev || opNeedsReverse;
-
+  
   let conj;
   let havingVals;
   let havingNot = false;
+  const canRevHaving = !!config.settings.reverseOperatorsForNot;
   if (fieldConfig?.type == "!group" && having) {
     conj = Object.keys(having)[0];
     havingVals = having[conj];
@@ -834,7 +828,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
       conj = Object.keys(having)[0];
       havingVals = having[conj];
       // Negation group with single rule is to be treated the same as !
-      if ((conj == "and" || conj == "or") && havingVals.length == 1) {
+      if (canRevHaving && jlConjs.includes(conj) && havingVals.length == 1) {
         having = having[conj][0];
         conj = Object.keys(having)[0];
         havingVals = having[conj];
