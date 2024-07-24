@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { LazyStyleModule } from "../utils";
+import { LazyStyleModule } from "./utils";
 // @ts-ignore
 import styles from "@react-awesome-query-builder/ui/css/styles.scss";
 

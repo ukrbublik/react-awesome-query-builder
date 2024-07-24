@@ -34,8 +34,6 @@
     "skipLibCheck": true,
   },
   "include": [
-    "demo/**/*",
-    "demo_switch/**/*",
-    "index.tsx"
+    "src/**/*"
   ]
 }

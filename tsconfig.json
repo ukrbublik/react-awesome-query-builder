@@ -16,5 +16,10 @@
     "moduleResolution": "node",
     "skipLibCheck": false,
   },
-  "include": ["packages/**/*"]
+  "include": [
+    "packages/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

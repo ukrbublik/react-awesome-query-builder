@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { LazyStyleModule } from "../utils";
+import { LazyStyleModule } from "./utils";
 // @ts-ignore
 //import antd from "antd/dist/antd.css"; // for v4
 // @ts-ignore

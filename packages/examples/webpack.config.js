@@ -27,7 +27,7 @@ const MUI_CSS = path.resolve(EXAMPLES, '../mui/styles/');
 const MATERIAL_CSS = path.resolve(EXAMPLES, '../material/styles/');
 const BOOTSTRAP_CSS = path.resolve(EXAMPLES, '../bootstrap/styles/');
 const FLUENT_CSS = path.resolve(EXAMPLES, '../fluent/styles/');
-const DIST = path.resolve(EXAMPLES, './build');
+const DIST = path.resolve(EXAMPLES, './build/');
 const NODE_MODULES = path.resolve(EXAMPLES, './node_modules/');
 const isMono = fs.existsSync(CORE_MODULES);
 
@@ -78,14 +78,18 @@ const lazy_style_loaders = [
 })
 ];
 
+plugins = [
+    ...plugins,
+    new CopyPlugin({
+      patterns: [
+        { from: "./index.html", to: DIST },
+      ],
+    }),
+];
+
 if (isProd) {
     plugins = [
         ...plugins,
-        new CopyPlugin({
-          patterns: [
-            { from: "./index.html", to: DIST },
-          ],
-        }),
         new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
         new MomentLocalesPlugin({
             localesToKeep: ['es-us', 'ru'],
@@ -157,10 +161,10 @@ module.exports = {
         hot: true,
         // inline: true,
         static: {
-          directory: path.join(__dirname, '/'),
+          directory: DIST,
         },
     },
-    entry: './index',
+    entry: './src/index',
     output: {
         path: DIST,
         filename: 'bundle.js'
