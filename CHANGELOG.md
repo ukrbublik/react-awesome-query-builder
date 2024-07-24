@@ -6,6 +6,7 @@
   - Added tasks for VSCode (PR #1095)
   - Refactored examples demo app (PR #1097)
   - JsonLogic roundtrip fix (issue #1084) (PR #1092)
+  - Fixed lagging state of multiselect FluentUI component and added searchable options to select and multiselect (PR #1090)
 - 6.6.2
   - Fixed issue with rendering func select inside func (PR #1086) (issue #1085)
   - Added `DefaultUtils` typings to `index.d.ts` (PR #1078) (issue #1079)

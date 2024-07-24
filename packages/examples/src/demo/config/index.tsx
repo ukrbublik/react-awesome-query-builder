@@ -523,8 +523,23 @@ export default (skin: string) => {
       label: "Color",
       type: "select",
       valueSources: ["value"],
+      widgets: {
+        select: {
+          widgetProps: {
+            valuePlaceholder: "Select color",
+            searchPlaceholder: "Search color",
+          },
+        },
+        multiselect: {
+          widgetProps: {
+            valuePlaceholder: "Select colors",
+            searchPlaceholder: "Search colors",
+          },
+        },
+      },
       fieldSettings: {
         showSearch: true,
+
         // * old format:
         // listValues: {
         //     yellow: 'Yellow',
