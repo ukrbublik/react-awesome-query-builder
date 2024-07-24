@@ -1,6 +1,7 @@
 import React from "react";
 import { Dropdown } from "@fluentui/react";
 import { Utils } from "@react-awesome-query-builder/ui";
+import SearchableDropdown from "../SearchableDropdown";
 const { mapListValues } = Utils.ListUtils;
 
 export default ({
@@ -11,6 +12,7 @@ export default ({
   readonly,
   customProps,
   placeholder,
+  showSearch,
 }) => {
   var onChange = function onChange(_, option) {
     if (option.key === undefined) return;
@@ -28,8 +30,10 @@ export default ({
     return options;
   };
 
+  const DropdownType = showSearch ? SearchableDropdown : Dropdown;
+
   return (
-    <Dropdown
+    <DropdownType
       placeholder={placeholder}
       options={renderOptions(listValues)}
       selectedKey={value}
