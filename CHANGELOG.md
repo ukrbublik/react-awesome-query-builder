@@ -2,8 +2,10 @@
 - 6.6.3
   - Fixed `Utils.isValidTree` for prod build.
     Removed `checkTree`, `isValidTree` from `Utils.Import` and `getTreeBadFields` from `Utils.TreeUtils`. (PR #1091) (issue #1075)
-  - Use pnpm 8
+  - Use pnpm 8 (to support CodeSandbox and StackBlitz) (PR #1093)
+  - Added tasks for VSCode (PR #1095)
   - Refactored examples demo app (PR #1097)
+  - JsonLogic roundtrip fix (issue #1084) (PR #1092)
 - 6.6.2
   - Fixed issue with rendering func select inside func (PR #1086) (issue #1085)
   - Added `DefaultUtils` typings to `index.d.ts` (PR #1078) (issue #1079)

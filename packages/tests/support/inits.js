@@ -422,6 +422,64 @@ export const with_not_and_in_some = {
 };
 export const spel_with_not_and_in_some = "cars.?[!(year == null && !({'Ford', 'Toyota'}.?[true].contains(vendor)))].size() > 0";
 
+export const with_not_and_neg_in_some = {
+  "and": [
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] },
+    { "all": [
+      { "var": "cars" },
+      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+    ] },
+    { "all": [
+      { "var": "cars" },
+      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } } }
+    ] }
+  ]
+};
+
+export const with_not_and_neg_in_some_reversed = {
+  "and": [
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] },
+    { "all": [
+      { "var": "cars" },
+      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+    ] },
+    { "all": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+    ] }
+  ]
+};
+
 export const with_nested_group = {
   "and": [
     { "some": [
@@ -784,6 +842,96 @@ export const with_ops = {
   ]
 };
 
+export const with_ops_and_negation_groups = {
+  "and": [
+    {
+      "==": [ { "var": "text" },  "Long\nText" ]
+    }, {
+      "!=": [ { "var": "num" },  2 ]
+    }, {
+      "in": [ "abc",  { "var": "str" } ]
+    }, {
+      "!": {
+        "and": [
+          {
+            "in": [ "xyz", { "var": "str" } ]
+          }
+        ]
+      }
+    }, {
+      "<=": [  1,  { "var": "num" },  2  ]
+    }, {
+      "!": {
+        "and": [
+          {
+            "<=": [  3,  { "var": "num" },  4  ]
+          }
+        ]
+      }
+    }, {
+      "!": { "var": "num" }
+    }, {
+      "in": [
+        { "var": "color" },
+        [ "yellow" ]
+      ]
+    }, {
+      "!": {
+        "and": [
+          {
+            "in": [
+              { "var": "color" },  [ "green" ]
+            ]
+          }
+        ]
+      }
+    }, {
+      "!": {
+        "and": [
+          {
+            "all": [
+              { "var": "multicolor" },
+              { "in": [ { "var": "" },  [ "yellow" ] ] }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const exclamation_operators_and_negation_groups = {
+  "and": [
+    {"!": {"and": [{"in": ["abc3", {"var": "str"}]}]}},
+    {"!": {"in": ["xyz", {"var": "str"}]}},
+    {"!": {"and": [{"<=": [1, {"var": "num"}, 2]}]}},
+    {"!": {"<=": [3, {"var": "num"}, 4]}},
+    {"!": {"and": [{"in": [{"var": "color"}, ["yellow"]]}]}},
+    {"!": {"in": [{"var": "color"}, ["green"]]}},
+    {"!": {"and": [{"all": [{"var": "multicolor"}, {"in": [{"var": ""}, ["yellow"]]}]}]}},
+    {"!": {"all": [{"var": "multicolor"}, {"in": [{"var": ""}, ["yellow"]]}]}},
+    {"!": {"and": [{"some": [{"var": "multicolor"}, {"in": [{"var": ""}, ["green"]]}]}]}},
+    {"!": {"some": [{"var": "multicolor"}, {"in": [{"var": ""}, ["green"]]}]}},
+    {"==": [{"var": "str"}, null]}
+  ]
+};
+
+export const exclamation_operators_and_negation_groups_reversed = {
+  "and": [
+    {"!": {"in": ["abc3", {"var": "str"}]}},
+    {"!": {"in": ["xyz", {"var": "str"}]}},
+    {"!": {"<=": [1, {"var": "num"}, 2]}},
+    {"!": {"<=": [3, {"var": "num"}, 4]}},
+    {"!": {"in": [{"var": "color"}, ["yellow"]]}},
+    {"!": {"in": [{"var": "color"}, ["green"]]}},
+    {"!": {"all": [{"var": "multicolor"}, {"in": [{"var": ""}, ["yellow"]]}]}},
+    {"!": {"all": [{"var": "multicolor"}, {"in": [{"var": ""}, ["yellow"]]}]}},
+    {"!": {"some": [{"var": "multicolor"}, {"in": [{"var": ""}, ["green"]]}]}},
+    {"!": {"some": [{"var": "multicolor"}, {"in": [{"var": ""}, ["green"]]}]}},
+    {"==": [{"var": "str"}, null]}
+  ]
+};
+
 export const with_multiselecttree = {
   "and": [
     {
@@ -890,6 +1038,21 @@ export const with_func_tolower_from_field = {
         { "toLowerCase": [
           { "var": "str2" }
         ] }
+      ]
+    }
+  ]
+};
+
+export const with_func_tolower_and_contains_op = {
+  "and": [
+    {
+      "in": [
+        "aa",
+        {
+          "toLowerCase": [
+            "AAA"
+          ]
+        }
       ]
     }
   ]

@@ -165,9 +165,8 @@ const operators = {
     spelOp: "${0}.contains(${1})",
     valueTypes: ["text"],
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) : undefined), false, ...args); },
-    //jsonLogic: (field, op, val) => ({ "in": [val, field] }),
-    jsonLogic: "in",
-    _jsonLogicIsRevArgs: true,
+    jsonLogic: (field, op, val) => ({ "in": [val, field] }),
+    jsonLogic2: "#in",
     valueSources: ["value"],
     elasticSearchQueryType: "regexp",
   },
@@ -178,6 +177,9 @@ const operators = {
     labelForFormat: "Not Contains",
     sqlOp: "NOT LIKE",
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) : undefined), true, ...args); },
+    jsonLogic: (field, op, val) => ({"!": { "in": [val, field] }}),
+    jsonLogic2: "#!in",
+    _jsonLogicIsExclamationOp: true,
     valueSources: ["value"],
   },
   starts_with: {
@@ -266,6 +268,9 @@ const operators = {
       "and"
     ],
     reversedOp: "between",
+    jsonLogic:  (field, op, val) => ({"!": { "<=": [Array.isArray(val) ? val[0] : val, field, Array.isArray(val) ? val[1] : val] }}),
+    jsonLogic2: "!<=",
+    _jsonLogicIsExclamationOp: true,
     validateValues: (values) => {
       if (values[0] != undefined && values[1] != undefined) {
         return values[0] <= values[1];
@@ -415,6 +420,9 @@ const operators = {
     },
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$nin", v => v, false, ...args); },
     reversedOp: "select_any_in",
+    jsonLogic: (field, op, val) => ({"!": { "in": [field, val] }}),
+    jsonLogic2: "!in",
+    _jsonLogicIsExclamationOp: true,
   },
   // it's not "contains all", but "contains any" operator
   multiselect_contains: {
@@ -446,7 +454,12 @@ const operators = {
       else
         return `${field} NOT CONTAINS ${values}`;
     },
-    reversedOp: "multiselect_contains"
+    reversedOp: "multiselect_contains",
+    jsonLogic2: "!some-in",
+    jsonLogic: (field, op, vals) => ({
+      "!": { "some": [ field, {"in": [{"var": ""}, vals]} ]}
+    }),
+    _jsonLogicIsExclamationOp: true,
   },
   multiselect_equals: {
     label: "Equals",
@@ -496,6 +509,12 @@ const operators = {
     },
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$ne", v => v, false, ...args); },
     reversedOp: "multiselect_equals",
+    jsonLogic2: "!all-in",
+    jsonLogic: (field, op, vals) => ({
+      // it's not "equals", but "includes" operator - just for example
+      "!": { "all": [ field, {"in": [{"var": ""}, vals]} ]}
+    }),
+    _jsonLogicIsExclamationOp: true,
   },
   proximity: {
     label: "Proximity search",

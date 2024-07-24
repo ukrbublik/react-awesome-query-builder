@@ -11,7 +11,16 @@ import moment from "moment";
 
 // helpers
 const arrayUniq = (arr) => Array.from(new Set(arr));
-const arrayToObject = (arr) => arr.reduce((acc, [f, fc]) => ({ ...acc, [f]: fc }), {});
+
+// constants
+const jlFieldMarker = "jlField";
+const jlArgsMarker = "jlArgs";
+const jlEqOps = ["==", "!="];
+const jlRangeOps = ["<", "<=", ">", ">="];
+const multiselectOps = [
+  "multiselect_equals", "multiselect_not_equals",
+  "multiselect_contains", "multiselect_not_contains"
+];
 
 const createMeta = (parentMeta) => {
   return {
@@ -48,11 +57,12 @@ export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
 
 const buildConv = (config) => {
   let operators = {};
+  let combinationOperators = {};
   for (let opKey in config.operators) {
     const opConfig = config.operators[opKey];
     if (typeof opConfig.jsonLogic == "string") {
       // example: "</2", "#in/1"
-      const opk = (opConfig._jsonLogicIsRevArgs ? "#" : "") + opConfig.jsonLogic + "/" + getOpCardinality(opConfig);
+      const opk = opConfig.jsonLogic + "/" + getOpCardinality(opConfig);
       if (!operators[opk])
         operators[opk] = [];
       operators[opk].push(opKey);
@@ -62,6 +72,14 @@ const buildConv = (config) => {
       if (!operators[opk])
         operators[opk] = [];
       operators[opk].push(opKey);
+
+      if (!combinationOperators[opKey])
+        combinationOperators[opKey] = {};
+      combinationOperators[opKey] = {
+        "template": opConfig.jsonLogic(jlFieldMarker, opKey, jlArgsMarker), 
+        "jsonLogic2": opConfig.jsonLogic2,
+        "_jsonLogicIsExclamationOp": !!opConfig._jsonLogicIsExclamationOp
+      };
     }
   }
 
@@ -94,7 +112,91 @@ const buildConv = (config) => {
     conjunctions,
     funcs,
     varKeys: ["var", groupVarKey, altVarKey],
+    combinationOperators,
   };
+};
+
+/**
+ * This function checks a given jsonlogic object against a set of templates defined in 'conv'. 
+ * It determines if the jsonlogic object matches any of the specified templates.
+ * 
+ * @param {*} jsonlogic The jsonlogic object to be matched against the templates.
+ * @param {*} conv The object containing all potential templates and their associated logic for matching. 
+ * It is expected to have a 'combinationOperators' property that houses the templates.
+ * @param {*} meta An object where any errors or metadata during the processing are stored. It's modified by reference.
+ * @param {*} operatorsToCheck An optional array of operator keys that limits which operators in 'conv' are checked. 
+ * If null, all operators in 'conv' are considered.
+ * @returns {Object|null} The response object containing the match result, and any relevant matched fields and 
+ * arguments if a match is found. Returns null if no match is found.
+ */
+const matchAgainstTemplates = (jsonlogic, conv, meta, operatorsToCheck = null) => {
+  let response;
+  if (conv?.combinationOperators) {
+    for (const [key, value] of Object.entries(conv.combinationOperators)) {
+      if ((operatorsToCheck == null || operatorsToCheck.includes(key))) {
+        const tempResponse = isTemplateMatch(value.template, jsonlogic);
+        // Found a match
+        if (tempResponse.match) {
+          if (!response) response = tempResponse;
+          // Templates should be spesific enough that only one match can be found. This should not happen
+          else meta.errors.push(`Operator matched against 2 templates: ${response.newOp} and ${key}`);
+          // New op that is used to represent operator that is combosed of multiple operators
+          response["newOp"] = value.jsonLogic2;
+        }
+      }
+    }
+  }
+  // Returns undefined if no matches found
+  return response;
+};
+
+/**
+ * This function recursively compares a jsonlogic object against a template to determine if they match structurally and content-wise.
+ * It is used to support complex template matching where the template can include special markers indicating variable fields and arguments.
+ *
+ * @param {*} template The template object to match against, which can include special markers to denote fields and arguments.
+ * @param {*} jsonlogic The jsonlogic object to test against the template.
+ * @param {*} response An object to accumulate results such as whether a match is found, and to collect any fields or arguments identified 
+ * by the template markers. Default is initialized to a match state with empty fields and arguments.
+ * @returns {Object} The updated response object after checking the current template level. It includes whether the current level 
+ * matches (match: true/false), any identified fields (jlField), and any arguments (jlArgs).
+ */
+const isTemplateMatch = (template, jsonlogic, response = {"match": true, "jlField": null, "jlArgs": []}) => {
+  if (template == undefined || jsonlogic == undefined) {
+    response.match = false;
+    return response;    
+  }
+  // This lets us compare order easily
+  const tKeys = Object.keys(template);
+  const jKeys = Object.keys(jsonlogic);
+  if (tKeys.length !== jKeys.length) {
+    // Both have same length
+    response.match = false;
+    return response;      
+  }
+  for (let index = 0; index < tKeys.length; index++) {
+    const key = tKeys[index];
+    const value = template[key];
+    if (key !== jKeys[index]) { 
+      // Checks that both have exact same key at exact same place. Kind of pointless for arrays but whatever
+      response.match = false;
+      return response;
+    } else if (value === jlFieldMarker && isJsonLogic(jsonlogic[key])) {
+      // If jlFieldMarker is found in template AND it's field or func we take the value from corresponding place in jsonlogic
+      response.jlField = jsonlogic[key];
+    } else if (value === jlArgsMarker) {
+      // If jlArgsMarker is found in template we take the value from corresponding place in jsonlogic
+      response.jlArgs.push(jsonlogic[key]);
+    } else if (typeof value === "object" && value !== null || Array.isArray(value)) {
+      // Here we recurse thru objects and arrays of template until we have gone thru it completely
+      response = isTemplateMatch(value, jsonlogic[key], response);
+    } else if (value !== jsonlogic[key]) {
+      // This is for cases of {var: ""}, which should be only case in default config that leads here
+      response.match = false;
+      return response;
+    }
+  }
+  return response;
 };
 
 // expectedTypes - "val", "rule", "group", "switch", "case_val"
@@ -112,6 +214,16 @@ const convertFromLogic = (logic, conv, config, expectedTypes, meta, not = false,
 
   const {lockedOp} = config.settings.jsonLogic;
   const isEmptyOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && conv.varKeys.includes(Object.keys(vals[0])[0]));
+  // If matchAgainstTemplates returns match then op is replaced with special jsonlogic2 value
+  const match = matchAgainstTemplates(logic, conv, meta);
+  if (match) {
+    // We reset vals if match found
+    vals = [];
+    vals[0] = match.jlField;
+    match.jlArgs.forEach(arg => vals.push(arg));
+    // We reset op to new op that represents multiple jsonlogic operators
+    op = match.newOp;
+  }
   const isNot = op == "!" && !isEmptyOp;
   const isLocked = lockedOp && op == lockedOp;
   const isSwitch = expectedTypes.includes("switch");
@@ -585,11 +697,7 @@ const wrapInDefaultConj = (rule, config, not = false) => {
 
 const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
   const submeta = createMeta(meta);
-  let res = _parseRule(op, arity, vals, parentField, conv, config, false, submeta);
-  if (!res) {
-    // try reverse
-    res = _parseRule(op, arity, vals, parentField, conv, config, true, createMeta(meta));
-  }
+  let res = _parseRule(op, arity, vals, parentField, conv, config, submeta);
   if (!res) {
     meta.errors.push(submeta.errors.join("; ") || `Unknown op ${op}/${arity}`);
     return undefined;
@@ -598,38 +706,31 @@ const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
   return res;
 };
 
-const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta) => {
+const _parseRule = (op, arity, vals, parentField, conv, config, meta) => {
   // config.settings.groupOperators are used for group count (cardinality = 0 is exception)
   // but don't confuse with "all-in" or "some-in" for multiselect
-  const isAllOrSomeInForMultiselect
-    = (op === "all" || op === "some")
-    && isJsonLogic(vals[1])
-    && Object.keys(vals[1])[0] == "in"
-    && vals[1]["in"][0]?.["var"] === "";
-  const isGroup0 = !isAllOrSomeInForMultiselect && config.settings.groupOperators.includes(op);
-  const eqOps = ["==", "!="];
+  const isAllOrSomeInForMultiselect = multiselectOps
+    .map((opName) => config.operators[opName]?.jsonLogic2)
+    .includes(op);
+  const isGroup0 = config.settings.groupOperators.includes(op) && !isAllOrSomeInForMultiselect;
   let cardinality = isGroup0 ? 0 : arity - 1;
   if (isGroup0)
     cardinality = 0;
-  else if (eqOps.includes(op) && cardinality == 1 && vals[1] === null) {
+  else if (jlEqOps.includes(op) && cardinality == 1 && vals[1] === null) {
     arity = 1;
     cardinality = 0;
     vals = [vals[0]];
   }
 
   const opk = op + "/" + cardinality;
-  let opKeys = conv.operators[(isRevArgs ? "#" : "") + opk];
+  let opKeys = conv.operators[opk];
   if (!opKeys)
     return;
   
   let jlField, jlArgs = [];
-  const rangeOps = ["<", "<=", ">", ">="];
-  if (rangeOps.includes(op) && arity == 3) {
+  if (jlRangeOps.includes(op) && arity == 3) {
     jlField = vals[1];
     jlArgs = [ vals[0], vals[2] ];
-  } else if (isRevArgs) {
-    jlField = vals[1];
-    jlArgs = [ vals[0] ];
   } else {
     [jlField, ...jlArgs] = vals;
   }
@@ -669,20 +770,9 @@ const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta)
 
 const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOneRuleInRuleGroup = false) => {
   if (!op) return undefined;
-
+  
+  const jlConjs = Object.values(config.conjunctions).map(({jsonLogicConj}) => jsonLogicConj);
   const arity = vals.length;
-  if ((op === "all" || op === "some") && isJsonLogic(vals[1])) {
-    // special case for "all-in" and "some-in"
-    const op2 = Object.keys(vals[1])[0];
-    const isEmptyVar = vals[1][op2][0]?.["var"] === "";
-    if (op2 === "in" && isEmptyVar) {
-      vals = [
-        vals[0],
-        vals[1][op2][1]
-      ];
-      op = op + "-" + op2; // "all-in" and "some-in"
-    }
-  }
 
   const parseRes = parseRule(op, arity, vals, parentField, conv, config, meta);
   if (!parseRes) return undefined;
@@ -709,10 +799,11 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
   // if (isGroupArray && showNot)
   //   canRev = false;
   const needRev = not && canRev || opNeedsReverse;
-
+  
   let conj;
   let havingVals;
   let havingNot = false;
+  const canRevHaving = !!config.settings.reverseOperatorsForNot;
   if (fieldConfig?.type == "!group" && having) {
     conj = Object.keys(having)[0];
     havingVals = having[conj];
@@ -721,7 +812,10 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
 
     // Preprocess "!": Try to reverse op in single rule in having
     // Eg. use `not_equal` instead of `not` `equal`
-    while (conj == "!") {
+    // We look for template matches here to make sure we dont reverse when "!" is
+    // part of operator
+    let match = matchAgainstTemplates(having, conv, meta);
+    while (conj == "!" && !match) {
       const isEmptyOp = conj == "!" && (
         havingVals.length == 1 && havingVals[0] && isJsonLogic(havingVals[0])
         && conv.varKeys.includes(Object.keys(havingVals[0])[0])
@@ -733,9 +827,27 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
       having = having["!"];
       conj = Object.keys(having)[0];
       havingVals = having[conj];
+      // Negation group with single rule is to be treated the same as !
+      if (canRevHaving && jlConjs.includes(conj) && havingVals.length == 1) {
+        having = having[conj][0];
+        conj = Object.keys(having)[0];
+        havingVals = having[conj];
+      }
+      // Another template matching
+      const matchTemp = matchAgainstTemplates(having, conv, meta);
+      match = matchTemp ? matchTemp : match;
     }
     if (!Array.isArray(havingVals)) {
       havingVals = [ havingVals ];
+    }
+    // If template match found we act accordingly
+    if (match) {
+      // We reset vals if match found
+      havingVals = [];
+      havingVals[0] = match.jlField;
+      match.jlArgs.forEach(arg => havingVals.push(arg));
+      // We reset op to new op that represents multiple jsonlogic operators
+      conj = match.newOp;
     }
   }
 

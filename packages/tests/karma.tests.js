@@ -46,6 +46,6 @@ beforeEach(function() {
     setCurrentTestName(currentTestName);
   } else {
     //console.log(`Skipping spec ${currentTestName}`);
-    this.currentTest.fn = function() { this.skip(); }
+    this.currentTest.fn = function() { this.skip(); };
   }
 });

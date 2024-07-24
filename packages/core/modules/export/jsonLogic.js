@@ -154,12 +154,28 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
       return undefined;
   }
 
-  let resultQuery = {};
-  if (list.size == 1 && !isRoot && !shouldPreserveGroups)
-    resultQuery = list.first();
-  else
-    resultQuery[conj] = list.toList().toJS();
+  // I any of these conditions are true then we cannot remove group
+  let preserveSingleRuleGroup = isRoot || shouldPreserveGroups || list.size != 1;
 
+  // If preserveSingleRuleGroup is already true then there is no point to even check also if its not a negation group 
+  // then this does not matter
+  if (!preserveSingleRuleGroup && origNot && !revChildren) {
+    // We check all children even thuogh there should be only one in case the formatting of one of them failed.
+    // From config we see if exclamation is part of reverse operator definition and if so then we cannot ever remove a negation single 
+    // rule group because then this combination would be identical to that reverse operator. see issue #1084
+    preserveSingleRuleGroup = children.some((currentChild) => {
+      const op = currentChild.get("properties")?.get("operator");
+      const revOp  = config["operators"]?.[op]?.reversedOp;
+      return config.operators?.[revOp]?._jsonLogicIsExclamationOp ?? false;
+    });
+  }
+  
+  let resultQuery = {};
+  if (preserveSingleRuleGroup)
+    resultQuery[conj] = list.toList().toJS();
+  else
+    resultQuery = list.first();
+  
   // reverse filter
   if (filterNot) {
     resultQuery = { "!": resultQuery };
@@ -525,7 +541,6 @@ const formatField = (meta, config, field, parentField = null) => {
 const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formattedValue) => {
   let formatteOp = operator;
   const cardinality = getOpCardinality(operatorDefinition);
-  const isReverseArgs = operatorDefinition._jsonLogicIsRevArgs ?? false;
   if (typeof operatorDefinition.jsonLogic == "string")
     formatteOp = operatorDefinition.jsonLogic;
   const rangeOps = ["<", "<=", ">", ">="];
@@ -535,8 +550,6 @@ const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formatt
       return { [formatteOp]: [formattedField, null] };
     else if (cardinality == 0)
       return { [formatteOp]: formattedField };
-    else if (cardinality == 1 && isReverseArgs)
-      return { [formatteOp]: [formattedValue, formattedField] };
     else if (cardinality == 1)
       return { [formatteOp]: [formattedField, formattedValue] };
     else if (cardinality == 2 && rangeOps.includes(formatteOp))

@@ -3,6 +3,7 @@ import * as inits from "../support/inits";
 import { export_checks } from "../support/utils";
 import { Utils } from "@react-awesome-query-builder/core";
 import { BasicConfig } from "@react-awesome-query-builder/ui";
+import { expect } from "chai";
 
 describe("query with ops", () => {
   describe("reverseOperatorsForNot == true", () => {
@@ -172,7 +173,7 @@ describe("query with ops", () => {
   });
 
   describe("reverseOperatorsForNot == false", () => {
-    export_checks([configs.with_all_types], inits.with_ops, "JsonLogic", {
+    export_checks([configs.with_all_types], inits.with_ops_and_negation_groups, "JsonLogic", {
       "spel": "(text == 'Long\nText' && num != 2 && str.contains('abc') && !(str.contains('xyz')) && num >= 1 && num <= 2 && !(num >= 3 && num <= 4) && num == null && {'yellow'}.?[true].contains(color) && !({'green'}.?[true].contains(color)) && !(multicolor.equals({'yellow'})))",
       "query": "(text == \"Long\\nText\" && num != 2 && str Contains \"abc\" && NOT (str Contains \"xyz\") && num >= 1 && num <= 2 && NOT (num >= 3 && num <= 4) && !num && color IN (\"yellow\") && NOT (color IN (\"green\")) && NOT (multicolor == [\"yellow\"]))",
       "queryHuman": "(Textarea = Long\nText AND Number != 2 AND String Contains abc AND NOT (String Contains xyz) AND Number BETWEEN 1 AND 2 AND NOT (Number BETWEEN 3 AND 4) AND Number IS NULL AND Color IN (Yellow) AND NOT (Color IN (Green)) AND NOT (Colors = [Yellow]))",
@@ -244,103 +245,53 @@ describe("query with ops", () => {
       "logic": {
         "and": [
           {
-            "==": [
-              {
-                "var": "text"
-              },
-              "Long\nText"
-            ]
-          },
-          {
-            "!=": [
-              {
-                "var": "num"
-              },
-              2
-            ]
-          },
-          {
-            "in": [
-              "abc",
-              {
-                "var": "str"
-              }
-            ]
-          },
-          {
+            "==": [ { "var": "text" },  "Long\nText" ]
+          }, {
+            "!=": [ { "var": "num" },  2 ]
+          }, {
+            "in": [ "abc",  { "var": "str" } ]
+          }, {
             "!": {
-              "in": [
-                "xyz",
+              "and": [
                 {
-                  "var": "str"
+                  "in": [ "xyz", { "var": "str" } ]
                 }
               ]
             }
-          },
-          {
-            "<=": [
-              1,
-              {
-                "var": "num"
-              },
-              2
-            ]
-          },
-          {
+          }, {
+            "<=": [  1,  { "var": "num" },  2  ]
+          }, {
             "!": {
-              "<=": [
-                3,
+              "and": [
                 {
-                  "var": "num"
-                },
-                4
+                  "<=": [  3,  { "var": "num" },  4  ]
+                }
               ]
             }
-          },
-          {
-            "==": [
-              {
-                "var": "num"
-              },
-              null
-            ]
-          },
-          {
+          }, {
+            "==": [ { "var": "num" }, null ]
+          }, {
             "in": [
-              {
-                "var": "color"
-              },
-              [
-                "yellow"
-              ]
+              { "var": "color" },
+              [ "yellow" ]
             ]
-          },
-          {
+          }, {
             "!": {
-              "in": [
-                {
-                  "var": "color"
-                },
-                [
-                  "green"
-                ]
-              ]
-            }
-          },
-          {
-            "!": {
-              "all": [
-                {
-                  "var": "multicolor"
-                },
+              "and": [
                 {
                   "in": [
-                    {
-                      "var": ""
-                    },
-                    [
-                      "yellow"
-                    ]
+                    { "var": "color" },  [ "green" ]
+                  ]
+                }
+              ]
+            }
+          }, {
+            "!": {
+              "and": [
+                {
+                  "all": [
+                    { "var": "multicolor" },
+                    { "in": [ { "var": "" },  [ "yellow" ] ] }
                   ]
                 }
               ]
@@ -450,7 +401,7 @@ describe("query with ops", () => {
   });
 
   describe("canShortMongoQuery == false", () => {
-    export_checks([configs.with_all_types, configs.without_short_mongo_query], inits.with_ops, "JsonLogic", {
+    export_checks([configs.with_all_types, configs.without_short_mongo_query], inits.with_ops_and_negation_groups, "JsonLogic", {
       "mongo": {
         "$and": [
           {
@@ -526,6 +477,61 @@ describe("query with ops", () => {
       expect(errs).to.deep.equal([]);
       const output = Utils.jsonLogicFormat(tree, config);
       expect(output.logic).to.deep.equal(input);
+    });
+  });
+});
+
+describe("query with exclamation operators", () => {
+  describe("reverseOperatorsForNot == false", () => {
+    export_checks([configs.with_all_types], inits.exclamation_operators_and_negation_groups, "JsonLogic", {
+      "logic": inits.exclamation_operators_and_negation_groups
+    });
+  });
+  describe("reverseOperatorsForNot == true", () => {
+    export_checks([configs.with_all_types, configs.with_reverse_operators], inits.exclamation_operators_and_negation_groups, "JsonLogic", {
+      "logic": inits.exclamation_operators_and_negation_groups_reversed
+    });
+  });
+});
+
+describe("query with exclamation operators in array group", () => {
+  describe("reverseOperatorsForNot == false", () => {
+    export_checks([configs.with_group_array_cars], inits.with_not_and_neg_in_some, "JsonLogic", {
+      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
+      "logic": {
+        "and": [
+          { "some": [
+            { "var": "cars" },
+            { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+          ] },
+          { "all": [
+            { "var": "cars" },
+            { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+          ] },
+          { "all": [
+            { "var": "cars" },
+            { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+          ] }
+        ]
+      },
+    });
+  });
+  describe("reverseOperatorsForNot == true", () => {
+    export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_and_neg_in_some, "JsonLogic", {
+      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
+      "logic": inits.with_not_and_neg_in_some_reversed
     });
   });
 });
