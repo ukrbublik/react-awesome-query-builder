@@ -23,6 +23,7 @@ export default class OperatorWrapper extends PureComponent {
                 selectedFieldId={selectedFieldId}
                 selectedOperator={selectedOperator}
                 setOperator={setOperator}
+                customProps={config.settings.customOperatorSelectProps}
                 readonly={readonly}
                 id={id}
                 groupId={groupId}

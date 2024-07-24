@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Tooltip, Select } from "antd";
 import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../utils/domUtils";
 const { Option, OptGroup } = Select;
@@ -34,15 +34,17 @@ const FieldSelect = (props) => {
   if (tooltipText == selectedLabel)
     tooltipText = null;
 
-  const onChange = (key) => {
+  const style = useMemo(() => ({ width }), [width]);
+
+  const onChange = useCallback((key) => {
     setField(key);
-  };
+  }, [setField]);
 
-  const onSearch = (search) => {
+  const onSearch = useCallback((search) => {
     setSearchValue(search);
-  };
+  }, [setSearchValue]);
 
-  const filterOption = (input, option) => {
+  const filterOption = useCallback((input, option) => {
     const keysForFilter = config.settings.fieldItemKeysForSearch
       .map(k => mapFieldItemToOptionKeys[k]);
     const valueForFilter = keysForFilter
@@ -50,7 +52,7 @@ const FieldSelect = (props) => {
       .join("\0");
     const matches = valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
     return matches;
-  };
+  }, [config.settings.fieldItemKeysForSearch]);
 
   const renderSelectItems = (fields, level = 0) => {
     return fields.map(field => {
@@ -107,7 +109,7 @@ const FieldSelect = (props) => {
       onDropdownVisibleChange={setOpen}
       dropdownAlign={dropdownAlign}
       popupMatchSelectWidth={false}
-      style={{ width }}
+      style={style}
       placeholder={placeholder}
       size={config.settings.renderSize}
       onChange={onChange}
@@ -116,9 +118,9 @@ const FieldSelect = (props) => {
       filterOption={filterOption}
       disabled={readonly}
       status={errorText && "error"}
-      showSearch={true}
+      showSearch={!!showSearch}
       searchValue={searchValue}
-      onSearch={onSearch}
+      onSearch={showSearch ? onSearch : undefined}
       {...customProps}
     >{fieldSelectItems}</Select>
   );

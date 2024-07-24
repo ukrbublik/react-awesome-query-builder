@@ -287,6 +287,9 @@ export default (skin: string) => {
     customFieldSelectProps: {
       showSearch: true
     },
+    customOperatorSelectProps: {
+      // showSearch: true
+    },
     // renderField: (props) => <FieldCascader {...props} />,
     // renderOperator: (props) => <FieldDropdown {...props} />,
     // renderFunc: (props) => <FieldSelect {...props} />,
@@ -520,8 +523,23 @@ export default (skin: string) => {
       label: "Color",
       type: "select",
       valueSources: ["value"],
+      widgets: {
+        select: {
+          widgetProps: {
+            valuePlaceholder: "Select color",
+            searchPlaceholder: "Search color",
+          },
+        },
+        multiselect: {
+          widgetProps: {
+            valuePlaceholder: "Select colors",
+            searchPlaceholder: "Search colors",
+          },
+        },
+      },
       fieldSettings: {
         showSearch: true,
+
         // * old format:
         // listValues: {
         //     yellow: 'Yellow',

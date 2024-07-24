@@ -1152,6 +1152,7 @@ export type AsyncFetchListValuesFn = (search: string | null, offset: number) => 
 
 export interface BasicFieldSettings<V = RuleValue> {
   validateValue?: ValidateValue<V> | SerializedFunction;
+  valuePlaceholder?: string;
 }
 export interface TextFieldSettings<V = string> extends BasicFieldSettings<V> {
   maxLength?: number;
@@ -1174,6 +1175,7 @@ export interface SelectFieldSettings<V = string | number> extends BasicFieldSett
   listValues?: ListValues;
   allowCustomValues?: boolean;
   showSearch?: boolean;
+  searchPlaceholder?: string;
   showCheckboxes?: boolean;
   asyncFetch?: AsyncFetchListValuesFn | SerializedFunction;
   useLoadMore?: boolean;

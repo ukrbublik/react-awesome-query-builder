@@ -209,6 +209,10 @@ export const without_field_autocomplete = (BasicConfig) => ({
       ...(BasicConfig.settings?.customFieldSelectProps || {}),
       showSearch: false
     },
+    customOperatorSelectProps: {
+      ...(BasicConfig.settings?.customOperatorSelectProps || {}),
+      showSearch: false
+    },
   }
 });
 

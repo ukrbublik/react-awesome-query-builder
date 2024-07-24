@@ -1,28 +1,24 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+  // "image": "mcr.microsoft.com/devcontainers/universal:2",
   "features": {
-  },
-  
-  "customizations": {
-    "codespaces": {
-      "openFiles": [
-        "README.md",
-        "packages/examples/src/demo/index.tsx"
-      ]
+    "ghcr.io/kreemer/features/chrometesting:1": {
+      "version": "latest"
     }
   },
-  
+
+  "customizations": {
+    "codespaces": {
+      "openFiles": ["packages/examples/src/demo/index.tsx"]
+    }
+  },
+
   "postCreateCommand": "./scripts/nvms.sh pnpm install",
   "postAttachCommand": {
     "server": "./scripts/nvms.sh pnpm start"
   },
 
-  "forwardPorts": [
-    3001,
-    5174,
-    5175,
-    3002
-  ],
+  "forwardPorts": [3001, 5174, 5175, 3002],
   "portsAttributes": {
     "3001": {
       "label": "Examples app",

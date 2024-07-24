@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { Dropdown } from "@fluentui/react";
 import { Utils } from "@react-awesome-query-builder/ui";
 import SearchableDropdown from "../SearchableDropdown";
@@ -11,7 +11,9 @@ export default ({
   setValue,
   readonly,
   placeholder,
+  searchPlaceholder,
   showSearch,
+  customProps,
 }) => {
 
   const renderOptions = () =>
@@ -19,7 +21,7 @@ export default ({
       return { key: value, text: title };
     });
 
-  const onChange = (_, item) => {
+  const onChange = useCallback((_, item) => {
     if (item) {
       const currentItems = value ?? [];
       const selectedItems = item.selected
@@ -28,9 +30,18 @@ export default ({
 
       setValue(selectedItems);
     }
-  };
+  }, [value, setValue]);
 
   const DropdownType = showSearch ? SearchableDropdown : Dropdown;
+
+  const searchProps = useMemo(() => ({
+    placeholder: searchPlaceholder, // || "Search options"
+  }), [searchPlaceholder]);
+
+  const otherProps = {
+    ...(customProps ?? {}),
+    ...(showSearch ? {searchProps} : {}),
+  };
 
   return (
     <DropdownType
@@ -41,6 +52,7 @@ export default ({
       multiSelect
       options={renderOptions()}
       disabled={readonly}
+      {...otherProps}
     />
   );
 };

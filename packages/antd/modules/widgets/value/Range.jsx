@@ -126,7 +126,7 @@ export default class RangeWidget extends PureComponent {
             max={max}
             step={step}
             marks={marks}
-            included={false}
+            included={true}
             range={true}
             onChange={this.handleChange}
             {...customSliderProps}
