@@ -149,10 +149,15 @@ module.exports = {
     devServer: {
         port: PORT,
         host: '0.0.0.0',
+        client: {
+            webSocketURL: 'ws://0.0.0.0:0/ws',
+        },
         allowedHosts: [
             'localhost',
             '.csb.app', // codesandbox.io
             '.webcontainer.io', // stackblitz.com
+            '.app.github.dev', // GitHub Codespaces
+            '.github.dev', // GitHub Codespaces
         ],
         headers: {
             'Document-Policy': 'js-profiling',

@@ -1,0 +1,44 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+  },
+  
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "README.md",
+        "packages/examples/src/demo/index.tsx"
+      ]
+    }
+  },
+  
+  "postCreateCommand": "./scripts/nvms.sh pnpm install",
+  "postAttachCommand": {
+    "server": "./scripts/nvms.sh pnpm start"
+  },
+
+  "forwardPorts": [
+    3001,
+    5174,
+    5175,
+    3002
+  ],
+  "portsAttributes": {
+    "3001": {
+      "label": "Examples app",
+      "onAutoForward": "openPreview"
+    },
+    "3002": {
+      "label": "Sandbox Next.js",
+      "onAutoForward": "openPreview"
+    },
+    "5174": {
+      "label": "Sandbox simple",
+      "onAutoForward": "openPreview"
+    },
+    "5175": {
+      "label": "Sandbox",
+      "onAutoForward": "openPreview"
+    }
+  }
+}
