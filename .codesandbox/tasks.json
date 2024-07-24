@@ -1,12 +1,12 @@
 {
   "$schema": "https://codesandbox.io/schemas/tasks.json",
-  
+
   // These tasks will run in order when initializing your CodeSandbox project.
   "setupTasks": [
-    // {
-    //   "name": "Install pnpm 9",
-    //   "command": "npm i -g pnpm@9"
-    // },
+    {
+      "name": "Install pnpm 8",
+      "command": "npm i -g pnpm@8"
+    },
     {
       "name": "Install dependencies",
       "command": "pnpm install --frozen-lockfile"
@@ -26,6 +26,22 @@
       "preview": {
         "port": 3001
       }
+    },
+    "install": {
+      "name": "install",
+      "command": "pnpm install"
+    },
+    "install-noscripts": {
+      "name": "install-noscripts",
+      "command": "pnpm install-noscripts"
+    },
+    "install-frozen": {
+      "name": "install-frozen",
+      "command": "pnpm install-frozen"
+    },
+    "install-frozen-noscripts": {
+      "name": "install-frozen-noscripts",
+      "command": "pnpm install-frozen-noscripts"
     },
     "test": {
       "name": "test",
