@@ -287,6 +287,9 @@ export default (skin: string) => {
     customFieldSelectProps: {
       showSearch: true
     },
+    customOperatorSelectProps: {
+      // showSearch: true
+    },
     // renderField: (props) => <FieldCascader {...props} />,
     // renderOperator: (props) => <FieldDropdown {...props} />,
     // renderFunc: (props) => <FieldSelect {...props} />,

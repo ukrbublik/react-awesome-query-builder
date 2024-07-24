@@ -9,7 +9,9 @@ const settings = {
   renderField: (props, {RCE, W: {MaterialFieldAutocomplete, MaterialFieldSelect}}) => props?.customProps?.showSearch 
     ? RCE(MaterialFieldAutocomplete, props)
     : RCE(MaterialFieldSelect, props),
-  renderOperator: (props, {RCE, W: {MaterialFieldSelect}}) => RCE(MaterialFieldSelect, props),
+  renderOperator: (props, {RCE, W: {MaterialFieldAutocomplete, MaterialFieldSelect}}) => props?.customProps?.showSearch 
+    ? RCE(MaterialFieldAutocomplete, props)
+    : RCE(MaterialFieldSelect, props),
 
   renderFunc: (props, {RCE, W: {MaterialFieldSelect}}) => RCE(MaterialFieldSelect, props),
   renderConjs: (props, {RCE, W: {MaterialConjs}}) => RCE(MaterialConjs, props),

@@ -9,7 +9,9 @@ const settings = {
   renderField: (props, {RCE, W: {MuiFieldAutocomplete, MuiFieldSelect}}) => props?.customProps?.showSearch 
     ? RCE(MuiFieldAutocomplete, props)
     : RCE(MuiFieldSelect, props),
-  renderOperator: (props, {RCE, W: {MuiFieldSelect}}) => RCE(MuiFieldSelect, props),
+  renderOperator: (props, {RCE, W: {MuiFieldAutocomplete, MuiFieldSelect}}) => props?.customProps?.showSearch 
+    ? RCE(MuiFieldAutocomplete, props)
+    : RCE(MuiFieldSelect, props),
   renderFunc: (props, {RCE, W: {MuiFieldSelect}}) => RCE(MuiFieldSelect, props),
   renderConjs: (props, {RCE, W: {MuiConjs}}) => RCE(MuiConjs, props),
   renderSwitch: (props, {RCE, W: {MuiSwitch}}) => RCE(MuiSwitch, props),

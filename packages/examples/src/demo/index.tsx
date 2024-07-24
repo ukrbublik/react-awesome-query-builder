@@ -17,8 +17,8 @@ import { defaultInitFile, initialSkin, validationTranslateOptions, defaultRender
 import "./i18n";
 
 // Load config and initial tree
-const loadedConfig = loadConfig(initialSkin);
-const initTree = initTreeWithValidation(defaultInitFile, loadedConfig, validationTranslateOptions);
+const loadedConfig = loadConfig(window._initialSkin || initialSkin);
+const initTree = initTreeWithValidation(window._initFile || defaultInitFile, loadedConfig, validationTranslateOptions);
 
 // Trick for HMR: triggers callback put in useHmrUpdate on every update from HMR
 dispatchHmrUpdate(loadedConfig, initTree);

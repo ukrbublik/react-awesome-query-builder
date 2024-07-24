@@ -3,8 +3,8 @@ import {
 } from "@react-awesome-query-builder/ui";
 import { DemoQueryBuilderState } from "./types";
 
-export const defaultInitFile = window._initFile || "tree/complex";
-export const initialSkin = window._initialSkin || "mui";
+export const defaultInitFile = "tree/complex";
+export const initialSkin = "mui";
 
 export const validationTranslateOptions: Partial<SanitizeOptions> = {
   translateErrors: true,

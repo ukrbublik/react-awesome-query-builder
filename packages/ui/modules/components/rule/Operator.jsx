@@ -19,6 +19,7 @@ export default class Operator extends Component {
     selectedFieldSrc: PropTypes.string,
     selectedOperator: PropTypes.string,
     readonly: PropTypes.bool,
+    customProps: PropTypes.object,
     //actions
     setOperator: PropTypes.func.isRequired,
   };

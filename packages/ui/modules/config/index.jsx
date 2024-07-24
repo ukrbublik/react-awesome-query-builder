@@ -134,6 +134,9 @@ const settings = {
   customFieldSelectProps: {
     showSearch: true
   },
+  customOperatorSelectProps: {
+    // showSearch: false
+  },
 
   defaultSliderWidth: "200px",
   defaultSelectWidth: "200px",

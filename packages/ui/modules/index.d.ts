@@ -338,6 +338,7 @@ export interface RenderSettings {
   showLabels?: boolean;
   maxLabelsLength?: number;
   customFieldSelectProps?: AnyObject;
+  customOperatorSelectProps?: AnyObject;
   renderBeforeWidget?: FactoryWithContext<RuleProps> | SerializedFunction;
   renderAfterWidget?: FactoryWithContext<RuleProps> | SerializedFunction;
   renderBeforeActions?: FactoryWithContext<RuleProps> | SerializedFunction;
