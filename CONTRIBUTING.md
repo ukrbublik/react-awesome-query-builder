@@ -55,8 +55,8 @@ Or with VSCode:
 - [`packages/bootstrap`](/packages/bootstrap) - Provides config with [Bootstrap](https://reactstrap.github.io/) widgets
 - [`packages/fluent`](/packages/fluent) - Provides config with [Fluent UI](https://developer.microsoft.com/en-us/fluentui#/get-started/web) widgets
 - [`packages/examples`](/packages/examples) - Demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
-  - [`demo`](/packages/examples/demo) - Advanced demo
-  - [`demo_switch`](/packages/examples/demo_switch) - Demo of ternary mode (switch/case) for SpEL
+  - [`src/demo`](/packages/examples/src/demo) - Advanced demo
+  - [`src/demo_switch`](/packages/examples/src/demo_switch) - Demo of ternary mode (switch/case)
 - [`packages/sandbox`](/packages/sandbox) - Demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
 - [`packages/sandbox_simple`](/packages/sandbox_simple) - Demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
 - [`packages/sandbox_next`](/packages/sandbox_next) - Demo app on Next.js with SSR, simple server-side query storage and export
@@ -93,7 +93,7 @@ Currently there are 5 collections of widgets:
 Let's say you want to create new collection of widgets for new UI framework X to be used in this lib (and submit PR which is always welcomed!).  
 You can use any of this packages as a skeleton, eg. [mui](/packages/mui). I don't recommend to take [antd](/packages/antd) as example as it's more complicated.  
 Create new package `@react-awesome-query-builder/x` in [packages](/packages). 
-For a playground integrate it in [examples](/packages/examples) - add to `dependecies` in [package.json](/packages/examples/package.json), `paths` in [tsconfig.json](/packages/examples/tsconfig.json), `aliases` in [webpack.config.js](/packages/examples/webpack.config.js), `skinToConfig` in [config.tsx](/packages/examples/demo/config.tsx).
+For a playground integrate it in [examples](/packages/examples) - add to `dependecies` in [package.json](/packages/examples/package.json), `paths` in [tsconfig.json](/packages/examples/tsconfig.json), `aliases` in [webpack.config.js](/packages/examples/webpack.config.js), `skinToConfig` in [config.tsx](/packages/examples/src/demo/config/index.tsx).
 
 Take [PR #727 to add Fluent UI widgets](https://github.com/ukrbublik/react-awesome-query-builder/pull/727) as an example.
 

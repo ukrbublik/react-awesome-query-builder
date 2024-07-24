@@ -14,7 +14,7 @@ endif::[]
 :i18n:         https://github.com/ukrbublik/react-awesome-query-builder/#i18n
 :config1:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox_simple/src/demo/config.jsx
 :config2:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox/src/demo/config.tsx
-:config3:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx
+:config3:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/src/demo/config/index.tsx
 :funcs:        https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/core/modules/config/funcs.js
 :renderSwitch: https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/antd/modules/config/index.jsx#L54
 :config_ser:   https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/sandbox_next/lib/config_ser.js
@@ -235,7 +235,7 @@ Example:
 |fieldSettings.useAsyncSearch |- for `select` widget |false |If true, `asyncFetch` supports search.
 |fieldSettings.useLoadMore |- for `select` widget |false |If true, `asyncFetch` supports pagination.
 |defaultValue | | |Default value
-|preferWidgets | | |See usecase at {config3}[`examples/demo`] for `slider` field. +
+|preferWidgets | | |See usecase at {config3}[`packages/examples/src/demo/config`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
   So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input.
 |operators, defaultOperator, widgets, valueSources | | |You can override config of corresponding type (see below at section link:#configtypes[config.types])
@@ -576,7 +576,7 @@ There is also special `proximity` operator, its options are rendered with `<Prox
 import {CustomOperators: {ProximityOperator}} from '@react-awesome-query-builder/ui';
 ----
 
-See {config3}[`examples/demo`]
+See {config3}[`packages/examples/src/demo/config`]
 ====
 
 
@@ -720,7 +720,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`. If `'value'` is included, you can compare field with values. If `'field'` is included, you can compare field with another field of same type. If `'func'` is included, you can compare field with result of function (see link:#configfuncs[config.funcs]).
 |defaultOperator | | |If specified, it will be auto selected when user selects field
 |widgets.* |+ | |Available widgets for current type and their config. +
-  Normally there is only 1 widget per type. But see type `number` at {config3}[`examples/demo`] - it has 3 widgets `number`, `slider`, `rangeslider`. +
+  Normally there is only 1 widget per type. But see type `number` at {config3}[`packages/examples/src/demo/config`] - it has 3 widgets `number`, `slider`, `rangeslider`. +
   Or see type `select` - it has widget `select` for operator `=` and widget `multiselect` for operator `IN`.
 |widgets.<widget>.operators | | |List of operators for widget, described in link:#configoperators[config.operators]
 |widgets.<widget>.widgetProps | | |Can be used to override config of corresponding widget specified in link:#configwidgets[config.widgets]. Example: `{timeFormat: 'h:mm:ss A'}` for time field with AM/PM.

@@ -6,7 +6,7 @@ import {
   Config,
   ImmutableTree
 } from "@react-awesome-query-builder/ui";
-import { LazyStyleModule } from "../utils";
+import { LazyStyleModule } from "../skins/utils";
 // @ts-ignore
 import styles from "@react-awesome-query-builder/mui/css/styles.scss";
 import getConfig from "./config";

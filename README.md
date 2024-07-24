@@ -28,6 +28,7 @@ Now [Fluent UI](https://developer.microsoft.com/en-us/fluentui#/get-started/web)
 See [live demo](https://ukrbublik.github.io/react-awesome-query-builder) 
 
 [![Edit in codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/ukrbublik/react-awesome-query-builder/master?file=%2Fpackages%2Fexamples%2Fdemo%2Findex.tsx)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/ukrbublik/react-awesome-query-builder)
 
 
 * [Features](#features)
@@ -238,7 +239,7 @@ class DemoQueryBuilder extends Component {
   )
   
   onChange = (immutableTree, config) => {
-    // Tip: for better performance you can apply `throttle` - see `examples/demo`
+    // Tip: for better performance you can apply `throttle` - see `packages/examples/src/demo`
     this.setState({tree: immutableTree, config: config});
 
     const jsonTree = QbUtils.getTree(immutableTree);
@@ -319,7 +320,7 @@ const DemoQueryBuilder: React.FC = () => {
   });
 
   const onChange = useCallback((immutableTree: ImmutableTree, config: Config) => {
-    // Tip: for better performance you can apply `throttle` - see `examples/demo`
+    // Tip: for better performance you can apply `throttle` - see `packages/examples/src/demo`
     setState(prevState => ({ ...prevState, tree: immutableTree, config: config }));
 
     const jsonTree = QbUtils.getTree(immutableTree);
@@ -395,7 +396,7 @@ Props:
 - If you put query builder component inside [Fluent-UI](https://developer.microsoft.com/en-us/fluentui)'s `<Panel />`, please:
   - set css `.ms-Layer.ms-Layer--fixed.root-119 { z-index: 900 !important; }`
 - `props` arg in `renderBuilder` have `actions` and `dispatch` you can use to run actions programmatically
-- For a list of available actions see `Actions` interface in [`index.d.ts`](/packages/core/modules/index.d.ts). See `runActions()` in [examples](/packages/examples/demo/index.tsx) as a demonstration of calling actions programmatically.
+- For a list of available actions see `Actions` interface in [`index.d.ts`](/packages/core/modules/index.d.ts). See `runActions()` in [examples](/packages/examples/src/demo/index.tsx) as a demonstration of calling actions programmatically.
 
 ## `<Builder />`
 
@@ -617,7 +618,7 @@ const config = {
 // then use <Query {...config} />
 ```
 
-See [example](/packages/examples/demo/index.tsx).
+See [example](/packages/examples/src/demo/index.tsx).
 
 
 ## Ternary mode
@@ -660,7 +661,7 @@ const emptyJson: JsonSwitchGroup = { id: QbUtils.uuid(), type: "switch_group", }
 const tree = QbUtils.loadTree(emptyJson);
 ```
 
-See [example](/packages/examples/demo_switch/index.tsx)
+See [example](/packages/examples/src/demo_switch/index.tsx)
 
 ![Screenshot](https://github.com/ukrbublik/react-awesome-query-builder/assets/3238637/4bf87da5-47f2-4a64-b1be-8924a62f96ad)
 

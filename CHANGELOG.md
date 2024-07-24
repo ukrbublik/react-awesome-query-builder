@@ -3,6 +3,7 @@
   - Fixed `Utils.isValidTree` for prod build.
     Removed `checkTree`, `isValidTree` from `Utils.Import` and `getTreeBadFields` from `Utils.TreeUtils`. (PR #1091) (issue #1075)
   - Use pnpm 8
+  - Refactored examples demo app (PR #1097)
 - 6.6.2
   - Fixed issue with rendering func select inside func (PR #1086) (issue #1085)
   - Added `DefaultUtils` typings to `index.d.ts` (PR #1078) (issue #1079)
