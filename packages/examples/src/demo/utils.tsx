@@ -3,6 +3,7 @@ import {
   Utils,
   ImmutableTree, Config, JsonTree, JsonLogicTree, SanitizeOptions, Actions
 } from "@react-awesome-query-builder/ui";
+import { SqlUtils } from "@react-awesome-query-builder/sql";
 import { initFiles } from "./init_data";
 
 
@@ -40,9 +41,16 @@ export const useHmrUpdate = (callback: (detail: CustomEventDetail) => void) => {
 export const importFromInitFile = (fileKey: string, config?: Config) => {
   const fileType = fileKey.split("/")[0];
   let importedTree: ImmutableTree | undefined;
+  let errors: string[];
   if (fileType === "logic") {
     const initLogic = initFiles[fileKey] as JsonLogicTree;
     importedTree = Utils.loadFromJsonLogic(initLogic, config);
+  } else if (fileType === "sql") {
+    const initValue = initFiles[fileKey] as string;
+    ({tree: importedTree, errors} = SqlUtils.loadFromSql(initValue, config));
+  } else if (fileType === "spel") {
+    const initValue = initFiles[fileKey] as string;
+    [importedTree, errors] = Utils.loadFromSpel(initValue, config);
   } else if (fileType === "tree") {
     const initValue = initFiles[fileKey] as JsonTree;
     importedTree = Utils.loadTree(initValue);

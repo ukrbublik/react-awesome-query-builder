@@ -528,6 +528,10 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   `Utils.Import.loadFromSpel (string, config) -> [Immutable, errors]`  
   Convert query value from [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html) format to internal Immutable format. 
 
+  #### `loadFromSql`
+  `SqlUtils.loadFromSql (string, config) -> {tree: Immutable, errors: string[]}`  
+  Convert query value from SQL format to internal Immutable format. 
+
 ### Save/load config from server
 
   #### `compressConfig`

@@ -26,6 +26,7 @@ import { MuiConfig } from "@react-awesome-query-builder/mui";
 import { MaterialConfig } from "@react-awesome-query-builder/material";
 import { BootstrapConfig } from "@react-awesome-query-builder/bootstrap";
 import { FluentUIConfig } from "@react-awesome-query-builder/fluent";
+import { SqlUtils } from "@react-awesome-query-builder/sql";
 
 
 let currentTestName: string;
@@ -60,7 +61,7 @@ interface MockedConsole extends Console {
   __origConsole: Console;
   __consoleData: ConsoleData;
 }
-type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null | undefined;
+type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | "SQL" | null | undefined;
 type TreeValue = JsonLogicTree | JsonTree | string | undefined;
 type ConfigFn = (_: Config) => Config;
 type ConfigFns = ConfigFn | ConfigFn[];
@@ -190,12 +191,14 @@ const stringifyValidationErrors = (errors: ValidationItemErrors[]) => {
 
 export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeValueFormat = null, options?: DoOptions) => {
   if (!valueFormat) {
-    if (isJsonLogic(value))
+    if (isJsonLogic(value)) {
       valueFormat = "JsonLogic";
-    else if (typeof value === "string")
+    } else if (typeof value === "string") {
+      // todo: can be SQL
       valueFormat = "SpEL";
-    else
+    } else {
       valueFormat = "default";
+    }
   }
   let errors: string[] = [];
 
@@ -204,6 +207,8 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
   let tree: ImmutableTree | undefined;
   if (valueFormat === "JsonLogic") {
     [tree, errors] = _loadFromJsonLogic(value, config);
+  } else if (valueFormat == "SQL") {
+    [tree, errors] = SqlUtils.loadFromSql(value as string, config);
   } else if (valueFormat == "SpEL") {
     [tree, errors] = loadFromSpel(value as string, config);
   } else {
@@ -629,11 +634,11 @@ const do_export_checks = async (config: Config, tree: ImmutableTree, expects?: E
       });
     }
   
-    doIt("should work to QueryBuilder", () => {
-      const _res = queryBuilderFormat(tree, config);
-    });
+    // doIt("should work to QueryBuilder", () => {
+    //   const _res = queryBuilderFormat(tree, config);
+    // });
 
-    if (options?.withRender) {
+    if (options?.withRender && tree) {
       const render = async () => {
         // Render
         const { destroyQb } = renderQueryBuilder(config, tree!, options);

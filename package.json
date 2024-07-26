@@ -45,6 +45,7 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "workspaces": [
     "packages/core",
+    "packages/sql",
     "packages/ui",
     "packages/antd",
     "packages/mui",
