@@ -2,6 +2,7 @@ import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { export_checks } from "../support/utils";
 import { Utils } from "@react-awesome-query-builder/core";
+import { SqlUtils } from "@react-awesome-query-builder/sql";
 import { BasicConfig } from "@react-awesome-query-builder/ui";
 import { expect } from "chai";
 
@@ -477,6 +478,12 @@ describe("query with ops", () => {
       expect(errs).to.deep.equal([]);
       const output = Utils.jsonLogicFormat(tree, config);
       expect(output.logic).to.deep.equal(input);
+    });
+  });
+
+  describe("@sql", () => {
+    export_checks([configs.with_all_types], inits.with_ops_sql, "SQL", {
+      "sql": "???", 
     });
   });
 });

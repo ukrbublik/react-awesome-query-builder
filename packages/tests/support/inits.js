@@ -842,6 +842,8 @@ export const with_ops = {
   ]
 };
 
+export const with_ops_sql = "(text = 'Long\\nText' AND num <> 2)";
+
 export const with_ops_and_negation_groups = {
   "and": [
     {

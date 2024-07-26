@@ -26,8 +26,8 @@ const isFuncableProperty = (p) => ["length"].includes(p);
 
 const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
-export const loadFromSpel = (logicTree, config) => {
-  return _loadFromSpel(logicTree, config, true);
+export const loadFromSpel = (spelStr, config) => {
+  return _loadFromSpel(spelStr, config, true);
 };
 
 export const _loadFromSpel = (spelStr, config, returnErrors = true) => {

@@ -1,0 +1,67 @@
+{
+  "name": "@react-awesome-query-builder/sql",
+  "version": "6.6.2",
+  "description": "User-friendly query builder for React. SQL support",
+  "keywords": [
+    "query-builder",
+    "query",
+    "builder",
+    "query builder",
+    "sql"
+  ],
+  "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
+  "bugs": "https://github.com/ukrbublik/react-awesome-query-builder/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
+    "directory": "packages/sql"
+  },
+  "license": "MIT",
+  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./esm/index.js",
+      "require": "./cjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "types": "./types/index.d.ts",
+  "scripts": {
+    "build": "sh ./scripts/build-npm.sh",
+    "eslint": "eslint --ext .js --ext .ts  ./modules/",
+    "lint": "npm run eslint && npm run tsc-lint",
+    "lint-fix": "eslint --ext .js --ext .ts --fix  ./modules/",
+    "prepare": "npm run build",
+    "tsc-lint": "tsc -p . --noEmit",
+    "tsc-emit-dts": "tsc -p . --declaration --emitDeclarationOnly --declarationDir types",
+    "tsc-emit-esm": "tsc -p . --outDir esm",
+    "tsc-emit-esm-composite": "tsc -p . --outDir esm  --declaration",
+    "tsc-emit": "tsc -p . --outDir esm --declaration --declarationDir types"
+  },
+  "dependencies": {
+    "clone": "^2.1.2",
+    "sqlstring": "^2.3.3",
+    "node-sql-parser": "^5.2.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.24.7",
+    "@babel/core": "^7.24.5",
+    "@babel/plugin-transform-class-properties": "^7.24.1",
+    "@babel/plugin-transform-modules-commonjs": "^7.24.1",
+    "@babel/plugin-transform-private-methods": "^7.24.1",
+    "@babel/plugin-transform-private-property-in-object": "^7.24.5",
+    "@babel/plugin-transform-runtime": "^7.24.3",
+    "@babel/preset-env": "^7.24.5",
+    "@babel/preset-typescript": "^7.24.1",
+    "@babel/runtime": "^7.24.5",
+    "@types/clone": "^2.1.1",
+    "@types/lodash": "^4.14.170",
+    "@types/node": "^18.15.0"
+  },
+  "peerDependencies": {
+    "@react-awesome-query-builder/core": "workspace:^"
+  }
+}

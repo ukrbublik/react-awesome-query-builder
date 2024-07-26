@@ -13,6 +13,8 @@ const { uuid } = Utils;
 export const emptyTree: JsonTree = {id: uuid(), type: "group"};
 export const emptySwitchTree: JsonTree = {id: uuid(), type: "switch_group"};
 
+const initSqlSimple = "NOT (text = 'Long\\nText' AND num <> 2 OR DATE_ADD(NOW(), INTERVAL 2 DAY) > '2024-07-26 00:00:00.000' OR LOWER(user.firstName) = UPPER('gg') OR CONTAINS(prox1, 'NEAR((a, b), 2)'))";
+
 export const initFiles: Record<string, any> = {
   "logic/complex": initLogicComplex,
   "logic/simple": initLogicSimple,
@@ -24,4 +26,6 @@ export const initFiles: Record<string, any> = {
   "tree/complex": initTreeComplex,
   "tree/empty": emptyTree,
   "tree/empty_switch": emptySwitchTree,
+
+  "sql/simple": initSqlSimple,
 };
