@@ -57,6 +57,9 @@ export const importFromInitFile = (fileKey: string, config?: Config) => {
   } else {
     throw new Error(`Unknown file type ${fileType}`);
   }
+  if (errors.length) {
+    console.warn(`Errors while importing from ${fileKey} as ${fileType}:`, errors);
+  }
   return importedTree;
 };
 

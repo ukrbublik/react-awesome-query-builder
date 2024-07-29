@@ -531,7 +531,7 @@ interface ConfigUtils {
   compressConfig(config: Config, baseConfig: Config): ZipConfig;
   decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
   compileConfig(config: Config): Config;
-  extendConfig(config: Config): Config;
+  extendConfig(config: Config, configId?: string, canCompile?: boolean): Config;
   getFieldConfig(config: Config, field: AnyFieldValue): FieldConfig;
   getFuncConfig(config: Config, func: string): Func | null;
   getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
