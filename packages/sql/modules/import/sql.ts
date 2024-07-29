@@ -73,9 +73,9 @@ export const loadFromSql = (sqlStr: string, config: Config): {tree: ImmutableTre
 
 };
 
-export const _loadFromSqlAndPrintErrors = (sqlStr: string, config: Config): ImmutableTree => {
-  const {tree, errors} = loadFromSql(sqlStr, config);
-  if (errors.length)
-    console.warn("Errors while importing from SQL:", errors);
-  return tree;
-};
+// export const _loadFromSqlAndPrintErrors = (sqlStr: string, config: Config): ImmutableTree => {
+//   const {tree, errors} = loadFromSql(sqlStr, config);
+//   if (errors.length)
+//     console.warn("Errors while importing from SQL:", errors);
+//   return tree;
+// };

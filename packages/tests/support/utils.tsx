@@ -208,7 +208,7 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
   if (valueFormat === "JsonLogic") {
     [tree, errors] = _loadFromJsonLogic(value, config);
   } else if (valueFormat == "SQL") {
-    [tree, errors] = SqlUtils.loadFromSql(value as string, config);
+    ({tree, errors} = SqlUtils.loadFromSql(value as string, config));
   } else if (valueFormat == "SpEL") {
     [tree, errors] = loadFromSpel(value as string, config);
   } else {

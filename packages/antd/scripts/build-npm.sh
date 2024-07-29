@@ -7,8 +7,9 @@ babel --extensions ".tsx,.jsx,.ts,.js" -d ./cjs ./modules
 #rm ./cjs/**/*.bak
 node ./scripts/fix-antd.js
 ESM=1 babel --extensions ".tsx,.jsx,.ts,.js" -d ./esm ./modules
-cp ./modules/index.d.ts ./cjs/index.d.ts
-cp ./modules/index.d.ts ./esm/index.d.ts
+
+rsync -ma --include '*/' --include '*.d.ts' --exclude '*' ./modules/ ./cjs/
+rsync -ma --include '*/' --include '*.d.ts' --exclude '*' ./modules/ ./esm/
 
 rm -rf ./css
 sass -I node_modules -I ../../node_modules styles/:css/ --no-source-map --style=expanded
