@@ -36,10 +36,9 @@
     "lint-fix": "eslint --ext .js --ext .ts --fix  ./modules/",
     "prepare": "npm run build",
     "tsc-lint": "tsc -p . --noEmit",
-    "tsc-emit-dts": "tsc -p . --declaration --emitDeclarationOnly --declarationDir types",
+    "tsc-emit-types": "tsc -p . --declaration --emitDeclarationOnly --declarationDir types",
     "tsc-emit-esm": "tsc -p . --outDir esm",
-    "tsc-emit-esm-composite": "tsc -p . --outDir esm  --declaration",
-    "tsc-emit": "tsc -p . --outDir esm --declaration --declarationDir types"
+    "tsc-emit-esm-with-dts": "tsc -p . --outDir esm  --declaration"
   },
   "dependencies": {
     "clone": "^2.1.2",

@@ -7,11 +7,14 @@ This packages provides import from SQL using [node-sql-parser](https://www.npmjs
 ## Installation
 
 Install:
-```
+
+```sh
 npm i @react-awesome-query-builder/sql --save
 ```
 
 ## Usage
+
+todo
 
 ```js
 // >>>
