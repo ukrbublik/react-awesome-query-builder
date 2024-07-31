@@ -1,6 +1,3 @@
-export {default as clone} from "clone";
-export {default as moment} from "moment";
-export {default as i18n} from "../i18n";
 export * as ConfigUtils from "./configUtils";
 export * as RuleUtils from "./ruleUtils";
 export * as FuncUtils from "./funcUtils";
@@ -11,11 +8,16 @@ export * as ListUtils from "./listValues";
 export * as Autocomplete from "./autocomplete";
 export * as Validation from "./validation";
 export * as OtherUtils from "./stuff";
+export {default as i18n} from "../i18n";
 
+// expose
+export {default as moment} from "moment"; // in OtherUtils
+export {default as clone} from "clone"; // in OtherUtils
+export {default as uuid} from "./uuid"; // in OtherUtils
 // expose validation api to top level for convenience
 export {validateTree, sanitizeTree, isValidTree} from "./validation";
 // deprecated
 export {checkTree, validateAndFixTree} from "./validation";
-export {default as uuid} from "./uuid";
-export {getSwitchValues} from "./treeUtils";
-export {compressConfig, decompressConfig} from "./configSerialize";
+// expose, deprecated
+export {getSwitchValues} from "./treeUtils"; // in TreeUtils
+export {compressConfig, decompressConfig} from "./configSerialize"; // in ConfigUtils
