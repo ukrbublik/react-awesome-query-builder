@@ -1,6 +1,6 @@
 import merge from "lodash/merge";
 import pick from "lodash/pick";
-import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual} from "./stuff";
+import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual, isObject} from "./stuff";
 import clone from "clone";
 import JL from "json-logic-js";
 import { addRequiredJsonLogicOperations, applyJsonLogic } from "./jsonLogic";
@@ -202,8 +202,6 @@ const compileMeta = {
   },
   settings: compileMetaSettings,
 };
-
-const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
 /////////////
 
