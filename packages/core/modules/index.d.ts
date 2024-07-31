@@ -34,7 +34,18 @@ type IdPath = Array<string> | ImmutablePath; // should be used in actions only
 
 type Optional<T> = {
   [P in keyof T]?: T[P];
-}
+};
+
+type PickDeprecated<T, K extends keyof T> = {
+  /**
+   * @deprecated
+   */
+  [P in K]: T[P];
+};
+
+export type PartialPartial<T> = {
+  [P in keyof T]?: T[P] extends Object ? Partial<T[P]> : T[P];
+};
 
 type OptionalBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
@@ -45,7 +56,7 @@ type TypedMap<T> = Record<string, T>;
 type TypedKeyMap<K extends string|number, T> = {
   [key: string]: T;
   [key: number]: T;
-}
+};
 
 interface ObjectToImmOMap<P> extends ImmutableOMap<keyof P, any> {
   get<K extends keyof P>(name: K): P[K];
@@ -601,6 +612,8 @@ interface TreeUtils {
   getSwitchValues(tree: ImmutableTree): Array<any | null>;
 }
 interface OtherUtils {
+  clone(obj: any): any;
+  moment: Moment;
   uuid(): string;
   deepFreeze(obj: any): any;
   deepEqual(a: any, b: any): boolean;
@@ -618,10 +631,11 @@ interface OtherUtils {
 }
 
 export interface Utils extends Import, Export,
-  Pick<Validation, "sanitizeTree" | "validateTree" | "isValidTree" | "checkTree">,
-  Pick<ConfigUtils, "compressConfig" | "decompressConfig">,
-  Pick<OtherUtils, "uuid">,
-  Pick<TreeUtils, "getSwitchValues">
+  Pick<OtherUtils, "uuid" | "clone" | "moment">,
+  Pick<Validation, "sanitizeTree" | "validateTree" | "isValidTree">,
+  PickDeprecated<Validation, "checkTree">,
+  PickDeprecated<ConfigUtils, "compressConfig" | "decompressConfig">,
+  PickDeprecated<TreeUtils, "getSwitchValues">
 {
   Import: Import;
   Export: Export;
@@ -633,7 +647,7 @@ export interface Utils extends Import, Export,
   ListUtils: ListUtils;
   TreeUtils: TreeUtils;
   OtherUtils: OtherUtils;
-  // libs
+
   i18n: i18n;
   moment: typeof moment;
 }
@@ -656,12 +670,12 @@ export interface Config {
 
 export type ZipConfig = Omit<Config, "ctx">;
 
-export interface ConfigMixin<C = Config, S = Settings> {
+export interface ConfigMixin<C extends {settings: any} = Config> {
   conjunctions?: Record<string, Partial<Conjunction>>;
   operators?: Record<string, Partial<Operator<C>>>;
   widgets?: Record<string, Partial<Widget<C>>>;
   types?: Record<string, Partial<Type>>;
-  settings?: Partial<S>;
+  settings?: PartialPartial<C["settings"]>;
   fields?: Record<string, Partial<FieldOrGroup>>;
   funcs?: Record<string, Partial<FuncOrGroup>>;
   ctx?: Partial<ConfigContext>;

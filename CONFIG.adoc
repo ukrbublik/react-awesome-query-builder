@@ -347,7 +347,7 @@ Behaviour settings:
 |removeEmptyGroupsOnLoad |true |Remove empty groups during initial validation of `value` prop passed to `<Query>`
 |removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during initial validation of `value` prop passed to `<Query>`? +
   By default `true`, but `false` for AntDesign as can be removed manually
-|useConfigCompress |false |Set to `true` if you use `Utils.decompressConfig()`
+|useConfigCompress |false |Set to `true` if you use `Utils.ConfigUtils.decompressConfig()`
 |fieldItemKeysForSearch |`["label", "path", "altLabel", "grouplabel"]` |Keys in field item (see {d_ts}[type] `FieldItem`) available for search. Available keys: "key", "path", "label", "altLabel" (label2), "tooltip", "grouplabel" (label of parent group, for subfields of complex fields)
 |listKeysForSearch |`["title", "value"]` |Keys in list item (see {d_ts}[type] `ListItem`) available for search. Available keys: "title", "value", "groupTitle"
 |reverseOperatorsForNot |false |True to convert "!(x == 1)" to "x != 1" on import and export
@@ -850,13 +850,13 @@ const ctx = {
 const zipConfig = {
   fields,
   settings: {
-    useConfigCompress: true, // this is required to use Utils.decompressConfig()
+    useConfigCompress: true, // this is required to use Utils.ConfigUtils.decompressConfig()
   },
   // you can add here other sections like `widgets` or `types`, but don't add `ctx`
 };
 
 // Config can be loaded from backend with providing `ctx`
-const config = Utils.decompressConfig(zipConfig, BasicConfig, ctx);
+const config = Utils.ConfigUtils.decompressConfig(zipConfig, BasicConfig, ctx);
 ----
 
 You _can't_ just pass JS function to `validateValue` in `fieldSettings` because functions can't be serialized to JSON. 
@@ -932,7 +932,7 @@ const zipConfig = {
 To build zip config from full config you can use this util:
 [source,javascript]
 ----
-const zipConfig = Utils.compressConfig(config, BasicConfig);
+const zipConfig = Utils.ConfigUtils.compressConfig(config, BasicConfig);
 ----
 In order to generate zip config corretly (to JSON-serializable object), you should put your custom functions to `ctx` and refer to them by names as in examples above.
 [source,javascript]
@@ -954,11 +954,11 @@ const config = merge({}, BasicConfig, {
   },
   ctx,
 });
-const zipConfig = Utils.compressConfig(config, BasicConfig);
-const config2 = Utils.decompressConfig(zipConfig, BasicConfig, ctx); // should be same as `config`
+const zipConfig = Utils.ConfigUtils.compressConfig(config, BasicConfig);
+const config2 = Utils.ConfigUtils.decompressConfig(zipConfig, BasicConfig, ctx); // should be same as `config`
 ----
 
-NOTE: `settings.useConfigCompress` should be `true` if you use `Utils.decompressConfig()`
+NOTE: `settings.useConfigCompress` should be `true` if you use `Utils.ConfigUtils.decompressConfig()`
 
 
 {nbsp} +

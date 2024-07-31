@@ -677,15 +677,15 @@ See [example](/packages/examples/src/demo_switch/index.tsx)
 
 ## SSR
 You can save and load config from server with help of utils:
-- [Utils.compressConfig()](#compressconfig)
-- [Utils.decompressConfig()](#decompressconfig)
+- [Utils.ConfigUtils.compressConfig()](#compressconfig)
+- [Utils.ConfigUtils.decompressConfig()](#decompressconfig)
 
 You need these utils because you can't just send config *as-is* to server, as it contains functions that can't be serialized to JSON.  
 Note that you need to set `config.settings.useConfigCompress = true` to enable this feature.  
 
 To put it simple:
 - `ZipConfig` type is a JSON that contains only changes against basic config (differences). At minimum it contains your `fields`. It does not contain [`ctx`](#ctx).
-- `Utils.decompressConfig()` will merge `ZipConfig` to basic config (and add `ctx` if passed). 
+- `Utils.ConfigUtils.decompressConfig()` will merge `ZipConfig` to basic config (and add `ctx` if passed). 
 
 See [sandbox_next demo app](/packages/sandbox_next) that demonstrates server-side features. 
 

@@ -1,6 +1,6 @@
 import React from "react";
 import type {
-  Config, FieldOrGroup, Operator, Settings, Widget, ConfigMixin
+  Config, FieldOrGroup, Operator, Settings, Widget, ConfigMixin, PartialPartial,
 } from "@react-awesome-query-builder/ui";
 import merge from "lodash/merge";
 import pureServerConfig from "./config_base";
@@ -83,32 +83,30 @@ const operatorsMixin: Record<string, Partial<Operator>> = {
   },
 };
 
-const renderSettings: Partial<Settings> = {
+const settingsMixin: PartialPartial<Settings> = {
   renderField: "myRenderField",
   renderConfirm: "W.MuiConfirm",
   useConfirm: "W.MuiUseConfirm",
+  locale: {
+    mui: { var: "ctx.ukUA" },
+  },
 };
 
 
-const configMixin: ConfigMixin = {
+const configMixin: ConfigMixin<Config> = {
   fields: fieldsMixin,
   widgets: widgetsMixin,
   operators: operatorsMixin,
-  settings: {
-    ...renderSettings,
-    locale: {
-      mui: { var: "ctx.ukUA" },
-    },
-  }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  settings: settingsMixin,
 };
 
-
-const mixinConfig = (baseConfig: Config) => {
+const mixinConfig = (baseConfig: Config): Config => {
   return merge(
     {},
     baseConfig,
     configMixin,
-  ) as Config;
+  );
 };
 
 export default mixinConfig(pureServerConfig);

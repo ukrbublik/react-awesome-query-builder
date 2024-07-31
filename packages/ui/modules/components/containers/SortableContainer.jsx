@@ -7,7 +7,7 @@ import * as constants from "../../stores/constants";
 import PropTypes from "prop-types";
 import * as actions from "../../actions";
 import {pureShouldComponentUpdate, useOnPropsChanged, isUsingLegacyReactDomRender} from "../../utils/reactUtils";
-const {clone} = Utils;
+const {clone} = Utils.OtherUtils;
 const {getFlatTree} = Utils.TreeUtils;
 
 let _isReorderingTree = false;
