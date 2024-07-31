@@ -16,6 +16,8 @@ export const opDefKeysToOmit = [
 export const isObject = (v) => {
   return typeof v === "object" && v !== null && Object.prototype.toString.call(v) === "[object Object]";
 };
+// export const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
+export const isObjectOrArray = (v) => (typeof v === "object" && v !== null);
 
 export const shallowCopy = (v) => {
   if (typeof v === "object" && v !== null) {

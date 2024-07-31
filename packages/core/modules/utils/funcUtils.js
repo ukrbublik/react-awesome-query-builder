@@ -2,10 +2,8 @@
 import {getFieldConfig, getFuncConfig, getFuncSignature} from "../utils/configUtils";
 import {filterValueSourcesForField, completeValue, selectTypes} from "../utils/ruleUtils";
 import {validateValue} from "../utils/validation";
+import {isObject} from "../utils/stuff";
 import Immutable from "immutable";
-
-// helpers
-const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
 
 /**

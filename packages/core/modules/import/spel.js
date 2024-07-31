@@ -4,8 +4,7 @@ import {getFieldConfig, getFuncConfig, extendConfig, normalizeField, iterateFunc
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultGroupConjunction} from "../utils/defaultUtils";
-import {getOpCardinality, logger, isJsonCompatible} from "../utils/stuff";
-import moment from "moment";
+import {getOpCardinality, logger, isJsonCompatible, isObject} from "../utils/stuff";
 import {compareToSign} from "../export/spel";
 
 // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions
@@ -23,8 +22,6 @@ const SpelPrimitiveClasses = {
 };
 const ListValueType = "multiselect";
 const isFuncableProperty = (p) => ["length"].includes(p);
-
-const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
 export const loadFromSpel = (spelStr, config) => {
   return _loadFromSpel(spelStr, config, true);
