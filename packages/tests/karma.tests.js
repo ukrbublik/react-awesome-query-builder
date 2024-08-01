@@ -7,11 +7,11 @@ Enzyme.configure({adapter: new Adapter()});
 // FILTER YOUR TESTS HERE
 const testsFilter = [
   "QueryWithOperators",
-  "Basic",
+  "OtherUtils",
 ];
 const specFilter = [
   "@sql",
-  "@util"
+  "OtherUtils"
 ];
 
 const origDescribe = describe;
