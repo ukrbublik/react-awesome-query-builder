@@ -611,12 +611,13 @@ interface TreeUtils {
   // case mode
   getSwitchValues(tree: ImmutableTree): Array<any | null>;
 }
-type MixinValue<T = any> =  T | {
-  _v: T,
-  _canCreate?: boolean,
-  _canIgnore?: boolean,
-  _canRewrite?: boolean,
-};
+interface MixinValueExt<T = any> {
+  _v?: T;
+  _type?: string;
+  _canCreate?: boolean;
+  _canChangeType?: boolean;
+}
+type MixinValue<T = any> =  T | MixinValueExt<T>;
 type MixinFlat = Record<string, MixinValue>;
 type MixinObj = Record<string, MixinValue | MixinFlat>;
 interface OtherUtils {
@@ -627,12 +628,12 @@ interface OtherUtils {
     obj: O,
     path: string[],
     newValue: T | undefined | ((old: T) => T),
-    options?: {canCreate?: boolean, canIgnore?: boolean, canRewrite?: boolean }
+    options?: {canCreate?: boolean, canIgnore?: boolean, canChangeType?: boolean }
   ): O;
   mergeIn(
     obj: Record<string, any>,
     mixin: MixinObj,
-    options?: {canCreate?: boolean, canIgnore?: boolean, canRewrite?: boolean }
+    options?: {canCreate?: boolean, canChangeType?: boolean }
   ): Record<string, any>;
   deepFreeze(obj: any): any;
   deepEqual(a: any, b: any): boolean;

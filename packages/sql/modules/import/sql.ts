@@ -55,9 +55,9 @@ export const loadFromSql = (sqlStr: string, config: Config, options?: SqlParseOp
     logger.debug("convertedObj:", convertedObj, meta);
 
     jsTree = convertToTree(convertedObj, conv, extendedConfig, meta);
-    if (jsTree && jsTree.type != "group" && jsTree.type != "switch_group") {
-      jsTree = wrapInDefaultConj(jsTree, extendedConfig, convertedObj["not"]);
-    }
+    // if (jsTree && jsTree.type != "group" && jsTree.type != "switch_group") {
+    //   jsTree = wrapInDefaultConj(jsTree, extendedConfig, convertedObj["not"]);
+    // }
     logger.debug("jsTree:", jsTree);
   }
 
@@ -421,7 +421,7 @@ const processFunc = (expr: SqlFunction, meta: Meta, not = false): OutLogic | und
 const convertToTree = (select: OutSelect | undefined, conv: Conv, config: Config, meta: Meta, parentLogic = null) => {
   if (!select) return undefined;
 
-}
+};
 
 const wrapInDefaultConj = (rule: JsonAnyRule, config: Config, not = false): JsonGroup => {
   return {
