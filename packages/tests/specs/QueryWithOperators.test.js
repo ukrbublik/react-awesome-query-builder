@@ -5,6 +5,9 @@ import { Utils } from "@react-awesome-query-builder/core";
 import { SqlUtils } from "@react-awesome-query-builder/sql";
 import { BasicConfig } from "@react-awesome-query-builder/ui";
 import { expect } from "chai";
+import deepEqualInAnyOrder from "deep-equal-in-any-order";
+chai.use(deepEqualInAnyOrder);
+
 
 describe("query with ops", () => {
   describe("reverseOperatorsForNot == true", () => {

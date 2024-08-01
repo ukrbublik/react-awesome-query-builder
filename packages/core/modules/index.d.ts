@@ -611,10 +611,29 @@ interface TreeUtils {
   // case mode
   getSwitchValues(tree: ImmutableTree): Array<any | null>;
 }
+type MixinValue<T = any> =  T | {
+  _v: T,
+  _canCreate?: boolean,
+  _canIgnore?: boolean,
+  _canRewrite?: boolean,
+};
+type MixinFlat = Record<string, MixinValue>;
+type MixinObj = Record<string, MixinValue | MixinFlat>;
 interface OtherUtils {
   clone(obj: any): any;
   moment: Moment;
   uuid(): string;
+  setIn<O, T = any>(
+    obj: O,
+    path: string[],
+    newValue: T | undefined | ((old: T) => T),
+    options?: {canCreate?: boolean, canIgnore?: boolean, canRewrite?: boolean }
+  ): O;
+  mergeIn(
+    obj: Record<string, any>,
+    mixin: MixinObj,
+    options?: {canCreate?: boolean, canIgnore?: boolean, canRewrite?: boolean }
+  ): Record<string, any>;
   deepFreeze(obj: any): any;
   deepEqual(a: any, b: any): boolean;
   shallowEqual(a: any, b: any, deep?: boolean): boolean;

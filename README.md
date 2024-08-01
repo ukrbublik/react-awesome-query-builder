@@ -105,7 +105,8 @@ From v6 library is divided into packages:
 
 ```mermaid
 graph LR;
-  core((core))-->ui(ui);
+  core-->ui;
+  core-->sql((sql));
   ui-->antd;
   ui-->mui;
   ui-->material;
@@ -530,7 +531,8 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 
   #### `loadFromSql`
   `SqlUtils.loadFromSql (string, config) -> {tree: Immutable, errors: string[]}`  
-  Convert query value from SQL format to internal Immutable format. 
+  Convert query value from SQL format to internal Immutable format.  
+  Requires `@react-awesome-query-builder/sql`. 
 
 ### Save/load config from server
 
