@@ -290,6 +290,7 @@ const operators = {
       const empty = this.utils.sqlEmptyValue(fieldDef);
       return `COALESCE(${field}, ${empty}) = ${empty}`;
     },
+    // tip: operators is_empty / is_null are imported manually from SpEL without using config
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       //tip: is empty or null
       return `${field} <= ''`;

@@ -1,86 +1,35 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
 import {
-  Utils, Config,
-  JsonTree,
-  ImmutableTree,
-  JsonGroup, JsonRule, JsonAnyRule,
+  Utils, Config, JsonTree, ImmutableTree, JsonGroup, JsonAnyRule,
 } from "@react-awesome-query-builder/core";
+import type { Conv, Meta, OutLogic, OutSelect } from "./types";
 import {
   // ext
-  ConjExpr, BinaryExpr, UnaryExpr, AnyExpr, Logic,
-  BaseExpr,
+  ConjExpr, BinaryExpr, UnaryExpr, AnyExpr, Logic, BaseExpr,
   // orig
-  Parser as NodeSqlParser, Option as SqlParseOption, AST,
-  Select, Function as SqlFunction, ExpressionValue, ExprList, LocationRange,
-  ColumnRef,
-  ValueExpr, Value,
-  Case,
-  Interval,
+  Parser as NodeSqlParser, Option as SqlParseOption, AST, Select,
+  Function as SqlFunction, ExpressionValue, ExprList, LocationRange,
+  ColumnRef, ValueExpr, Value, Case, Interval,
 } from "node-sql-parser";
 
-declare module "node-sql-parser" {
-  export interface BaseExpr {
-    parentheses?: boolean;
-  }
-  export interface BinaryExpr extends BaseExpr {
-    type: "binary_expr";
-    operator: string;
-    left: Logic;
-    right: Logic;
-    loc?: LocationRange;
-  }
-  export interface ConjExpr extends BaseExpr {
-    type: "binary_expr";
-    operator: "AND" | "OR";
-    left: Logic;
-    right: Logic;
-    loc?: LocationRange;
-  }
-  export interface UnaryExpr extends BaseExpr {
-    type: "unary_expr";
-    operator: string;
-    expr: Logic;
-  }
-  export type AnyExpr = BinaryExpr | ConjExpr | UnaryExpr | ExprList;
-  export type Logic = AnyExpr | ExpressionValue;
-}
-
-interface Meta {
-  errors: string[];
-}
-interface OutLogic  {
-  parentheses?: boolean;
-  not?: boolean;
-  conj?: string;
-  children?: OutLogic[];
-  field?: string;
-  table?: string;
-  value?: any;
-  valueType?: string;
-  operator?: string;
-  func?: string;
-  _type?: string;
-  unit?: string;
-}
 
 
 
-const isObject = (v: any) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
+const logger = console; // (Utils.OtherUtils as any).logger as typeof console; // todo: at end
 
 export const loadFromSql = (sqlStr: string, config: Config, options?: SqlParseOption): {tree: ImmutableTree | undefined, errors: string[]} => {
-  //meta is mutable
-  const meta: Meta = {
-    errors: []
-  };
-  const logger = console; // (Utils.OtherUtils as any).logger as typeof console; // todo: at end
   const extendedConfig = Utils.ConfigUtils.extendConfig(config, undefined, false);
-  // const conv = buildConv(extendedConfig);
+  const conv = buildConv(extendedConfig);
   let jsTree: JsonTree | undefined;
   let sqlAst: AST | undefined;
-  let convertedObj; // todo
+  let convertedObj: OutSelect | undefined;
+  const meta: Meta = {
+    errors: [], // mutable
+  };
 
+  // Normalize
   if (!options) {
     options = {};
   }
@@ -88,7 +37,6 @@ export const loadFromSql = (sqlStr: string, config: Config, options?: SqlParseOp
     // todo
     options.database = "Postgresql";
   }
-
   if (!sqlStr.startsWith("SELECT ")) {
     sqlStr = "SELECT * FROM t WHERE " + sqlStr;
   }
@@ -106,10 +54,10 @@ export const loadFromSql = (sqlStr: string, config: Config, options?: SqlParseOp
     convertedObj = processAst(sqlAst, meta);
     logger.debug("convertedObj:", convertedObj, meta);
 
-    // jsTree = convertToTree(convertedObj, conv, extendedConfig, meta);
-    // if (jsTree && jsTree.type != "group" && jsTree.type != "switch_group") {
-    //   jsTree = wrapInDefaultConj(jsTree, extendedConfig, convertedObj["not"]);
-    // }
+    jsTree = convertToTree(convertedObj, conv, extendedConfig, meta);
+    if (jsTree && jsTree.type != "group" && jsTree.type != "switch_group") {
+      jsTree = wrapInDefaultConj(jsTree, extendedConfig, convertedObj["not"]);
+    }
     logger.debug("jsTree:", jsTree);
   }
 
@@ -119,10 +67,140 @@ export const loadFromSql = (sqlStr: string, config: Config, options?: SqlParseOp
     tree: immTree,
     errors: meta.errors
   };
-
 };
 
-const processAst = (sqlAst: AST, meta: Meta) => {
+// export const _loadFromSqlAndPrintErrors = (sqlStr: string, config: Config): ImmutableTree => {
+//   const {tree, errors} = loadFromSql(sqlStr, config);
+//   if (errors.length)
+//     console.warn("Errors while importing from SQL:", errors);
+//   return tree;
+// };
+
+///////////////////
+
+const buildConv = (config: Config): Conv => {
+  const operators: Record<string, string[]> = {};
+  for (const opKey in config.operators) {
+    const opConfig = config.operators[opKey];
+    if (opConfig.sqlOps) {
+      // examples: "==", "eq", ".contains", "matches" (can be used for starts_with, ends_with)
+      opConfig.spelOps?.forEach(spelOp => {
+        const opk = spelOp; // + "/" + getOpCardinality(opConfig);
+        if (!operators[opk])
+          operators[opk] = [];
+        operators[opk].push(opKey);
+      });
+    } else if (opConfig.sqlOp) {
+      const opk = opConfig.sqlOp;
+      if (!operators[opk])
+        operators[opk] = [];
+      operators[opk].push(opKey);
+    } else {
+      logger.log(`[sql] No sqlOp for operator ${opKey}`);
+    }
+  }
+
+  const conjunctions: Record<string, string> = {};
+  for (const conjKey in config.conjunctions) {
+    const conjunctionDefinition = config.conjunctions[conjKey];
+    const ck = conjunctionDefinition.spelConj || conjKey.toLowerCase();
+    conjunctions[ck] = conjKey;
+  }
+
+  // let funcs = {};
+  // for (const [funcPath, funcConfig] of iterateFuncs(config)) {
+  //   let fks = [];
+  //   const {spelFunc} = funcConfig;
+  //   if (typeof spelFunc === "string") {
+  //     const optionalArgs = Object.keys(funcConfig.args || {})
+  //       .reverse()
+  //       .filter(argKey => !!funcConfig.args[argKey].isOptional || funcConfig.args[argKey].defaultValue != undefined);
+  //     const funcSignMain = spelFunc
+  //       .replace(/\${(\w+)}/g, (_, _k) => "?");
+  //     const funcSignsOptional = optionalArgs
+  //       .reduce((acc, argKey) => (
+  //         [
+  //           ...acc,
+  //           [
+  //             argKey,
+  //             ...(acc[acc.length-1] || []),
+  //           ]
+  //         ]
+  //       ), [])
+  //       .map(optionalArgKeys => (
+  //         spelFunc
+  //           .replace(/(?:, )?\${(\w+)}/g, (found, a) => (
+  //             optionalArgKeys.includes(a) ? "" : found
+  //           ))
+  //           .replace(/\${(\w+)}/g, (_, _k) => "?")
+  //       ));
+  //     fks = [
+  //       funcSignMain,
+  //       ...funcSignsOptional,
+  //     ];
+  //   }
+  //   for (const fk of fks) {
+  //     if (!funcs[fk])
+  //       funcs[fk] = [];
+  //     funcs[fk].push(funcPath);
+  //   }
+  // }
+
+  // let valueFuncs = {};
+  // for (let w in config.widgets) {
+  //   const widgetDef = config.widgets[w];
+  //   const {spelImportFuncs, type} = widgetDef;
+  //   if (spelImportFuncs) {
+  //     for (const fk of spelImportFuncs) {
+  //       if (typeof fk === "string") {
+  //         const fs = fk.replace(/\${(\w+)}/g, (_, k) => "?");
+  //         const argsOrder = [...fk.matchAll(/\${(\w+)}/g)].map(([_, k]) => k);
+  //         if (!valueFuncs[fs])
+  //           valueFuncs[fs] = [];
+  //         valueFuncs[fs].push({
+  //           w,
+  //           argsOrder
+  //         });
+  //       }
+  //     }
+  //   }
+  // }
+
+  // let opFuncs = {};
+  // for (let op in config.operators) {
+  //   const opDef = config.operators[op];
+  //   const {spelOp} = opDef;
+  //   if (spelOp?.includes("${0}")) {
+  //     const fs = spelOp.replace(/\${(\w+)}/g, (_, k) => "?");
+  //     const argsOrder = [...spelOp.matchAll(/\${(\w+)}/g)].map(([_, k]) => k);
+  //     if (!opFuncs[fs])
+  //       opFuncs[fs] = [];
+  //     opFuncs[fs].push({
+  //       op,
+  //       argsOrder
+  //     });
+  //   }
+  // }
+  // // Special .compareTo()
+  // const compareToSS = compareToSign.replace(/\${(\w+)}/g, (_, k) => "?");
+  // opFuncs[compareToSS] = [{
+  //   op: "!compare",
+  //   argsOrder: ["0", "1"]
+  // }];
+
+  return {
+    operators,
+    conjunctions,
+    // funcs,
+    // valueFuncs,
+    // opFuncs,
+  };
+};
+
+
+///////////////////
+
+const processAst = (sqlAst: AST, meta: Meta): OutSelect => {
   if (sqlAst.type !== "select") {
     meta.errors.push(`Expected SELECT, but got ${sqlAst.type}`);
   }
@@ -337,12 +415,13 @@ const processFunc = (expr: SqlFunction, meta: Meta, not = false): OutLogic | und
   return ret;
 };
 
-// export const _loadFromSqlAndPrintErrors = (sqlStr: string, config: Config): ImmutableTree => {
-//   const {tree, errors} = loadFromSql(sqlStr, config);
-//   if (errors.length)
-//     console.warn("Errors while importing from SQL:", errors);
-//   return tree;
-// };
+
+///////////////////
+
+const convertToTree = (select: OutSelect | undefined, conv: Conv, config: Config, meta: Meta, parentLogic = null) => {
+  if (!select) return undefined;
+
+}
 
 const wrapInDefaultConj = (rule: JsonAnyRule, config: Config, not = false): JsonGroup => {
   return {
