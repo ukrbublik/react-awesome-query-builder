@@ -20,7 +20,7 @@ describe("OtherUtils", () => {
 
     it("can rewrite", () => {
       const bef = {xx: {yy: 22}, x: 2};
-      const aft = Utils.OtherUtils.setIn(bef, ["x", "y"], 11, {canCreate: true, canRewrite: true});
+      const aft = Utils.OtherUtils.setIn(bef, ["x", "y"], 11, {canCreate: true, canChangeType: true});
       expect(bef.xx === aft.xx).to.eq(true);
       expect(aft).to.eql({x: {y: 11}, xx: {yy: 22}});
     });
@@ -99,6 +99,31 @@ describe("OtherUtils", () => {
       expect(aft).to.eql({a: undefined, x: {y: 1, z: undefined}});
     });
 
+    it("respects _canCreate", () => {
+      const bef = {x: {xx: 1}};
+      const aft = Utils.OtherUtils.mergeIn(bef, {x: {add: "add"}, y: {_canCreate: false, add: "add"}, z: {_canCreate: false, _v: "zz"}});
+      expect(aft).to.eql({x: {xx: 1, add: "add"}});
+
+      const aft2 = Utils.OtherUtils.mergeIn(bef, {x: {add: "add"}, y: {_canCreate: true, add: "add"}, z: {_canCreate: true, _v: "zz"}});
+      expect(aft2).to.eql({x: {xx: 1, add: "add"}, y: {add: "add"}, z: "zz"});
+    });
+
+    it("respects _canChangeType", () => {
+      const bef = {x: {xx: 1}, y: ["yy"], z: ["z", "z"]};
+      const aft = Utils.OtherUtils.mergeIn(bef, {x: {_v: ["x"], _canChangeType: false}, y: {_canChangeType: false, add: "add"}, z: ["zz"]});
+      expect(aft).to.eql({x: {xx: 1}, y: ["yy"], z: ["zz", "z"]});
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(bef.x === aft.x).to.eq(true);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(bef.y === aft.y).to.eq(true);
+
+      const aft2 = Utils.OtherUtils.mergeIn(bef, {x: {_v: ["x"], _canChangeType: true}, y: {_canChangeType: true, add: "add"}, z: {_v: ["zz"]}});
+      expect(aft2).to.eql({x: ["x"], y: {add: "add"}, z: ["zz"]});
+
+      const aft3 = Utils.OtherUtils.mergeIn(bef, {x: {_canChangeType: true, _type: "array", 1: "1"}});
+      expect(aft3).to.eql({x: [undefined, "1"], y: ["yy"], z: ["z", "z"]});
+    });
+
     it("respects arrays with _type", () => {
       const bef = {a: [
         {aa: "a"},
@@ -154,5 +179,9 @@ describe("OtherUtils", () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       expect(bef.a[5] === aft.a[5]).to.eql(true);
     });
+
+    //todo: _replace: (old) => (new)
+    //todo: insert in aray ???
+    //todo: find in [] by predicate ??
   });
 });

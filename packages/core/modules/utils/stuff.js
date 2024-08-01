@@ -47,9 +47,9 @@ export const shallowCopy = (v) => {
 };
 
 export const setIn = (obj, path, newValue, {
-  canCreate, canIgnore, canRewrite,
+  canCreate, canIgnore, canChangeType,
 } = {
-  canCreate: false, canIgnore: false, canRewrite: false,
+  canCreate: false, canIgnore: false, canChangeType: false,
 }) => {
   if (!Array.isArray(path)) {
     throw new Error("path is not an array");
@@ -73,7 +73,7 @@ export const setIn = (obj, path, newValue, {
     const expectedType = typeof nextKey === "number" ? "array" : "object";
     if (!isTypeOf(target[k], expectedType)) {
       // value at path has another type
-      if (target[k] ? canRewrite : canCreate) {
+      if (target[k] ? canChangeType : canCreate) {
         target[k] = expectedType === "array" ? [] : {};
       } else if (canIgnore) {
         target = undefined;
@@ -105,9 +105,9 @@ export const setIn = (obj, path, newValue, {
 };
 
 export const mergeIn = (obj, mixin, {
-  canCreate, canIgnore, canRewrite,
+  canCreate, canChangeType,
 } = {
-  canCreate: true, canIgnore: false, canRewrite: true,
+  canCreate: true, canChangeType: true,
 }) => {
   if (!isTypeOf(obj, "object")) {
     throw new Error("obj is not an object");
@@ -117,7 +117,7 @@ export const mergeIn = (obj, mixin, {
   }
 
   const newObj = shallowCopy(obj);
-  const specialKeys = [ "_type", "_v", "_canCreate", "_canRewrite", "_canIgnore" ];
+  const specialKeys = [ "_type", "_v", "_canCreate", "_canChangeType" ];
   let newObjChanged = false;
   const _process = (path, targetMix, target, {isMixingArray, isMixingRealArray} = {}) => {
     let indexDelta = 0;
@@ -127,7 +127,7 @@ export const mergeIn = (obj, mixin, {
       }
       const k = isMixingArray ? Number(mk) + indexDelta : mk;
       const isTargetMixItemObject = isTypeOf(targetMix[mk], "object");
-      let _canCreate = canCreate, _canRewrite = canRewrite, _canIgnore = canIgnore;
+      let _canCreate = canCreate, _canChangeType = canChangeType;
       let targetMixValue = targetMix[mk];
       let isMixValueExplicit = false;
       if (isTargetMixItemObject) {
@@ -136,31 +136,30 @@ export const mergeIn = (obj, mixin, {
           targetMixValue = targetMix[mk]._v;
         }
         _canCreate = targetMix[mk]?._canCreate ?? _canCreate;
-        _canRewrite = targetMix[mk]?._canRewrite ?? _canRewrite;
-        _canIgnore = targetMix[mk]?._canIgnore ?? _canIgnore;
+        _canChangeType = targetMix[mk]?._canChangeType ?? _canChangeType;
       }
       const expectedType = isTargetMixItemObject && targetMix[mk]?._type || typeOf(targetMixValue);
-      //todo: insert in aray ???
-      //todo: find in [] by predicate ??
-      //todo: {widgets: {text: { _v: { type: "overwrite type" }, _replace: (path, old) => (new), _canCreate: false, _canRewrite: false (from {} to []???) }}}
       if (!isTypeOf(target[k], expectedType)) {
         // value at path has another type
-        if (target[k] ? _canRewrite : _canCreate) {
+        if (target[k] ? _canChangeType : _canCreate) {
           if (expectedType === "array" || expectedType === "object") {
             target[k] = expectedType === "array" ? [] : {};
             newObjChanged = true;
           } else {
             // primitive
           }
-        } else if (_canIgnore) {
-          continue;
         } else {
-          throw new Error(`Value by path ${[...path, mk].join(".")} should have type ${expectedType} but got ${typeOf(target[k])}`);
+          continue;
         }
       }
       if (expectedType === "array" || expectedType === "object") {
         // recursive
-        target[k] = shallowCopy(target[k]);
+        if (isMixValueExplicit) {
+          // copy whole object/array from mix instead of merging
+          target[k] = expectedType === "array" ? [] : {};
+        } else {
+          target[k] = shallowCopy(target[k]);
+        }
         _process([...path, mk], targetMixValue, target[k], {
           isMixingArray: expectedType === "array",
           isMixingRealArray: expectedType === "array" && !targetMix[mk]?._type,
