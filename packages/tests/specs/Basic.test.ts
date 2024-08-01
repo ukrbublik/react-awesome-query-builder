@@ -1,11 +1,12 @@
-import { Query, Builder, BasicConfig } from "@react-awesome-query-builder/ui";
+import { Query, Builder, BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 import { AntdConfig } from "@react-awesome-query-builder/antd";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb, empty_value, export_checks } from "../support/utils";
 import { expect } from "chai";
 // warning: don't put `export_checks` inside `it`
-
+import deepEqualInAnyOrder from "deep-equal-in-any-order";
+chai.use(deepEqualInAnyOrder);
 
 describe("library", () => {
   it("should be imported correctly", () => {
@@ -16,6 +17,95 @@ describe("library", () => {
   });
 });
 
+describe("@util", () => {
+  describe("OtherUtils.setIn()", () => {
+    it("throws if path is incorrect", () => {
+      expect(() => Utils.OtherUtils.setIn({}, ["a", "b"], 1)).to.throw();
+      expect(() => Utils.OtherUtils.setIn({}, ["a"], 1)).not.to.throw();
+    });
+
+    it("can create", () => {
+      const bef = {};
+      const aft = Utils.OtherUtils.setIn(bef, ["x", "y"], 11, {canCreate: true});
+      expect(aft).to.eql({x: {y: 11}});
+    });
+
+    it("can rewrite", () => {
+      const bef = {xx: {yy: 22}, x: 2};
+      const aft = Utils.OtherUtils.setIn(bef, ["x", "y"], 11, {canCreate: true, canRewrite: true});
+      expect(bef.xx === aft.xx).to.eq(true);
+      expect(aft).to.eql({x: {y: 11}, xx: {yy: 22}});
+    });
+  });
+
+  describe("OtherUtils.mergeIn()", () => {
+    it("throws", () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      expect(() => Utils.OtherUtils.mergeIn("" as any, {})).to.throw();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      expect(() => Utils.OtherUtils.mergeIn(undefined as any, {})).to.throw();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      expect(() => Utils.OtherUtils.mergeIn({}, undefined as any)).to.throw();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      expect(() => Utils.OtherUtils.mergeIn({}, [])).to.throw();
+    });
+    
+    it("noop if mixin is empty", () => {
+      const bef = {a: "a", x: []};
+      const aft = Utils.OtherUtils.mergeIn(bef, {});
+      expect(aft).to.eql(bef);
+      expect(bef === aft).to.eq(true);
+    });
+
+    it("noop if mixin does nothing", () => {
+      const bef = {a: "a", x: []};
+      const aft = Utils.OtherUtils.mergeIn(bef, {y: undefined});
+      expect(aft).to.eql(bef);
+      expect(bef === aft).to.eq(true);
+    });
+
+    it("noop if deep mixin does nothing", () => {
+      const bef = {a: "a", x: {}};
+      const aft = Utils.OtherUtils.mergeIn(bef, {y: undefined, x: {g: undefined}});
+      expect(aft).to.eql(bef);
+      expect(bef === aft).to.eq(true);
+    });
+
+    it("NOT noop if mixin creates empty {}", () => {
+      const bef = {a: "a", x: {}};
+      const aft = Utils.OtherUtils.mergeIn(bef, {y: undefined, x: {g: {}}});
+      expect(aft).to.eql({a: "a", x: {g: {}}});
+      expect(bef === aft).to.eq(false);
+    });
+
+    it("can overwrite [] to {}", () => {
+      const bef = {a: "a", x: []};
+      const aft = Utils.OtherUtils.mergeIn(bef, {x: {y: "y", z: "z"}});
+      expect(aft).to.eql({a: "a", x: {y: "y", z: "z"}});
+    });
+  
+    it("can overwrite {} to primitive", () => {
+      const bef = {a: "a", x: {}};
+      const aft = Utils.OtherUtils.mergeIn(bef, {x: "x"});
+      expect(aft).to.eql({a: "a", x: "x"});
+    });
+  
+    it("can merge deeply", () => {
+      const bef = {a: "a", x: {y: 1}, z: {zz: {zzz: 3, aaa: 1}}};
+      const aft = Utils.OtherUtils.mergeIn(bef, {z: {zz: {zzz: 4, ddd: 5}}});
+      expect(aft).to.eql({a: "a", x: {y: 1}, z: {zz: {zzz: 4, aaa: 1, ddd: 5}}});
+    });
+  
+    it("can delete key if value is undefined in mixin", () => {
+      const bef = {a: "a", x: {y: 1}, z: {zz: {zzz: {zzzz: 0}, aaa: [1]}}, keeped: [2]};
+      const aft = Utils.OtherUtils.mergeIn(bef, {x: undefined, z: {zz: {zzz: undefined, miss: undefined}}});
+      expect(aft).to.eql({a: "a", z: {zz: {aaa: [1]}}, keeped: [2]});
+      expect(bef.keeped === aft.keeped).to.eq(true);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(bef.z.zz.aaa === aft.z.zz.aaa).to.eq(true);
+    });
+  });
+});
 
 describe("basic query", () => {
 

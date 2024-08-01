@@ -7,7 +7,7 @@ import {
   getOperatorsForField, getWidgetForFieldOp, whatRulePropertiesAreCompleted,
   selectTypes, getValueSourcesForFieldOp,
 } from "../utils/ruleUtils";
-import {getOpCardinality, getFirstDefined, deepEqual} from "../utils/stuff";
+import {getOpCardinality, getFirstDefined, deepEqual, isTypeOf, typeOf} from "../utils/stuff";
 import {getItemInListValues} from "../utils/listValues";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
 import {fixPathsInTree, getItemByPath, getFlatTree} from "../utils/treeUtils";
@@ -17,21 +17,6 @@ import * as constants from "../i18n/validation/constains";
 import { translateValidation } from "../i18n";
 
 export { translateValidation };
-
-const typeOf = (v) => {
-  if (typeof v === "object" && v !== null && Array.isArray(v))
-    return "array";
-  else
-    return (typeof v);
-};
-
-const isTypeOf = (v, type) => {
-  if (typeOf(v) === type)
-    return true;
-  if (type === "number" && !isNaN(v))
-    return true; //can be casted
-  return false;
-};
 
 // tip: If showErrorMessage is false, this function will always return true
 export const isValidTree = (tree, config) => {

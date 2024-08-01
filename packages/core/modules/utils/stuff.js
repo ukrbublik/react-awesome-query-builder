@@ -19,6 +19,21 @@ export const isObject = (v) => {
 // export const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 export const isObjectOrArray = (v) => (typeof v === "object" && v !== null);
 
+export const typeOf = (v) => {
+  if (typeof v === "object" && v !== null && Array.isArray(v))
+    return "array";
+  else
+    return (typeof v);
+};
+
+export const isTypeOf = (v, type) => {
+  if (typeOf(v) === type)
+    return true;
+  if (type === "number" && !isNaN(v))
+    return true; //can be casted
+  return false;
+};
+
 export const shallowCopy = (v) => {
   if (typeof v === "object" && v !== null) {
     if (Array.isArray(v)) {
@@ -28,6 +43,125 @@ export const shallowCopy = (v) => {
     }
   }
   return v;
+};
+
+export const setIn = (obj, path, newValue, {
+  canCreate, canIgnore, canRewrite,
+} = {
+  canCreate: false, canIgnore: false, canRewrite: false,
+}) => {
+  if (!Array.isArray(path)) {
+    throw new Error("path is not an array");
+  }
+  if (!path.length) {
+    throw new Error("path is empty");
+  }
+  const expectedObjType = typeof path[0] === "number" ? "array" : "object";
+  if (!isTypeOf(obj, expectedObjType)) {
+    throw new Error(`obj is not of type ${expectedObjType}`);
+  }
+
+  let newObj = shallowCopy(obj);
+
+  let target = newObj;
+  const pathToTarget = [...path];
+  const targetKey = pathToTarget.pop();
+  const goodPath = [];
+  for (const k of pathToTarget) {
+    const nextKey = path[goodPath.length];
+    const expectedType = typeof nextKey === "number" ? "array" : "object";
+    if (!isTypeOf(target[k], expectedType)) {
+      // value at path has another type
+      if (target[k] ? canRewrite : canCreate) {
+        target[k] = expectedType === "array" ? [] : {};
+      } else if (canIgnore) {
+        target = undefined;
+        newObj = obj; // return initial obj as-is
+        break;
+      } else {
+        throw new Error(`Value by path ${goodPath.join(".")} should have type ${expectedType} but got ${typeOf(target[k])}`);
+      }
+    }
+    goodPath.push(k);
+    target[k] = shallowCopy(target[k]);
+    target = target[k];
+  }
+
+  if (target) {
+    if (newValue === undefined) {
+      delete target[targetKey];
+    } else {
+      const oldValue = target[targetKey];
+      if (typeof newValue === "function") {
+        target[targetKey] = newValue(oldValue);
+      } else {
+        target[targetKey] = newValue;
+      }
+    }
+  }
+
+  return newObj;
+};
+
+export const mergeIn = (obj, mixin, {
+  canCreate, canIgnore, canRewrite,
+} = {
+  canCreate: true, canIgnore: false, canRewrite: true,
+}) => {
+  if (!isTypeOf(obj, "object")) {
+    throw new Error("obj is not an object");
+  }
+  if (!isTypeOf(mixin, "object")) {
+    throw new Error("mixin is not an object");
+  }
+
+  const newObj = shallowCopy(obj);
+  let newObjChanged = false;
+  const _process = (path, targetMix, target) => {
+    for (const k in targetMix) {
+      const targetMixValue = targetMix[k]?._v ?? targetMix[k]; // todo: _replace fn
+      const _canCreate = targetMix[k]?._canCreate ?? canCreate;
+      const _canRewrite = targetMix[k]?._canRewrite ?? canRewrite;
+      const _canIgnore = targetMix[k]?._canIgnore ?? canIgnore; 
+      //todo: find in [] by predicate
+      //todo: {widgets: {text: { _v: { type: "overwrite type" }, _replace: (path, old) => (new), _canCreate: false, _canRewrite: false (from {} to []???) }}}
+      const expectedType = typeOf(targetMixValue);
+      if (!isTypeOf(target[k], expectedType)) {
+        // value at path has another type
+        if (target[k] ? _canRewrite : _canCreate) {
+          if (expectedType === "array" || expectedType === "object") {
+            target[k] = expectedType === "array" ? [] : {};
+            newObjChanged = true;
+          } else {
+            // primitive
+          }
+        } else if (_canIgnore) {
+          continue;
+        } else {
+          throw new Error(`Value by path ${[...path, k].join(".")} should have type ${expectedType} but got ${typeOf(target[k])}`);
+        }
+      }
+      if (expectedType === "object") {
+        // recursive
+        target[k] = shallowCopy(target[k]);
+        _process([...path, k], targetMixValue, target[k]);
+      } else {
+        if (targetMixValue === undefined) {
+          if (k in target) {
+            newObjChanged = true;
+            delete target[k];
+          }
+        } else {
+          newObjChanged = true;
+          target[k] = targetMixValue;
+        }
+      }
+    }
+  };
+
+  _process([], mixin, newObj);
+
+  return newObjChanged ? newObj : obj;
 };
 
 export const omit = (obj, keys) => {

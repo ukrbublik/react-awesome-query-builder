@@ -1,4 +1,4 @@
-import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit, isObject} from "../utils/stuff";
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
 } from "../utils/configUtils";
@@ -6,10 +6,6 @@ import {getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue,
 import {defaultConjunction} from "../utils/defaultUtils";
 import pick from "lodash/pick";
 import {List, Map} from "immutable";
-
-
-// helpers
-const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
 export const mongodbFormat = (tree, config) => {
   return _mongodbFormat(tree, config, false);
