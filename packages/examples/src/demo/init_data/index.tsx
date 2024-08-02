@@ -13,12 +13,13 @@ const { uuid } = Utils;
 export const emptyTree: JsonTree = {id: uuid(), type: "group"};
 export const emptySwitchTree: JsonTree = {id: uuid(), type: "switch_group"};
 
-// todo: try NOT instead of NOT()
-// num NOT = 2
+// todo: 
 // funcs: LENGTH("sql"), LCASE("")/LOWER(""), CONCAT("1", "2"), CONCAT_WS(",", "1", "2"), SUBSTRING("", 1, 1), SUBSTR(), ADDDATE/DATE_ADD
 // json funcs: JSON_VALUE(a, "$.info.address.town")
 // CASE mode: https://www.w3schools.com/sql/sql_case.asp
-const initSqlSimple = "(a = 2 OR NOT(a = 1 OR b > 2) OR g = 2) AND g < 3"; //"NOT (text = 'Long\\nText' AND num <> 2 OR DATE_ADD(NOW(), INTERVAL 2 DAY) > '2024-07-26 00:00:00.000' OR LOWER(user.firstName) = UPPER('gg') OR CONTAINS(prox1, 'NEAR((a, b), 2)'))";
+// 
+const initSqlSimple = " DATE_ADD(NOW(), INTERVAL 2 DAY) > '2024-07-26 00:00:00.000' "; //"NOT (text = 'Long\\nText' AND num <> 2 OR DATE_ADD(NOW(), INTERVAL 2 DAY) > '2024-07-26 00:00:00.000' OR LOWER(user.firstName) = UPPER('gg') OR CONTAINS(prox1, 'NEAR((a, b), 2)'))";
+
 
 export const initFiles: Record<string, any> = {
   "logic/complex": initLogicComplex,

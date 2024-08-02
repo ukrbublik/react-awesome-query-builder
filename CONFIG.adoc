@@ -549,6 +549,7 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2` +
   `useExpr` - true if resulted expression will be wrapped in https://docs.mongodb.com/manual/reference/operator/query/expr/index.html[`{'$expr': {...}}`] (used only if you compare field with another field or function) (you need to use aggregation operators in this case, like https://docs.mongodb.com/manual/reference/operator/aggregation/eq/[$eq (aggregation)] instead of https://docs.mongodb.com/manual/reference/operator/query/eq/[$eq])
 |sqlOp |+ for SQL format | |Operator name in SQL
+|sqlOps |- for SQL format | |Operator names in SQL
 |sqlFormatOp |- for SQL format | |Function for advanced formatting SQL WHERE query when just `sqlOp` is not enough. +
   `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, Object fieldDef) => string` +
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2`

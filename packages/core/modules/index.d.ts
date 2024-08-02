@@ -612,29 +612,45 @@ interface TreeUtils {
   getSwitchValues(tree: ImmutableTree): Array<any | null>;
 }
 interface MixinValueExt<T = any> {
-  _v?: T;
-  _type?: string;
-  _canCreate?: boolean;
-  _canChangeType?: boolean;
+  /**
+   * Symbols:
+   * _v?: T | undefined;
+   * _type?: string;
+   * _canCreate?: boolean;
+   * _canChangeType?: boolean;
+   * _arrayMergeMode?: "join" | "joinMissing" | "joinRespectOrder" | "overwrite" | "merge";
+   */
+  [key: symbol]: boolean | string | T;
+  [key: string]: MixinValue | MixinFlat;
 }
-type MixinValue<T = any> =  T | MixinValueExt<T>;
+type MixinValue<T = any> = T | MixinValueExt<T>;
 type MixinFlat = Record<string, MixinValue>;
 type MixinObj = Record<string, MixinValue | MixinFlat>;
 interface OtherUtils {
   clone(obj: any): any;
   moment: Moment;
   uuid(): string;
+  mergeArraysSmart(arr1: any[], arr2: any[]): any[];
   setIn<O, T = any>(
     obj: O,
     path: string[],
     newValue: T | undefined | ((old: T) => T),
-    options?: {canCreate?: boolean, canIgnore?: boolean, canChangeType?: boolean }
+    options?: {
+      canCreate?: boolean,
+      canIgnore?: boolean,
+      canChangeType?: boolean,
+    }
   ): O;
   mergeIn(
-    obj: Record<string, any>,
+    obj: Record<string, AnyValue>,
     mixin: MixinObj,
-    options?: {canCreate?: boolean, canChangeType?: boolean }
-  ): Record<string, any>;
+    options?: {
+      canCreate?: boolean,
+      canChangeType?: boolean,
+      deepCopyObj?: boolean,
+      arrayMergeMode?: "join" | "joinMissing" | "joinRespectOrder" | "overwrite" | "merge",
+    }
+  ): Record<string, AnyValue>;
   deepFreeze(obj: any): any;
   deepEqual(a: any, b: any): boolean;
   shallowEqual(a: any, b: any, deep?: boolean): boolean;
@@ -1094,6 +1110,7 @@ export interface BaseOperator {
   labelForFormat?: string;
   mongoFormatOp?: MongoFormatOperator | SerializedFunction;
   sqlOp?: string;
+  sqlOps?: string[];
   sqlFormatOp?: SqlFormatOperator | SerializedFunction;
   spelOp?: string;
   spelOps?: string[];
