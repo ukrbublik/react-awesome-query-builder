@@ -6,6 +6,33 @@ chai.use(deepEqualInAnyOrder);
 
 
 describe("OtherUtils", () => {
+  describe("mergeArraysSmart()", () => {
+    it("works 1", () => {
+      expect(Utils.OtherUtils.mergeArraysSmart(
+        [1, 4, 9],
+        [3, 5, 9]
+      )).to.eql(
+        [1, 4, 3, 5, 9]
+      );
+    });
+    it("works 2", () => {
+      expect(Utils.OtherUtils.mergeArraysSmart(
+        [1, 3, 50, 60],
+        [2, 3, 5, 6, 60, 7, 8],
+      )).to.eql(
+        [1, 2, 3, 5, 6, 50, 60, 7, 8]
+      );
+    });
+    it("works 3", () => {
+      expect(Utils.OtherUtils.mergeArraysSmart(
+        [1, 4, 11],
+        [3, 3.5, 4, 5, 9, 10, 11]
+      )).to.eql(
+        [1, 3, 3.5, 4, 5, 9, 10, 11]
+      );
+    });
+  });
+
   describe("setIn()", () => {
     it("throws if path is incorrect", () => {
       expect(() => Utils.OtherUtils.setIn({}, ["a", "b"], 1)).to.throw();
@@ -27,6 +54,20 @@ describe("OtherUtils", () => {
   });
 
   describe("mergeIn()", () => {
+    const $v = Symbol.for("_v");
+    const $type = Symbol.for("_type");
+    const $canCreate = Symbol.for("_canCreate");
+    const $canChangeType = Symbol.for("_canChangeType");
+    //const $arrayMergeMode = Symbol.for("_arrayMergeMode");
+
+    const withCanCreate = (o: any, v = true) => {
+      Object.assign(o, {[$canCreate]: v});
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return o;
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    const withCantCreate = (o: any) => withCanCreate(o, false);
+
     it("throws", () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       expect(() => Utils.OtherUtils.mergeIn("" as any, {})).to.throw();
@@ -82,49 +123,85 @@ describe("OtherUtils", () => {
       const bef = {a: "a", x: {y: 1}, z: {zz: {zzz: 3, aaa: 1}}};
       const aft = Utils.OtherUtils.mergeIn(bef, {z: {zz: {zzz: 4, ddd: 5}}});
       expect(aft).to.eql({a: "a", x: {y: 1}, z: {zz: {zzz: 4, aaa: 1, ddd: 5}}});
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(bef.a === aft.a).to.eq(true);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(bef.x === aft.x).to.eq(true);
+    });
+  
+    it("must clone if deepCopyObj: true", () => {
+      const bef = {a: "a", x: {y: 1}, z: {zz: {zzz: 3, aaa: 1}}};
+      const aft = Utils.OtherUtils.mergeIn(bef, {z: {zz: {zzz: 4, ddd: 5}}}, { deepCopyObj: true });
+      expect(aft).to.eql({a: "a", x: {y: 1}, z: {zz: {zzz: 4, aaa: 1, ddd: 5}}});
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(bef.a === aft.a).to.eq(true);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(bef.x === aft.x).to.eq(false);
     });
   
     it("can delete key if value is undefined in mixin", () => {
-      const bef = {a: "a", x: {y: 1}, z: {zz: {zzz: {zzzz: 0}, aaa: [1]}}, keeped: [2]};
-      const aft = Utils.OtherUtils.mergeIn(bef, {x: undefined, z: {zz: {zzz: undefined, miss: undefined}}});
+      const bef = {
+        a: "a", x: {y: 1}, z: {zz: {zzz: {zzzz: 0}, aaa: [1]}}, keeped: [2]
+      };
+      const aft = Utils.OtherUtils.mergeIn(bef, {
+        x: undefined, z: {zz: {zzz: undefined, miss: undefined}}
+      });
       expect(aft).to.eql({a: "a", z: {zz: {aaa: [1]}}, keeped: [2]});
       expect(bef.keeped === aft.keeped).to.eq(true);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       expect(bef.z.zz.aaa === aft.z.zz.aaa).to.eq(true);
     });
 
-    it("can set undefined value with _v", () => {
+    it("can set undefined value with Symbol.for('_v')", () => {
       const bef = {a: "a", x: {y: 1}};
-      const aft = Utils.OtherUtils.mergeIn(bef, {a: {_v: undefined}, x: {y: 1, z: {_v: undefined}}});
+      const aft = Utils.OtherUtils.mergeIn(bef, {
+        a: {[$v]: undefined}, x: {y: 1, z: {[$v]: undefined}}
+      });
       expect(aft).to.eql({a: undefined, x: {y: 1, z: undefined}});
     });
 
-    it("respects _canCreate", () => {
+    it("respects Symbol.for('_canCreate')", () => {
       const bef = {x: {xx: 1}};
-      const aft = Utils.OtherUtils.mergeIn(bef, {x: {add: "add"}, y: {_canCreate: false, add: "add"}, z: {_canCreate: false, _v: "zz"}});
+      const aft = Utils.OtherUtils.mergeIn(bef, {
+        x: {add: "add"}, y: {[$canCreate]: false, add: "add"}, z: {[$canCreate]: false, [$v]: "zz"}
+      });
       expect(aft).to.eql({x: {xx: 1, add: "add"}});
 
-      const aft2 = Utils.OtherUtils.mergeIn(bef, {x: {add: "add"}, y: {_canCreate: true, add: "add"}, z: {_canCreate: true, _v: "zz"}});
+      const aft2 = Utils.OtherUtils.mergeIn(bef, {
+        x: {add: "add"}, y: {[$canCreate]: true, add: "add"}, z: {[$canCreate]: true, [$v]: "zz"}
+      });
       expect(aft2).to.eql({x: {xx: 1, add: "add"}, y: {add: "add"}, z: "zz"});
+
+      // respects even for array
+      const aft3 = Utils.OtherUtils.mergeIn(bef, {
+        y: withCanCreate([1]), z: withCantCreate([2])
+      });
+      expect(aft3).to.eql({x: {xx: 1}, y: [1]});
     });
 
-    it("respects _canChangeType", () => {
+    it("respects Symbol.for('_canChangeType')", () => {
       const bef = {x: {xx: 1}, y: ["yy"], z: ["z", "z"]};
-      const aft = Utils.OtherUtils.mergeIn(bef, {x: {_v: ["x"], _canChangeType: false}, y: {_canChangeType: false, add: "add"}, z: ["zz"]});
+      const aft = Utils.OtherUtils.mergeIn(bef, {
+        x: {[$v]: ["x"], [$canChangeType]: false}, y: {[$canChangeType]: false, add: "add"}, z: ["zz"]
+      });
       expect(aft).to.eql({x: {xx: 1}, y: ["yy"], z: ["zz", "z"]});
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       expect(bef.x === aft.x).to.eq(true);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       expect(bef.y === aft.y).to.eq(true);
 
-      const aft2 = Utils.OtherUtils.mergeIn(bef, {x: {_v: ["x"], _canChangeType: true}, y: {_canChangeType: true, add: "add"}, z: {_v: ["zz"]}});
+      const aft2 = Utils.OtherUtils.mergeIn(bef, {
+        x: {[$v]: ["x"], [$canChangeType]: true}, y: {[$canChangeType]: true, add: "add"}, z: {[$v]: ["zz"]}
+      });
       expect(aft2).to.eql({x: ["x"], y: {add: "add"}, z: ["zz"]});
 
-      const aft3 = Utils.OtherUtils.mergeIn(bef, {x: {_canChangeType: true, _type: "array", 1: "1"}});
+      const aft3 = Utils.OtherUtils.mergeIn(bef, {
+        x: {[$canChangeType]: true, [$type]: "array", 1: "1"}
+      });
       expect(aft3).to.eql({x: [undefined, "1"], y: ["yy"], z: ["z", "z"]});
     });
 
-    it("respects arrays with _type", () => {
+    it("(deprecated) respects arrays with Symbol.for('_type')", () => {
       const bef = {a: [
         {aa: "a"},
         {bb: "b", cc:
@@ -132,12 +209,12 @@ describe("OtherUtils", () => {
         }
       ]};
       const aft = Utils.OtherUtils.mergeIn(bef, {a: {
-        _type: "array",
+        [$type]: "array",
         0: {aa: "aa"},
         1: {
           bb: "bb",
           cc: {
-            _type: "array",
+            [$type]: "array",
             0: "0",
             1: "1",
             // skip `2`
@@ -180,8 +257,45 @@ describe("OtherUtils", () => {
       expect(bef.a[5] === aft.a[5]).to.eql(true);
     });
 
-    //todo: _replace: (old) => (new)
-    //todo: insert in aray ???
-    //todo: find in [] by predicate ??
+    it("can join arrays with arrayMergeMode: 'join'", () => {
+      const bef = {x: [1, 2, {a: 3}]};
+      const aft = Utils.OtherUtils.mergeIn(bef, {
+        x: [2, {a: 3}, 5]
+      }, {
+        arrayMergeMode: "join",
+      });
+      expect(aft).to.eql({x: [1, 2, {a: 3}, 2, {a: 3}, 5]});
+    });
+
+    it("can join arrays without repeats with arrayMergeMode: 'joinMissing'", () => {
+      const bef = {x: [1, 2, {a: 3}]};
+      const aft = Utils.OtherUtils.mergeIn(bef, {
+        x: [2, {a: 3}, 5]
+      }, {
+        arrayMergeMode: "joinMissing",
+      });
+      expect(aft).to.eql({x: [1, 2, {a: 3}, {a: 3}, 5]});
+    });
+
+    it("can join arrays respecting order with arrayMergeMode: 'joinRespectOrder'", () => {
+      const bef = {x: [1, 4, 9]};
+      const aft = Utils.OtherUtils.mergeIn(bef, {
+        x: [3, 5, 9]
+      }, {
+        arrayMergeMode: "joinRespectOrder",
+      });
+      expect(aft).to.eql({x: [1, 4, 3, 5, 9]});
+    });
+
+    it("can overwrite arrays with arrayMergeMode: 'overwrite'", () => {
+      const bef = {x: [1, 4, 5]};
+      const aft = Utils.OtherUtils.mergeIn(bef, {
+        x: [4, 6, 2]
+      }, {
+        arrayMergeMode: "overwrite",
+      });
+      expect(aft).to.eql({x: [4, 6, 2]});
+    });
+
   });
 });

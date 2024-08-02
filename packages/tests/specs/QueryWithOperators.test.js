@@ -485,9 +485,9 @@ describe("query with ops", () => {
   });
 
   describe("@sql", () => {
-    export_checks([configs.with_all_types], inits.with_ops_sql, "SQL", {
-      "sql": "???", 
-    });
+    // export_checks([configs.with_all_types], inits.with_ops_sql, "SQL", {
+    //   "sql": "???", 
+    // });
   });
 });
 

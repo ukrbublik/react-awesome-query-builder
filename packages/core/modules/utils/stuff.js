@@ -46,11 +46,12 @@ export const shallowCopy = (v) => {
   return v;
 };
 
-export const setIn = (obj, path, newValue, {
-  canCreate, canIgnore, canChangeType,
-} = {
-  canCreate: false, canIgnore: false, canChangeType: false,
-}) => {
+export const setIn = (obj, path, newValue, opts) => {
+  const defaultOpts = {
+    canCreate: false, canIgnore: false, canChangeType: false,
+  };
+  opts = { ...defaultOpts, ...(opts ?? {}) };
+  const { canCreate, canIgnore, canChangeType } = opts;
   if (!Array.isArray(path)) {
     throw new Error("path is not an array");
   }
@@ -104,11 +105,16 @@ export const setIn = (obj, path, newValue, {
   return newObj;
 };
 
-export const mergeIn = (obj, mixin, {
-  canCreate, canChangeType,
-} = {
-  canCreate: true, canChangeType: true,
-}) => {
+export const mergeIn = (obj, mixin, opts) => {
+  const defaultOpts = {
+    canCreate: true, canChangeType: true,
+    deepCopyObj: false, deepCopyMixin: false,
+    arrayMergeMode: "merge", // "merge" | "join" | "joinMissing" | "joinRespectOrder" | "overwrite"
+    circularRefs: false,
+    specialSymbols: true,
+  };
+  opts = { ...defaultOpts, ...(opts ?? {}) };
+  const { deepCopyObj, deepCopyMixin, circularRefs, specialSymbols } = opts;
   if (!isTypeOf(obj, "object")) {
     throw new Error("obj is not an object");
   }
@@ -116,32 +122,45 @@ export const mergeIn = (obj, mixin, {
     throw new Error("mixin is not an object");
   }
 
-  const newObj = shallowCopy(obj);
-  const specialKeys = [ "_type", "_v", "_canCreate", "_canChangeType" ];
+  // symbols
+  const $v = Symbol.for("_v");
+  const $type = Symbol.for("_type");
+  const $canCreate = Symbol.for("_canCreate");
+  const $canChangeType = Symbol.for("_canChangeType");
+  const $arrayMergeMode = Symbol.for("_arrayMergeMode");
+
+  const newObj = deepCopyObj ? clone(obj, circularRefs) : shallowCopy(obj);
   let newObjChanged = false;
-  const _process = (path, targetMix, target, {isMixingArray, isMixingRealArray} = {}) => {
+  const _process = (path, targetMix, target, {
+    isMixingArray, isMixingRealArray,
+  } = {}) => {
     let indexDelta = 0;
     for (const mk in targetMix) {
-      if (specialKeys.includes(mk)) {
-        continue;
-      }
       const k = isMixingArray ? Number(mk) + indexDelta : mk;
-      const isTargetMixItemObject = isTypeOf(targetMix[mk], "object");
-      let _canCreate = canCreate, _canChangeType = canChangeType;
+      const useSymbols = specialSymbols && isObjectOrArray(targetMix[mk]);
+      let canCreate = opts.canCreate, canChangeType = opts.canChangeType, arrayMergeMode = opts.arrayMergeMode;
       let targetMixValue = targetMix[mk];
       let isMixValueExplicit = false;
-      if (isTargetMixItemObject) {
-        if ("_v" in targetMix[mk]) {
+      let expectedType = typeOf(targetMixValue);
+      if (useSymbols) {
+        if ($v in targetMix[mk]) {
           isMixValueExplicit = true;
-          targetMixValue = targetMix[mk]._v;
+          targetMixValue = targetMix[mk][$v];
         }
-        _canCreate = targetMix[mk]?._canCreate ?? _canCreate;
-        _canChangeType = targetMix[mk]?._canChangeType ?? _canChangeType;
+        expectedType = targetMix[mk]?.[$type] || typeOf(targetMixValue);
+        canCreate = targetMix[mk]?.[$canCreate] ?? canCreate;
+        canChangeType = targetMix[mk]?.[$canChangeType] ?? canChangeType;
+        arrayMergeMode = targetMix[mk]?.[$arrayMergeMode] ?? arrayMergeMode;
+        if (expectedType === "array" && arrayMergeMode === "overwrite") {
+          isMixValueExplicit = true;
+        }
       }
-      const expectedType = isTargetMixItemObject && targetMix[mk]?._type || typeOf(targetMixValue);
+      if (expectedType !== "array") {
+        arrayMergeMode = undefined;
+      }
       if (!isTypeOf(target[k], expectedType)) {
         // value at path has another type
-        if (target[k] ? _canChangeType : _canCreate) {
+        if (target[k] ? canChangeType : canCreate) {
           if (expectedType === "array" || expectedType === "object") {
             target[k] = expectedType === "array" ? [] : {};
             newObjChanged = true;
@@ -153,17 +172,35 @@ export const mergeIn = (obj, mixin, {
         }
       }
       if (expectedType === "array" || expectedType === "object") {
-        // recursive
         if (isMixValueExplicit) {
-          // copy whole object/array from mix instead of merging
-          target[k] = expectedType === "array" ? [] : {};
+          // deep copy from mix to target
+          newObjChanged = true;
+          target[k] = deepCopyMixin ? clone(targetMixValue, circularRefs) : shallowCopy(targetMixValue);
         } else {
-          target[k] = shallowCopy(target[k]);
+          if (arrayMergeMode && ["join", "joinMissing", "joinRespectOrder"].includes(arrayMergeMode)) {
+            // join 2 arrays
+            newObjChanged = true;
+            const left = (deepCopyObj ? target[k] : clone(target[k], circularRefs));
+            let right = (deepCopyMixin ? clone(targetMixValue, circularRefs) : targetMixValue);
+            if (arrayMergeMode === "joinRespectOrder") {
+              target[k] = mergeArraysSmart(left, right);
+            } else {
+              if (arrayMergeMode === "joinMissing") {
+                right = right.filter(v => !left.includes(v));
+              }
+              target[k] = [ ...left, ...right ];
+            }
+          } else {
+            // recursive merge
+            if (!deepCopyObj) {
+              target[k] = shallowCopy(target[k]);
+            }
+            _process([...path, mk], targetMixValue, target[k], {
+              isMixingArray: expectedType === "array",
+              isMixingRealArray: expectedType === "array" && !targetMix[mk]?.[$type],
+            });
+          }
         }
-        _process([...path, mk], targetMixValue, target[k], {
-          isMixingArray: expectedType === "array",
-          isMixingRealArray: expectedType === "array" && !targetMix[mk]?._type,
-        });
       } else {
         const needDelete = targetMixValue === undefined && !isMixingRealArray && !isMixValueExplicit;
         const valueExists = (k in target);
@@ -401,30 +438,42 @@ export function mergeArraysSmart(arr1, arr2) {
     .map(([op, ind], i, orig) => {
       if (ind == -1) {
         const next = orig.slice(i+1);
-        const prev = orig.slice(0, i);
-        const after = prev.reverse().find(([_cop, ci]) => ci != -1);
+        const prevs = orig.slice(0, i);
+        const after = [...prevs].reverse().find(([_cop, ci]) => ci != -1);
+        const prev = prevs[prevs.length - 1];
         const before = next.find(([_cop, ci]) => ci != -1);
-        if (before)
-          return [op, "before", before[0]];
-        else if (after)
+        const isAfterDirectly = after && after === prevs[prevs.length-1];
+        const isBeforeDirectly = before && next === next[0];
+        if (isAfterDirectly) {
           return [op, "after", after[0]];
-        else
+        } else if (isBeforeDirectly) {
+          return [op, "before", before[0]];
+        } else if (after) {
+          if (prev) {
+            return [op, "after", prev[0]];
+          }
+          return [op, "after", after[0]];
+        } else if (before) {
+          return [op, "before", before[0]];
+        } else {
           return [op, "append", null];
+        }
       } else {
-      // already exists
+        // already exists
         return null;
       }
     })
     .filter(x => x !== null)
     .reduce((acc, [newOp, rel, relOp]) => {
       const ind = acc.indexOf(relOp);
-      if (acc.indexOf(newOp) == -1) {
+      if (acc.indexOf(newOp) === -1) {
         if (ind > -1) {
-        // insert after or before
-          acc.splice( ind + (rel == "after" ? 1 : 0), 0, newOp );
+          // insert after or before
+          const offset = (rel === "after" ? 1 : 0);
+          acc.splice( ind + offset, 0, newOp );
         } else {
-        // insert to end or start
-          acc.splice( (rel == "append" ? Infinity : 0), 0, newOp );
+          // insert to end or start
+          acc.splice( (rel === "append" ? Infinity : 0), 0, newOp );
         }
       }
       return acc;

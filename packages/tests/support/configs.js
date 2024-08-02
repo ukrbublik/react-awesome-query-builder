@@ -111,6 +111,7 @@ export const without_less_format = (BasicConfig) => ({
     less: {
       ...BasicConfig.operators.less,
       sqlOp: null,
+      sqlOps: null,
       spelOp: null,
       spelOps: null,
       formatOp: null,
