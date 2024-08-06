@@ -6,12 +6,12 @@ Enzyme.configure({adapter: new Adapter()});
 
 // FILTER YOUR TESTS HERE
 const testsFilter = [
-  "QueryWithOperators",
-  "OtherUtils",
+  // "QueryWithOperators",
+  // "OtherUtils",
 ];
 const specFilter = [
-  "@sql",
-  "OtherUtils"
+  // "@sql",
+  // "OtherUtils"
 ];
 
 const origDescribe = describe;
