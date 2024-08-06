@@ -482,7 +482,7 @@ const convertFuncRhs = (op, vals, conv, config, not, fieldConfig = null, meta, p
       if (fc.jsonLogicImport && (returnType ? fc.returnType == returnType : true)) {
         let parsed;
         try {
-          parsed = fc.jsonLogicImport(v);
+          parsed = fc.jsonLogicImport.call(config.ctx, v);
         } catch(_e) {
           // given expression `v` can't be parsed into function
         }

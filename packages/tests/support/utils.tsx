@@ -207,9 +207,9 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
   let tree: ImmutableTree | undefined;
   if (valueFormat === "JsonLogic") {
     [tree, errors] = _loadFromJsonLogic(value, config);
-  } else if (valueFormat == "SQL") {
+  } else if (valueFormat === "SQL") {
     ({tree, errors} = SqlUtils.loadFromSql(value as string, config));
-  } else if (valueFormat == "SpEL") {
+  } else if (valueFormat === "SpEL") {
     [tree, errors] = loadFromSpel(value as string, config);
   } else {
     tree = loadTree(value as JsonTree);
@@ -702,7 +702,8 @@ export const export_checks = (
 
 export const export_checks_in_it = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports, options?: DoOptions) => {
   const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
-  const config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
+  let config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
+  config = SqlUtils.mixinConfigForSql(config);
 
   const {tree, errors} = load_tree(value, config, valueFormat);
   if (errors?.length) {
