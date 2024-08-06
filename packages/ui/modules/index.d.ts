@@ -61,6 +61,7 @@ import {
   CoreOperators as _CoreOperators,
   CoreWidgets as _CoreWidgets,
   ConfigMixin as _ConfigMixin,
+  ConfigMixinExt as _ConfigMixinExt,
   ImmutableItem,
 } from "@react-awesome-query-builder/core";
 
@@ -113,7 +114,8 @@ export type TreeMultiSelectWidgetProps<C = Config> = _TreeMultiSelectWidgetProps
 export type CaseValueWidgetProps<C = Config> = _CaseValueWidgetProps<C>;
 export type CoreOperators<C = Config> = _CoreOperators<C>;
 export type CoreWidgets<C = Config> = _CoreWidgets<C>;
-export type ConfigMixin<C extends {settings: any} = Config> = _ConfigMixin<C>;
+export type ConfigMixin<C extends Config = Config> = _ConfigMixin<C>;
+export type ConfigMixinExt<C extends Config = Config> = _ConfigMixinExt<C>;
 
 /////////////////
 // extend config

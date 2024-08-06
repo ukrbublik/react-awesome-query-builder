@@ -3,13 +3,16 @@ import SqlStringOrig from "sqlstring";
 export const SqlString = SqlStringOrig;
 
 SqlString.trim = (val) => {
-  if (val.charAt(0) == "'")
+  if (val?.charAt(0) == "'")
     return val.substring(1, val.length-1);
   else
     return val;
 };
 
 SqlString.escapeLike = (val, any_start = true, any_end = true) => {
+  if (typeof val !== "string") {
+    return val;
+  }
   // normal escape
   let res = SqlString.escape(val);
   // unwrap ''

@@ -418,9 +418,10 @@ const processFunc = (expr: SqlFunction, meta: Meta, not = false): OutLogic | und
 
 ///////////////////
 
-const convertToTree = (select: OutSelect | undefined, conv: Conv, config: Config, meta: Meta, parentLogic = null) => {
+const convertToTree = (select: OutSelect | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonTree | undefined => {
   if (!select) return undefined;
-
+  parentLogic; // todo
+  return undefined;
 };
 
 const wrapInDefaultConj = (rule: JsonAnyRule, config: Config, not = false): JsonGroup => {

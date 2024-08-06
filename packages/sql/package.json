@@ -35,6 +35,7 @@
     "lint": "npm run eslint && npm run tsc-lint",
     "lint-fix": "eslint --ext .js --ext .ts --fix  ./modules/",
     "prepare": "npm run build",
+    "tsc": "npm run tsc-lint",
     "tsc-lint": "tsc -p . --noEmit",
     "tsc-emit-types": "tsc -p . --declaration --emitDeclarationOnly --declarationDir types",
     "tsc-emit-esm": "tsc -p . --outDir esm",
@@ -46,6 +47,7 @@
     "node-sql-parser": "^5.2.0"
   },
   "devDependencies": {
+    "@react-awesome-query-builder/core": "workspace:^",
     "@babel/cli": "^7.24.7",
     "@babel/core": "^7.24.5",
     "@babel/plugin-transform-class-properties": "^7.24.1",

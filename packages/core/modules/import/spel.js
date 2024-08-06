@@ -856,7 +856,7 @@ const convertFunc = (spel, conv, config, meta, parentSpel = null) => {
       if (fc.spelImport) {
         let parsed;
         try {
-          parsed = fc.spelImport(spel);
+          parsed = fc.spelImport.call(config.ctx, spel);
         } catch(_e) {
           // can't be parsed
         }

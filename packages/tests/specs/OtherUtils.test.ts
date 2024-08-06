@@ -60,13 +60,15 @@ describe("OtherUtils", () => {
     const $canChangeType = Symbol.for("_canChangeType");
     //const $arrayMergeMode = Symbol.for("_arrayMergeMode");
 
-    const withCanCreate = (o: any, v = true) => {
-      Object.assign(o, {[$canCreate]: v});
+    function withCanCreate<T>(o: T, v = true): T {
+      Object.assign(o as Object, {[$canCreate]: v});
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return o;
-    };
+    }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    const withCantCreate = (o: any) => withCanCreate(o, false);
+    function withCantCreate<T>(o: T): T {
+      return withCanCreate(o, false);
+    }
 
     it("throws", () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -76,6 +78,7 @@ describe("OtherUtils", () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       expect(() => Utils.OtherUtils.mergeIn({}, undefined as any)).to.throw();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      // @ts-ignore
       expect(() => Utils.OtherUtils.mergeIn({}, [])).to.throw();
     });
     
