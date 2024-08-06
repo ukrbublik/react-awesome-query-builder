@@ -41,6 +41,7 @@ export interface Conv {
 
 export interface Meta {
   errors: string[];
+  convertedObj?: OutSelect;
 }
 
 export interface OutLogic  {

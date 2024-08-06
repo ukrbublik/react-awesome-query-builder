@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
 import {
-  Utils, Config, JsonTree, ImmutableTree, JsonGroup, JsonAnyRule,
+  Utils, Config, JsonTree, ImmutableTree, JsonGroup, JsonAnyRule, JsonRule, PartialPartial,
+  RuleProperties,
+  ValueSource,
 } from "@react-awesome-query-builder/core";
 import type { Conv, Meta, OutLogic, OutSelect } from "./types";
 import {
@@ -53,8 +55,9 @@ export const loadFromSql = (sqlStr: string, config: Config, options?: SqlParseOp
   if (sqlAst) {
     convertedObj = processAst(sqlAst, meta);
     logger.debug("convertedObj:", convertedObj, meta);
+    meta.convertedObj = convertedObj;
 
-    jsTree = convertToTree(convertedObj, conv, extendedConfig, meta);
+    jsTree = convertToTree(convertedObj?.where, conv, extendedConfig, meta);
     // if (jsTree && jsTree.type != "group" && jsTree.type != "switch_group") {
     //   jsTree = wrapInDefaultConj(jsTree, extendedConfig, convertedObj["not"]);
     // }
@@ -84,8 +87,8 @@ const buildConv = (config: Config): Conv => {
     const opConfig = config.operators[opKey];
     if (opConfig.sqlOps) {
       // examples: "==", "eq", ".contains", "matches" (can be used for starts_with, ends_with)
-      opConfig.spelOps?.forEach(spelOp => {
-        const opk = spelOp; // + "/" + getOpCardinality(opConfig);
+      opConfig.sqlOps?.forEach(sqlOp => {
+        const opk = sqlOp; // + "/" + getOpCardinality(opConfig);
         if (!operators[opk])
           operators[opk] = [];
         operators[opk].push(opKey);
@@ -418,9 +421,83 @@ const processFunc = (expr: SqlFunction, meta: Meta, not = false): OutLogic | und
 
 ///////////////////
 
-const convertToTree = (select: OutSelect | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonTree | undefined => {
-  if (!select) return undefined;
-  parentLogic; // todo
+const convertToTree = (logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonRule | JsonGroup | undefined => {
+  if (!logic) return undefined;
+
+  let res;
+  if (logic.operator) {
+    res = convertOp(logic, conv, config, meta, undefined);
+  } else if (logic.conj) {
+    res = convertConj(logic, conv, config, meta, undefined);
+  }
+  // todo
+  return res;
+};
+
+const convertConj = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonGroup => {
+  const { conj, children } = logic;
+  const conjunction = conj!; // todo: conj conv
+  const convChildren = (children || []).map(a => convertToTree(a, conv, config, meta, logic)).filter(c => !!c) as JsonGroup[];
+  return {
+    type: "group",
+    properties: {
+      conjunction,
+      not: logic.not,
+    },
+    children1: convChildren,
+  };
+};
+
+const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonRule => {
+  const { operator, children } = logic;
+  // todo: operator conv
+  const opKey = conv.operators[operator!][0];
+  const [left, ...right] = (children || []).map(a => convertArg(a, conv, config, meta, logic)).filter(c => !!c);
+  // todo: 2 right for between
+  const properties: RuleProperties = {
+    operator: opKey,
+    value: [],
+    valueSrc: [],
+    valueType: [],
+    field: undefined,
+  };
+  if (left?.valueSrc === "field") {
+    properties.field = left.value;
+    properties.fieldSrc = "field";
+  }
+  // todo: left/right can be func
+  right.forEach((v, i) => {
+    if (v) {
+      properties.valueSrc![i] = v?.valueSrc as ValueSource;
+      properties.valueType![i] = v?.valueType!;
+      properties.value[i] = v?.value;
+    }
+  });
+  return {
+    type: "rule",
+    properties,
+  };
+};
+
+const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic) => {
+  const { fieldSeparator } = config.settings;
+  if (logic?.valueType) {
+    const valueType = undefined; // todo
+    const value = logic.value; // todo: convert ?
+    return {
+      valueSrc: "value",
+      valueType,
+      value,
+    };
+  } else if (logic?.field) {
+    const valueType = undefined; // todo
+    const value = [logic.table, logic.field].filter(v => !!v).join(fieldSeparator);
+    return {
+      valueSrc: "field",
+      valueType,
+      value,
+    };
+  }
   return undefined;
 };
 
