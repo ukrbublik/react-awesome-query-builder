@@ -2,8 +2,13 @@
 
 import {
   Utils, Config, JsonTree, ImmutableTree, JsonGroup, JsonAnyRule, JsonRule, PartialPartial,
+  FieldConfigExt,
   RuleProperties,
   ValueSource,
+  JsonSwitchGroup,
+  JsonCaseGroup,
+  CaseGroupProperties,
+  BaseWidget,
 } from "@react-awesome-query-builder/core";
 import type { Conv, Meta, OutLogic, OutSelect } from "./types";
 import {
@@ -13,6 +18,7 @@ import {
   Parser as NodeSqlParser, Option as SqlParseOption, AST, Select,
   Function as SqlFunction, ExpressionValue, ExprList, LocationRange,
   ColumnRef, ValueExpr, Value, Case, Interval,
+  Column,
 } from "node-sql-parser";
 
 
@@ -57,10 +63,7 @@ export const loadFromSql = (sqlStr: string, config: Config, options?: SqlParseOp
     logger.debug("convertedObj:", convertedObj, meta);
     meta.convertedObj = convertedObj;
 
-    jsTree = convertToTree(convertedObj?.where, conv, extendedConfig, meta);
-    // if (jsTree && jsTree.type != "group" && jsTree.type != "switch_group") {
-    //   jsTree = wrapInDefaultConj(jsTree, extendedConfig, convertedObj["not"]);
-    // }
+    jsTree = convertToTree(convertedObj?.where ?? convertedObj?.select, conv, extendedConfig, meta, undefined, true) as JsonTree;
     logger.debug("jsTree:", jsTree);
   }
 
@@ -207,13 +210,17 @@ const processAst = (sqlAst: AST, meta: Meta): OutSelect => {
   if (sqlAst.type !== "select") {
     meta.errors.push(`Expected SELECT, but got ${sqlAst.type}`);
   }
-  if (!(sqlAst as Select).where) {
-    meta.errors.push("WHERE is missing");
-  }
   const select = sqlAst as Select;
   const pWhere = processLogic(select.where, meta);
+  const selectExpr = ((select.columns ?? []) as Column[]).find(c => c.type === "expr");
+  const pSelectExpr = processLogic(selectExpr?.expr as Logic, meta);
+  const hasLogic = select.where || selectExpr?.expr;
+  if (!hasLogic) {
+    meta.errors.push("No logic found in WHERE/SELECT");
+  }
   return {
     where: pWhere,
+    select: pSelectExpr,
   };
 };
 
@@ -374,6 +381,23 @@ const processField = (expr: ColumnRef, meta: Meta, not = false): OutLogic | unde
   };
 };
 
+const flatizeTernary = (children: OutLogic[], meta: Meta) => {
+  const flat: [OutLogic | undefined, OutLogic][] = [];
+  function _processTernaryChildren(tern: OutLogic[]) {
+    const [cond, if_val, else_val] = tern;
+    if (if_val.func === "IF") {
+      meta.errors.push("Unexpected IF inside IF");
+    }
+    flat.push([cond, if_val]);
+    if (else_val?.func === "IF") {
+      _processTernaryChildren(else_val?.children!);
+    } else {
+      flat.push([undefined, else_val]);
+    }
+  }
+  _processTernaryChildren(children);
+  return flat;
+};
 
 const processFunc = (expr: SqlFunction, meta: Meta, not = false): OutLogic | undefined => {
   const nameType = expr.name.name[0].type as string;
@@ -405,12 +429,16 @@ const processFunc = (expr: SqlFunction, meta: Meta, not = false): OutLogic | und
     ret = args[0];
   } else if (nameType === "default") {
     const useNot = false;
+    const flatizeArgs = firstName === "IF";
     const args = getArgs(useNot);
     ret = {
       func: firstName,
       children: args,
       not: useNot ? undefined : not,
     };
+    if (flatizeArgs) {
+      ret.ternaryChildren = flatizeTernary(args, meta);
+    }
     return ret;
   } else {
     meta.errors.push(`Unexpected function name ${JSON.stringify(expr.name.name)}`);
@@ -421,17 +449,86 @@ const processFunc = (expr: SqlFunction, meta: Meta, not = false): OutLogic | und
 
 ///////////////////
 
-const convertToTree = (logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonRule | JsonGroup | undefined => {
+const convertToTree = (
+  logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic, returnGroup = false
+): JsonRule | JsonGroup | JsonSwitchGroup | JsonCaseGroup | undefined => {
   if (!logic) return undefined;
 
   let res;
   if (logic.operator) {
-    res = convertOp(logic, conv, config, meta, undefined);
+    res = convertOp(logic, conv, config, meta, parentLogic);
   } else if (logic.conj) {
-    res = convertConj(logic, conv, config, meta, undefined);
+    res = convertConj(logic, conv, config, meta, parentLogic);
+  } else if (logic.ternaryChildren) {
+    res = convertTernary(logic, conv, config, meta, parentLogic);
   }
+  // todo: case ?
+
   // todo
+
+  if (returnGroup && res && res.type != "group" && res.type != "switch_group") {
+    res = wrapInDefaultConj(res, config, logic.not);
+  }
+
   return res;
+};
+
+const convertTernary = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonSwitchGroup => {
+  const { ternaryChildren } = logic;
+  const cases = (ternaryChildren ?? []).map(([cond, val]) => {
+    return buildCase(cond, val, conv, config, meta, logic);
+  }) as JsonCaseGroup[];
+  return {
+    type: "switch_group",
+    children1: cases,
+  };
+};
+
+const buildCase = (cond: OutLogic | undefined, val: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonCaseGroup | undefined => {
+  const valProperties = buildCaseValProperties(config, meta, conv, val, parentLogic);
+
+  let caseI: JsonCaseGroup | undefined;
+  if (cond) {
+    caseI = convertToTree(cond, conv, config, meta, parentLogic, true) as JsonCaseGroup;
+    if (caseI && caseI.type) {
+      caseI.type = "case_group";
+    } else {
+      meta.errors.push(`Unexpected case: ${JSON.stringify(caseI)}`);
+      caseI = undefined;
+    }
+  } else {
+    caseI = {
+      type: "case_group",
+      properties: {}
+    };
+  }
+
+  if (caseI) {
+    caseI.properties = {
+      ...caseI.properties,
+      ...valProperties,
+    };
+  }
+
+  return caseI;
+};
+
+const buildCaseValProperties = (config: Config, meta: Meta, conv: Conv, val: OutLogic, parentLogic?: OutLogic): CaseGroupProperties => {
+  const caseValueFieldConfig = Utils.ConfigUtils.getFieldConfig(config, "!case_value") as FieldConfigExt;
+  const widget = caseValueFieldConfig?.mainWidget!;
+  const widgetConfig = config.widgets[widget] as BaseWidget;
+  const convVal = convertArg(val, conv, config, meta, parentLogic)!;
+  if (convVal && convVal.valueSrc === "value") {
+    // @ts-ignore
+    convVal.valueType = (widgetConfig.type || caseValueFieldConfig.type || convVal.valueType);
+  }
+  const valProperties = {
+    value: [convVal.value],
+    valueSrc: [convVal.valueSrc as ValueSource],
+    valueType: [convVal.valueType! as string],
+    field: "!case_value",
+  };
+  return valProperties;
 };
 
 const convertConj = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonGroup => {

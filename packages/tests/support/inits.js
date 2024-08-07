@@ -1720,6 +1720,8 @@ export const spel_with_cases = "(str == '222' ? is_string : (num == 4 ? is_numbe
 export const spel_with_cases_simple = "(str == '222' ? foo : bar)";
 export const spel_with_cases_and_concat = "(str == '222' ? foo : foo + bar)";
 
+export const sql_with_cases = "IF(str = '222', 'is_string', IF(num = 4, 'is_number', 'unknown'))";
+
 export const with_cases = {"if": [
   {"==":[{"var":"str"},"222"]},
   "is_string",
