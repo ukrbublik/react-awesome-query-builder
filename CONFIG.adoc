@@ -19,6 +19,7 @@ endif::[]
 :renderSwitch: https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/antd/modules/config/index.jsx#L54
 :config_ser:   https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/sandbox_next/lib/config_ser.js
 :d_ts:         https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/core/modules/index.d.ts
+:ts-pattern:   https://github.com/gvergnaud/ts-pattern
 
 = Config format
 
@@ -37,7 +38,7 @@ Optionally you can override some options in basic config or add your own types/w
 There are functions for building query string: `formatConj`, `formatValue`, `formatOp`, `formatField`, `formatFunc` which are used for `QbUtils.queryString()`. +
 They have common param `isForDisplay` - false by default, true will be used for {queryString}[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc`, `mongoFormatFunc`, `mongoArgsAsObject` for building MongoDb query with `QbUtils.mongodbFormat()`. +
-And `sqlFormatConj`, `sqlOp`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `formatSpelField`, `sqlFunc`, `sqlFormatFunc` for building SQL where query with `QbUtils.sqlFormat()`. +
+And `sqlFormatConj`, `sqlOp`, `sqlOps`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `formatSpelField`, `sqlFunc`, `sqlFormatFunc`, `sqlImport` for building SQL where query with `QbUtils.sqlFormat()`. +
 And `spelFormatConj`, `spelOp`, `spelFormatOp`, `spelFormatValue`, `spelFormatReverse`, `spelFunc`, `spelFormatFunc` for building query in (https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)[Spring Expression Language (SpEL)] with `QbUtils.spelFormat()`. +
 And `jsonLogic` for building http://jsonlogic.com[JsonLogic] with `QbUtils.jsonLogicFormat()`. +
 
@@ -769,6 +770,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |sqlFunc |- for SQL format |same as func key |Func name in SQL
 |sqlFormatFunc |- for SQL format | |Can be used instead of `sqlFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression string. +
   Example: SUM function can be formatted with `({a, b}) => a + " + " + b`
+|sqlImport | | |Function to convert given raw SQL value (not string, but object got from `node-sql-parser`) to object of arguments of current function. If given expression can't be parsed into current function, throw an error.
 |spelFunc |- for SpEL format |same as func key |Func name in SpEL
 |spelFormatFunc |- for SpEL format | |Can be used instead of `spelFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression string. +
   Example: SUM function can be formatted with `({a, b}) => a + " + " + b`
@@ -777,7 +779,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |mongoFormatFunc |- for MongoDB format | |Can be used instead of `mongoFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression object.
 |jsonLogic |+ for http://jsonlogic.com[JsonLogic] | |String (function name) or function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression for JsonLogic.
 |jsonLogicImport | | |Function to convert given JsonLogic expression to array of arguments of current function. If given expression can't be parsed into current function, throw an error.
-|spelImport | | |Function to convert given raw SpEL value to array of arguments of current function. If given value can't be parsed into current function, throw an error.
+|spelImport | | |Function to convert given raw SpEL value to object of arguments of current function. If given value can't be parsed into current function, throw an error or return undefined.
 |args.* | | |Arguments of function. Config is almost same as for simple link:#configfields[fields]
 |args.<arg>.label | |arg's key |Label to be displayed in arg's label or placeholder (if `config.settings.showLabels` is false)
 |args.<arg>.type |+ | |One of types described in link:#configtypes[config.types]
