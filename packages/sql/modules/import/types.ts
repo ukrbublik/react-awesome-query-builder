@@ -49,6 +49,7 @@ export interface OutLogic  {
   not?: boolean;
   conj?: string;
   children?: OutLogic[];
+  ternaryChildren?: [OutLogic | undefined, OutLogic][];
   field?: string;
   table?: string;
   value?: any;
@@ -61,4 +62,5 @@ export interface OutLogic  {
 
 export interface OutSelect {
   where?: OutLogic;
+  select?: OutLogic;
 }

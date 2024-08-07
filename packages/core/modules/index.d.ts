@@ -558,7 +558,7 @@ interface ConfigUtils {
   decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
   compileConfig(config: Config): Config;
   extendConfig(config: Config, configId?: string, canCompile?: boolean): Config;
-  getFieldConfig(config: Config, field: AnyFieldValue): FieldConfig;
+  getFieldConfig(config: Config, field: AnyFieldValue): FieldConfig | null;
   getFuncConfig(config: Config, func: string): Func | null;
   getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
   getOperatorConfig(config: Config, operator: string, field?: AnyFieldValue): Operator | null;
@@ -1373,8 +1373,11 @@ export type Field = SimpleField;
 export type FieldOrGroup = FieldStruct | FieldGroup | FieldGroupExt | Field;
 export type Fields = TypedMap<FieldOrGroup>;
 
-export type FieldConfig = Field | Func | null;
-export type FieldValueOrConfig = FieldConfig | AnyFieldValue;
+export type FieldConfig = Field | Func;
+export type FieldValueOrConfig = FieldConfig | AnyFieldValue | null;
+
+export type FieldConfigExt = Field & Type;
+export type FuncConfigExt = Func & Type;
 
 export type NumberField = SimpleField<NumberFieldSettings>;
 export type DateTimeField = SimpleField<DateTimeFieldSettings>;
