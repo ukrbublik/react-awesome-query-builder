@@ -570,6 +570,8 @@ interface ConfigUtils {
   isDirtyJSX(jsx: any): boolean;
   cleanJSX(jsx: any): Object;
   applyJsonLogic(logic: any, data?: any): any;
+  iterateFuncs(config: Config): Iterable<[funcPath: string, funcConfig: Func]>;
+  iterateFields(config: Config): Iterable<[fieldPath: string, fieldConfig: Field]>;
 }
 interface DefaultUtils {
   getDefaultField(config: Config, canGetFirst?: boolean, parentRuleGroupPath?: IdPath): FieldValueI | null;
@@ -1510,11 +1512,12 @@ export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettin
 /////////////////
 
 type SqlFormatFunc        = (this: ConfigContext, formattedArgs: TypedMap<string>) => string;
+type SqlImportFunc        = (this: ConfigContext, sql: Object) => Record<string, RuleValue> | undefined; // can throw
 type FormatFunc           = (this: ConfigContext, formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
 type MongoFormatFunc      = (this: ConfigContext, formattedArgs: TypedMap<MongoValue>) => MongoValue;
 type JsonLogicFormatFunc  = (this: ConfigContext, formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
 type JsonLogicImportFunc  = (this: ConfigContext, val: JsonLogicValue) => Array<RuleValue> | undefined; // can throw
-type SpelImportFunc       = (this: ConfigContext, spel: SpelRawValue) => Array<RuleValue>;
+type SpelImportFunc       = (this: ConfigContext, spel: SpelRawValue) => Record<string, RuleValue> | undefined; // can throw
 type SpelFormatFunc       = (this: ConfigContext, formattedArgs: TypedMap<string>) => string;
 
 interface FuncGroup extends BaseField {
@@ -1539,6 +1542,7 @@ export interface Func extends Omit<BaseSimpleField, "type"> {
   spelImport?: SpelImportFunc | SerializedFunction;
   formatFunc?: FormatFunc | SerializedFunction;
   sqlFormatFunc?: SqlFormatFunc | SerializedFunction;
+  sqlImport?: SqlImportFunc | SerializedFunction;
   mongoFormatFunc?: MongoFormatFunc | SerializedFunction;
   renderBrackets?: Array<RenderedReactElement>;
   renderSeps?: Array<RenderedReactElement>;

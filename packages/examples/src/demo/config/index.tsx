@@ -14,7 +14,6 @@ import {
   Config,
   ValidateValue,
 } from "@react-awesome-query-builder/ui";
-import { SqlUtils } from "@react-awesome-query-builder/sql";
 import moment from "moment";
 import ru_RU from "antd/es/locale/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
@@ -33,8 +32,7 @@ const { simulateAsyncFetch } = Utils.Autocomplete;
 
 export default (skin: string) => {
   const originalConfig = skinToConfig[skin] as BasicConfig;
-  const InitialConfig = SqlUtils.mixinConfigForSql(originalConfig) as BasicConfig;
-  console.log(originalConfig, InitialConfig);
+  const InitialConfig = originalConfig as BasicConfig;
 
   const demoListValues = [
     { title: "A", value: "a" },

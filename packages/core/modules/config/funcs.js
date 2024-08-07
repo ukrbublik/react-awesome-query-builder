@@ -12,6 +12,7 @@ const NOW = {
   //spelFunc: "new java.util.Date()",
   spelFunc: "T(java.time.LocalDateTime).now()",
   sqlFormatFunc: () => "NOW()",
+  sqlFunc: "NOW",
   mongoFormatFunc: () => new Date(),
   formatFunc: () => "NOW",
 };
@@ -63,6 +64,19 @@ const RELATIVE_DATETIME = {
   // MySQL
   //todo: other SQL dialects?
   sqlFormatFunc: ({date, op, val, dim}) => `DATE_ADD(${date}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, "")})`,
+  sqlImport: (sqlObj) => {
+    if (["DATE_ADD", "DATE_SUB"].includes(sqlObj?.func) && sqlObj.children?.length === 2) {
+      const [date, interval] = sqlObj.children;
+      if (interval._type == "interval") {
+        return {
+          date,
+          op: sqlObj?.func === "DATE_ADD" ? "plus" : "minus",
+          val: interval.value,
+          dim: interval.unit,
+        };
+      }
+    }
+  },
   mongoFormatFunc: null, //todo: support?
   formatFunc: ({date, op, val, dim}) => (!val ? date : `${date} ${op == "minus" ? "-" : "+"} ${val} ${dim}`),
   args: {
@@ -128,6 +142,7 @@ const LOWER = {
   label: "Lowercase",
   mongoFunc: "$toLower",
   jsonLogic: "toLowerCase",
+  sqlFunc: "LOWER",
   spelFunc: "${str}.toLowerCase()",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
   jsonLogicCustomOps: {
@@ -147,6 +162,7 @@ const UPPER = {
   label: "Uppercase",
   mongoFunc: "$toUpper",
   jsonLogic: "toUpperCase",
+  sqlFunc: "UPPER",
   spelFunc: "${str}.toUpperCase()",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
   jsonLogicCustomOps: {

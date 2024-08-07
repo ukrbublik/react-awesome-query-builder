@@ -9,6 +9,7 @@ import {
   JsonCaseGroup,
   CaseGroupProperties,
   BaseWidget,
+  SqlImportFunc,
 } from "@react-awesome-query-builder/core";
 import type { Conv, Meta, OutLogic, OutSelect } from "./types";
 import {
@@ -418,8 +419,13 @@ const processFunc = (expr: SqlFunction, meta: Meta, not = false): OutLogic | und
 
   if (nameType === "default" && firstName === "NOT") {
     if (expr.args?.value.length === 1) {
-      const args = getArgs(true);
+      const args = getArgs(false);
       ret = args[0];
+      // ret.parentheses = true;
+      ret.not = !ret.not;
+      if (not) {
+        ret.not = !ret.not;
+      }
     } else {
       meta.errors.push(`Unexpected args for func NOT: ${JSON.stringify(expr.args?.value)}`);
     }
@@ -428,13 +434,12 @@ const processFunc = (expr: SqlFunction, meta: Meta, not = false): OutLogic | und
     // const defaultValue = args[1].value;
     ret = args[0];
   } else if (nameType === "default") {
-    const useNot = false;
     const flatizeArgs = firstName === "IF";
-    const args = getArgs(useNot);
+    const args = getArgs(false);
     ret = {
       func: firstName,
       children: args,
-      not: useNot ? undefined : not,
+      not: not,
     };
     if (flatizeArgs) {
       ret.ternaryChildren = flatizeTernary(args, meta);
@@ -446,8 +451,21 @@ const processFunc = (expr: SqlFunction, meta: Meta, not = false): OutLogic | und
   return ret;
 };
 
+const getLogicDescr = (logic?: OutLogic) => {
+  if (logic?._type === "case") {
+    // const cases = logic.children as {cond: OutLogic, result: OutLogic}[];
+    return "CASE";
+  } else if (logic?._type === "interval") {
+    return `INTERVAL ${JSON.stringify(logic.value)} ${logic.unit}`;
+  } else if (logic?.func) {
+    return `${logic.func}()`;
+  }
+  // todo
+  return JSON.stringify(logic);
+};
 
 ///////////////////
+
 
 const convertToTree = (
   logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic, returnGroup = false
@@ -461,8 +479,9 @@ const convertToTree = (
     res = convertConj(logic, conv, config, meta, parentLogic);
   } else if (logic.ternaryChildren) {
     res = convertTernary(logic, conv, config, meta, parentLogic);
+  } else {
+    meta.errors.push(`Unexpected logic: ${getLogicDescr(logic)}`);
   }
-  // todo: case ?
 
   // todo
 
@@ -561,6 +580,9 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
   if (left?.valueSrc === "field") {
     properties.field = left.value;
     properties.fieldSrc = "field";
+  } else if (left?.valueSrc === "func") {
+    properties.field = left.value;
+    properties.fieldSrc = left.valueSrc;
   }
   // todo: left/right can be func
   right.forEach((v, i) => {
@@ -594,8 +616,98 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
       valueType,
       value,
     };
+  } else if (logic?.func) {
+    return convertFunc(logic, conv, config, meta, parentLogic);
+  } else {
+    meta.errors.push(`Unexpected arg: ${getLogicDescr(logic)}`);
   }
   return undefined;
+};
+
+const convertFuncArg = (logic: any, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic) => {
+  if (typeof logic === "object" && logic !== null && !Array.isArray(logic)) {
+    return convertArg(logic as OutLogic, conv, config, meta, parentLogic);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return {
+    valueSrc: "value",
+    value: logic,
+  };
+};
+
+const convertFunc = (logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic) => {
+  let funcKey, argsObj, funcConfig;
+
+  for (const [f, fc] of Utils.ConfigUtils.iterateFuncs(config)) {
+    const { sqlFunc, sqlImport } = fc;
+    if (sqlImport) {
+      let parsed: Record<string, any> | undefined;
+      try {
+        // todo: types: always SqlImportFunc
+        parsed = (sqlImport as SqlImportFunc).call(config.ctx, logic!);
+      } catch(_e) {
+        // can't be parsed
+      }
+      if (parsed) {
+        funcKey = f;
+        funcConfig = Utils.ConfigUtils.getFuncConfig(config, funcKey);
+        argsObj = {};
+        for (const argKey in parsed) {
+          argsObj[argKey] = convertFuncArg(parsed[argKey] as OutLogic, conv, config, meta, logic);
+        }
+      }
+    }
+    if (!funcKey && sqlFunc && sqlFunc === logic?.func) {
+      funcKey = f;
+      funcConfig = Utils.ConfigUtils.getFuncConfig(config, funcKey);
+      argsObj = {};
+      let argIndex = 0;
+      for (const argKey in funcConfig!.args) {
+        const argLogic = logic.children?.[argIndex];
+        argsObj[argKey] = argLogic;
+        argIndex++;
+      }
+    }
+  }
+
+  if (funcKey) {
+    const funcArgs = {};
+    for (const argKey in funcConfig!.args) {
+      const argConfig = funcConfig!.args[argKey];
+      let argVal = argsObj![argKey];
+      if (argVal === undefined) {
+        argVal = argConfig?.defaultValue;
+        if (argVal === undefined) {
+          if (argConfig?.isOptional) {
+            //ignore
+          } else {
+            meta.errors.push(`No value for arg ${argKey} of func ${funcKey}`);
+            return undefined;
+          }
+        } else {
+          argVal = {
+            value: argVal,
+            valueSrc: argVal?.func ? "func" : "value",
+            valueType: argConfig.type,
+          };
+        }
+      }
+      if (argVal)
+        funcArgs[argKey] = argVal;
+    }
+
+    return {
+      valueSrc: "func",
+      value: {
+        func: funcKey,
+        args: funcArgs
+      },
+      valueType: funcConfig!.returnType,
+    };
+  } else {
+    meta.errors.push(`Unexpected func: ${getLogicDescr(logic)}`);
+    return undefined;
+  }
 };
 
 const wrapInDefaultConj = (rule: JsonAnyRule, config: Config, not = false): JsonGroup => {

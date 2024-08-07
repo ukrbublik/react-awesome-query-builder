@@ -59,10 +59,15 @@ const conjunctions = {
         ? (not ? "NOT " : "") + "(" + children.join(" " + (isForDisplay ? "OR" : "||") + " ") + ")"
         : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
     },
-    sqlFormatConj: (children, conj, not) => {
-      return children.size > 1
-        ? (not ? "NOT " : "") + "(" + children.join(" " + "OR" + " ") + ")"
-        : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
+    sqlFormatConj: function (children, conj, not) {
+      let ret = (children.size > 1 ? children.join(" " + "OR" + " ") : children.first());
+      if (children.size > 1 || not) {
+        ret = this.utils.wrapWithBrackets(ret);
+      }
+      if (not) {
+        ret = "NOT " + ret;
+      }
+      return ret;
     },
     spelFormatConj: (children, conj, not, omitBrackets) => {
       if (not) omitBrackets = false;
@@ -101,6 +106,7 @@ const operators = {
     label: "!=",
     labelForFormat: "!=",
     sqlOp: "<>",
+    sqlOps: ["<>", "!="],
     spelOp: "!=",
     spelOps: ["!=", "ne"],
     reversedOp: "equal",
@@ -372,6 +378,7 @@ const operators = {
     label: "!=",
     labelForFormat: "!=",
     sqlOp: "<>", // enum/set
+    sqlOps: ["<>", "!="],
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return `${field} != ${value}`;
     },
@@ -495,6 +502,7 @@ const operators = {
     label: "Not equals",
     labelForFormat: "!=",
     sqlOp: "<>",
+    sqlOps: ["<>", "!="],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       if (valueSrc == "value")
         return `${field} != [${values.join(", ")}]`;

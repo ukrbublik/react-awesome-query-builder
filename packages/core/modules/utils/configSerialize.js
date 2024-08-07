@@ -106,6 +106,7 @@ const compileMetaFunc = {
   jsonLogic: { type: "f", ignore: "string", args: ["formattedArgs"] },
   jsonLogicImport: { type: "f", args: ["val"] },
   spelImport: { type: "f", args: ["spel"] },
+  sqlImport: { type: "f", args: ["sqlObj"] },
   formatFunc: { type: "f", args: ["formattedArgs", "isForDisplay"] },
   sqlFormatFunc: { type: "f", args: ["formattedArgs"] },
   mongoFormatFunc: { type: "f", args: ["formattedArgs"] },
