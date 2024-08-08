@@ -1,19 +1,20 @@
 name: Bump version & create PR
 
 on:
-  # push:
-  #   branches:
-  #     - "ukrbublik-patch-1"
-  # pull_request:
-  #   branches:
-  #     - "main" 
-  #   paths:
-  #     - ".github/workflows/bump-version-pr.yml"
+  push:
+    branches:
+      - "ukrbublik-patch-1"
+  pull_request:
+    branches:
+      - "main" 
+    paths:
+      - ".github/workflows/bump-version-pr.yml"
   workflow_dispatch:
     inputs:
       new_version:
         description: 'New version name'
         required: true
+        default: "6.6.3"
         type: string
 
 permissions:
