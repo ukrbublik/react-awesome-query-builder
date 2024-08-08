@@ -566,8 +566,11 @@ const convertConj = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pa
 
 const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonRule => {
   const { operator, children } = logic;
-  // todo: operator conv
-  const opKey = conv.operators[operator!][0];
+  const opKeys = conv.operators[operator!];
+  if (opKeys.length != 1) {
+    // todo
+  }
+  const opKey = opKeys?.[0];
   const [left, ...right] = (children || []).map(a => convertArg(a, conv, config, meta, logic)).filter(c => !!c);
   // todo: 2 right for between
   const properties: RuleProperties = {
@@ -664,7 +667,7 @@ const convertFunc = (logic: OutLogic | undefined, conv: Conv, config: Config, me
       let argIndex = 0;
       for (const argKey in funcConfig!.args) {
         const argLogic = logic.children?.[argIndex];
-        argsObj[argKey] = argLogic;
+        argsObj[argKey] = convertFuncArg(argLogic, conv, config, meta, logic);
         argIndex++;
       }
     }

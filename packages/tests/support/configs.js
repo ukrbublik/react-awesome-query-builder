@@ -1087,6 +1087,7 @@ export const with_funcs = (BasicConfig) => ({
         LOWER2: merge({}, BasicFuncs.LOWER, {
           label: "Lowercase2",
           mongoFunc: "$toLower2",
+          sqlFunc: "LOWER2",
           jsonLogic: "toLowerCase2",
           spelFunc: "${str}.toLowerCase2(${def}, ${opt})",
           allowSelfNesting: true,

@@ -1740,6 +1740,8 @@ export const with_cases_simple = {
   ]
 };
 
+export const sql_with_lhs_toLowerCase = "LOWER(str) LIKE 'aaa%'";
+
 export const spel_with_lhs_toLowerCase = "str.toLowerCase().startsWith('aaa')";
 export const spel_with_lhs_toLowerCase_toUpperCase = "str.toLowerCase().toUpperCase() == str.toUpperCase()";
 //export const spel_with_new_Date = "datetime == new java.util.Date()";
