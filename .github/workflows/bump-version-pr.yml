@@ -25,10 +25,10 @@ jobs:
           node-version: 18
           #cache: 'pnpm'
       - run: pnpm i --frozen-lockfile
-      - name: Lerna: bump version
+      - name: Lerna - bump version
         id: bump
         run: npx lerna version ${{ inputs.version }} --no-push --no-git-tag-version --yes
-      - name: Git Identity
+      - name: Git identity
         run: |
           git config --global user.name '${GITHUB_ACTOR}'
           git config --global user.email '${GITHUB_ACTOR}@users.noreply.github.com'
