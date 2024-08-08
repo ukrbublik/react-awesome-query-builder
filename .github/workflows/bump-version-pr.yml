@@ -6,16 +6,16 @@ on:
       - "ukrbublik-patch-1"
   pull_request:
     branches:
-      - "main" 
+      - "master" 
     paths:
       - ".github/workflows/bump-version-pr.yml"
   workflow_dispatch:
-    inputs:
-      new_version:
-        description: 'New version name'
-        required: true
-        default: "6.6.3"
-        type: string
+    # inputs:
+    #   new_version:
+    #     description: 'New version name'
+    #     required: true
+    #     default: "6.6.3"
+    #     type: string
 
 permissions:
   contents: write
@@ -24,7 +24,7 @@ permissions:
 jobs:
   bump-version:
     runs-on: ubuntu-latest
-    # if: ${{ inputs.new_version }} 
+    if: ${{ inputs.new_version }} 
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
