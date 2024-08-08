@@ -83,6 +83,7 @@ const compileMetaOperator = {
   sqlFormatOp: { type: "f", args: ["field", "op", "vals", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
   spelFormatOp: { type: "f", args: ["field", "op", "vals", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
   jsonLogic: { type: "f", ignore: "string", args: ["field", "op", "vals", "opDef", "operatorOptions", "fieldDef"] },
+  sqlImport: { type: "f", args: ["sqlObj"] },
   elasticSearchQueryType: { type: "f", ignore: "string", args: ["valueType"] },
   textSeparators: { type: "r", isArr: true },
 };

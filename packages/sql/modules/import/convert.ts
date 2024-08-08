@@ -105,14 +105,39 @@ const convertConj = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pa
   };
 };
 
-const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonRule => {
-  const { operator, children } = logic;
-  const opKeys = conv.operators[operator!];
-  if (opKeys.length != 1) {
-    // todo
+const convertOpFunc = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): OutLogic | undefined => {
+  for (const opKey in conv.opFuncs) {
+    for (const f of conv.opFuncs[opKey]) {
+      const parsed = useImportFunc(f, logic, conv, config, meta);
+      if (parsed) {
+        const { operator, children } = parsed as OutLogic;
+        return { operator, children };
+      }
+    }
   }
-  const opKey = opKeys?.[0];
-  const [left, ...right] = (children || []).map(a => convertArg(a, conv, config, meta, logic)).filter(c => !!c);
+  return undefined;
+};
+
+const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonRule | undefined => {
+  const opKeys = conv.operators[logic.operator!];
+  let opKey = opKeys?.[0];
+  if (opKeys.length != 1) {
+    // todo: cover other cases like is_empty, proximity
+    const newLogic = convertOpFunc(logic, conv, config, meta, parentLogic)!;
+    if (!newLogic) {
+      if (!opKeys.length) {
+        meta.errors.push(`Can't convert op ${getLogicDescr(logic)}`);
+        return undefined;
+      } else {
+        // todo
+        meta.errors.push(`SQL operator "${logic.operator}" can be converted to several operators: ${opKeys.join(", ")}`);
+      }
+    } else {
+      logic = newLogic;
+      opKey = logic.operator!;
+    }
+  }
+  const [left, ...right] = (logic.children || []).map(a => convertArg(a, conv, config, meta, logic)).filter(c => !!c);
   // todo: 2 right for between
   const properties: RuleProperties = {
     operator: opKey,
@@ -124,6 +149,7 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
   if (left?.valueSrc === "field") {
     properties.field = left.value;
     properties.fieldSrc = "field";
+    // todo: support tableName ?
   } else if (left?.valueSrc === "func") {
     properties.field = left.value;
     properties.fieldSrc = left.valueSrc;
