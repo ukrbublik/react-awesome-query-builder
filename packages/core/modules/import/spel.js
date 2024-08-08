@@ -284,19 +284,15 @@ const buildConv = (config) => {
   let operators = {};
   for (let opKey in config.operators) {
     const opConfig = config.operators[opKey];
-    if (opConfig.spelOps) {
-      // examples: "==", "eq", ".contains", "matches" (can be used for starts_with, ends_with)
-      opConfig.spelOps.forEach(spelOp => {
+    const spelOps = opConfig.spelOps ? opConfig.spelOps : opConfig.spelOp ? [opConfig.spelOp] : undefined;
+    if (spelOps) {
+      // examples of 2+: "==", "eq", ".contains", "matches" (can be used for starts_with, ends_with)
+      spelOps.forEach(spelOp => {
         const opk = spelOp; // + "/" + getOpCardinality(opConfig);
         if (!operators[opk])
           operators[opk] = [];
         operators[opk].push(opKey);
       });
-    } else if (opConfig.spelOp) {
-      const opk = opConfig.spelOp; // + "/" + getOpCardinality(opConfig);
-      if (!operators[opk])
-        operators[opk] = [];
-      operators[opk].push(opKey);
     } else {
       logger.log(`[spel] No spelOp for operator ${opKey}`);
     }
@@ -371,17 +367,19 @@ const buildConv = (config) => {
   let opFuncs = {};
   for (let op in config.operators) {
     const opDef = config.operators[op];
-    const {spelOp} = opDef;
-    if (spelOp?.includes("${0}")) {
-      const fs = spelOp.replace(/\${(\w+)}/g, (_, k) => "?");
-      const argsOrder = [...spelOp.matchAll(/\${(\w+)}/g)].map(([_, k]) => k);
-      if (!opFuncs[fs])
-        opFuncs[fs] = [];
-      opFuncs[fs].push({
-        op,
-        argsOrder
-      });
-    }
+    const spelOps = opDef.spelOps ? opDef.spelOps : opDef.spelOp ? [opDef.spelOp] : undefined;
+    spelOps?.forEach(spelOp => {
+      if (spelOp?.includes("${0}")) {
+        const fs = spelOp.replace(/\${(\w+)}/g, (_, k) => "?");
+        const argsOrder = [...spelOp.matchAll(/\${(\w+)}/g)].map(([_, k]) => k);
+        if (!opFuncs[fs])
+          opFuncs[fs] = [];
+        opFuncs[fs].push({
+          op,
+          argsOrder
+        });
+      }
+    });
   }
   // Special .compareTo()
   const compareToSS = compareToSign.replace(/\${(\w+)}/g, (_, k) => "?");
@@ -1016,7 +1014,7 @@ const convertFuncToOp = (spel, conv, config, meta, parentSpel, fsigns, convertFu
       foundSign = s;
       errs = [];
       const opDef = config.operators[opKey];
-      const {spelOp, valueTypes} = opDef;
+      const {valueTypes} = opDef;
       const argsObj = Object.fromEntries(
         argsOrder.map((argKey, i) => [argKey, argsArr[i]])
       );
