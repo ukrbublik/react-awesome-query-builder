@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/antd",
-  "version": "6.6.2",
+  "version": "6.6.3",
   "description": "User-friendly query builder for React. AntDesign widgets",
   "keywords": [
     "query-builder",
