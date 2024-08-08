@@ -1,7 +1,7 @@
-export * as ConfigUtils from "./configUtils";
+export * as ConfigUtils from "./configAllUtils";
 export * as RuleUtils from "./ruleUtils";
 export * as FuncUtils from "./funcUtils";
-export * as DefaultUtils from "./defaultUtils";
+export * as DefaultUtils from "./defaultRuleUtils";
 export * as TreeUtils from "./treeUtils";
 export * as ExportUtils from "./export";
 export * as ListUtils from "./listValues";

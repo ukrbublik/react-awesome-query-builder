@@ -11,7 +11,7 @@ import {createValidationMemo} from "../utils/validationMemo";
 import {liteShouldComponentUpdate, useOnPropsChanged} from "../utils/reactUtils";
 import ConnectedQuery from "./Query";
 const {defaultRoot} = Utils.DefaultUtils;
-const {createConfigMemo} = Utils.ConfigUtils;
+const {createConfigMemo, extendConfig} = Utils.ConfigUtils;
 
 
 export default class QueryContainer extends Component {
@@ -39,6 +39,7 @@ export default class QueryContainer extends Component {
       reactIndex: this._reactInternals?.index ?? -1,
       maxSize: 2, // current and prev
       canCompile: true,
+      extendConfig,
     });
     this.getMemoizedConfig = getExtendedConfig;
     this.getBasicConfig = getBasicConfig;

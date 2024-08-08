@@ -1,8 +1,9 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, getWidgetForFieldOp,
 } from "../utils/configUtils";
+import {extendConfig} from "../utils/configExtend";
 import {
-  getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue
+  getFieldPathLabels, formatFieldName, completeValue
 } from "../utils/ruleUtils";
 import pick from "lodash/pick";
 import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
@@ -295,7 +296,12 @@ const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, f
         const valFieldDefinition = getFieldConfig(config, value) || {}; 
         args.push(valFieldDefinition);
       }
-      ret = fn.call(config.ctx, ...args);
+      const doEscape = fieldDef?.escapeForFormat ?? true;
+      if (!doEscape) {
+        ret = value;
+      } else {
+        ret = fn.call(config.ctx, ...args);
+      }
     } else {
       ret = value;
     }

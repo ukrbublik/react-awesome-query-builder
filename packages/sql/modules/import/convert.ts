@@ -93,7 +93,7 @@ const buildCaseValProperties = (config: Config, meta: Meta, conv: Conv, val: Out
 
 const convertConj = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonGroup => {
   const { conj, children } = logic;
-  const conjunction = conj!; // todo: conj conv
+  const conjunction = conv.conjunctions[conj!];
   const convChildren = (children || []).map(a => convertToTree(a, conv, config, meta, logic)).filter(c => !!c) as JsonGroup[];
   return {
     type: "group",
@@ -179,19 +179,25 @@ const convertFuncArg = (logic: any, conv: Conv, config: Config, meta: Meta, pare
   };
 };
 
+const useImportFunc = (sqlImport: SqlImportFunc, logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta) => {
+  let parsed: Record<string, any> | undefined;
+  try {
+    parsed = sqlImport.call(config.ctx, logic!);
+  } catch(_e) {
+    // can't be parsed
+  }
+
+  return parsed;
+};
+
 const convertFunc = (logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic) => {
   let funcKey, argsObj, funcConfig;
 
   for (const [f, fc] of Utils.ConfigUtils.iterateFuncs(config)) {
     const { sqlFunc, sqlImport } = fc;
     if (sqlImport) {
-      let parsed: Record<string, any> | undefined;
-      try {
-        // todo: types: always SqlImportFunc
-        parsed = (sqlImport as SqlImportFunc).call(config.ctx, logic!);
-      } catch(_e) {
-        // can't be parsed
-      }
+      // todo: types: always SqlImportFunc
+      const parsed = useImportFunc(sqlImport as SqlImportFunc, logic, conv, config, meta);
       if (parsed) {
         funcKey = f;
         funcConfig = Utils.ConfigUtils.getFuncConfig(config, funcKey);
