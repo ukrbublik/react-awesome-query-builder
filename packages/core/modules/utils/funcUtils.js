@@ -1,58 +1,11 @@
 
-import {getFieldConfig, getFuncConfig, getFuncSignature} from "../utils/configUtils";
-import {filterValueSourcesForField, completeValue, selectTypes} from "../utils/ruleUtils";
+import {getFieldConfig, getFuncConfig, getFuncSignature, selectTypes} from "../utils/configUtils";
+import {getDefaultArgValue, setArgValue, setFuncDefaultArgs, setFuncDefaultArg} from "../utils/ruleUtils";
 import {validateValue} from "../utils/validation";
-import {isObject} from "../utils/stuff";
 import Immutable from "immutable";
 
 
-/**
- * @param {Immutable.Map} value
- * @param {object} config
- * @return {Immutable.Map | undefined} - undefined if func value is not complete (missing required arg vals); can return completed value != value
- */
-export const completeFuncValue = (value, config) => {
-  if (!value)
-    return undefined;
-  const funcKey = value.get("func");
-  const funcConfig = funcKey && getFuncConfig(config, funcKey);
-  if (!funcConfig)
-    return undefined;
-  let complValue = value;
-  let tmpHasOptional = false;
-  for (const argKey in funcConfig.args) {
-    const argConfig = funcConfig.args[argKey];
-    const {valueSources, isOptional, defaultValue} = argConfig;
-    const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
-    const args = complValue.get("args");
-    const argDefaultValueSrc = filteredValueSources.length == 1 ? filteredValueSources[0] : undefined;
-    const argVal = args ? args.get(argKey) : undefined;
-    const argValue = argVal ? argVal.get("value") : undefined;
-    const argValueSrc = (argVal ? argVal.get("valueSrc") : undefined) || argDefaultValueSrc;
-    if (argValue !== undefined) {
-      const completeArgValue = completeValue(argValue, argValueSrc, config);
-      if (completeArgValue === undefined) {
-        return undefined;
-      } else if (completeArgValue !== argValue) {
-        complValue = complValue.setIn(["args", argKey, "value"], completeArgValue);
-      }
-      if (tmpHasOptional) {
-        // has gap
-        return undefined;
-      }
-    } else if (defaultValue !== undefined && !isObject(defaultValue)) {
-      complValue = complValue.setIn(["args", argKey, "value"], getDefaultArgValue(argConfig));
-      complValue = complValue.setIn(["args", argKey, "valueSrc"], "value");
-    } else if (isOptional) {
-      // optional
-      tmpHasOptional = true;
-    } else {
-      // missing value
-      return undefined;
-    }
-  }
-  return complValue;
-};
+export { setArgValue, setFuncDefaultArgs, setFuncDefaultArg, getDefaultArgValue };
 
 
 /**
@@ -124,68 +77,10 @@ export const setFunc = (value, funcKey, config, canFixArgs) => {
   return value;
 };
 
-const setFuncDefaultArgs = (config, funcValue, funcConfig) => {
-  if (funcConfig) {
-    for (const argKey in funcConfig.args) {
-      funcValue = setFuncDefaultArg(config, funcValue, funcConfig, argKey);
-    }
-  }
-  return funcValue;
-};
 
-export const setFuncDefaultArg = (config, funcValue, funcConfig, argKey) => {
-  const argConfig = funcConfig.args[argKey];
-  const {valueSources, defaultValue} = argConfig;
-  const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
-  const firstValueSrc = filteredValueSources.length ? filteredValueSources[0] : undefined;
-  const defaultValueSrc = defaultValue ? (isObject(defaultValue) && !!defaultValue.func ? "func" : "value") : undefined;
-  const argDefaultValueSrc = defaultValueSrc || firstValueSrc;
-  const hasValue = funcValue.getIn(["args", argKey]);
-  if (!hasValue) {
-    if (defaultValue !== undefined) {
-      funcValue = funcValue.setIn(["args", argKey, "value"], getDefaultArgValue(argConfig));
-    }
-    if (argDefaultValueSrc) {
-      funcValue = funcValue.setIn(["args", argKey, "valueSrc"], argDefaultValueSrc);
-    }
-  }
-  return funcValue;
-};
 
-const getDefaultArgValue = ({defaultValue: value}) => {
-  if (isObject(value) && !Immutable.Map.isMap(value) && value.func) {
-    return Immutable.fromJS(value, function (k, v) {
-      return Immutable.Iterable.isIndexed(v) ? v.toList() : v.toOrderedMap();
-    });
-  }
-  return value;
-};
 
-/**
-* Used @ FuncWidget
-* @param {Immutable.Map} value 
-* @param {string} argKey 
-* @param {*} argVal 
-* @param {object} argConfig 
-*/
-export const setArgValue = (value, argKey, argVal, argConfig, config) => {
-  if (value && value.get("func")) {
-    value = value.setIn(["args", argKey, "value"], argVal);
 
-    // set default arg value source
-    const valueSrc = value.getIn(["args", argKey, "valueSrc"]);
-    const {valueSources} = argConfig;
-    const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
-    let argDefaultValueSrc = filteredValueSources.length == 1 ? filteredValueSources[0] : undefined;
-    if (!argDefaultValueSrc && filteredValueSources.includes("value")) {
-      argDefaultValueSrc = "value";
-    }
-    if (!valueSrc && argDefaultValueSrc) {
-      value = value.setIn(["args", argKey, "valueSrc"], argDefaultValueSrc);
-    }
-  }
-  return value;
-};
 
 /**
 * Used @ FuncWidget

@@ -1,7 +1,7 @@
 import uuid from "../utils/uuid";
 import {getOpCardinality, isJsonLogic, shallowEqual, logger} from "../utils/stuff";
-import {getFieldConfig, extendConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts} from "../utils/configUtils";
-import {getWidgetForFieldOp} from "../utils/ruleUtils";
+import {getFieldConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts, getWidgetForFieldOp} from "../utils/configUtils";
+import {extendConfig} from "../utils/configExtend";
 import {loadTree} from "./tree";
 import {defaultGroupConjunction} from "../utils/defaultUtils";
 

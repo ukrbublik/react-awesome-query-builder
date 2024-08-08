@@ -702,7 +702,7 @@ export const export_checks = (
 
 export const export_checks_in_it = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports, options?: DoOptions) => {
   const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
-  let config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
+  const config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
 
   const {tree, errors} = load_tree(value, config, valueFormat);
   if (errors?.length) {

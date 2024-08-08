@@ -85,7 +85,7 @@ const RELATIVE_DATETIME = {
       type: "datetime",
       defaultValue: {func: "NOW", args: []},
       valueSources: ["func", "field", "value"],
-      spelEscapeForFormat: true,
+      escapeForFormat: true,
     },
     op: {
       label: "Op",
@@ -103,7 +103,7 @@ const RELATIVE_DATETIME = {
           minus: "-",
         },
       },
-      spelEscapeForFormat: false,
+      escapeForFormat: false,
     },
     val: {
       label: "Value",
@@ -113,7 +113,7 @@ const RELATIVE_DATETIME = {
       },
       defaultValue: 0,
       valueSources: ["value"],
-      spelEscapeForFormat: false,
+      escapeForFormat: false,
     },
     dim: {
       label: "Dimension",
@@ -133,7 +133,7 @@ const RELATIVE_DATETIME = {
           year: "year",
         },
       },
-      spelEscapeForFormat: false,
+      escapeForFormat: false,
     },
   }
 };

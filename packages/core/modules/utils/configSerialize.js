@@ -4,8 +4,8 @@ import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual, isObject} from "
 import clone from "clone";
 import JL from "json-logic-js";
 import { addRequiredJsonLogicOperations, applyJsonLogic } from "./jsonLogic";
-import { BasicFuncs } from "..";
-import { getFieldRawConfig } from "./configUtils";
+import * as BasicFuncs from "../config/funcs";
+import { getFieldRawConfig, configKeys } from "./configUtils";
 
 // Add new operations for JsonLogic
 addRequiredJsonLogicOperations();
@@ -34,7 +34,6 @@ function callContextFn(_this, fn, args, path) {
   return ret;
 }
 
-export const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs", "ctx"];
 
 // type: 
 //  x - iterate (with nesting `subfields`)
