@@ -352,6 +352,7 @@ const formatFunc = (config, meta, funcValue, parentField = null) => {
     const fieldDef = getFieldConfig(config, argConfig);
     const {defaultValue, isOptional} = argConfig || {};
     const defaultValueSrc = defaultValue?.func ? "func" : "value";
+    const fieldWidgetDef = getFieldWidgetConfig(config, argConfig, undefined, undefined, defaultValueSrc, { forExport: true });
     const argName = isForDisplay && argConfig?.label || argKey;
     const argVal = args ? args.get(argKey) : undefined;
     let argValue = argVal ? argVal.get("value") : undefined;
@@ -362,7 +363,7 @@ const formatFunc = (config, meta, funcValue, parentField = null) => {
     }
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
     const formattedArgVal = formatValue(
-      config, meta, argValue, argValueSrc, argConfig?.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
+      config, meta, argValue, argValueSrc, argConfig?.type, fieldWidgetDef, argConfig, null, null, parentField, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
       if (argValueSrc != "func") // don't triger error if args value is another incomplete function
@@ -372,7 +373,7 @@ const formatFunc = (config, meta, funcValue, parentField = null) => {
     let formattedDefaultVal;
     if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
       formattedDefaultVal = formatValue(
-        config, meta, defaultValue, defaultValueSrc, argConfig?.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
+        config, meta, defaultValue, defaultValueSrc, argConfig?.type, fieldWidgetDef, argConfig, null, null, parentField, argAsyncListValues
       );
       if (formattedDefaultVal === undefined) {
         if (defaultValueSrc != "func") // don't triger error if args value is another incomplete function
