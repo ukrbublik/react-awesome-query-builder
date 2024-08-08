@@ -10,12 +10,12 @@ on:
     paths:
       - ".github/workflows/bump-version-pr.yml"
   workflow_dispatch:
-    # inputs:
-    #   new_version:
-    #     description: 'New version name'
-    #     required: true
-    #     default: "6.6.3"
-    #     type: string
+    inputs:
+      new_version:
+        description: 'New version name'
+        # required: true
+        default: "6.6.3"
+        type: string
 
 permissions:
   contents: write
