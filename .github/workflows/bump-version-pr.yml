@@ -3,7 +3,7 @@ name: Bump version & create PR
 on:
   push:
     branches:
-      - "ukrbublik-patch-1"
+      - '**'
   pull_request:
     branches:
       - master
