@@ -1,14 +1,6 @@
 name: Bump version & create PR
 
 on:
-  push:
-    branches:
-      - '**'
-  pull_request:
-    branches:
-      - master
-    paths:
-      - ".github/workflows/bump-version-pr.yml"
   workflow_dispatch:
     inputs:
       new_version:
@@ -20,15 +12,10 @@ permissions:
   contents: write
   pull-requests: write
 
-env:
-  new_version: '6.6.3' # ${{ inputs.new_version }}
-
 jobs:
   bump-version:
     runs-on: ubuntu-latest
-    # if: ${{ env.new_version }} 
-    env:
-      new_version: '6.6.3' # ${{ inputs.new_version }}
+    if: ${{ inputs.new_version }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -41,7 +28,7 @@ jobs:
       - run: pnpm i --frozen-lockfile
       - name: Lerna - bump version
         id: bump
-        run: npx lerna version ${{ env.new_version }} --no-push --no-git-tag-version --yes
+        run: npx lerna version ${{ inputs.new_version }} --no-push --no-git-tag-version --yes
       - name: Git identity
         run: |
           git config --global user.name '${GITHUB_ACTOR}'
@@ -51,19 +38,23 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
       - name: Create Pull Request
         id: cpr
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Bump ${{ env.new_version }}"
           committer: GitHub <noreply@github.com>
           author: "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
-          title: 'Bump ${{ env.new_version }}'
+          signoff: false
+          delete-branch: true
+          draft: false
+          title: 'Bump ${{ inputs.new_version }}'
           body: |
-            ## Version ${{ env.new_version }}
-          branch: "bump_${{ env.new_version }}"
-          # labels: "Type: Release"
-          # request-to-parent: false
+            ## Version ${{ inputs.new_version }}
+          branch: "bump_${{ inputs.new_version }}"
       - name: Check outputs
+        if: ${{ steps.cpr.outputs.pull-request-number }}
         run: |
-          echo "Pull Request Number - ${{ env.PULL_REQUEST_NUMBER }}"
-          echo "Pull Request Number - ${{ steps.cpr.outputs.pr_number }}"
+          echo "PULL_REQUEST_NUMBER - ${{ env.PULL_REQUEST_NUMBER }}"
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+
