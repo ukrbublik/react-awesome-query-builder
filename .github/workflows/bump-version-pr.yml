@@ -11,7 +11,7 @@ on:
       - ".github/workflows/bump-version-pr.yml"
   workflow_dispatch:
     inputs:
-      version:
+      new_version:
         description: 'New version name'
         required: true
         type: string
@@ -23,6 +23,7 @@ permissions:
 jobs:
   bump-version:
     runs-on: ubuntu-latest
+    if: ${{ inputs.new_version }} 
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -35,7 +36,7 @@ jobs:
       - run: pnpm i --frozen-lockfile
       - name: Lerna - bump version
         id: bump
-        run: npx lerna version ${{ inputs.version }} --no-push --no-git-tag-version --yes
+        run: npx lerna version ${{ inputs.new_version }} --no-push --no-git-tag-version --yes
       - name: Git identity
         run: |
           git config --global user.name '${GITHUB_ACTOR}'
@@ -48,13 +49,13 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Bump ${{ inputs.version }}"
+          commit-message: "Bump ${{ inputs.new_version }}"
           committer: GitHub <noreply@github.com>
           author: "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
-          title: 'Bump ${{ inputs.version }}'
+          title: 'Bump ${{ inputs.new_version }}'
           body: |
-            ## v${{ steps.changelog.outputs.version }}
-          branch: "bump_${{ inputs.version }}"
+            ## Version ${{ inputs.new_version }}
+          branch: "bump_${{ inputs.new_version }}"
           # labels: "Type: Release"
           # request-to-parent: false
       - name: Check outputs
