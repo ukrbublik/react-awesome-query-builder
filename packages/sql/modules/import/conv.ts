@@ -3,6 +3,7 @@
 import type { Conv } from "./types";
 import {
   Config,
+  SqlImportFunc,
 } from "@react-awesome-query-builder/core";
 
 
@@ -11,26 +12,27 @@ const logger = console; // (Utils.OtherUtils as any).logger as typeof console; /
 
 export const buildConv = (config: Config): Conv => {
   const operators: Record<string, string[]> = {};
+  const opFuncs: Record<string, SqlImportFunc[]> = {};
+
   for (const opKey in config.operators) {
     const opConfig = config.operators[opKey];
     const isGroupOp = config.settings.groupOperators?.includes(opKey);
-    if (opConfig.sqlOps) {
-      // examples: "==", "eq", ".contains", "matches" (can be used for starts_with, ends_with)
-      opConfig.sqlOps?.forEach(sqlOp => {
-        const opk = sqlOp; // + "/" + getOpCardinality(opConfig);
-        if (!operators[opk])
-          operators[opk] = [];
-        operators[opk].push(opKey);
+    const sqlOps = opConfig.sqlOps ? opConfig.sqlOps : opConfig.sqlOp ? [opConfig.sqlOp] : undefined;
+    if (opConfig.sqlImport) {
+      if (!opFuncs[opKey])
+        opFuncs[opKey] = [] as SqlImportFunc[];
+      opFuncs[opKey].push(opConfig.sqlImport as SqlImportFunc);
+    }
+    if (sqlOps) {
+      // examples of 2+: "==", "eq", ".contains", "matches" (can be used for starts_with, ends_with)
+      sqlOps?.forEach(sqlOp => {
+        if (!operators[sqlOp])
+          operators[sqlOp] = [];
+        operators[sqlOp].push(opKey);
       });
-    } else if (opConfig.sqlOp) {
-      const opk = opConfig.sqlOp;
-      if (!operators[opk])
-        operators[opk] = [];
-      operators[opk].push(opKey);
     } else {
-      // todo
-      if (!isGroupOp) {
-        logger.log(`[sql] No sqlOp for operator ${opKey}`);
+      if (!isGroupOp && !opConfig.sqlImport) {
+        logger.log(`[sql] No sqlOp/sqlImport for operator ${opKey}`);
       }
     }
   }
@@ -41,45 +43,6 @@ export const buildConv = (config: Config): Conv => {
     const ck = conjunctionDefinition.sqlConj || conjKey.toLowerCase();
     conjunctions[ck] = conjKey;
   }
-
-  // let funcs = {};
-  // for (const [funcPath, funcConfig] of iterateFuncs(config)) {
-  //   let fks = [];
-  //   const {sqlFunc} = funcConfig;
-  //   if (typeof sqlFunc === "string") {
-  //     const optionalArgs = Object.keys(funcConfig.args || {})
-  //       .reverse()
-  //       .filter(argKey => !!funcConfig.args[argKey].isOptional || funcConfig.args[argKey].defaultValue != undefined);
-  //     const funcSignMain = sqlFunc
-  //       .replace(/\${(\w+)}/g, (_, _k) => "?");
-  //     const funcSignsOptional = optionalArgs
-  //       .reduce((acc, argKey) => (
-  //         [
-  //           ...acc,
-  //           [
-  //             argKey,
-  //             ...(acc[acc.length-1] || []),
-  //           ]
-  //         ]
-  //       ), [])
-  //       .map(optionalArgKeys => (
-  //         sqlFunc
-  //           .replace(/(?:, )?\${(\w+)}/g, (found, a) => (
-  //             optionalArgKeys.includes(a) ? "" : found
-  //           ))
-  //           .replace(/\${(\w+)}/g, (_, _k) => "?")
-  //       ));
-  //     fks = [
-  //       funcSignMain,
-  //       ...funcSignsOptional,
-  //     ];
-  //   }
-  //   for (const fk of fks) {
-  //     if (!funcs[fk])
-  //       funcs[fk] = [];
-  //     funcs[fk].push(funcPath);
-  //   }
-  // }
 
   // let valueFuncs = {};
   // for (let w in config.widgets) {
@@ -126,8 +89,8 @@ export const buildConv = (config: Config): Conv => {
   return {
     operators,
     conjunctions,
+    opFuncs,
     // funcs,
     // valueFuncs,
-    // opFuncs,
   };
 };

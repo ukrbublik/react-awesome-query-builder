@@ -1,3 +1,4 @@
+import { SqlImportFunc } from "@react-awesome-query-builder/core";
 import type {
   ExpressionValue, ExprList, LocationRange,
 } from "node-sql-parser";
@@ -32,6 +33,7 @@ declare module "node-sql-parser" {
 export interface Conv {
   conjunctions: Record<string, string>;
   operators: Record<string, string[]>;
+  opFuncs: Record<string, SqlImportFunc[]>;
 }
 
 export interface Meta {

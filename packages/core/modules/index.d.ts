@@ -1150,6 +1150,7 @@ export interface BaseOperator {
   mongoFormatOp?: MongoFormatOperator | SerializedFunction;
   sqlOp?: string;
   sqlOps?: string[];
+  sqlImport?: SqlImportFunc | SerializedFunction;
   sqlFormatOp?: SqlFormatOperator | SerializedFunction;
   spelOp?: string;
   spelOps?: string[];

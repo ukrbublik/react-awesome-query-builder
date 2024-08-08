@@ -554,6 +554,7 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 |sqlFormatOp |- for SQL format | |Function for advanced formatting SQL WHERE query when just `sqlOp` is not enough. +
   `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, Object fieldDef) => string` +
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2`
+|sqlImport |- for SQL format | |Function to convert given raw SQL value (not string, but object got from `node-sql-parser`) to object `{ operator, children }`. If given expression can't be parsed into current operator, throw an error.
 |spelOp |+ for SpEL format | |Operator name in SpEL
 |spelFormatOp |- for SpEL format | |Function for advanced formatting query in SpEL when just `spelOp` is not enough. +
   `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, Object fieldDef) => string` +
@@ -770,7 +771,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |sqlFunc |- for SQL format |same as func key |Func name in SQL
 |sqlFormatFunc |- for SQL format | |Can be used instead of `sqlFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression string. +
   Example: SUM function can be formatted with `({a, b}) => a + " + " + b`
-|sqlImport | | |Function to convert given raw SQL value (not string, but object got from `node-sql-parser`) to object of arguments of current function. If given expression can't be parsed into current function, throw an error.
+|sqlImport |- for SQL format | |Function to convert given raw SQL value (not string, but object got from `node-sql-parser`) to object of arguments of current function. If given expression can't be parsed into current function, throw an error.
 |spelFunc |- for SpEL format |same as func key |Func name in SpEL
 |spelFormatFunc |- for SpEL format | |Can be used instead of `spelFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression string. +
   Example: SUM function can be formatted with `({a, b}) => a + " + " + b`
