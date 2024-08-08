@@ -24,7 +24,7 @@ permissions:
 jobs:
   bump-version:
     runs-on: ubuntu-latest
-    if: ${{ inputs.new_version }} 
+    # if: ${{ inputs.new_version }} 
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
