@@ -1,10 +1,5 @@
 import type {
-  Parser as NodeSqlParser, Option as SqlParseOption, AST,
-  Select, Function as SqlFunction, ExpressionValue, ExprList, LocationRange,
-  ColumnRef,
-  ValueExpr, Value,
-  Case,
-  Interval,
+  ExpressionValue, ExprList, LocationRange,
 } from "node-sql-parser";
 
 declare module "node-sql-parser" {

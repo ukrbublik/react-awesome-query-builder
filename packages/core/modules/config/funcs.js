@@ -194,6 +194,7 @@ const LINEAR_REGRESSION = {
       }
     }
   },
+  // todo: sqlImport
   mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
   jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
   jsonLogicImport: (v) => {
