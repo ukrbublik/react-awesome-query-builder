@@ -1,11 +1,17 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
-import type { Conv, Meta, OutLogic } from "./types";
+import type { Conv, FuncArgsObj, Meta, OperatorObj, OutLogic, ValueObj } from "./types";
 import {
   Config, JsonRule, JsonGroup, JsonSwitchGroup, JsonCaseGroup, CaseGroupProperties, FieldConfigExt,
   BaseWidget, Utils, ValueSource, RuleProperties, SqlImportFunc, JsonAnyRule,
+  FuncArg,
+  Func,
+  FuncValue,
+  Field,
 } from "@react-awesome-query-builder/core";
 import { getLogicDescr } from "./ast";
+import { SqlPrimitiveTypes } from "./conv";
+import { ValueExpr } from "node-sql-parser";
 
 
 export const convertToTree = (
@@ -105,39 +111,32 @@ const convertConj = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pa
   };
 };
 
-const convertOpFunc = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): OutLogic | undefined => {
-  for (const opKey in conv.opFuncs) {
-    for (const f of conv.opFuncs[opKey]) {
-      const parsed = useImportFunc(f, logic, conv, config, meta);
-      if (parsed) {
-        const { operator, children } = parsed as OutLogic;
-        return { operator, children };
-      }
-    }
-  }
-  return undefined;
-};
 
 const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonRule | undefined => {
   const opKeys = conv.operators[logic.operator!];
   let opKey = opKeys?.[0];
+  let convChildren, convFuncOp;
   if (opKeys.length != 1) {
     // todo: cover other cases like is_empty, proximity
-    const newLogic = convertOpFunc(logic, conv, config, meta, parentLogic)!;
-    if (!newLogic) {
+    convFuncOp = convertOpFunc(logic, conv, config, meta, parentLogic)!;
+    if (convFuncOp) {
+      opKey = convFuncOp.operator!;
+      convChildren = convFuncOp.children;
+    } else {
       if (!opKeys.length) {
         meta.errors.push(`Can't convert op ${getLogicDescr(logic)}`);
         return undefined;
       } else {
         // todo
-        meta.errors.push(`SQL operator "${logic.operator}" can be converted to several operators: ${opKeys.join(", ")}`);
+        meta.warnings.push(`SQL operator "${logic.operator}" can be converted to several operators: ${opKeys.join(", ")}`);
       }
-    } else {
-      logic = newLogic;
-      opKey = logic.operator!;
     }
   }
-  const [left, ...right] = (logic.children || []).map(a => convertArg(a, conv, config, meta, logic)).filter(c => !!c);
+  if (!convChildren) {
+    convChildren = (logic.children || []).map(a => convertArg(a, conv, config, meta, logic));
+  }
+
+  const [left, ...right] = (convChildren || []).filter(c => !!c);
   // todo: 2 right for between
   const properties: RuleProperties = {
     operator: opKey,
@@ -168,10 +167,14 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
   };
 };
 
-const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic) => {
+const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): ValueObj | undefined => {
   const { fieldSeparator } = config.settings;
   if (logic?.valueType) {
-    const valueType = undefined; // todo
+    const sqlType = logic?.valueType;
+    const valueType = SqlPrimitiveTypes[sqlType];
+    if (!valueType) {
+      meta.warnings.push(`Unexpected value type ${sqlType}`);
+    }
     const value = logic.value; // todo: convert ?
     return {
       valueSrc: "value",
@@ -179,12 +182,13 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
       value,
     };
   } else if (logic?.field) {
-    const valueType = undefined; // todo
-    const value = [logic.table, logic.field].filter(v => !!v).join(fieldSeparator);
+    const field = [logic.table, logic.field].filter(v => !!v).join(fieldSeparator);
+    const fieldConfig = Utils.ConfigUtils.getFieldConfig(config, field) as Field | undefined;
+    const valueType = fieldConfig?.type;
     return {
       valueSrc: "field",
       valueType,
-      value,
+      value: field,
     };
   } else if (logic?.func) {
     return convertFunc(logic, conv, config, meta, parentLogic);
@@ -194,18 +198,20 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
   return undefined;
 };
 
-const convertFuncArg = (logic: any, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic) => {
+const convertFuncArg = (logic: any, argConfig: FuncArg | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): ValueObj => {
   if (typeof logic === "object" && logic !== null && !Array.isArray(logic)) {
-    return convertArg(logic as OutLogic, conv, config, meta, parentLogic);
+    return convertArg(logic as OutLogic, conv, config, meta, parentLogic)!;
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return {
     valueSrc: "value",
     value: logic,
+    //valueType: // todo: see SpelPrimitiveTypes[spel.type] or argConfig
   };
 };
 
-const useImportFunc = (sqlImport: SqlImportFunc, logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta) => {
+const useImportFunc = (
+  sqlImport: SqlImportFunc, logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta
+): FuncArgsObj | OperatorObj | undefined => {
   let parsed: Record<string, any> | undefined;
   try {
     parsed = sqlImport.call(config.ctx, logic!);
@@ -213,44 +219,76 @@ const useImportFunc = (sqlImport: SqlImportFunc, logic: OutLogic | undefined, co
     // can't be parsed
   }
 
-  return parsed;
+  if (parsed) {
+    if (parsed?.children) {
+      return {
+        operator: parsed.operator ?? meta.opKey,
+        children: (parsed as OutLogic).children?.map(ch => convertArg(ch, conv, config, meta, logic)),
+      } as OperatorObj;
+    } else if (parsed?.args) {
+      const funcKey = parsed?.func as string ?? meta.funcKey;
+      const funcConfig = Utils.ConfigUtils.getFuncConfig(config, funcKey);
+      const argsObj: FuncArgsObj = {};
+      for (const argKey in parsed) {
+        const argLogic = parsed[argKey] as OutLogic;
+        const argConfig = funcConfig?.args[argKey];
+        argsObj[argKey] = convertFuncArg(argLogic, argConfig, conv, config, meta, logic);
+      }
+      return argsObj;
+    }
+  }
+
+  return undefined;
 };
 
-const convertFunc = (logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic) => {
-  let funcKey, argsObj, funcConfig;
+
+const convertOpFunc = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): OperatorObj | undefined => {
+  for (const opKey in conv.opFuncs) {
+    for (const f of conv.opFuncs[opKey]) {
+      const parsed = useImportFunc(f, logic, conv, config, {...meta, opKey: opKey});
+      if (parsed) {
+        return parsed as OperatorObj;
+      }
+    }
+  }
+  return undefined;
+};
+
+const convertFunc = (logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): ValueObj | undefined => {
+  let funcKey: string | undefined, argsObj: FuncArgsObj | undefined, funcConfig: Func | undefined | null;
 
   for (const [f, fc] of Utils.ConfigUtils.iterateFuncs(config)) {
     const { sqlFunc, sqlImport } = fc;
     if (sqlImport) {
       // todo: types: always SqlImportFunc
-      const parsed = useImportFunc(sqlImport as SqlImportFunc, logic, conv, config, meta);
+      const parsed = useImportFunc(sqlImport as SqlImportFunc, logic, conv, config, {...meta, funcKey: f});
       if (parsed) {
         funcKey = f;
         funcConfig = Utils.ConfigUtils.getFuncConfig(config, funcKey);
-        argsObj = {};
-        for (const argKey in parsed) {
-          argsObj[argKey] = convertFuncArg(parsed[argKey] as OutLogic, conv, config, meta, logic);
-        }
+        argsObj = parsed as FuncArgsObj;
+        break;
       }
     }
-    if (!funcKey && sqlFunc && sqlFunc === logic?.func) {
+    if (sqlFunc && sqlFunc === logic?.func) {
       funcKey = f;
       funcConfig = Utils.ConfigUtils.getFuncConfig(config, funcKey);
       argsObj = {};
       let argIndex = 0;
       for (const argKey in funcConfig!.args) {
         const argLogic = logic.children?.[argIndex];
-        argsObj[argKey] = convertFuncArg(argLogic, conv, config, meta, logic);
+        const argConfig = funcConfig?.args[argKey];
+        argsObj[argKey] = convertFuncArg(argLogic, argConfig, conv, config, meta, logic);
         argIndex++;
       }
+      break;
     }
   }
 
   if (funcKey) {
-    const funcArgs = {};
-    for (const argKey in funcConfig!.args) {
-      const argConfig = funcConfig!.args[argKey];
-      let argVal = argsObj![argKey];
+    const funcArgs: FuncArgsObj = {};
+    for (const argKey in funcConfig?.args) {
+      const argConfig = funcConfig.args[argKey];
+      let argVal = argsObj?.[argKey];
       if (argVal === undefined) {
         argVal = argConfig?.defaultValue;
         if (argVal === undefined) {
@@ -263,7 +301,7 @@ const convertFunc = (logic: OutLogic | undefined, conv: Conv, config: Config, me
         } else {
           argVal = {
             value: argVal,
-            valueSrc: argVal?.func ? "func" : "value",
+            valueSrc: (argVal as any)["func"] ? "func" : "value",
             valueType: argConfig.type,
           };
         }
@@ -277,7 +315,7 @@ const convertFunc = (logic: OutLogic | undefined, conv: Conv, config: Config, me
       value: {
         func: funcKey,
         args: funcArgs
-      },
+      } as FuncValue,
       valueType: funcConfig!.returnType,
     };
   } else {

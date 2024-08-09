@@ -7,7 +7,7 @@ import {
   formatFieldName, completeValue
 } from "../utils/ruleUtils";
 import pick from "lodash/pick";
-import {getOpCardinality, logger, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 import {spelEscape} from "../utils/export";

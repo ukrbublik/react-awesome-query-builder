@@ -184,14 +184,15 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
       //todo: it's naive, use valueType
       const field = fieldObj?.value;
       const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
-      logger.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}.`,
-        "widgets:", widgets, "vals:", vals, "valueType=", valueType);
       
       if (op == "eq" || op == "ne") {
         const ws = widgets.find(({ op, widget }) => (widget && widget != "field"));
         if (ws) {
           opKey = ws.op;
         }
+      } else {
+        logger.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}.`,
+          "widgets:", widgets, "vals:", vals, "valueType=", valueType);
       }
     }
 

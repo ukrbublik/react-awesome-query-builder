@@ -6,11 +6,18 @@ const { logger } = Utils.OtherUtils;
 
 const isFuncableProperty = (p) => ["length"].includes(p);
 
+export const manuallyImportedOps = [
+  "between", "not_between", "is_empty", "is_not_empty", "is_null", "is_not_null",
+  "some", "all", "none",
+];
+export const unsupportedOps = ["proximity"];
+
 
 export const buildConv = (config) => {
   let operators = {};
   for (let opKey in config.operators) {
     const opConfig = config.operators[opKey];
+    // const isGroupOp = config.settings.groupOperators?.includes(opKey);
     const spelOps = opConfig.spelOps ? opConfig.spelOps : opConfig.spelOp ? [opConfig.spelOp] : undefined;
     if (spelOps) {
       // examples of 2+: "==", "eq", ".contains", "matches" (can be used for starts_with, ends_with)
@@ -21,7 +28,14 @@ export const buildConv = (config) => {
         operators[opk].push(opKey);
       });
     } else {
-      logger.log(`[spel] No spelOp for operator ${opKey}`);
+      const revOpConfig = config.operators?.[opConfig.reversedOp];
+      const canUseRev = revOpConfig?.spelOp || revOpConfig?.spelOps;
+      const canIgnore = canUseRev
+        || manuallyImportedOps.includes(opKey) || manuallyImportedOps.includes(opConfig.reversedOp)
+        || unsupportedOps.includes(opKey);
+      if (!canIgnore) {
+        logger.warn(`[spel] No spelOp for operator ${opKey}`);
+      }
     }
   }
 

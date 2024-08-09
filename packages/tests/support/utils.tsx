@@ -1,5 +1,6 @@
 import React, { ReactElement } from "react";
 import { mount, shallow, ReactWrapper, MountRendererProps } from "enzyme";
+import type { SuiteFunction, TestFunction, HookFunction } from "mocha"; // to fix TS warnings in VSCode about `describe`, `it`
 import sinon, {spy} from "sinon";
 import { expect } from "chai";
 const stringify = JSON.stringify;

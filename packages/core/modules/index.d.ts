@@ -661,6 +661,7 @@ type _MixType<T> = T extends Function ? T : T extends Array<any> ? MixArray<T> :
 export type MixType<T> = _MixType<Opt<T>>;
 
 interface OtherUtils {
+  logger: typeof console;
   clone(obj: any): any;
   moment: Moment;
   uuid(): string;
@@ -1525,7 +1526,7 @@ export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettin
 /////////////////
 
 type SqlFormatFunc        = (this: ConfigContext, formattedArgs: TypedMap<string>) => string;
-type SqlImportFunc        = (this: ConfigContext, sql: Object) => Record<string, RuleValue> | undefined; // can throw
+type SqlImportFunc        = (this: ConfigContext, sql: Object) => Record<string, RuleValue> | undefined; // can throw, should return {func?, args: {}} or {operator?, children: []}
 type FormatFunc           = (this: ConfigContext, formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
 type MongoFormatFunc      = (this: ConfigContext, formattedArgs: TypedMap<MongoValue>) => MongoValue;
 type JsonLogicFormatFunc  = (this: ConfigContext, formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;

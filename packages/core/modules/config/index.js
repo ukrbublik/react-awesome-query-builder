@@ -241,6 +241,7 @@ const operators = {
       else
         return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
     },
+    // tip: this op can be imported from SpEL manually without using config
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       const valFrom = values[0];
       const valTo = values[1];
@@ -318,7 +319,7 @@ const operators = {
       const empty = this.utils.sqlEmptyValue(fieldDef);
       return `COALESCE(${field}, ${empty}) = ${empty}`;
     },
-    // tip: operators is_empty / is_null are imported manually from SpEL without using config
+    // tip: this op can be imported from SpEL manually without using config
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       //tip: is empty or null
       return `${field} <= ''`;
@@ -356,6 +357,7 @@ const operators = {
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS NULL` : `!${field}`;
     },
+    // tip: this op can be imported from SpEL manually without using config
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       return `${field} == null`;
     },
