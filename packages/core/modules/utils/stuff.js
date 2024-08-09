@@ -521,10 +521,19 @@ export const isJsonCompatible = (tpl, obj, bag = {}, path = []) => {
   }
 };
 
-const isDev = () => (typeof process !== "undefined" && process.env && process.env.NODE_ENV == "development");
+const isDev = () => (process?.env?.NODE_ENV == "development");
+const isTest = () => (process?.env?.NODE_ENV_TEST == "true");
 
-export const getLogger = (devMode = false) => {
-  const verbose = devMode != undefined ? devMode : isDev(); 
+export const getLogger = (devMode) => {
+  if (isTest()) {
+    return {
+      ...console,
+      log: () => {},
+      debug: () => {},
+      info: () => {},
+    };
+  }
+  const verbose = devMode != undefined ? devMode : isDev();
   return verbose ? console : {
     error: () => {},
     log: () => {},

@@ -8,6 +8,9 @@
       "dom",
       "dom.iterable"
     ],
+    "types": [
+      "mocha"
+    ],
     "allowJs": true,
     "outDir": "ts_out",
 

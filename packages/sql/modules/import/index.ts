@@ -11,19 +11,21 @@ import { processAst } from "./ast";
 import { buildConv } from "./conv";
 import { convertToTree } from "./convert";
 
+const logger = Utils.OtherUtils.logger;
 
-const logger = console; // (Utils.OtherUtils as any).logger as typeof console; // todo: at end
 
-
-export const loadFromSql = (sqlStr: string, config: Config, options?: SqlParseOption): {tree: ImmutableTree | undefined, errors: string[]} => {
+export const loadFromSql = (
+  sqlStr: string, config: Config, options?: SqlParseOption
+): {tree: ImmutableTree | undefined, errors: string[], warnings: string[]} => {
+  const meta: Meta = {
+    errors: [], // mutable
+    warnings: [], // mutable
+  };
   const extendedConfig = Utils.ConfigUtils.extendConfig(config, undefined, false);
-  const conv = buildConv(extendedConfig);
+  const conv = buildConv(extendedConfig, meta);
   let jsTree: JsonTree | undefined;
   let sqlAst: AST | undefined;
   let convertedObj: OutSelect | undefined;
-  const meta: Meta = {
-    errors: [], // mutable
-  };
 
   // Normalize
   if (!options) {
@@ -59,7 +61,8 @@ export const loadFromSql = (sqlStr: string, config: Config, options?: SqlParseOp
 
   return {
     tree: immTree,
-    errors: meta.errors
+    errors: meta.errors,
+    warnings: meta.warnings,
   };
 };
 

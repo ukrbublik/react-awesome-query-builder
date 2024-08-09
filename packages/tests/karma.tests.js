@@ -15,7 +15,7 @@ const specFilter = [
 ];
 
 const origDescribe = describe;
-// eslint-disable-next-line no-global-assign
+// eslint-disable-next-line no-global-assign, no-import-assign
 describe = function (suiteName, fn) {
   setCurrentTestName(suiteName);
   return origDescribe.call(this, suiteName, fn);

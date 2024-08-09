@@ -1,6 +1,6 @@
-import { SqlImportFunc } from "@react-awesome-query-builder/core";
+import { FuncValue, RuleValue, SimpleValue, SqlImportFunc, ValueSource } from "@react-awesome-query-builder/core";
 import type {
-  ExpressionValue, ExprList, LocationRange,
+  ExpressionValue, ExprList, LocationRange, ValueExpr,
 } from "node-sql-parser";
 
 declare module "node-sql-parser" {
@@ -37,8 +37,14 @@ export interface Conv {
 }
 
 export interface Meta {
+  // out meta
   errors: string[];
+  warnings: string[];
   convertedObj?: OutSelect;
+
+  // call meta
+  opKey?: string;
+  funcKey?: string;
 }
 
 export interface OutLogic  {
@@ -50,7 +56,7 @@ export interface OutLogic  {
   field?: string;
   table?: string;
   value?: any;
-  valueType?: string;
+  valueType?: /* ValueExpr["type"] */ string;
   operator?: string;
   func?: string;
   _type?: string;
@@ -61,3 +67,18 @@ export interface OutSelect {
   where?: OutLogic;
   select?: OutLogic;
 }
+
+///////
+
+export interface ValueObj {
+  valueType?: string;
+  value: RuleValue;
+  valueSrc: ValueSource;
+}
+
+export type FuncArgsObj = Record<string, ValueObj>;
+export interface OperatorObj {
+  operator: string;
+  children: Array<any>;
+}
+

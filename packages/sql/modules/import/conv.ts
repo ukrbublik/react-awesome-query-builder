@@ -1,22 +1,35 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
-import type { Conv } from "./types";
+import type { Conv, Meta } from "./types";
 import {
-  Config,
-  SqlImportFunc,
+  Config, SqlImportFunc, Utils,
 } from "@react-awesome-query-builder/core";
+import { ValueExpr } from "node-sql-parser";
+
+const logger = Utils.OtherUtils.logger;
+
+export const manuallyImportedOps: string[] = [
+];
+export const unsupportedOps: string[] = [
+  "some", "all", "none",
+];
+// sql type => raqb type
+export const SqlPrimitiveTypes: Record<string, string> = {
+  single_quote_string: "text",
+  number: "number",
+  null: "null",
+  bool: "boolean",
+  // todo: others? see ValueExpr["type"]
+};
 
 
-const logger = console; // (Utils.OtherUtils as any).logger as typeof console; // todo: at end
-
-
-export const buildConv = (config: Config): Conv => {
+export const buildConv = (config: Config, meta: Meta): Conv => {
   const operators: Record<string, string[]> = {};
   const opFuncs: Record<string, SqlImportFunc[]> = {};
 
   for (const opKey in config.operators) {
     const opConfig = config.operators[opKey];
-    const isGroupOp = config.settings.groupOperators?.includes(opKey);
+    // const isGroupOp = config.settings.groupOperators?.includes(opKey);
     const sqlOps = opConfig.sqlOps ? opConfig.sqlOps : opConfig.sqlOp ? [opConfig.sqlOp] : undefined;
     if (opConfig.sqlImport) {
       if (!opFuncs[opKey])
@@ -31,8 +44,13 @@ export const buildConv = (config: Config): Conv => {
         operators[sqlOp].push(opKey);
       });
     } else {
-      if (!isGroupOp && !opConfig.sqlImport) {
-        logger.log(`[sql] No sqlOp/sqlImport for operator ${opKey}`);
+      const revOpConfig = config.operators?.[opConfig.reversedOp!];
+      const canUseRev = revOpConfig?.sqlOp || revOpConfig?.sqlOps || revOpConfig?.sqlImport;
+      const canIgnore = canUseRev || opConfig.sqlImport
+        || manuallyImportedOps.includes(opKey) || manuallyImportedOps.includes(opConfig.reversedOp!)
+        || unsupportedOps.includes(opKey);
+      if (!canIgnore) {
+        logger.warn(`[sql] No sqlOp/sqlImport for operator ${opKey}`);
       }
     }
   }

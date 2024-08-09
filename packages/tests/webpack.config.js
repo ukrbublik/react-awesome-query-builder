@@ -43,6 +43,7 @@ console.log('karma-webpack output: ' + outputPath);
 
 const processEnv = {
   NODE_ENV: JSON.stringify('development'),
+  NODE_ENV_TEST: JSON.stringify('true'),
   CI: JSON.stringify(process.env.CI),
   FILTER_ARGS: JSON.stringify(filterArgs),
   // default is 2*1000
@@ -63,6 +64,10 @@ module.exports = {
     }),
   ],
   module: {
+    // Suppress warning from mocha: "Critical dependency: the request of a dependency is an expression"
+    // @see https://webpack.js.org/configuration/module/#module-contexts
+    exprContextCritical: false,
+
     rules: [
       {
         test: /\.[tj]sx?$/,
