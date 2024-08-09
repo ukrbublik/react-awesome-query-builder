@@ -3,7 +3,7 @@ import {
 } from "@react-awesome-query-builder/ui";
 import { DemoQueryBuilderState } from "./types";
 
-export const defaultInitFile = "tree/complex";
+export const defaultInitFile = "sql/simple";
 export const initialSkin = "mui";
 
 export const validationTranslateOptions: Partial<SanitizeOptions> = {
@@ -13,15 +13,15 @@ export const validationTranslateOptions: Partial<SanitizeOptions> = {
 };
 
 export const defaultRenderBlocks: DemoQueryBuilderState["renderBocks"] = {
-  validation: true,
-  jsonlogic: true,
-  elasticSearch: true,
-  mongo: true,
+  validation: false,
+  jsonlogic: false,
+  elasticSearch: false,
+  mongo: false,
   jsTree: true,
-  spel: true,
+  spel: false,
   strings: true,
   sql: true,
   actions: false,
   withProfile: false,
-  queryBuilder: true,
+  queryBuilder: false,
 };

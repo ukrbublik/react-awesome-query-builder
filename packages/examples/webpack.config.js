@@ -14,6 +14,7 @@ const isDev = (MODE == "development");
 const isAnalyze = process.env.ANALYZE == "1";
 const isSeparateCss = process.env.CSS == "1";
 const EXAMPLES = __dirname;
+
 const CORE_MODULES = path.resolve(EXAMPLES, '../core/modules/');
 const UI_MODULES = path.resolve(EXAMPLES, '../ui/modules/');
 const ANTD_MODULES = path.resolve(EXAMPLES, '../antd/modules/');
@@ -21,12 +22,15 @@ const MUI_MODULES = path.resolve(EXAMPLES, '../mui/modules/');
 const MATERIAL_MODULES = path.resolve(EXAMPLES, '../material/modules/');
 const BOOTSTRAP_MODULES = path.resolve(EXAMPLES, '../bootstrap/modules/');
 const FLUENT_MODULES = path.resolve(EXAMPLES, '../fluent/modules/');
+const SQL_MODULES = path.resolve(EXAMPLES, '../sql/modules/');
+
 const UI_CSS = path.resolve(EXAMPLES, '../ui/styles/');
 const ANTD_CSS = path.resolve(EXAMPLES, '../antd/styles/');
 const MUI_CSS = path.resolve(EXAMPLES, '../mui/styles/');
 const MATERIAL_CSS = path.resolve(EXAMPLES, '../material/styles/');
 const BOOTSTRAP_CSS = path.resolve(EXAMPLES, '../bootstrap/styles/');
 const FLUENT_CSS = path.resolve(EXAMPLES, '../fluent/styles/');
+
 const DIST = path.resolve(EXAMPLES, './build/');
 const NODE_MODULES = path.resolve(EXAMPLES, './node_modules/');
 const isMono = fs.existsSync(CORE_MODULES);
@@ -58,6 +62,8 @@ let aliases = isMono ? {
     '@react-awesome-query-builder/material': MATERIAL_MODULES,
     '@react-awesome-query-builder/bootstrap': BOOTSTRAP_MODULES,
     '@react-awesome-query-builder/fluent': FLUENT_MODULES,
+    '@react-awesome-query-builder/sql': SQL_MODULES,
+
 
     'react': path.resolve(NODE_MODULES, 'react'),
     'react-dom': path.resolve(NODE_MODULES, 'react-dom'),
