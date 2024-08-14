@@ -1,4 +1,4 @@
-import { FuncValue, RuleValue, SimpleValue, SqlImportFunc, ValueSource } from "@react-awesome-query-builder/core";
+import { Func, FuncValue, RuleValue, SimpleValue, SqlImportFunc, ValueSource } from "@react-awesome-query-builder/core";
 import type {
   ExpressionValue, ExprList, LocationRange, ValueExpr,
 } from "node-sql-parser";
@@ -77,8 +77,12 @@ export interface ValueObj {
 }
 
 export type FuncArgsObj = Record<string, ValueObj>;
+export interface FuncWithArgsObj {
+  func: string;
+  funcConfig?: Func | null;
+  args: FuncArgsObj;
+}
 export interface OperatorObj {
   operator: string;
   children: Array<any>;
 }
-

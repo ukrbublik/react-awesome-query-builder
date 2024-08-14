@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
-import type { Conv, FuncArgsObj, Meta, OperatorObj, OutLogic, ValueObj } from "./types";
+import type { Conv, FuncArgsObj, Meta, OperatorObj, FuncWithArgsObj, OutLogic, ValueObj } from "./types";
 import {
   Config, JsonRule, JsonGroup, JsonSwitchGroup, JsonCaseGroup, CaseGroupProperties, FieldConfigExt,
   BaseWidget, Utils, ValueSource, RuleProperties, SqlImportFunc, JsonAnyRule,
@@ -209,9 +209,10 @@ const convertFuncArg = (logic: any, argConfig: FuncArg | undefined, conv: Conv, 
   };
 };
 
+// `meta` should contain either `funcKey` or `opKey`
 const useImportFunc = (
   sqlImport: SqlImportFunc, logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta
-): FuncArgsObj | OperatorObj | undefined => {
+): FuncWithArgsObj | OperatorObj | undefined => {
   let parsed: Record<string, any> | undefined;
   try {
     parsed = sqlImport.call(config.ctx, logic!);
@@ -228,13 +229,19 @@ const useImportFunc = (
     } else if (parsed?.args) {
       const funcKey = parsed?.func as string ?? meta.funcKey;
       const funcConfig = Utils.ConfigUtils.getFuncConfig(config, funcKey);
-      const argsObj: FuncArgsObj = {};
-      for (const argKey in parsed) {
-        const argLogic = parsed[argKey] as OutLogic;
+      const args: FuncArgsObj = {};
+      for (const argKey in parsed.args) {
+        const argLogic = parsed.args[argKey] as OutLogic;
         const argConfig = funcConfig?.args[argKey];
-        argsObj[argKey] = convertFuncArg(argLogic, argConfig, conv, config, meta, logic);
+        args[argKey] = convertFuncArg(argLogic, argConfig, conv, config, meta, logic);
       }
-      return argsObj;
+      return {
+        func: funcKey,
+        funcConfig,
+        args,
+      };
+    } else {
+      meta.errors.push(`Result of parsing as ${meta.opKey ?? meta.funcKey ?? "?"} should contain either 'children' or 'args'`);
     }
   }
 
@@ -254,18 +261,20 @@ const convertOpFunc = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, 
   return undefined;
 };
 
-const convertFunc = (logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): ValueObj | undefined => {
+const convertFunc = (
+  logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic
+): ValueObj | undefined => {
   let funcKey: string | undefined, argsObj: FuncArgsObj | undefined, funcConfig: Func | undefined | null;
 
   for (const [f, fc] of Utils.ConfigUtils.iterateFuncs(config)) {
     const { sqlFunc, sqlImport } = fc;
     if (sqlImport) {
       // todo: types: always SqlImportFunc
-      const parsed = useImportFunc(sqlImport as SqlImportFunc, logic, conv, config, {...meta, funcKey: f});
+      const parsed = useImportFunc(sqlImport as SqlImportFunc, logic, conv, config, {...meta, funcKey: f}) as FuncWithArgsObj;
       if (parsed) {
-        funcKey = f;
-        funcConfig = Utils.ConfigUtils.getFuncConfig(config, funcKey);
-        argsObj = parsed as FuncArgsObj;
+        funcKey = parsed.func;
+        funcConfig = parsed.funcConfig;
+        argsObj = parsed.args;
         break;
       }
     }

@@ -953,6 +953,9 @@ const widgets = {
         return [undefined, "Invalid date"];
       }
     },
+    spelImport: function (sqlObj) {
+      // todo: TO_DATE
+    },
     jsonLogic: function (val, fieldDef, wgtDef) {
       return this.utils.moment(val, wgtDef.valueFormat).toDate();
     },

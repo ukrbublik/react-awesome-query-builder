@@ -69,10 +69,12 @@ const RELATIVE_DATETIME = {
       const [date, interval] = sqlObj.children;
       if (interval._type == "interval") {
         return {
-          date,
-          op: sqlObj?.func === "DATE_ADD" ? "plus" : "minus",
-          val: interval.value,
-          dim: interval.unit,
+          args: {
+            date,
+            op: sqlObj?.func === "DATE_ADD" ? "plus" : "minus",
+            val: interval.value,
+            dim: interval.unit,
+          }
         };
       }
     }
