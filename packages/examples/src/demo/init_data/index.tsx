@@ -18,7 +18,7 @@ export const emptySwitchTree: JsonTree = {id: uuid(), type: "switch_group"};
 // json funcs: JSON_VALUE(a, "$.info.address.town")
 // CASE mode: https://www.w3schools.com/sql/sql_case.asp
 // 
-const initSqlSimple = " DATE_ADD(NOW(), INTERVAL 2 DAY) > '2024-07-26 00:00:00.000' "; //"NOT (text = 'Long\\nText' AND num <> 2 OR DATE_ADD(NOW(), INTERVAL 2 DAY) > '2024-07-26 00:00:00.000' OR LOWER(user.firstName) = UPPER('gg') OR CONTAINS(prox1, 'NEAR((a, b), 2)'))";
+const initSqlSimple = "LOWER(bio) = 'aa' AND DATE_ADD(NOW(), INTERVAL 2 DAY) > TO_DATE('2024-07-26 00:00:00.000', 'yyyy-mi-dd hh:mm:ss.mmm') "; //"NOT (text = 'Long\\nText' AND num <> 2 OR DATE_ADD(NOW(), INTERVAL 2 DAY) > '2024-07-26 00:00:00.000' OR LOWER(user.firstName) = UPPER('gg') OR CONTAINS(prox1, 'NEAR((a, b), 2)'))";
 
 
 export const initFiles: Record<string, any> = {
