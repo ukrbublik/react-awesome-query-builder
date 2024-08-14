@@ -12,6 +12,7 @@ const NOW = {
   //spelFunc: "new java.util.Date()",
   spelFunc: "T(java.time.LocalDateTime).now()",
   sqlFormatFunc: () => "NOW()",
+  sqlFunc: "NOW",
   mongoFormatFunc: () => new Date(),
   formatFunc: () => "NOW",
 };
@@ -63,6 +64,21 @@ const RELATIVE_DATETIME = {
   // MySQL
   //todo: other SQL dialects?
   sqlFormatFunc: ({date, op, val, dim}) => `DATE_ADD(${date}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, "")})`,
+  sqlImport: (sqlObj) => {
+    if (["DATE_ADD", "DATE_SUB"].includes(sqlObj?.func) && sqlObj.children?.length === 2) {
+      const [date, interval] = sqlObj.children;
+      if (interval._type == "interval") {
+        return {
+          args: {
+            date,
+            op: sqlObj?.func === "DATE_ADD" ? "plus" : "minus",
+            val: interval.value,
+            dim: interval.unit,
+          }
+        };
+      }
+    }
+  },
   mongoFormatFunc: null, //todo: support?
   formatFunc: ({date, op, val, dim}) => (!val ? date : `${date} ${op == "minus" ? "-" : "+"} ${val} ${dim}`),
   args: {
@@ -71,7 +87,7 @@ const RELATIVE_DATETIME = {
       type: "datetime",
       defaultValue: {func: "NOW", args: []},
       valueSources: ["func", "field", "value"],
-      spelEscapeForFormat: true,
+      escapeForFormat: true,
     },
     op: {
       label: "Op",
@@ -89,7 +105,7 @@ const RELATIVE_DATETIME = {
           minus: "-",
         },
       },
-      spelEscapeForFormat: false,
+      escapeForFormat: false,
     },
     val: {
       label: "Value",
@@ -99,7 +115,7 @@ const RELATIVE_DATETIME = {
       },
       defaultValue: 0,
       valueSources: ["value"],
-      spelEscapeForFormat: false,
+      escapeForFormat: false,
     },
     dim: {
       label: "Dimension",
@@ -119,7 +135,7 @@ const RELATIVE_DATETIME = {
           year: "year",
         },
       },
-      spelEscapeForFormat: false,
+      escapeForFormat: false,
     },
   }
 };
@@ -128,6 +144,7 @@ const LOWER = {
   label: "Lowercase",
   mongoFunc: "$toLower",
   jsonLogic: "toLowerCase",
+  sqlFunc: "LOWER",
   spelFunc: "${str}.toLowerCase()",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
   jsonLogicCustomOps: {
@@ -147,6 +164,7 @@ const UPPER = {
   label: "Uppercase",
   mongoFunc: "$toUpper",
   jsonLogic: "toUpperCase",
+  sqlFunc: "UPPER",
   spelFunc: "${str}.toUpperCase()",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
   jsonLogicCustomOps: {
@@ -178,6 +196,7 @@ const LINEAR_REGRESSION = {
       }
     }
   },
+  // todo: sqlImport
   mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
   jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
   jsonLogicImport: (v) => {

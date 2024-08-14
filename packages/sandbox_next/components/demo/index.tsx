@@ -32,7 +32,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
 
   constructor(props: DemoQueryBuilderProps) {
     super(props);
-    const config = Utils.decompressConfig(props.zipConfig, MuiConfig, ctx);
+    const config = Utils.ConfigUtils.decompressConfig(props.zipConfig, MuiConfig, ctx);
     const loadedTree = loadTree(props.jsonTree);
     const { fixedTree, fixedErrors } = sanitizeTree(loadedTree, config);
     if (fixedErrors.length) {
@@ -114,7 +114,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
   updateConfig = () => {
     (async () => {
       const config = updateConfigWithSomeChanges(this.state.config);
-      const zipConfig = Utils.compressConfig(config, MuiConfig);
+      const zipConfig = Utils.ConfigUtils.compressConfig(config, MuiConfig);
       const response = await fetch("/api/config", {
         method: "POST",
         body: JSON.stringify({

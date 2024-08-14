@@ -188,7 +188,7 @@ describe("query with func", () => {
   describe("loads tree with func SUM_OF_MULTISELECT", () => {
     export_checks([with_all_types, with_funcs], inits.with_func_sum_of_multiselect, "JsonLogic", {
       "query": "num == SUM_OF_MULTISELECT(3,5)",
-      "queryHuman": "Number = Sum of multiselect(Value: 3,5)",
+      "queryHuman": "Number = Sum of multiselect(Value: C,E)",
       "sql": "num = SUM_OF_MULTISELECT(3,5)",
       "spel": "num == {3, 5}.sumOfMultiselect()",
       "logic": {
@@ -211,7 +211,7 @@ describe("query with func", () => {
   describe("loads tree with func SUM_OF_MULTISELECT from SpEL", () => {
     export_checks([with_all_types, with_funcs], inits.with_func_sum_of_multiselect_spel, "SpEL", {
       "query": "num == SUM_OF_MULTISELECT(5)",
-      "queryHuman": "Number = Sum of multiselect(Value: 5)",
+      "queryHuman": "Number = Sum of multiselect(Value: E)",
       "sql": "num = SUM_OF_MULTISELECT(5)",
       "spel": "num == {5}.sumOfMultiselect()",
       "logic": {
