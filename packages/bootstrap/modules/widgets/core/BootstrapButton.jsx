@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "reactstrap";
 
 const hideLabelsFor = {
-  "addRuleGroup": true,
+  "addSubRuleSimple": true,
   "delRuleGroup": true,
   "delRule": true,
 };

@@ -2,14 +2,15 @@ import React from "react";
 import { IconButton, ActionButton, CommandBarButton, DefaultButton } from "@fluentui/react";
 
 const hideLabelsFor = {
-  "addRuleGroup": true,
+  "addSubRuleSimple": true,
   "delRuleGroup": true,
   "delRule": true,  
-  // "addRuleGroupExt": true,
+  // "addSubRule": true,
+  // "addSubGroup": true,
   // "delGroup": true,
 };
 const useAction = {
-  "addRuleGroup": true,
+  "addSubRuleSimple": true,
 };
 
 const FluentUIButton = (props) => {

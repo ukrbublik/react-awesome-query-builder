@@ -209,6 +209,7 @@ export class BasicGroup extends Component {
   canAddGroup() {
     return this.props.allowFurtherNesting;
   }
+
   canAddRule() {
     const maxNumberOfRules = this.props.config.settings.maxNumberOfRules;
     const totalRulesCnt = this.props.totalRulesCnt;
@@ -217,6 +218,7 @@ export class BasicGroup extends Component {
     }
     return true;
   }
+
   canDeleteGroup() {
     return !this.props.isRoot;
   }

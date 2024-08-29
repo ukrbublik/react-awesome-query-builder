@@ -1302,16 +1302,16 @@ const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
   return valProperties;
 };
 
-// const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj) => {
+// const wrapInDefaultConjRuleGroup = (rule, groupField, groupFieldConfig, config, conj) => {
 //   if (!rule) return undefined;
 //   return {
 //     type: "rule_group",
 //     id: uuid(),
 //     children1: { [rule.id]: rule },
 //     properties: {
-//       conjunction: conj || defaultGroupConjunction(config, parentFieldConfig),
+//       conjunction: conj || defaultGroupConjunction(config, groupFieldConfig),
 //       not: false,
-//       field: parentField,
+//       field: groupField,
 //     }
 //   };
 // };

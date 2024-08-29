@@ -455,6 +455,7 @@ Localization:
 |addGroupLabel |Add group
 |addRuleLabel |Add rule
 |addSubRuleLabel |Add sub rule
+|addSubGroupLabel |Add sub group
 |notLabel |Not
 |fieldSourcesPopupTitle |Select source
 |valueSourcesPopupTitle |Select value source
