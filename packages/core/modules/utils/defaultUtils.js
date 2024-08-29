@@ -105,13 +105,20 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null, item =
         .set("fieldError", newFieldError);
     }
   }
+
+  const fieldConfig = getFieldConfig(config, field);
+  if (fieldConfig?.type === "!group") {
+    const conjunction = defaultGroupConjunction(config, fieldConfig);
+    current = current.set("conjunction", conjunction);
+  }
+
   return current; 
 };
 
 
-export const defaultGroupConjunction = (config, fieldConfig = null) => {
-  fieldConfig = getFieldConfig(config, fieldConfig); // if `fieldConfig` is field name, not config
-  const conjs = fieldConfig && fieldConfig.conjunctions || Object.keys(config.conjunctions);
+export const defaultGroupConjunction = (config, groupFieldConfig = null) => {
+  groupFieldConfig = getFieldConfig(config, groupFieldConfig); // if `groupFieldConfig` is field name, not config
+  const conjs = groupFieldConfig && groupFieldConfig.conjunctions || Object.keys(config.conjunctions);
   if (conjs.length == 1)
     return conjs[0];
   return config.settings.defaultGroupConjunction || config.settings.defaultConjunction || conjs[0];
@@ -120,14 +127,16 @@ export const defaultGroupConjunction = (config, fieldConfig = null) => {
 export const defaultConjunction = (config) =>
   config.settings.defaultConjunction || Object.keys(config.conjunctions)[0];
 
-export const defaultGroupProperties = (config, fieldConfig = null) => new Immutable.Map({
-  conjunction: defaultGroupConjunction(config, fieldConfig),
-  not: false
-});
+export const defaultGroupProperties = (config, groupFieldConfig = null) => {
+  return new Immutable.Map({
+    conjunction: defaultGroupConjunction(config, groupFieldConfig),
+    not: false
+  });
+};
 
 export const defaultItemProperties = (config, item) => {
-  return item && item.type == "group" 
-    ? defaultGroupProperties(config, item?.properties?.field) 
+  return item?.type == "group" 
+    ? defaultGroupProperties(config) 
     : defaultRuleProperties(config, null, item);
 };
 

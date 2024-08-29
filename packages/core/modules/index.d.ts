@@ -553,11 +553,11 @@ interface DefaultUtils {
   defaultRule(id: string, config: Config): Record<string, ImmutableRule>;
   defaultRoot(config: Config, canAddDefaultRule?: boolean): ImmutableGroup;
   defaultItemProperties(config: Config, item: JsonItem): ImmutableItemProperties;
-  defaultGroupProperties(config: Config, fieldConfig?: FieldValueOrConfig): ImmutableGroupProperties;
+  defaultGroupProperties(config: Config, groupFieldConfig?: FieldValueOrConfig): ImmutableGroupProperties;
   defaultRuleProperties(config: Config, parentRuleGroupPath?: IdPath, item?: JsonItem, canUseDefaultFieldAndOp?: boolean, canGetFirst?: boolean): ImmutableRuleProperties;
   defaultConjunction(config: Config): string;
   defaultOperatorOptions(config: Config, operator: string, field: Field): OperatorOptionsI | null;
-  defaultGroupConjunction(config: Config, fieldConfig?: FieldValueOrConfig): string;
+  defaultGroupConjunction(config: Config, groupFieldConfig?: FieldValueOrConfig): string;
 
   // createListWithOneElement<TItem>(el: TItem): ImmutableList<TItem>;
   // createListFromArray<TItem>(array: TItem[]): ImmutableList<TItem>;
@@ -1256,6 +1256,7 @@ interface FieldGroup<FS = NumberFieldSettings<number>> extends BaseField {
   isSpelItemMap?: boolean;
   defaultField?: FieldPath;
   fieldSettings?: FS;
+  maxNesting?: number;
 }
 interface FieldGroupExt<FS = NumberFieldSettings<number>> extends BaseField {
   type: "!group";
@@ -1338,6 +1339,7 @@ export interface LocaleSettings {
   defaultCaseLabel?: string;
   addRuleLabel?: string;
   addSubRuleLabel?: string;
+  addSubGroupLabel?: string;
   delGroupLabel?: string;
   notLabel?: string;
   fieldSourcesPopupTitle?: string;

@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "antd";
 
 const hideLabelsFor = {
-  "addRuleGroup": true,
+  "addSubRuleSimple": true,
   "delGroup": true,
   "delRuleGroup": true,
   "delRule": true,
@@ -14,7 +14,9 @@ const typeToClass = {
   "delRule": "action action--DELETE",
   "delGroup": "action action--DELETE",
   "delRuleGroup": "action action--DELETE",
-  "addRuleGroup": "action action--ADD-RULE",
+  "addSubRuleSimple": "action action--ADD-RULE",
+  "addSubRule": "action action--ADD-RULE",
+  "addSubGroup": "action action--ADD-GROUP",
 };
 
 const typeToType = {

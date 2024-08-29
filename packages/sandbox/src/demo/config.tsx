@@ -393,6 +393,7 @@ export function createConfig(InitialConfig: BasicConfig): Config {
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
     addSubRuleLabel: "Add sub rule",
+    addSubGroupLabel: "Add sub group",
     delGroupLabel: undefined,
     notLabel: "Not",
     fieldSourcesPopupTitle: "Select source",

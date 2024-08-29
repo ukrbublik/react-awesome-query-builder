@@ -31,6 +31,7 @@ export class BasicGroup extends Component {
     isDraggingTempo: PropTypes.bool,
     isLocked: PropTypes.bool,
     isTrueLocked: PropTypes.bool,
+    parentField: PropTypes.string, //from RuleGroup
     //actions
     handleDraggerMouseDown: PropTypes.func,
     onDragStart: PropTypes.func,
@@ -209,6 +210,7 @@ export class BasicGroup extends Component {
   canAddGroup() {
     return this.props.allowFurtherNesting;
   }
+
   canAddRule() {
     const maxNumberOfRules = this.props.config.settings.maxNumberOfRules;
     const totalRulesCnt = this.props.totalRulesCnt;
@@ -217,6 +219,7 @@ export class BasicGroup extends Component {
     }
     return true;
   }
+
   canDeleteGroup() {
     return !this.props.isRoot;
   }
@@ -231,13 +234,12 @@ export class BasicGroup extends Component {
       return undefined;
     }
     const props = this.props;
-    const {config, actions, onDragStart, isLocked} = props;
+    const {config, actions, onDragStart, isLocked, parentField} = props;
     const isRuleGroup = item.get("type") == "group" && item.getIn(["properties", "field"]) != null;
     const type = isRuleGroup ? "rule_group" : item.get("type");
     
     return (
       <Item
-        {...this.extraPropsForItem(item)}
         key={item.get("id")}
         id={item.get("id")}
         groupId={props.id}
@@ -248,12 +250,14 @@ export class BasicGroup extends Component {
         config={config}
         actions={actions}
         children1={item.get("children1")}
+        parentField={parentField}
         reordableNodesCnt={this.reordableNodesCntForItem(item)}
         totalRulesCnt={this.totalRulesCntForItem(item)}
         parentReordableNodesCnt={this.reordableNodesCnt()}
         onDragStart={onDragStart}
         isDraggingTempo={this.props.isDraggingTempo}
         isParentLocked={isLocked}
+        {...this.extraPropsForItem(item)}
       />
     );
   }
