@@ -57,7 +57,7 @@ const typeMap = {
       onDragStart={props.onDragStart}
       isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
-      parentField={null}
+      parentField={props.parentField}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
     />
   ),
