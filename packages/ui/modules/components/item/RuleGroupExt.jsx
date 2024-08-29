@@ -222,12 +222,14 @@ class RuleGroupExt extends BasicGroup {
   }
 
   renderActions() {
-    const {config, addRule, isLocked, isTrueLocked, id} = this.props;
+    const {config, addRule, addGroup, isLocked, isTrueLocked, id} = this.props;
 
     return <RuleGroupExtActions
       config={config}
       addRule={addRule}
+      addGroup={addGroup}
       canAddRule={this.canAddRule()}
+      canAddGroup={this.canAddGroup()}
       canDeleteGroup={this.canDeleteGroup()}
       removeSelf={this.removeSelf}
       setLock={this.setLock}

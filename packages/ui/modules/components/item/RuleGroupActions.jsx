@@ -21,8 +21,8 @@ export class RuleGroupActions extends PureComponent {
       type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} checkedLabel={lockedLabel} hideLabel={true} config={config}
     />;
 
-    const addRuleBtn = !immutableGroupsMode && canAddRule && !isLocked && <Btn 
-      type="addRuleGroup" onClick={addRule} label={addRuleLabel} readonly={isLocked} config={config} renderIcon={Icon}
+    const addSubRuleBtn = !immutableGroupsMode && canAddRule && !isLocked && <Btn 
+      type="addSubRuleSimple" onClick={addRule} label={addRuleLabel} readonly={isLocked} config={config} renderIcon={Icon}
     />;
 
     const delGroupBtn = !immutableGroupsMode && canDeleteGroup && (!isLocked || isLocked && canDeleteLocked) && <Btn 
@@ -33,7 +33,7 @@ export class RuleGroupActions extends PureComponent {
       <div className={"group--actions"}>
         <BtnGrp config={config}>
           {setLockSwitch}
-          {addRuleBtn}
+          {addSubRuleBtn}
           {delGroupBtn}
         </BtnGrp>
       </div>

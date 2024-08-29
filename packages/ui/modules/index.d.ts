@@ -206,7 +206,7 @@ export type Query = ElementType<QueryProps>;
 // Props for render* in RenderSettings
 /////////////////
 
-type ButtonIconType = "addRule" | "addGroup" | "delRule" | "delGroup"  | "addRuleGroup" | "delRuleGroup";
+type ButtonIconType = "addRule" | "addGroup" | "delRule" | "delGroup" | "addSubRuleSimple" | "addSubRule" | "addSubGroup" | "delRuleGroup";
 type IconType = ButtonIconType | "drag";
 
 export interface ButtonProps {

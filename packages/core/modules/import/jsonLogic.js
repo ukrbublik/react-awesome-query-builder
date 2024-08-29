@@ -669,16 +669,16 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
 //   return arr;
 // };
 
-const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj = undefined, not = false) => {
+const wrapInDefaultConjRuleGroup = (rule, groupField, groupFieldConfig, config, conj = undefined, not = false) => {
   if (!rule) return undefined;
   return {
     type: "rule_group",
     id: uuid(),
     children1: { [rule.id]: rule },
     properties: {
-      conjunction: conj || defaultGroupConjunction(config, parentFieldConfig),
+      conjunction: conj || defaultGroupConjunction(config, groupFieldConfig),
       not: not,
-      field: parentField,
+      field: groupField,
     }
   };
 };
