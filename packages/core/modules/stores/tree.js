@@ -1,6 +1,6 @@
 import Immutable, { fromJS } from "immutable";
 import {
-  expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree, 
+  expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree,
   getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren, removeIsLockedInTree
 } from "../utils/treeUtils";
 import {
@@ -50,8 +50,7 @@ const addNewGroup = (state, path, type, generatedId, properties, config, childre
 
       // Add one empty rule into new group
       if (canAddNewRule) {
-        // todo: set defaultField inside rule-group
-        state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+        state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config, meta.parentRuleGroupField), config);
       }
     }
 

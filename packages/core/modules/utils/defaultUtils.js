@@ -7,10 +7,10 @@ import { isImmutable, isImmutableList } from "./stuff";
 import { jsToImmutable } from "../import";
 
 
-export const getDefaultField = (config, canGetFirst = true, parentRuleGroupPath = null) => {
+export const getDefaultField = (config, canGetFirst = true, parentRuleGroupField = null) => {
   const {defaultField} = config.settings;
-  let f = (!parentRuleGroupPath ? defaultField : getDefaultSubField(config, parentRuleGroupPath))
-    || canGetFirst && getFirstField(config, parentRuleGroupPath)
+  let f = (!parentRuleGroupField ? defaultField : getDefaultSubField(config, parentRuleGroupField))
+    || canGetFirst && getFirstField(config, parentRuleGroupField)
     || null;
   // if default LHS is func, convert to Immutable
   if (f != null && typeof f !== "string" && !isImmutable(f)) {
@@ -19,14 +19,14 @@ export const getDefaultField = (config, canGetFirst = true, parentRuleGroupPath 
   return f;
 };
 
-export const getDefaultSubField = (config, parentRuleGroupPath = null) => {
-  if (!parentRuleGroupPath)
+export const getDefaultSubField = (config, parentRuleGroupField = null) => {
+  if (!parentRuleGroupField)
     return null;
   const fieldSeparator = config?.settings?.fieldSeparator || ".";
-  const parentRuleGroupConfig = getFieldConfig(config, parentRuleGroupPath);
+  const parentRuleGroupConfig = getFieldConfig(config, parentRuleGroupField);
   let f = parentRuleGroupConfig?.defaultField;
   if (f) {
-    f = [...getFieldParts(parentRuleGroupPath), f].join(fieldSeparator);
+    f = [...getFieldParts(parentRuleGroupField), f].join(fieldSeparator);
   }
   return f;
 };
@@ -59,7 +59,7 @@ export const defaultOperatorOptions = (config, operator, field) => {
   ) : null;
 };
 
-export const defaultRuleProperties = (config, parentRuleGroupPath = null, item = null, canUseDefaultFieldAndOp = true, canGetFirst = false) => {
+export const defaultRuleProperties = (config, parentRuleGroupField = null, item = null, canUseDefaultFieldAndOp = true, canGetFirst = false) => {
   let field = null, operator = null, fieldSrc = null;
   const {showErrorMessage} = config.settings;
   if (item) {
@@ -67,7 +67,7 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null, item =
     field = item?.properties?.field;
     operator = item?.properties?.operator;
   } else if (canUseDefaultFieldAndOp) {
-    field = getDefaultField(config, canGetFirst, parentRuleGroupPath);
+    field = getDefaultField(config, canGetFirst, parentRuleGroupField);
     if (field) {
       fieldSrc = isImmutable(field) ? "func" : "field";
     } else {
