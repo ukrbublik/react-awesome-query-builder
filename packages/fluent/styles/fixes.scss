@@ -31,7 +31,7 @@
   .rule_group .group--actions {
     align-self: center;
   }
-  .rule_group_ext .group--actions {
+  .rule_group_ext > .group--header .group--actions {
     align-self: stretch;
   }
 
