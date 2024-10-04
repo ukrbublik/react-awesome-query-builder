@@ -189,7 +189,7 @@ export class BasicGroup extends Component {
   };
 
   renderActions() {
-    const {config, addRule, addGroup, isLocked, isTrueLocked, id} = this.props;
+    const {config, addRule, addGroup, isLocked, isTrueLocked, id, parentField} = this.props;
 
     return <GroupActions
       key="group-actions"
@@ -204,6 +204,7 @@ export class BasicGroup extends Component {
       isLocked={isLocked}
       isTrueLocked={isTrueLocked}
       id={id}
+      parentField={parentField}
     />;
   }
 
