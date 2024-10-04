@@ -116,9 +116,8 @@ const createGroupContainer = (Group, itemType) =>
     };
 
     addGroup = () => {
-      // todo: if nested, get field even if itemType == "group"
-      const parentRuleGroupPath = itemType == "rule_group" ? this.props.field : null;
-      this.props.actions.addGroup(this.props.path, undefined, undefined, undefined, parentRuleGroupPath);
+      const parentRuleGroupField = itemType == "rule_group" ? this.props.field : this.props.parentField;
+      this.props.actions.addGroup(this.props.path, undefined, undefined, parentRuleGroupField);
     };
 
     addCaseGroup = () => {
@@ -130,9 +129,8 @@ const createGroupContainer = (Group, itemType) =>
     };
 
     addRule = () => {
-      // todo: if nested, get field even if itemType == "group"
-      const parentRuleGroupPath = itemType == "rule_group" ? this.props.field : null;
-      this.props.actions.addRule(this.props.path, undefined, undefined, undefined, parentRuleGroupPath);
+      const parentRuleGroupField = itemType == "rule_group" ? this.props.field : this.props.parentField;
+      this.props.actions.addRule(this.props.path, undefined, undefined, undefined, parentRuleGroupField);
     };
 
     // for RuleGroup
