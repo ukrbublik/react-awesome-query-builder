@@ -3,8 +3,9 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 
 const hideLabelsFor = {
-  "addRuleGroup": true,
-  "addRuleGroupExt": true,
+  "addSubRuleSimple": true,
+  // "addSubRule": true,
+  // "addSubGroup": true,
   "delGroup": true,
   "delRuleGroup": true,
   "delRule": true,

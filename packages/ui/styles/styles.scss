@@ -488,7 +488,7 @@ $rule-group-actions-offset-left: 10px !default;
   /** RULE_GROUP_EXT *********************************************************************/
   /******************************************************************************/
 
-  .rule_group_ext .group--actions {
+  .rule_group_ext > .group--header .group--actions {
     flex: none;
   }
 

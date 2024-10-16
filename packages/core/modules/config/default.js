@@ -56,6 +56,7 @@ export const settings = {
   defaultCaseLabel: "Default:",
   addRuleLabel: "Add rule",
   addSubRuleLabel: "Add sub rule",
+  addSubGroupLabel: "Add sub group",
   delGroupLabel: "Delete",
   notLabel: "Not",
   fieldSourcesPopupTitle: "Select source",

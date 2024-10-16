@@ -322,6 +322,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
     addSubRuleLabel: "Add sub rule",
+    addSubGroupLabel: "Add sub group",
     delGroupLabel: null,
     notLabel: "Not",
     fieldSourcesPopupTitle: "Select source",

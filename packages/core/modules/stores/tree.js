@@ -1,6 +1,6 @@
 import Immutable, { fromJS } from "immutable";
 import {
-  expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree, 
+  expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree,
   getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren, removeIsLockedInTree
 } from "../utils/treeUtils";
 import {
@@ -50,7 +50,7 @@ const addNewGroup = (state, path, type, generatedId, properties, config, childre
 
       // Add one empty rule into new group
       if (canAddNewRule) {
-        state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+        state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config, meta.parentRuleGroupField), config);
       }
     }
 
@@ -229,6 +229,7 @@ const addItem = (state, path, type, generatedId, properties, config, children = 
     currentNumber = path.size;
     maxNumber = maxNesting;
   } else if (targetItem?.get("type") === "rule_group") {
+    // todo
     // don't restrict
   } else {
     currentNumber = isTernary ? getTotalRulesCountInTree(caseGroup) : getTotalRulesCountInTree(state);
@@ -573,7 +574,7 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
     const {canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality} = getNewValueForFieldOp(
       config, config, currentProperties, newField, newOperator, "field", canFix, isEndValue, canDropArgs
     );
-    let groupProperties = defaultGroupProperties(config, newFieldConfig).merge({
+    let groupProperties = defaultGroupProperties(config, newFieldConfig, newField).merge({
       field: newField,
       fieldSrc: "field",
       mode: newFieldConfig.mode,

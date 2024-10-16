@@ -4,11 +4,11 @@ export class RuleGroupExtActions extends PureComponent {
   render() {
     const {
       config, 
-      addRule, canAddRule, canDeleteGroup, removeSelf, 
+      addRule, addGroup, canAddRule, canAddGroup, canDeleteGroup, removeSelf, 
       setLock, isLocked, isTrueLocked, id,
     } = this.props;
     const {
-      immutableGroupsMode, addSubRuleLabel, delGroupLabel,
+      immutableGroupsMode, addSubRuleLabel, addSubGroupLabel, delGroupLabel,
       renderButton, renderIcon, renderSwitch, renderButtonGroup,
       lockLabel, lockedLabel, showLock, canDeleteLocked,
     } = config.settings;
@@ -21,10 +21,14 @@ export class RuleGroupExtActions extends PureComponent {
       type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} checkedLabel={lockedLabel} config={config}
     />;
 
-    const addRuleBtn = !immutableGroupsMode && canAddRule && !isLocked && <Btn 
-      type="addRuleGroupExt" onClick={addRule} label={addSubRuleLabel} readonly={isLocked} config={config} renderIcon={Icon}
+    const addSubRuleBtn = !immutableGroupsMode && canAddRule && !isLocked && <Btn 
+      type="addSubRule" onClick={addRule} label={addSubRuleLabel} readonly={isLocked} config={config} renderIcon={Icon}
     />;
 
+    const addSubGroupBtn = !immutableGroupsMode && canAddGroup && !isLocked && <Btn
+      type="addSubGroup" onClick={addGroup} label={addSubGroupLabel} readonly={isLocked} config={config} renderIcon={Icon}
+    />;
+  
     const delGroupBtn = !immutableGroupsMode && canDeleteGroup && (!isLocked || isLocked && canDeleteLocked) && <Btn 
       type="delRuleGroup" onClick={removeSelf} label={delGroupLabel} config={config} renderIcon={Icon}
     />;
@@ -33,7 +37,8 @@ export class RuleGroupExtActions extends PureComponent {
       <div className={"group--actions group--actions--tr"}>
         <BtnGrp config={config}>
           {setLockSwitch}
-          {addRuleBtn}
+          {addSubRuleBtn}
+          {addSubGroupBtn}
           {delGroupBtn}
         </BtnGrp>
       </div>

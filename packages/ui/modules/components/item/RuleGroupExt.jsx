@@ -41,8 +41,23 @@ class RuleGroupExt extends BasicGroup {
   childrenClassName = () => "rule_group_ext--children";
   
   renderFooterWrapper = () => null;
-  canAddGroup = () => false;
-  canAddRule = () => true;
+
+  canAddGroup() {
+    // todo
+    return true;
+    // return this.props.allowFurtherNesting;
+  }
+
+  canAddRule() {
+    // todo
+    // const maxNumberOfRules = this.props.config.settings.maxNumberOfRules;
+    // const totalRulesCnt = this.props.totalRulesCnt;
+    // if (maxNumberOfRules) {
+    //   return totalRulesCnt < maxNumberOfRules;
+    // }
+    return true;
+  }
+
   canDeleteGroup = () => true;
 
   renderHeaderWrapper() {
@@ -222,12 +237,14 @@ class RuleGroupExt extends BasicGroup {
   }
 
   renderActions() {
-    const {config, addRule, isLocked, isTrueLocked, id} = this.props;
+    const {config, addRule, addGroup, isLocked, isTrueLocked, id} = this.props;
 
     return <RuleGroupExtActions
       config={config}
       addRule={addRule}
+      addGroup={addGroup}
       canAddRule={this.canAddRule()}
+      canAddGroup={this.canAddGroup()}
       canDeleteGroup={this.canDeleteGroup()}
       removeSelf={this.removeSelf}
       setLock={this.setLock}
