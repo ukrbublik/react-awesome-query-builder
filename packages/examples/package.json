@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/examples",
-  "version": "6.6.3",
+  "version": "6.6.4-alpha.0",
   "description": "Local hot-reloadable demo for @react-awesome-query-builder",
   "repository": {
     "type": "git",

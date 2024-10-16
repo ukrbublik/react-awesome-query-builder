@@ -1,4 +1,6 @@
 # Changelog
+- 6.6.4-alpha.0
+  - Support groups inside rule-group (PR #1111) (issue #1108)
 - 6.6.3
   - Fixed `Utils.isValidTree` for prod build.
     Removed `checkTree`, `isValidTree` from `Utils.Import` and `getTreeBadFields` from `Utils.TreeUtils`. (PR #1091) (issue #1075)
