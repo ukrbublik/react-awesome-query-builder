@@ -36,6 +36,6 @@ jobs:
           #cache: 'pnpm'
           registry-url: https://registry.npmjs.org/
       - run: pnpm i --frozen-lockfile
-      - run: pnpm -r publish --access public
+      - run: pnpm -r publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
