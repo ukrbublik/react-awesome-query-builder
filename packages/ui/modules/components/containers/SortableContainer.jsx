@@ -575,7 +575,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       const isParentChange = fromII.parent != toII.parent;
       const isStructChange = isPend || isParentChange;
       // can't restruct `rule_group`
-      const isRuleGroupAffected = (fromII.type == "rule_group" || fromII.parentType == "rule_group" || toII.type == "rule_group" || toII.parentType == "rule_group");
+      const isRuleGroupAffected = (fromII.type == "rule_group" || !!fromII.closestRuleGroupId || toII.type == "rule_group" || !!toII.closestRuleGroupId);
       const targetRuleGroupId = isPend && toII.type == "rule_group" ? toII.id : toII.closestRuleGroupId;
       const isForbiddenRuleGroupChange = isRuleGroupAffected && fromII.closestRuleGroupId != targetRuleGroupId;
       const isForbiddenCaseChange = 
