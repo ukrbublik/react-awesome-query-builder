@@ -574,15 +574,19 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       const isLev1 = isBeforeAfter && toII.lev == 1 || isPend && toII.lev == 0;
       const isParentChange = fromII.parent != toII.parent;
       const isStructChange = isPend || isParentChange;
-      // can't move `case_group` anywhere but before/after anoter `case_group`
-      const isForbiddenStructChange = fromII.type == "case_group" && !isLev1
-        // can't restruct `rule_group`
-        || fromII.parentType == "rule_group" || toII.type == "rule_group" || toII.parentType == "rule_group" 
+      // can't restruct `rule_group`
+      const isRuleGroupAffected = (fromII.type == "rule_group" || fromII.parentType == "rule_group" || toII.type == "rule_group" || toII.parentType == "rule_group");
+      const targetRuleGroupId = isPend && toII.type == "rule_group" ? toII.id : toII.closestRuleGroupId;
+      const isForbiddenRuleGroupChange = isRuleGroupAffected && fromII.closestRuleGroupId != targetRuleGroupId;
+      const isForbiddenCaseChange = 
+        // can't move `case_group` anywhere but before/after anoter `case_group`
+        fromII.type == "case_group" && !isLev1
         // only `case_group` can be placed under `switch_group`
         || fromII.type != "case_group" && toII.type == "case_group" && isBeforeAfter
         || fromII.type != "case_group" && toII.type == "switch_group"
         // can't move rule/group to another case
         || !canRegroupCases && fromII.caseId != toII.caseId;
+      const isForbiddenStructChange = isForbiddenCaseChange || isForbiddenRuleGroupChange;
       const isLockedChange = toII.isLocked || fromII.isLocked || toParentII && toParentII.isLocked;
       
       if (maxNesting && newDepthLev > maxNesting)

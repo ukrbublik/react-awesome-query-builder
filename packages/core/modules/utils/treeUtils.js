@@ -208,6 +208,7 @@ export const getFlatTree = (tree) => {
     const isAtomicRule = !insideRuleGroup && (!children || isRuleGroup);
     const hasChildren = childrenIds?.length > 0;
     const parentId = path.length ? path[path.length-1] : null;
+    const closestRuleGroupId = [...path].reverse().find(id => items[id].type == "rule_group");
     const currentCaseId = isCaseGroup ? id : caseId;
 
     // Calculations before
@@ -248,6 +249,7 @@ export const getFlatTree = (tree) => {
       childNo,
       caseId: currentCaseId,
       caseNo,
+      closestRuleGroupId,
       path: path.concat(id),
       lev: lev, // depth level (0 for root node)
       isLeaf: !children, // is atomic rule OR rule inside rule_group
