@@ -33,13 +33,17 @@ if [[ "$(pnpm -v)" != "8."* ]]; then
 fi
 
 if [ $# -gt 0 ]; then
-    bin="$(which $1 | head -n 1)"
+    orig_cmd="$1"
+    fixed_cmd="${orig_cmd/yarn run/pnpm run}"
+    bin="$(which $fixed_cmd | head -n 1)"
     cmd="$@"
     shift
     args="$(echo $cmd | cut -d' ' -f2-)" # strip "pnpm" from "pnpm X"
     if [[ "$cmd" == *"pnpm run "* ]]; then
         args="$(echo $cmd | cut -d' ' -f3-)" # strip "pnpm run" from "pnpm run X"
     fi
+    echo "orig cmd: $orig_cmd"
+    echo "fixed cmd: $fixed_cmd"
     echo "bin: $bin"
     echo "cmd: $cmd"
     echo "args: $args"
