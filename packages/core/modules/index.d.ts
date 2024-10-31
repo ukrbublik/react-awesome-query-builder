@@ -555,6 +555,9 @@ interface DefaultUtils {
   defaultItemProperties(config: Config, item: JsonItem): ImmutableItemProperties;
   defaultGroupProperties(config: Config, groupFieldConfig?: FieldValueOrConfig): ImmutableGroupProperties;
   defaultRuleProperties(config: Config, parentRuleGroupField?: string, item?: JsonItem, canUseDefaultFieldAndOp?: boolean, canGetFirst?: boolean): ImmutableRuleProperties;
+  /**
+   * @deprecated Use defaultGroupConjunction() instead
+   */
   defaultConjunction(config: Config): string;
   defaultOperatorOptions(config: Config, operator: string, field: Field): OperatorOptionsI | null;
   defaultGroupConjunction(config: Config, groupFieldConfig?: FieldValueOrConfig): string;
@@ -1269,6 +1272,7 @@ interface FieldGroupExt<FS = NumberFieldSettings<number>> extends BaseField {
   initialEmptyWhere?: boolean;
   showNot?: boolean;
   conjunctions?: Array<string>;
+  defaultConjunction?: string;
   isSpelArray?: boolean;
   isSpelItemMap?: boolean;
 }
@@ -1364,6 +1368,7 @@ export interface BehaviourSettings {
   canShortMongoQuery?: boolean;
   defaultField?: AnyFieldValue;
   defaultOperator?: string;
+  defaultConjunction?: string;
   fieldSources?: Array<FieldSource>;
   valueSourcesInfo?: ValueSourcesInfo;
   canCompareFieldWithField?: CanCompareFieldWithField | SerializedFunction;

@@ -108,26 +108,14 @@ class RuleGroupExt extends BasicGroup {
   }
 
   showNot() {
-    const {config, selectedField, selectedOperator} = this.props;
-    const selectedFieldConfig = getFieldConfig(config, selectedField) || {};
-    return selectedFieldConfig.showNot != undefined ? selectedFieldConfig.showNot : config.settings.showNot;
+    const {config, selectedField} = this.props;
+    const selectedFieldConfig = getFieldConfig(config, selectedField);
+    return selectedFieldConfig?.showNot ?? config.settings.showNot;
   }
 
   conjunctionOptions() {
-    const {config, selectedField, selectedOperator} = this.props;
-    const selectedFieldConfig = getFieldConfig(config, selectedField) || {};
-    let conjunctionOptions = super.conjunctionOptions();
-    if (selectedFieldConfig.conjunctions) {
-      let filtered = {};
-      for (let k of selectedFieldConfig.conjunctions) {
-        const options = conjunctionOptions[k];
-        if (options) {
-          filtered[k] = options;
-        }
-      }
-      conjunctionOptions = filtered;
-    }
-    return conjunctionOptions;
+    const { selectedField } = this.props;
+    return this.conjunctionOptionsForGroupField(selectedField);
   }
 
   renderField() {

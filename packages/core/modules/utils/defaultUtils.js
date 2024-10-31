@@ -118,14 +118,15 @@ export const defaultRuleProperties = (config, parentRuleGroupField = null, item 
 
 export const defaultGroupConjunction = (config, groupFieldConfig = null) => {
   groupFieldConfig = getFieldConfig(config, groupFieldConfig); // if `groupFieldConfig` is field name, not config
-  const conjs = groupFieldConfig && groupFieldConfig.conjunctions || Object.keys(config.conjunctions);
+  const conjs = groupFieldConfig?.conjunctions || Object.keys(config.conjunctions);
   if (conjs.length == 1)
     return conjs[0];
-  return config.settings.defaultGroupConjunction || config.settings.defaultConjunction || conjs[0];
+  // todo: config.settings.defaultGroupConjunction is deprecated, defaultConjunction should be used instead
+  return groupFieldConfig?.defaultConjunction || config.settings.defaultConjunction || config.settings.defaultGroupConjunction || conjs[0];
 };
 
-export const defaultConjunction = (config) =>
-  config.settings.defaultConjunction || Object.keys(config.conjunctions)[0];
+// @deprecated Use defaultGroupConjunction
+export const defaultConjunction = (config) => defaultGroupConjunction(config);
 
 export const defaultGroupProperties = (config, groupFieldConfig = null) => {
   return new Immutable.Map({

@@ -84,8 +84,7 @@ export const addGroup = (config, path, properties, children = null, parentRuleGr
   path: toImmutableList(path),
   children: children,
   id: uuid(),
-  // todo: use parentRuleGroupField in defaultGroupProperties (for default conj)
-  properties: defaultGroupProperties(config).merge(fromJS(properties) || {}),
+  properties: defaultGroupProperties(config, parentRuleGroupField).merge(fromJS(properties) || {}),
   config: config,
   meta: {
     parentRuleGroupField,

@@ -9,6 +9,7 @@ import { Item } from "./Item";
 import {GroupActions} from "./GroupActions";
 import {WithConfirmFn, dummyFn, getRenderFromConfig} from "../utils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
+const {getFieldConfig} = Utils.ConfigUtils;
 const {isEmptyGroupChildren} = Utils.RuleUtils;
 
 const defaultPosition = "topRight";
@@ -107,7 +108,7 @@ export class BasicGroup extends Component {
 
   // show conjs for 2+ children?
   showConjs() {
-    const {conjunctionOptions, children1, config} = this.props;
+    const {conjunctionOptions} = this.props;
     const conjunctionCount = Object.keys(conjunctionOptions).length;
     return conjunctionCount > 1 || this.showNot();
   }
@@ -303,7 +304,24 @@ export class BasicGroup extends Component {
   }
 
   conjunctionOptions() {
-    const { conjunctionOptions } = this.props;
+    const { parentField, conjunctionOptions } = this.props;
+    // Note: if current group is a group inside rule-group, we should respect config of parent rule-group
+    return parentField ? this.conjunctionOptionsForGroupField(parentField) : conjunctionOptions;
+  }
+
+  conjunctionOptionsForGroupField(groupField = null) {
+    const {config, conjunctionOptions} = this.props;
+    const groupFieldConfig = getFieldConfig(config, groupField);
+    if (groupFieldConfig?.conjunctions) {
+      let filtered = {};
+      for (let k of groupFieldConfig.conjunctions) {
+        const options = conjunctionOptions[k];
+        if (options) {
+          filtered[k] = options;
+        }
+      }
+      return filtered;
+    }
     return conjunctionOptions;
   }
 
@@ -313,7 +331,7 @@ export class BasicGroup extends Component {
       selectedConjunction, setConjunction, not, setNot, isLocked
     } = this.props;
 
-    const {immutableGroupsMode, renderConjs, showNot: _showNot, notLabel} = config.settings;
+    const {immutableGroupsMode, notLabel} = config.settings;
     const conjunctionOptions = this.conjunctionOptions();
     if (!this.showConjs())
       return null;

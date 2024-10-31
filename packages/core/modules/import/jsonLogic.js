@@ -3,7 +3,7 @@ import {getOpCardinality, isJsonLogic, shallowEqual, logger} from "../utils/stuf
 import {getFieldConfig, extendConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
-import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
+import {defaultGroupConjunction} from "../utils/defaultUtils";
 
 import moment from "moment";
 
@@ -689,7 +689,7 @@ const wrapInDefaultConj = (rule, config, not = false) => {
     id: uuid(),
     children1: { [rule.id]: rule },
     properties: {
-      conjunction: defaultConjunction(config),
+      conjunction: defaultGroupConjunction(config),
       not: not
     }
   };

@@ -33,6 +33,8 @@ export const settings = {
   setOpOnChangeField: ["keep", "default"], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
   groupOperators: ["some", "all", "none"],
 
+  defaultConjunction: "AND",
+  // todo: deprecated, remove this in favour of defaultConjunction
   defaultGroupConjunction: "AND",
 
   // localization

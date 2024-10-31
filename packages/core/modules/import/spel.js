@@ -3,7 +3,7 @@ import uuid from "../utils/uuid";
 import {getFieldConfig, getFuncConfig, extendConfig, normalizeField, iterateFuncs} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
-import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
+import {defaultGroupConjunction} from "../utils/defaultUtils";
 import {getOpCardinality, logger, isJsonCompatible} from "../utils/stuff";
 import moment from "moment";
 import {compareToSign} from "../export/spel";
@@ -1322,7 +1322,7 @@ const wrapInDefaultConj = (rule, config, not = false) => {
     id: uuid(),
     children1: { [rule.id]: rule },
     properties: {
-      conjunction: defaultConjunction(config),
+      conjunction: defaultGroupConjunction(config),
       not: not || false
     }
   };
