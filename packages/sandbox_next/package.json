@@ -64,10 +64,10 @@
     "@types/react-dom": "^18.3.0",
     "babel-loader": "^8.2.2",
     "babel-plugin-import": "^1.13.3",
-    "next": "^14.2.3",
+    "next": "^14.2.10",
     "sass": "^1.77.2",
     "typescript": "~5.4.5",
-    "webpack": "^5.91.0"
+    "webpack": "^5.95.0"
   },
   "readme": "README.md"
 }
