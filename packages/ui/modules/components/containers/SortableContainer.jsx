@@ -565,10 +565,11 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
         return false;
       if (fromII.id === toII.id)
         return false;
-
+      
       const { canRegroup, canRegroupCases, maxNesting, maxNumberOfRules, canLeaveEmptyCase } = this.props.config.settings;
       const newLev = toParentII ? toParentII.lev + 1 : toII.lev;
-      const newDepthLev = newLev + (fromII.depth || 0);
+      // tip: if group is empty, we still should use 1 (not 0) as depth because we could potentially add a rule inside it
+      const newDepthLev = newLev + (fromII.depth || (fromII.type == "group" ? 1 : 0));
       const isBeforeAfter = placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER;
       const isPend = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND;
       const isLev1 = isBeforeAfter && toII.lev == 1 || isPend && toII.lev == 0;

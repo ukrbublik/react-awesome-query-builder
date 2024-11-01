@@ -20,6 +20,7 @@ export class BasicGroup extends Component {
     reordableNodesCnt: PropTypes.number,
     conjunctionOptions: PropTypes.object.isRequired,
     allowFurtherNesting: PropTypes.bool.isRequired,
+    isMaxNestingExceeded: PropTypes.bool,
     isRoot: PropTypes.bool.isRequired,
     not: PropTypes.bool,
     selectedConjunction: PropTypes.string,
@@ -214,8 +215,11 @@ export class BasicGroup extends Component {
   }
 
   canAddRule() {
-    const maxNumberOfRules = this.props.config.settings.maxNumberOfRules;
-    const totalRulesCnt = this.props.totalRulesCnt;
+    const { totalRulesCnt, isMaxNestingExceeded } = this.props;
+    const { maxNumberOfRules } = this.props.config.settings;
+    if (isMaxNestingExceeded) {
+      return false;
+    }
     if (maxNumberOfRules) {
       return totalRulesCnt < maxNumberOfRules;
     }

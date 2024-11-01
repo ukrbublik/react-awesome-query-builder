@@ -173,6 +173,8 @@ const createGroupContainer = (Group, itemType) =>
       // allow removal of the root group.
       const allowFurtherNesting = typeof maxNesting === "undefined" || currentNesting < maxNesting;
       const isRoot = currentNesting == 1;
+      const isMaxNestingExceeded = maxNesting && currentNesting > maxNesting;
+
       return (
         <div
           className={classNames("group-or-rule-container", "group-container", hasError ? "group-with-error" : null)}
@@ -188,6 +190,7 @@ const createGroupContainer = (Group, itemType) =>
               dragging={this.props.dragging}
               isRoot={isRoot}
               allowFurtherNesting={allowFurtherNesting}
+              isMaxNestingExceeded={isMaxNestingExceeded}
               conjunctionOptions={this.conjunctionOptions}
               not={this.props.not}
               selectedConjunction={this.selectedConjunction}
@@ -231,6 +234,7 @@ const createGroupContainer = (Group, itemType) =>
               onDragStart={this.props.onDragStart}
               isRoot={isRoot}
               allowFurtherNesting={allowFurtherNesting}
+              isMaxNestingExceeded={isMaxNestingExceeded}
               conjunctionOptions={this.conjunctionOptions}
               not={this.props.not}
               selectedConjunction={this.selectedConjunction}

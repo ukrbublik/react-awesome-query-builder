@@ -1259,7 +1259,6 @@ interface FieldGroup<FS = NumberFieldSettings<number>> extends BaseField {
   isSpelItemMap?: boolean;
   defaultField?: FieldPath;
   fieldSettings?: FS;
-  maxNesting?: number;
 }
 interface FieldGroupExt<FS = NumberFieldSettings<number>> extends BaseField {
   type: "!group";
@@ -1273,6 +1272,7 @@ interface FieldGroupExt<FS = NumberFieldSettings<number>> extends BaseField {
   showNot?: boolean;
   conjunctions?: Array<string>;
   defaultConjunction?: string;
+  maxNesting?: number;
   isSpelArray?: boolean;
   isSpelItemMap?: boolean;
 }
