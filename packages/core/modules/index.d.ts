@@ -1005,7 +1005,10 @@ export interface ConjsProps {
   readonly?: boolean;
   disabled?: boolean;
   selectedConjunction?: string;
-  setConjunction(conj: string): void;
+  setConjunction: {
+    (conj: string): void;
+    isDummyFn?: boolean;
+  };
   conjunctionOptions?: TypedMap<ConjunctionOption>;
   config?: Config;
   not: boolean;
