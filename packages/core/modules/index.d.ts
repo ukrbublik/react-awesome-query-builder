@@ -173,10 +173,6 @@ export type AnyRuleProperties = RuleProperties | RuleGroupExtProperties | RuleGr
 export type AnyGroupProperties = GroupProperties | SwitchGroupProperties | CaseGroupProperties;
 export type ItemProperties = AnyRuleProperties | GroupProperties;
 
-export type TypedValueSourceMap<T> = {
-  [key in ValueSource]: T;
-}
-
 interface ExtraActionProperties {
   // note: id can pre-generated for actions addRule, addGroup
   id?: string;
