@@ -261,6 +261,7 @@ export interface ConfirmModalProps {
   okText: string;
   cancelText?: string;
   title: string;
+  okType?: string;
 }
 
 export interface RuleErrorProps {
