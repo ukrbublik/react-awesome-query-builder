@@ -12,7 +12,6 @@ import {
   ItemType,
   ItemProperties,
   ValueSource,
-  TypedValueSourceMap,
   ConfigContext, FactoryWithContext, RenderedReactElement, SerializedFunction,
   ConjsProps,
 
@@ -246,7 +245,7 @@ export interface ProviderProps {
 export type ValueSourceItem = {
   label: string;
 }
-type ValueSourcesItems = TypedValueSourceMap<ValueSourceItem>;
+type ValueSourcesItems = Array<[ValueSource, ValueSourceItem]>;
 
 export interface ValueSourcesProps {
   config?: Config;
