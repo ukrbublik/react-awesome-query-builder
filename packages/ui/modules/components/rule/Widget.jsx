@@ -270,7 +270,7 @@ export default class Widget extends Component {
     return (
       <div key={"wrapper-"+widgetId} className={classNames(
         valueSrc === "func" ? "widget--func" : "widget--widget",
-        hasValueSources ? "widget--has-valuerscs" : "widget--has-no-valuerscs"
+        hasValueSources ? "widget--has-valuesrcs" : "widget--has-no-valuesrcs"
       )}>
         {valueSrc === "func" ? null : widgetLabel}
         <WidgetFactory
