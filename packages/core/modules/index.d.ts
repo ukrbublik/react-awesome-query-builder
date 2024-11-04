@@ -575,8 +575,9 @@ interface ListUtils {
   getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
   searchListValue(search: string, listValues: ListValues): ListItem; // search by value and title
   listValuesToArray(listValues: ListValues): ListItems; // normalize
-  toListValue(value: string | number | ListItem, title?: string): ListItem; // create
+  toListValue(value: string | number | ListItem, title?: string): ListItem | undefined; // create
   makeCustomListValue(value: string | number): ListItem; // create
+  mapListValues<T>(listValues : ListValues, mapFn: (item: ListItem | undefined) => T | null) : T[];
 }
 interface TreeUtils {
   jsToImmutable(value: any): AnyImmutable;
