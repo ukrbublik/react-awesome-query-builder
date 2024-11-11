@@ -7,6 +7,7 @@ import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUti
 import classNames from "classnames";
 import {connect} from "react-redux";
 const {defaultGroupConjunction} = Utils.DefaultUtils;
+const {getFieldConfig} = Utils.ConfigUtils;
 
 
 const createGroupContainer = (Group, itemType) => 

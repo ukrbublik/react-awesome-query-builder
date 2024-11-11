@@ -49,6 +49,27 @@ export const getItemByPath = (tree, path) => {
 
 
 /**
+ * @param {Immutable.Map} tree
+ * @param {Immutable.List} path
+ * @return {field, path}[] ordered by closest
+ */
+export const getAncestorRuleGroups = (tree, path) => {
+  const parentRuleGroups = path
+    .map((_id, i) => path.take(i+1))
+    .reverse()
+    .toJS()
+    .map(path => ({ item: getItemByPath(tree, path), path }))
+    .filter(({ item }) => item.get("type") === "rule_group");
+  if (parentRuleGroups.length) {
+    return parentRuleGroups.map(({ item, path }) => ({
+      path,
+      field: item.get("properties").get("field"),
+    }));
+  }
+  return [];
+}
+
+/**
  * Remove `path` in every item
  * @param {Immutable.Map} tree
  * @return {Immutable.Map} tree
@@ -191,7 +212,7 @@ export const getFlatTree = (tree) => {
   // or by similars (rule-group #x) (NOT both _ext and no ext)
 
   function _flatizeTree (
-    item, path, insideCollapsed, insideLocked, insideRuleGroup, lev, caseId, childNo
+    item, path, insideCollapsed, insideLocked, insideRuleGroup, lev, atomicLev, caseId, childNo
   ) {
     const isRoot = item === tree;
     const type = item.get("type");
@@ -236,6 +257,7 @@ export const getFlatTree = (tree) => {
         position.globalGroupNo = globalGroupCount;
       }
     }
+    const nextAtomicLev = insideRuleGroup || isRuleGroup ? atomicLev : atomicLev + 1;
 
     flat.push(id);
     items[id] = {
@@ -244,7 +266,6 @@ export const getFlatTree = (tree) => {
       id: id,
       type: type,
       parent: parentId,
-      parentType: parentId ? items[parentId].type : null,
       children: childrenIds,
       childNo,
       caseId: currentCaseId,
@@ -252,6 +273,8 @@ export const getFlatTree = (tree) => {
       closestRuleGroupId,
       path: path.concat(id),
       lev: lev, // depth level (0 for root node)
+      atomicLev, // same as lev, but rules inside rule_group retains same number
+      nextAtomicLev,
       isLeaf: !children, // is atomic rule OR rule inside rule_group
       isAtomicRule, // is atomic (rule or rule_group, but not rules inside rule_group)
       isLocked: isLocked || insideLocked,
@@ -265,6 +288,7 @@ export const getFlatTree = (tree) => {
       // unused
       collapsed: collapsed,
       _top: itemsBefore,
+      parentType: parentId ? items[parentId].type : null,
       // @deprecated use isLeaf instead
       leaf: !children,
 
@@ -309,7 +333,8 @@ export const getFlatTree = (tree) => {
             child, 
             path.concat(id), 
             insideCollapsed || collapsed, insideLocked || isLocked, insideRuleGroup || isRuleGroup,
-            lev + 1, currentCaseId, childCount
+            lev + 1, nextAtomicLev,
+            currentCaseId, childCount
           );
           const childItem = items[childId];
           // Calculations after deep traversing 1 child
@@ -336,7 +361,7 @@ export const getFlatTree = (tree) => {
   }
 
   // Start recursion
-  _flatizeTree(tree, [], false, false, false, 0, null, null);
+  _flatizeTree(tree, [], false, false, false, 0, 0, null, null);
 
   // Calc after recursion
   for (let i = 0 ; i < flat.length ; i++) {
@@ -372,10 +397,10 @@ export const getTotalReordableNodesCountInTree = (tree) => {
       children = item.children1;
       type = item.type;
     }
-    const isRuleGroup = type == "rule_group";
     cnt++;
-    //tip: rules in rule-group can be reordered only inside
-    if (children && !isRuleGroup) {
+    if (type == "rule_group" && lev > 0) {
+      //tip: rules in rule-group can be reordered only inside
+    } else if (children) {
       children.map((child, _childId) => {
         if (child) {
           _processNode(child, path.concat(id), lev + 1);
@@ -411,7 +436,7 @@ export const getTotalRulesCountInTree = (tree) => {
       type = item.type;
     }
     
-    if (type == "rule" || type == "rule_group") {
+    if (type == "rule" || type == "rule_group" && lev > 0) {
       // tip: count rule_group as 1 rule
       cnt++;
     } else if (children) {

@@ -49,12 +49,13 @@ class RuleGroupExt extends BasicGroup {
   }
 
   canAddRule() {
-    // todo
-    // const maxNumberOfRules = this.props.config.settings.maxNumberOfRules;
-    // const totalRulesCnt = this.props.totalRulesCnt;
-    // if (maxNumberOfRules) {
-    //   return totalRulesCnt < maxNumberOfRules;
-    // }
+    const {config, selectedField} = this.props;
+    const selectedFieldConfig = getFieldConfig(config, selectedField);
+    const maxNumberOfRules = selectedFieldConfig.maxNumberOfRules;
+    const totalRulesCnt = this.props.totalRulesCnt;
+    if (maxNumberOfRules) {
+      return totalRulesCnt < maxNumberOfRules;
+    }
     return true;
   }
 

@@ -1273,6 +1273,7 @@ interface FieldGroupExt<FS = NumberFieldSettings<number>> extends BaseField {
   conjunctions?: Array<string>;
   defaultConjunction?: string;
   maxNesting?: number;
+  maxNumberOfRules?: number;
   isSpelArray?: boolean;
   isSpelItemMap?: boolean;
 }

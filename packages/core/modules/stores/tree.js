@@ -1,6 +1,6 @@
 import Immutable, { fromJS } from "immutable";
 import {
-  expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree,
+  expandTreePath, expandTreeSubpath, getItemByPath, getAncestorRuleGroups, fixPathsInTree,
   getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren, removeIsLockedInTree
 } from "../utils/treeUtils";
 import {
@@ -226,14 +226,30 @@ const addItem = (state, path, type, generatedId, properties, config, children = 
     currentNumber = targetChildrenSize;
     maxNumber = maxNumberOfCases;
   } else if (type === "group") {
-    currentNumber = path.size;
-    maxNumber = maxNesting;
-  } else if (targetItem?.get("type") === "rule_group") {
-    // todo
-    // don't restrict
-  } else {
-    currentNumber = isTernary ? getTotalRulesCountInTree(caseGroup) : getTotalRulesCountInTree(state);
-    maxNumber = maxNumberOfRules;
+    const ruleGroups = getAncestorRuleGroups(state, path);
+    if (ruleGroups.length) {
+      // closest rule-group
+      const { path: ruleGroupPath, field: ruleGroupField } = ruleGroups[0];
+      const ruleGroupFieldConfig = getFieldConfig(config, ruleGroupField);
+      currentNumber = path.size - ruleGroupPath.length;
+      maxNumber = ruleGroupFieldConfig?.maxNesting;
+    } else {
+      currentNumber = path.size;
+      maxNumber = maxNesting;
+    }
+  } else { // rule or rule_group
+    const ruleGroups = getAncestorRuleGroups(state, path);
+    if (ruleGroups.length) {
+      // closest rule-group
+      const { path: ruleGroupPath, field: ruleGroupField } = ruleGroups[0];
+      const ruleGroupFieldConfig = getFieldConfig(config, ruleGroupField);
+      const ruleGroupItem = getItemByPath(state, ruleGroupPath);
+      maxNumber = ruleGroupFieldConfig?.maxNumberOfRules;
+      currentNumber = getTotalRulesCountInTree(ruleGroupItem);
+    } else {
+      currentNumber = isTernary ? getTotalRulesCountInTree(caseGroup) : getTotalRulesCountInTree(state);
+      maxNumber = maxNumberOfRules;
+    }
   }
   const canAdd = maxNumber && currentNumber ? (currentNumber < maxNumber) : true;
   

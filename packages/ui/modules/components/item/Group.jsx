@@ -11,6 +11,7 @@ import {WithConfirmFn, dummyFn, getRenderFromConfig} from "../utils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 const {getFieldConfig} = Utils.ConfigUtils;
 const {isEmptyGroupChildren} = Utils.RuleUtils;
+const {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} = Utils.TreeUtils;
 
 const defaultPosition = "topRight";
 
@@ -249,7 +250,6 @@ export class BasicGroup extends Component {
         key={item.get("id")}
         id={item.get("id")}
         groupId={props.id}
-        //path={props.path.push(item.get('id'))}
         path={item.get("path")}
         type={type}
         properties={item.get("properties")}
@@ -278,7 +278,10 @@ export class BasicGroup extends Component {
     return this.props.reordableNodesCnt;
   }
 
-  totalRulesCntForItem(_item) {
+  totalRulesCntForItem(item) {
+    if (item.get("type") === "rule_group") {
+      return getTotalRulesCountInTree(item);
+    }
     return this.props.totalRulesCnt;
   }
 
