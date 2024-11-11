@@ -67,7 +67,7 @@ export const getAncestorRuleGroups = (tree, path) => {
     }));
   }
   return [];
-}
+};
 
 /**
  * Remove `path` in every item

@@ -13,6 +13,7 @@ import Widget from "../rule/Widget";
 import classNames from "classnames";
 const {getFieldConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
 const {isEmptyRuleGroupExtPropertiesAndChildren} = Utils.RuleUtils;
+const {getTotalReordableNodesCountInTree} = Utils.TreeUtils;
 
 
 class RuleGroupExt extends BasicGroup {
@@ -242,11 +243,14 @@ class RuleGroupExt extends BasicGroup {
     />;
   }
 
+
   reordableNodesCntForItem(_item) {
     if (this.props.isLocked)
       return 0;
-    const {children1} = this.props;
-    return children1?.size || 0;
+    const {children1, id} = this.props;
+    return getTotalReordableNodesCountInTree({
+      id, type: "rule_group", children1
+    });
   }
 
   extraPropsForItem(_item) {
