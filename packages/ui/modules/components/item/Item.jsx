@@ -41,6 +41,7 @@ const typeMap = {
       onDragStart={props.onDragStart}
       isDraggingTempo={props.isDraggingTempo}
       parentField={props.parentField}
+      parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
     />
   ),
@@ -58,6 +59,7 @@ const typeMap = {
       isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
       parentField={props.parentField}
+      parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
     />
   ),
@@ -75,6 +77,7 @@ const typeMap = {
       isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
       parentField={props.parentField}
+      parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
     />
   ),
@@ -92,6 +95,7 @@ const typeMap = {
       isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
       parentField={props.parentField}
+      parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
     />
   ),

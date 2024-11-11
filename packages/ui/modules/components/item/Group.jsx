@@ -216,8 +216,12 @@ export class BasicGroup extends Component {
   }
 
   canAddRule() {
-    const { totalRulesCnt, isMaxNestingExceeded } = this.props;
-    const { maxNumberOfRules } = this.props.config.settings;
+    const { totalRulesCnt, isMaxNestingExceeded, parentField } = this.props;
+    let { maxNumberOfRules } = this.props.config.settings;
+    if (parentField) {
+      const ruleGroupFieldConfig = getFieldConfig(this.props.config, parentField);
+      maxNumberOfRules = ruleGroupFieldConfig.maxNumberOfRules;
+    }
     if (isMaxNestingExceeded) {
       return false;
     }
@@ -241,7 +245,7 @@ export class BasicGroup extends Component {
       return undefined;
     }
     const props = this.props;
-    const {config, actions, onDragStart, isLocked, parentField} = props;
+    const {config, actions, onDragStart, isLocked, parentField, parentFieldPathSize} = props;
     const isRuleGroup = item.get("type") == "group" && item.getIn(["properties", "field"]) != null;
     const type = isRuleGroup ? "rule_group" : item.get("type");
     
@@ -257,6 +261,7 @@ export class BasicGroup extends Component {
         actions={actions}
         children1={item.get("children1")}
         parentField={parentField}
+        parentFieldPathSize={parentFieldPathSize}
         reordableNodesCnt={this.reordableNodesCntForItem(item)}
         totalRulesCnt={this.totalRulesCntForItem(item)}
         parentReordableNodesCnt={this.reordableNodesCnt()}

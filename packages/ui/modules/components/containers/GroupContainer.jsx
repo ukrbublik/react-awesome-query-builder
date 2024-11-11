@@ -161,8 +161,22 @@ const createGroupContainer = (Group, itemType) =>
     render() {
       const {showErrorMessage} = this.props.config.settings;
       const isDraggingMe = this.props.dragging.id == this.props.id;
-      const currentNesting = this.props.path.size;
-      const maxNesting = this.props.config.settings.maxNesting;
+      let currentNesting = this.props.path.size;
+      let maxNesting = this.props.config.settings.maxNesting;
+      let isRoot = currentNesting == 1;
+      if (this.props.parentField && this.props.parentFieldPathSize) {
+        // inside rule-group
+        const ruleGroupFieldConfig = getFieldConfig(this.props.config, this.props.parentField);
+        currentNesting = this.props.path.size - this.props.parentFieldPathSize + 1;
+        maxNesting = ruleGroupFieldConfig?.maxNesting;
+        isRoot = false;
+      } else if (this.props.field) {
+        // it is rule-group
+        const ruleGroupFieldConfig = getFieldConfig(this.props.config, this.props.field);
+        currentNesting = 1;
+        maxNesting = ruleGroupFieldConfig?.maxNesting;
+        isRoot = false;
+      }
       const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;
       const fieldType = this.props.fieldType || null;
 
@@ -173,7 +187,6 @@ const createGroupContainer = (Group, itemType) =>
       // Don't allow nesting further than the maximum configured depth and don't
       // allow removal of the root group.
       const allowFurtherNesting = typeof maxNesting === "undefined" || currentNesting < maxNesting;
-      const isRoot = currentNesting == 1;
       const isMaxNestingExceeded = maxNesting && currentNesting > maxNesting;
 
       return (
@@ -190,6 +203,7 @@ const createGroupContainer = (Group, itemType) =>
               isDraggingTempo={true}
               dragging={this.props.dragging}
               isRoot={isRoot}
+              lev={this.props.path.size - 1}
               allowFurtherNesting={allowFurtherNesting}
               isMaxNestingExceeded={isMaxNestingExceeded}
               conjunctionOptions={this.conjunctionOptions}
@@ -220,6 +234,7 @@ const createGroupContainer = (Group, itemType) =>
               selectedFieldSrc={this.props.fieldSrc || "field"}
               selectedFieldType={fieldType}
               parentField={this.props.parentField || null}
+              parentFieldPathSize={this.props.parentFieldPathSize}
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}
@@ -234,6 +249,7 @@ const createGroupContainer = (Group, itemType) =>
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
               isRoot={isRoot}
+              lev={this.props.path.size - 1}
               allowFurtherNesting={allowFurtherNesting}
               isMaxNestingExceeded={isMaxNestingExceeded}
               conjunctionOptions={this.conjunctionOptions}
@@ -264,6 +280,7 @@ const createGroupContainer = (Group, itemType) =>
               selectedFieldSrc={this.props.fieldSrc || "field"}
               selectedFieldType={fieldType}
               parentField={this.props.parentField || null}
+              parentFieldPathSize={this.props.parentFieldPathSize}
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}

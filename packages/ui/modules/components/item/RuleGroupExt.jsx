@@ -28,6 +28,7 @@ class RuleGroupExt extends BasicGroup {
     setOperator: PropTypes.func,
     setValue: PropTypes.func,
     valueError: PropTypes.any,
+    lev: PropTypes.number, // from GroupContainer
   };
 
   constructor(props) {
@@ -43,9 +44,7 @@ class RuleGroupExt extends BasicGroup {
   renderFooterWrapper = () => null;
 
   canAddGroup() {
-    // todo
-    return true;
-    // return this.props.allowFurtherNesting;
+    return this.props.allowFurtherNesting;
   }
 
   canAddRule() {
@@ -251,8 +250,10 @@ class RuleGroupExt extends BasicGroup {
   }
 
   extraPropsForItem(_item) {
+    const { selectedField, lev } = this.props;
     return {
-      parentField: this.props.selectedField
+      parentField: selectedField,
+      parentFieldPathSize: lev + 1,
     };
   }
 }

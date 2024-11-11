@@ -130,6 +130,7 @@ const createRuleContainer = (Rule) =>
               key={"dragging"}
               id={this.props.id}
               groupId={this.props.groupId}
+              lev={this.props.path.size - 1}
               isDraggingMe={true}
               isDraggingTempo={true}
               dragging={this.props.dragging}
@@ -146,6 +147,7 @@ const createRuleContainer = (Rule) =>
               selectedFieldSrc={this.props.fieldSrc || "field"}
               selectedFieldType={fieldType}
               parentField={this.props.parentField || null}
+              parentFieldPathSize={this.props.parentFieldPathSize}
               selectedOperator={this.props.operator || null}
               value={this.props.value || null}
               valueSrc={this.props.valueSrc || null}
@@ -166,6 +168,7 @@ const createRuleContainer = (Rule) =>
               key={this.props.id}
               id={this.props.id}
               groupId={this.props.groupId}
+              lev={this.props.path.size - 1}
               isDraggingMe={isDraggingMe}
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
@@ -182,6 +185,7 @@ const createRuleContainer = (Rule) =>
               selectedFieldSrc={this.props.fieldSrc || "field"}
               selectedFieldType={fieldType}
               parentField={this.props.parentField || null}
+              parentFieldPathSize={this.props.parentFieldPathSize}
               selectedOperator={this.props.operator || null}
               value={this.props.value || null}
               valueSrc={this.props.valueSrc || null}
