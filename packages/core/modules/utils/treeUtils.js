@@ -1,5 +1,6 @@
 import Immutable  from "immutable";
 import {toImmutableList, isImmutable, applyToJS as immutableToJs} from "./stuff";
+import {getFieldConfig} from "./configUtils";
 import {jsToImmutable} from "../import/tree";
 import uuid from "./uuid";
 
@@ -199,7 +200,7 @@ export const fixEmptyGroupsInTree = (tree) => {
  * @param {Immutable.Map} tree
  * @return {Object} {flat, items}
  */
-export const getFlatTree = (tree) => {
+export const getFlatTree = (tree, config) => {
   let flat = [];
   let items = {};
   let cases = [];
@@ -230,6 +231,11 @@ export const getFlatTree = (tree) => {
     const hasChildren = childrenIds?.length > 0;
     const parentId = path.length ? path[path.length-1] : null;
     const closestRuleGroupId = [...path].reverse().find(id => items[id].type == "rule_group");
+    const field = item.getIn(["properties", "field"]);
+    const fieldConfig = field && config && getFieldConfig(config, field);
+    const maxNesting = fieldConfig?.maxNesting;
+    const closestRuleGroupMaxNesting = items?.[closestRuleGroupId]?.maxNesting;
+    const closestRuleGroupLev = items?.[closestRuleGroupId]?.lev;
     const currentCaseId = isCaseGroup ? id : caseId;
 
     // Calculations before
@@ -271,6 +277,9 @@ export const getFlatTree = (tree) => {
       caseId: currentCaseId,
       caseNo,
       closestRuleGroupId,
+      closestRuleGroupLev,
+      closestRuleGroupMaxNesting,
+      maxNesting,
       path: path.concat(id),
       lev: lev, // depth level (0 for root node)
       atomicLev, // same as lev, but rules inside rule_group retains same number

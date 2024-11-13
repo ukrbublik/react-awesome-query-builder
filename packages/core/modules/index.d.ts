@@ -595,7 +595,7 @@ interface TreeUtils {
   expandTreeSubpath(path: ImmutablePath, ...suffix: string[]): ImmutablePath;
   fixEmptyGroupsInTree(tree: ImmutableTree): ImmutableTree;
   fixPathsInTree(tree: ImmutableTree): ImmutableTree;
-  getFlatTree(tree: ImmutableTree): FlatTree;
+  getFlatTree(tree: ImmutableTree, config?: Config): FlatTree;
   getTotalReordableNodesCountInTree(tree: ImmutableTree): number;
   getTotalRulesCountInTree(tree: ImmutableTree): number;
   isEmptyTree(tree: ImmutableTree): boolean;

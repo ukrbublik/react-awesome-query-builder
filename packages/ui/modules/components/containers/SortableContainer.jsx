@@ -29,7 +29,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
     }
 
     onPropsChanged(nextProps) {
-      this.tree = getFlatTree(nextProps.tree);
+      this.tree = getFlatTree(nextProps.tree, nextProps.config);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -578,6 +578,11 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       // can't restruct `rule_group`
       const isRuleGroupAffected = (fromII.type == "rule_group" || !!fromII.closestRuleGroupId || toII.type == "rule_group" || !!toII.closestRuleGroupId);
       const targetRuleGroupId = isPend && toII.type == "rule_group" ? toII.id : toII.closestRuleGroupId;
+      const targetRuleGroupMaxNesting = isPend && toII.type == "rule_group" ? toII.maxNesting : toII.closestRuleGroupMaxNesting;
+      const closestRuleGroupLev = isPend && toII.type == "rule_group" ? toII.lev : toII.closestRuleGroupLev;
+      const newDepthLevInRuleGroup = (toParentII ? toParentII.lev + 1 : toII.lev)
+        + (fromII.depth || (fromII.type == "group" ? 1 : 0))
+        - (closestRuleGroupLev || 0);
       const isForbiddenRuleGroupChange = isRuleGroupAffected && fromII.closestRuleGroupId != targetRuleGroupId;
       const isForbiddenCaseChange = 
         // can't move `case_group` anywhere but before/after anoter `case_group`
@@ -590,8 +595,13 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       const isForbiddenStructChange = isForbiddenCaseChange || isForbiddenRuleGroupChange;
       const isLockedChange = toII.isLocked || fromII.isLocked || toParentII && toParentII.isLocked;
       
-      if (maxNesting && newDepthLev > maxNesting)
+      if (maxNesting && newDepthLev > maxNesting) {
         return false;
+      }
+      
+      if (targetRuleGroupMaxNesting && newDepthLevInRuleGroup > targetRuleGroupMaxNesting) {
+        return false;
+      }
       
       if (isStructChange && (!canRegroup || isForbiddenStructChange || isLockedChange))
         return false;

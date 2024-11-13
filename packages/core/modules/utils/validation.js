@@ -247,7 +247,7 @@ export const _validateTree = (
   const allErrors = [];
   let flatItems, oldFlatItems;
   if (includeItemsPositions) {
-    flatItems = getFlatTree(fixedTree).items;
+    flatItems = getFlatTree(fixedTree, config).items;
   }
   for (const id in meta.errors) {
     let { path, errors } = meta.errors[id];
@@ -276,7 +276,7 @@ export const _validateTree = (
       if (isDeleted) {
         // get positions from old tree
         if (!oldFlatItems) {
-          oldFlatItems = getFlatTree(tree).items;
+          oldFlatItems = getFlatTree(tree, config).items;
         }
         flatItem = oldFlatItems[id];
       }
