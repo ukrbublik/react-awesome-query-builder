@@ -67,6 +67,11 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [Financial Contributing](#financial-contributing)
 
 
+### React-Awesome-Query-Builder AI Bot
+
+[React-Awesome-Query-Builder](https://codeparrot.ai/oracle?owner=ukrbublik&repo=react-awesome-query-builder) Bot will help you understand this repository better. You can ask for code examples, installation guide, debugging help and much more.
+
+
 ### Features
 [![Screenshot](https://user-images.githubusercontent.com/3238637/209590656-f32497be-6b74-4837-8414-4f44d78215ae.png)](https://ukrbublik.github.io/react-awesome-query-builder)
 
