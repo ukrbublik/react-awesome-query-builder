@@ -91,7 +91,7 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
   if (!conjunction)
     conjunction = defaultConjunction(config);
   const conjunctionDefinition = config.conjunctions[conjunction];
-  const conj = conjunctionDefinition.jsonLogicConj || conjunction.toLowerCase();
+  const conj = conjunctionDefinition?.jsonLogicConj || conjunction.toLowerCase();
   const origNot = !!properties.get("not");
 
   const isRuleGroup = (type === "rule_group" && !isRoot);

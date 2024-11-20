@@ -104,15 +104,22 @@ export class BasicGroup extends Component {
   }
 
   showNot() {
-    const {config} = this.props;
-    return config.settings.showNot;
+    const {config, parentField} = this.props;
+    let showNot = config.settings.showNot;
+    if (parentField) {
+      const ruleGroupFieldConfig = getFieldConfig(config, parentField);
+      showNot = showNot && (ruleGroupFieldConfig?.showNot ?? true);
+    }
+    return showNot;
   }
 
   // show conjs for 2+ children?
   showConjs() {
-    const {conjunctionOptions} = this.props;
+    const {config} = this.props;
+    const {forceShowConj} = config.settings;
+    const conjunctionOptions = this.conjunctionOptions();
     const conjunctionCount = Object.keys(conjunctionOptions).length;
-    return conjunctionCount > 1 || this.showNot();
+    return conjunctionCount > 1 && !this.isOneChild() || this.showNot() || forceShowConj;
   }
 
   isNoChildren() {

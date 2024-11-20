@@ -69,7 +69,7 @@ class RuleGroupExt extends BasicGroup {
         this.isOneChild() ? "hide--line" : "",
         this.isNoChildren() ? "no--children" : "",
         this.showDragIcon() ? "with--drag" : "hide--drag",
-        this.showConjs() && (!this.isOneChild() || this.showNot()) ? "with--conjs" : "hide--conjs"
+        this.showConjs() ? "with--conjs" : "hide--conjs"
       )}>
         {this.renderHeader()}
         {this.renderGroupField()}
