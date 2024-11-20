@@ -579,7 +579,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       const isRuleGroupAffected = (fromII.type == "rule_group" || !!fromII.closestRuleGroupId || toII.type == "rule_group" || !!toII.closestRuleGroupId);
       const targetRuleGroupId = isPend && toII.type == "rule_group" ? toII.id : toII.closestRuleGroupId;
       const targetRuleGroupMaxNesting = isPend && toII.type == "rule_group" ? toII.maxNesting : toII.closestRuleGroupMaxNesting;
-      const targetRuleGroupCanRegroup = isPend && toII.type == "rule_group" ? toII.canRegroup : toII.targetRuleGroupCanRegroup;
+      const targetRuleGroupCanRegroup = isPend && toII.type == "rule_group" ? toII.canRegroup : toII.closestRuleGroupCanRegroup;
       const closestRuleGroupLev = isPend && toII.type == "rule_group" ? toII.lev : toII.closestRuleGroupLev;
       const newDepthLevInRuleGroup = (toParentII ? toParentII.lev + 1 : toII.lev)
         + (fromII.depth || (fromII.type == "group" ? 1 : 0))
