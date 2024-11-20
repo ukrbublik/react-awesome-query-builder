@@ -579,6 +579,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       const isRuleGroupAffected = (fromII.type == "rule_group" || !!fromII.closestRuleGroupId || toII.type == "rule_group" || !!toII.closestRuleGroupId);
       const targetRuleGroupId = isPend && toII.type == "rule_group" ? toII.id : toII.closestRuleGroupId;
       const targetRuleGroupMaxNesting = isPend && toII.type == "rule_group" ? toII.maxNesting : toII.closestRuleGroupMaxNesting;
+      const targetRuleGroupCanRegroup = isPend && toII.type == "rule_group" ? toII.canRegroup : toII.targetRuleGroupCanRegroup;
       const closestRuleGroupLev = isPend && toII.type == "rule_group" ? toII.lev : toII.closestRuleGroupLev;
       const newDepthLevInRuleGroup = (toParentII ? toParentII.lev + 1 : toII.lev)
         + (fromII.depth || (fromII.type == "group" ? 1 : 0))
@@ -605,6 +606,10 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       
       if (isStructChange && (!canRegroup || isForbiddenStructChange || isLockedChange))
         return false;
+
+      if (isRuleGroupAffected && isStructChange && !targetRuleGroupCanRegroup) {
+        return false;
+      }
       
       if (fromII.type != "case_group" && fromII.caseId != toII.caseId) {
         const isLastFromCase = fromCaseII ? fromCaseII._height == 2 : false;

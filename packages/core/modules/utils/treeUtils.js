@@ -233,7 +233,9 @@ export const getFlatTree = (tree, config) => {
     const closestRuleGroupId = [...path].reverse().find(id => items[id].type == "rule_group");
     const field = item.getIn(["properties", "field"]);
     const fieldConfig = field && config && getFieldConfig(config, field);
+    const canRegroup = fieldConfig ? fieldConfig?.canRegroup !== false : undefined;
     const maxNesting = fieldConfig?.maxNesting;
+    const closestRuleGroupCanRegroup = items?.[closestRuleGroupId]?.canRegroup;
     const closestRuleGroupMaxNesting = items?.[closestRuleGroupId]?.maxNesting;
     const closestRuleGroupLev = items?.[closestRuleGroupId]?.lev;
     const currentCaseId = isCaseGroup ? id : caseId;
@@ -279,7 +281,9 @@ export const getFlatTree = (tree, config) => {
       closestRuleGroupId,
       closestRuleGroupLev,
       closestRuleGroupMaxNesting,
+      closestRuleGroupCanRegroup,
       maxNesting,
+      canRegroup,
       path: path.concat(id),
       lev: lev, // depth level (0 for root node)
       atomicLev, // same as lev, but rules inside rule_group retains same number

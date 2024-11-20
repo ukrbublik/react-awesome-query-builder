@@ -43,6 +43,7 @@ const typeMap = {
       parentField={props.parentField}
       parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
+      parentFieldCanReorder={props.parentFieldCanReorder}
     />
   ),
   group: (props) => (
@@ -61,6 +62,7 @@ const typeMap = {
       parentField={props.parentField}
       parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
+      parentFieldCanReorder={props.parentFieldCanReorder}
     />
   ),
   rule_group: (props) => (
@@ -79,6 +81,7 @@ const typeMap = {
       parentField={props.parentField}
       parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
+      parentFieldCanReorder={props.parentFieldCanReorder}
     />
   ),
   rule_group_ext: (props) => (
@@ -97,6 +100,7 @@ const typeMap = {
       parentField={props.parentField}
       parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
+      parentFieldCanReorder={props.parentFieldCanReorder}
     />
   ),
   switch_group: (props) => (

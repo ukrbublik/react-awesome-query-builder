@@ -235,6 +235,7 @@ const createGroupContainer = (Group, itemType) =>
               selectedFieldType={fieldType}
               parentField={this.props.parentField || null}
               parentFieldPathSize={this.props.parentFieldPathSize}
+              parentFieldCanReorder={this.props.parentFieldCanReorder}
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}
@@ -281,6 +282,7 @@ const createGroupContainer = (Group, itemType) =>
               selectedFieldType={fieldType}
               parentField={this.props.parentField || null}
               parentFieldPathSize={this.props.parentFieldPathSize}
+              parentFieldCanReorder={this.props.parentFieldCanReorder}
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}

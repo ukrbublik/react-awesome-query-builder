@@ -1274,6 +1274,8 @@ interface FieldGroupExt<FS = NumberFieldSettings<number>> extends BaseField {
   defaultConjunction?: string;
   maxNesting?: number;
   maxNumberOfRules?: number;
+  canRegroup?: boolean;
+  canReorder?: boolean;
   isSpelArray?: boolean;
   isSpelItemMap?: boolean;
 }

@@ -148,6 +148,7 @@ const createRuleContainer = (Rule) =>
               selectedFieldType={fieldType}
               parentField={this.props.parentField || null}
               parentFieldPathSize={this.props.parentFieldPathSize}
+              parentFieldCanReorder={this.props.parentFieldCanReorder}
               selectedOperator={this.props.operator || null}
               value={this.props.value || null}
               valueSrc={this.props.valueSrc || null}
@@ -186,6 +187,7 @@ const createRuleContainer = (Rule) =>
               selectedFieldType={fieldType}
               parentField={this.props.parentField || null}
               parentFieldPathSize={this.props.parentFieldPathSize}
+              parentFieldCanReorder={this.props.parentFieldCanReorder}
               selectedOperator={this.props.operator || null}
               value={this.props.value || null}
               valueSrc={this.props.valueSrc || null}

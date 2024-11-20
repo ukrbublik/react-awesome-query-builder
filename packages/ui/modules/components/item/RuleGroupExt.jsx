@@ -254,10 +254,12 @@ class RuleGroupExt extends BasicGroup {
   }
 
   extraPropsForItem(_item) {
-    const { selectedField, lev } = this.props;
+    const { selectedField, lev, config } = this.props;
+    const selectedFieldConfig = getFieldConfig(config, selectedField);
     return {
       parentField: selectedField,
       parentFieldPathSize: lev + 1,
+      parentFieldCanReorder: selectedFieldConfig?.canReorder ?? config.settings.canReorder,
     };
   }
 }

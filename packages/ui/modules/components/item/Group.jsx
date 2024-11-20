@@ -252,7 +252,7 @@ export class BasicGroup extends Component {
       return undefined;
     }
     const props = this.props;
-    const {config, actions, onDragStart, isLocked, parentField, parentFieldPathSize} = props;
+    const {config, actions, onDragStart, isLocked, parentField, parentFieldPathSize, parentFieldCanReorder} = props;
     const isRuleGroup = item.get("type") == "group" && item.getIn(["properties", "field"]) != null;
     const type = isRuleGroup ? "rule_group" : item.get("type");
     
@@ -269,6 +269,7 @@ export class BasicGroup extends Component {
         children1={item.get("children1")}
         parentField={parentField}
         parentFieldPathSize={parentFieldPathSize}
+        parentFieldCanReorder={parentFieldCanReorder}
         reordableNodesCnt={this.reordableNodesCntForItem(item)}
         totalRulesCnt={this.totalRulesCntForItem(item)}
         parentReordableNodesCnt={this.reordableNodesCnt()}
@@ -304,9 +305,13 @@ export class BasicGroup extends Component {
   }
 
   showDragIcon() {
-    const { config, isRoot, isLocked } = this.props;
+    const { config, isRoot, isLocked, parentField, parentFieldCanReorder } = this.props;
     const reordableNodesCnt = this.reordableNodesCnt();
-    return config.settings.canReorder && !isRoot && reordableNodesCnt > 1 && !isLocked;
+    let canReorder = config.settings.canReorder && !isRoot && reordableNodesCnt > 1 && !isLocked;
+    if (parentField) {
+      canReorder = canReorder && parentFieldCanReorder;
+    }
+    return canReorder;
   }
 
   renderDrag() {
