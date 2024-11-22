@@ -50,7 +50,7 @@ const addNewGroup = (state, path, type, generatedId, properties, config, childre
 
       // Add one empty rule into new group
       if (canAddNewRule) {
-        state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config, meta.parentRuleGroupField), config);
+        state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config, meta?.parentRuleGroupField), config);
       }
     }
 

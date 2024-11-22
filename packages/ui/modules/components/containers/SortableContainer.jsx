@@ -569,7 +569,8 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       const { canRegroup, canRegroupCases, maxNesting, maxNumberOfRules, canLeaveEmptyCase } = this.props.config.settings;
       const newAtomicLev = toParentII ? toParentII.nextAtomicLev : toII.atomicLev;
       // tip: if group is empty, we still should use 1 (not 0) as depth because we could potentially add a rule inside it
-      const newDepthLev = newAtomicLev + (fromII.depth || (fromII.type == "group" && !fromII.closestRuleGroupId ? 1 : 0));
+      // tip: don't use fepth inside rule-group
+      const newDepthLev = newAtomicLev + (fromII.closestRuleGroupId ? 0 : (fromII.depth || (fromII.type == "group" ? 1 : 0)));
       const isBeforeAfter = placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER;
       const isPend = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND;
       const isLev1 = isBeforeAfter && toII.lev == 1 || isPend && toII.lev == 0;
@@ -579,7 +580,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       const isRuleGroupAffected = (fromII.type == "rule_group" || !!fromII.closestRuleGroupId || toII.type == "rule_group" || !!toII.closestRuleGroupId);
       const targetRuleGroupId = isPend && toII.type == "rule_group" ? toII.id : toII.closestRuleGroupId;
       const targetRuleGroupMaxNesting = isPend && toII.type == "rule_group" ? toII.maxNesting : toII.closestRuleGroupMaxNesting;
-      const targetRuleGroupCanRegroup = isPend && toII.type == "rule_group" ? toII.canRegroup : toII.closestRuleGroupCanRegroup;
+      const targetRuleGroupCanRegroup = (isPend && toII.type == "rule_group" ? toII.canRegroup : toII.closestRuleGroupCanRegroup) != false;
       const closestRuleGroupLev = isPend && toII.type == "rule_group" ? toII.lev : toII.closestRuleGroupLev;
       const newDepthLevInRuleGroup = (toParentII ? toParentII.lev + 1 : toII.lev)
         + (fromII.depth || (fromII.type == "group" ? 1 : 0))
@@ -604,8 +605,9 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
         return false;
       }
       
-      if (isStructChange && (!canRegroup || isForbiddenStructChange || isLockedChange))
+      if (isStructChange && (!canRegroup || isForbiddenStructChange || isLockedChange)) {
         return false;
+      }
 
       if (isRuleGroupAffected && isStructChange && !targetRuleGroupCanRegroup) {
         return false;

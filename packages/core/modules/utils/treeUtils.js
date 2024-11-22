@@ -42,7 +42,7 @@ export const getItemByPath = (tree, path) => {
   let children = new Immutable.OrderedMap({ [tree.get("id")] : tree });
   let res = tree;
   path.forEach((id) => {
-    res = children.get(id);
+    res = children?.get(id);
     children = res?.get("children1");
   });
   return res;
@@ -60,7 +60,7 @@ export const getAncestorRuleGroups = (tree, path) => {
     .reverse()
     .toJS()
     .map(path => ({ item: getItemByPath(tree, path), path }))
-    .filter(({ item }) => item.get("type") === "rule_group");
+    .filter(({ item }) => item?.get("type") === "rule_group");
   if (parentRuleGroups.length) {
     return parentRuleGroups.map(({ item, path }) => ({
       path,
