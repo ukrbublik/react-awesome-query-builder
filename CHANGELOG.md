@@ -1,4 +1,8 @@
 # Changelog
+- 6.6.4
+  - Support groups inside rule-group (PR #1111) (issue #1108)
+  - Fixed cardinality issue (PR #1136) (issue #1118)
+  - Fixed types (PR #1131, #1132, #1130, #1129, #1127, #1128, #1126)
 - 6.6.4-alpha.0
   - Support groups inside rule-group (PR #1111) (issue #1108)
 - 6.6.3
