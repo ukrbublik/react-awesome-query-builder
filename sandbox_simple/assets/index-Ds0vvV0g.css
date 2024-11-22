@@ -1,0 +1,812 @@
+.query-builder .qb-drag-handler, .query-builder .qb-draggable, .query-builder {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.query-builder .rule--header:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.query-builder {
+  overflow: hidden;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.25;
+  margin: 1rem;
+}
+
+.query-builder {
+  /******************************************************************************/
+  /** DRAG *********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** TREE LINES *********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** GROUP *********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** CASE_GROUP *********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** RULE_GROUP *********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** RULE_GROUP_EXT *********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** RULE **********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** FUNC **********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** Shrink textarea ***********************************************************/
+  /******************************************************************************/
+}
+.query-builder .group {
+  background: rgba(250, 240, 210, 0.5);
+  border: 1px solid #DCC896;
+}
+.query-builder .rule {
+  background-color: white;
+  border: 1px solid transparent;
+  padding: 10px;
+}
+.query-builder .rule-with-error .rule {
+  border-color: #e0a1a1;
+}
+.query-builder .group-with-error > .group {
+  border-color: #e0a1a1;
+}
+.query-builder .rule--body {
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
+}
+.query-builder .rule--body--wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.query-builder .rule--error {
+  color: red;
+  margin-bottom: -5px;
+  margin-top: 5px;
+}
+.query-builder .rule_group--error {
+  color: red;
+  margin-bottom: -5px;
+  margin-top: 5px;
+  width: 100%;
+}
+.query-builder .group-or-rule {
+  border-radius: 5px;
+  position: relative;
+}
+.query-builder .rule_group {
+  background: rgba(255, 252, 242, 0.5);
+  border: 1px solid #f5e4b5;
+}
+.query-builder .rule_group_ext {
+  background: rgba(255, 252, 242, 0.5);
+  border: 1px solid #f5e4b5;
+}
+.query-builder .rule_group .rule {
+  background: white;
+  border: 1px solid transparent;
+}
+.query-builder .rule_group .rule_group {
+  background: rgba(255, 252, 242, 0.5);
+  border: 1px solid #f5e4b5;
+}
+.query-builder .rule_group .rule_group_ext {
+  background: rgba(255, 252, 242, 0.5);
+  border: 1px solid #f5e4b5;
+}
+.query-builder .rule_group_ext .rule {
+  background: white;
+  border: 1px solid transparent;
+}
+.query-builder .rule_group_ext .group {
+  background: rgba(250, 240, 210, 0.5);
+  border: 1px solid transparent;
+}
+.query-builder .rule_group_ext .rule_group_ext {
+  background: rgba(255, 252, 242, 0.5);
+  border: 1px solid #f5e4b5;
+}
+.query-builder .rule_group_ext .rule_group {
+  background: rgba(255, 252, 242, 0.5);
+  border: 1px solid #f5e4b5;
+}
+.query-builder .locked {
+  border-color: red !important;
+  border-style: dashed !important;
+}
+.query-builder .qb-placeholder {
+  border-color: gray !important;
+  border-style: dashed !important;
+}
+.query-builder.qb-dragging {
+  cursor: -webkit-grabbing !important;
+  cursor: grabbing !important;
+}
+.query-builder.qb-dragging button {
+  pointer-events: none;
+}
+.query-builder .qb-draggable {
+  pointer-events: none;
+  position: absolute;
+  opacity: 0.7;
+  z-index: 1000;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.query-builder .qb-drag-handler {
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+}
+.query-builder .group--header:not(.no--children):not(.hide--conjs) {
+  position: relative;
+}
+.query-builder .group--header:not(.no--children):not(.hide--conjs)::before {
+  z-index: 0;
+  content: "";
+  position: absolute;
+  border-color: #ccc;
+  border-style: solid;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.query-builder .group--header:not(.no--children):not(.hide--conjs).hide--line::before {
+  border-color: rgba(128, 128, 128, 0.1) !important;
+}
+.query-builder .group--children > .group-or-rule-container > .group-or-rule::before, .query-builder .group--children > .group-or-rule-container > .group-or-rule::after {
+  content: "";
+  position: absolute;
+  border-color: #ccc;
+  border-style: solid;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.query-builder .group--children > .group-or-rule-container:last-child > .group-or-rule::after {
+  display: none;
+}
+.query-builder .group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::before {
+  display: none;
+}
+.query-builder .group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  border-radius: 4px 0 0 0;
+  border-width: 2px 0 0 2px;
+}
+.query-builder .group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  top: calc(50% - 1px);
+  height: calc(50% + 1px + 10px + 2px);
+}
+.query-builder .group--children.hide--conjs > .group-or-rule-container:first-child > .group::after {
+  height: calc(50% + 1px + 10px + 2px);
+}
+.query-builder .group--children.hide--conjs > .group-or-rule-container:first-child > .rule_group::after {
+  height: calc(50% + 1px + 10px + 2px);
+}
+.query-builder .group--children.hide--conjs > .group-or-rule-container:first-child > .rule_group_ext::after {
+  height: calc(50% + 1px + 10px + 2px);
+}
+.query-builder .group--children.hide--line > .group-or-rule-container > .group-or-rule::before, .query-builder .group--children.hide--line > .group-or-rule-container > .group-or-rule::after {
+  border-color: rgba(128, 128, 128, 0.1) !important;
+}
+.query-builder .group--children > .group-or-rule-container:last-child > .group-or-rule::before {
+  border-radius: 0 0 0 4px;
+}
+.query-builder .group--children > .group-or-rule-container > .group-or-rule::before, .query-builder .group--children > .group-or-rule-container > .group-or-rule::after {
+  border-color: #ccc;
+}
+.query-builder .group--children > .group-or-rule-container > .group-or-rule::before {
+  border-width: 0 0 2px 2px;
+  top: -1px;
+  height: calc(50% + 1px + 1px);
+}
+.query-builder .group--children > .group-or-rule-container > .group-or-rule::after {
+  border-width: 0 0 0 2px;
+  top: calc(50% + 1px);
+  height: calc(50% - 1px + 10px + 2px);
+}
+.query-builder .group--children > .group-or-rule-container > .group-or-rule::before, .query-builder .group--children > .group-or-rule-container > .group-or-rule::after {
+  left: -14px;
+  width: 13px;
+}
+.query-builder .group--children > .group-or-rule-container > .group::before {
+  border-width: 0 0 2px 2px;
+  top: -1px;
+  height: calc(50% + 1px + 1px);
+}
+.query-builder .group--children > .group-or-rule-container > .group::after {
+  border-width: 0 0 0 2px;
+  top: calc(50% + 1px);
+  height: calc(50% - 1px + 10px + 2px);
+}
+.query-builder .group--children > .group-or-rule-container > .group::before, .query-builder .group--children > .group-or-rule-container > .group::after {
+  left: -14px;
+  width: 13px;
+}
+.query-builder .group--children > .group-or-rule-container > .rule_group::before {
+  border-width: 0 0 2px 2px;
+  top: -1px;
+  height: calc(50% + 1px + 1px);
+}
+.query-builder .group--children > .group-or-rule-container > .rule_group::after {
+  border-width: 0 0 0 2px;
+  top: calc(50% + 1px);
+  height: calc(50% - 1px + 10px + 2px);
+}
+.query-builder .group--children > .group-or-rule-container > .rule_group::before, .query-builder .group--children > .group-or-rule-container > .rule_group::after {
+  left: -14px;
+  width: 13px;
+}
+.query-builder .group--children > .group-or-rule-container > .rule_group_ext::before {
+  border-width: 0 0 2px 2px;
+  top: -1px;
+  height: calc(50% + 1px + 1px);
+}
+.query-builder .group--children > .group-or-rule-container > .rule_group_ext::after {
+  border-width: 0 0 0 2px;
+  top: calc(50% + 1px);
+  height: calc(50% - 1px + 10px + 2px);
+}
+.query-builder .group--children > .group-or-rule-container > .rule_group_ext::before, .query-builder .group--children > .group-or-rule-container > .rule_group_ext::after {
+  left: -14px;
+  width: 13px;
+}
+.query-builder .rule_group--children > .group-or-rule-container:last-child > .group-or-rule::before {
+  border-radius: 0 0 0 4px;
+}
+.query-builder .rule_group--children > .group-or-rule-container > .group-or-rule::before, .query-builder .rule_group--children > .group-or-rule-container > .group-or-rule::after {
+  border-color: #ccc;
+}
+.query-builder .rule_group--children > .group-or-rule-container > .group-or-rule::before {
+  border-width: 0 0 1px 1px;
+  top: -1px;
+  height: calc(50% + 0.5px + 1px);
+}
+.query-builder .rule_group--children > .group-or-rule-container > .group-or-rule::after {
+  border-width: 0 0 0 1px;
+  top: calc(50% + 0.5px);
+  height: calc(50% - 0.5px + 5px + 2px);
+}
+.query-builder .rule_group--children > .group-or-rule-container > .group-or-rule::before, .query-builder .rule_group--children > .group-or-rule-container > .group-or-rule::after {
+  left: -10.5px;
+  width: 9.5px;
+}
+.query-builder .rule_group--children > .group-or-rule-container > .group::before {
+  border-width: 0 0 1px 1px;
+  top: -1px;
+  height: calc(50% + 0.5px + 1px);
+}
+.query-builder .rule_group--children > .group-or-rule-container > .group::after {
+  border-width: 0 0 0 1px;
+  top: calc(50% + 0.5px);
+  height: calc(50% - 0.5px + 5px + 2px);
+}
+.query-builder .rule_group--children > .group-or-rule-container > .group::before, .query-builder .rule_group--children > .group-or-rule-container > .group::after {
+  left: -10.5px;
+  width: 9.5px;
+}
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group::before {
+  border-width: 0 0 1px 1px;
+  top: -1px;
+  height: calc(50% + 0.5px + 1px);
+}
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group::after {
+  border-width: 0 0 0 1px;
+  top: calc(50% + 0.5px);
+  height: calc(50% - 0.5px + 5px + 2px);
+}
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group::before, .query-builder .rule_group--children > .group-or-rule-container > .rule_group::after {
+  left: -10.5px;
+  width: 9.5px;
+}
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group_ext::before {
+  border-width: 0 0 1px 1px;
+  top: -1px;
+  height: calc(50% + 0.5px + 1px);
+}
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group_ext::after {
+  border-width: 0 0 0 1px;
+  top: calc(50% + 0.5px);
+  height: calc(50% - 0.5px + 5px + 2px);
+}
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group_ext::before, .query-builder .rule_group--children > .group-or-rule-container > .rule_group_ext::after {
+  left: -10.5px;
+  width: 9.5px;
+}
+.query-builder .rule_group--children > .group-or-rule-container:first-child > .group-or-rule::before, .query-builder .rule_group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::before {
+  display: none;
+}
+.query-builder .rule_group--children > .group-or-rule-container:first-child > .group-or-rule::after, .query-builder .rule_group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  border-radius: 4px 0 0 0;
+  border-width: 1px 0 0 1px;
+}
+.query-builder .rule_group--children > .group-or-rule-container:first-child > .group-or-rule::after, .query-builder .rule_group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  top: calc(50% - 0.5px);
+  height: calc(50% + 0.5px + 5px + 2px);
+}
+.query-builder .rule_group--children > .group-or-rule-container:first-child > .group::after, .query-builder .rule_group--children.hide--conjs > .group-or-rule-container:first-child > .group::after {
+  height: calc(50% + 0.5px + 5px + 2px);
+}
+.query-builder .rule_group--children > .group-or-rule-container:first-child > .rule_group::after, .query-builder .rule_group--children.hide--conjs > .group-or-rule-container:first-child > .rule_group::after {
+  height: calc(50% + 0.5px + 5px + 2px);
+}
+.query-builder .rule_group--children > .group-or-rule-container:first-child > .rule_group_ext::after, .query-builder .rule_group--children.hide--conjs > .group-or-rule-container:first-child > .rule_group_ext::after {
+  height: calc(50% + 0.5px + 5px + 2px);
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container:last-child > .group-or-rule::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container:last-child > .group-or-rule::before {
+  border-radius: 0 0 0 4px;
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .group-or-rule::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .group-or-rule::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .group-or-rule::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .group-or-rule::after {
+  border-color: #ccc;
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .group-or-rule::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .group-or-rule::before {
+  border-width: 0 0 1px 1px;
+  top: -1px;
+  height: calc(50% + 0.5px + 1px);
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .group-or-rule::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .group-or-rule::after {
+  border-width: 0 0 0 1px;
+  top: calc(50% + 0.5px);
+  height: calc(50% - 0.5px + 10px + 2px);
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .group-or-rule::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .group-or-rule::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .group-or-rule::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .group-or-rule::after {
+  left: -13.5px;
+  width: 12.5px;
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .group::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .group::before {
+  border-width: 0 0 1px 1px;
+  top: -1px;
+  height: calc(50% + 0.5px + 1px);
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .group::after {
+  border-width: 0 0 0 1px;
+  top: calc(50% + 0.5px);
+  height: calc(50% - 0.5px + 10px + 2px);
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .group::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .group::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .group::after {
+  left: -13.5px;
+  width: 12.5px;
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group::before {
+  border-width: 0 0 1px 1px;
+  top: -1px;
+  height: calc(50% + 0.5px + 1px);
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group::after {
+  border-width: 0 0 0 1px;
+  top: calc(50% + 0.5px);
+  height: calc(50% - 0.5px + 10px + 2px);
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group::after {
+  left: -13.5px;
+  width: 12.5px;
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group_ext::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group_ext::before {
+  border-width: 0 0 1px 1px;
+  top: -1px;
+  height: calc(50% + 0.5px + 1px);
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group_ext::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group_ext::after {
+  border-width: 0 0 0 1px;
+  top: calc(50% + 0.5px);
+  height: calc(50% - 0.5px + 10px + 2px);
+}
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group_ext::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group_ext::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group_ext::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group_ext::after {
+  left: -13.5px;
+  width: 12.5px;
+}
+.query-builder .rule_group_ext--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children).hide--conjs > .group-or-rule-container:first-child > .group-or-rule::before {
+  display: none;
+}
+.query-builder .rule_group_ext--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children).hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  border-radius: 4px 0 0 0;
+  border-width: 1px 0 0 1px;
+}
+.query-builder .rule_group_ext--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children).hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  top: calc(50% - 0.5px);
+  height: calc(50% + 0.5px + 10px + 2px);
+}
+.query-builder .rule_group_ext--children.hide--conjs > .group-or-rule-container:first-child > .group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children).hide--conjs > .group-or-rule-container:first-child > .group::after {
+  height: calc(50% + 0.5px + 10px + 2px);
+}
+.query-builder .rule_group_ext--children.hide--conjs > .group-or-rule-container:first-child > .rule_group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children).hide--conjs > .group-or-rule-container:first-child > .rule_group::after {
+  height: calc(50% + 0.5px + 10px + 2px);
+}
+.query-builder .rule_group_ext--children.hide--conjs > .group-or-rule-container:first-child > .rule_group_ext::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children).hide--conjs > .group-or-rule-container:first-child > .rule_group_ext::after {
+  height: calc(50% + 0.5px + 10px + 2px);
+}
+.query-builder .switch_group--children > .group-or-rule-container:last-child > .group-or-rule::before {
+  border-radius: 0 0 0 4px;
+}
+.query-builder .switch_group--children > .group-or-rule-container > .group-or-rule::before, .query-builder .switch_group--children > .group-or-rule-container > .group-or-rule::after {
+  border-color: #ccc;
+}
+.query-builder .switch_group--children > .group-or-rule-container > .group-or-rule::before {
+  border-width: 0 0 3px 3px;
+  top: -1px;
+  height: calc(50% + 1.5px + 1px);
+}
+.query-builder .switch_group--children > .group-or-rule-container > .group-or-rule::after {
+  border-width: 0 0 0 3px;
+  top: calc(50% + 1.5px);
+  height: calc(50% - 1.5px + 10px + 2px);
+}
+.query-builder .switch_group--children > .group-or-rule-container > .group-or-rule::before, .query-builder .switch_group--children > .group-or-rule-container > .group-or-rule::after {
+  left: -14.5px;
+  width: 13.5px;
+}
+.query-builder .switch_group--children > .group-or-rule-container > .group::before {
+  border-width: 0 0 3px 3px;
+  top: -3px;
+  height: calc(50% + 1.5px + 3px);
+}
+.query-builder .switch_group--children > .group-or-rule-container > .group::after {
+  border-width: 0 0 0 3px;
+  top: calc(50% + 1.5px);
+  height: calc(50% - 1.5px + 10px + 6px);
+}
+.query-builder .switch_group--children > .group-or-rule-container > .group::before, .query-builder .switch_group--children > .group-or-rule-container > .group::after {
+  left: -16.5px;
+  width: 13.5px;
+}
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group::before {
+  border-width: 0 0 3px 3px;
+  top: -1px;
+  height: calc(50% + 1.5px + 1px);
+}
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group::after {
+  border-width: 0 0 0 3px;
+  top: calc(50% + 1.5px);
+  height: calc(50% - 1.5px + 10px + 2px);
+}
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group::before, .query-builder .switch_group--children > .group-or-rule-container > .rule_group::after {
+  left: -14.5px;
+  width: 13.5px;
+}
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group_ext::before {
+  border-width: 0 0 3px 3px;
+  top: -1px;
+  height: calc(50% + 1.5px + 1px);
+}
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group_ext::after {
+  border-width: 0 0 0 3px;
+  top: calc(50% + 1.5px);
+  height: calc(50% - 1.5px + 10px + 2px);
+}
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group_ext::before, .query-builder .switch_group--children > .group-or-rule-container > .rule_group_ext::after {
+  left: -14.5px;
+  width: 13.5px;
+}
+.query-builder .group--header:not(.no--children):not(.hide--conjs)::before {
+  border-color: #ccc;
+  border-width: 0 0 0 2px;
+  top: 20px;
+  height: calc(100% + 10px - 20px);
+  left: 11px;
+  width: 13px;
+}
+.query-builder .rule_group_ext > .group--header:not(.no--children):not(.hide--conjs)::before,
+.query-builder .rule_group_ext .group > .group--header:not(.no--children):not(.hide--conjs)::before {
+  border-color: #ccc;
+  border-width: 0 0 0 1px;
+  top: 20px;
+  height: calc(100% + 10px - 20px);
+  left: 11.5px;
+  width: 12.5px;
+}
+.query-builder .switch_group > .group--header:not(.no--children):not(.hide--conjs)::before {
+  border-color: #ccc;
+  border-width: 0 0 0 3px;
+  top: 20px;
+  height: calc(100% + 10px - 20px);
+  left: 10.5px;
+  width: 13.5px;
+}
+.query-builder .qb-draggable::before, .query-builder .qb-draggable::after {
+  display: none;
+}
+.query-builder .group--header,
+.query-builder .group--footer {
+  display: flex;
+  align-items: stretch;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.query-builder .group-or-rule-container {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-right: 10px;
+}
+.query-builder .group-or-rule-container:first-child {
+  margin-top: 0px !important;
+}
+.query-builder .group-or-rule-container:last-child {
+  margin-bottom: 0px !important;
+}
+.query-builder .group--drag-handler {
+  margin-right: 8px;
+  margin-top: 3px;
+  position: relative;
+  align-self: center;
+}
+.query-builder .group--conjunctions {
+  flex-shrink: 0;
+  display: flex;
+}
+.query-builder .group--conjunctions .group--drag-handler {
+  margin-left: 10px;
+}
+.query-builder .group--children {
+  padding-left: 24px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.query-builder .group--children .group--field--count--rule {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.query-builder .group--conjunctions.hide--conj {
+  opacity: 0.3;
+}
+.query-builder .group--actions {
+  align-self: center;
+  margin-left: 10px;
+  flex: 1;
+  display: flex;
+}
+.query-builder .group--actions--tl, .query-builder .group--actions--bl {
+  justify-content: flex-start;
+}
+.query-builder .group--actions--tl {
+  margin-left: 20px;
+}
+.query-builder .group--actions--tc, .query-builder .group--actions--bc {
+  justify-content: center;
+}
+.query-builder .group--actions--tr, .query-builder .group--actions--br {
+  justify-content: flex-end;
+}
+.query-builder .case_group {
+  border-width: 3px;
+}
+.query-builder .case_group .case_group--body {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.query-builder .case_group .case_group--body .case_group--children {
+  flex: auto;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.query-builder .case_group .case_group--value {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.query-builder .rule_group {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 10px;
+}
+.query-builder .rule_group .group--field {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  align-self: center;
+}
+.query-builder .rule_group .group--actions {
+  margin-left: 10px;
+  align-self: center;
+  flex: 0;
+}
+.query-builder .rule_group .rule_group--children {
+  flex: 1;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-left: 18px;
+}
+.query-builder .rule_group .rule_group--children .group-or-rule-container {
+  margin-bottom: 5px;
+  margin-top: 5px;
+  padding-right: 5px;
+}
+.query-builder .rule_group .rule_group--children.one--child {
+  padding-left: 9px;
+}
+.query-builder .rule_group_ext > .group--header .group--actions {
+  flex: none;
+}
+.query-builder .group--header.hide--drag.with--conjs > .group--field--count--rule {
+  margin-left: 20px;
+}
+.query-builder .rule {
+  flex: 1;
+  display: flex;
+}
+.query-builder .rule--header {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+}
+.query-builder .rule--drag-handler {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
+.query-builder .rule--field, .query-builder .rule--fieldsrc, .query-builder .group--field, .query-builder .rule--operator, .query-builder .rule--value, .query-builder .rule--operator-options, .query-builder .rule--widget, .query-builder .widget--widget, .query-builder .widget--valuesrc, .query-builder .widget--sep, .query-builder .operator--options--sep, .query-builder .rule--before-widget, .query-builder .rule--after-widget {
+  display: inline-block;
+}
+.query-builder .widget--sep, .query-builder .operator--options--sep, .query-builder .rule--func--bracket-before, .query-builder .rule--func--bracket-after, .query-builder .rule--func--arg-sep {
+  vertical-align: bottom;
+  align-self: flex-end;
+  margin-bottom: 3px;
+}
+.query-builder .rule--func--arg-sep {
+  margin-bottom: -2px;
+}
+.query-builder .widget--sep {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.query-builder .widget--sep.widget--sep-first {
+  margin-right: 10px;
+  margin-left: 0;
+}
+.query-builder .rule--operator {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+.query-builder .operator--options--sep {
+  margin-right: 10px;
+}
+.query-builder .rule--func--arg-sep {
+  margin-left: 3px;
+  margin-right: 6px;
+}
+.query-builder .rule--func--bracket-after {
+  margin-left: 5px;
+  margin-right: 2px;
+}
+.query-builder .rule--func--bracket-before {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.query-builder .widget--valuesrc {
+  vertical-align: top;
+}
+.query-builder .rule--fieldsrc {
+  vertical-align: top;
+}
+.query-builder .operator--options {
+  display: flex;
+}
+.query-builder .rule--operator-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.query-builder .rule--operator-text-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.query-builder div.tooltip-inner {
+  max-width: 500px;
+}
+.query-builder .rule--label {
+  display: block;
+  font-weight: bold;
+}
+.query-builder .rule--func--wrapper, .query-builder .rule--func, .query-builder .rule--func--args, .query-builder .rule--func--arg, .query-builder .rule--func--arg-value, .query-builder .rule--func--bracket-before, .query-builder .rule--func--bracket-after, .query-builder .rule--func--arg-sep, .query-builder .rule--func--arg-label, .query-builder .rule--func--arg-label-sep {
+  display: inline-block;
+}
+.query-builder .rule--func--wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+.query-builder .rule--func--args {
+  display: flex;
+  flex-wrap: wrap;
+}
+.query-builder .rule--func--arg {
+  display: flex;
+}
+.query-builder .rule--field-wrapper,
+.query-builder .rule--field--func,
+.query-builder .rule--func--wrapper,
+.query-builder .rule--func--args,
+.query-builder .rule--func--arg,
+.query-builder .rule--func--arg-value,
+.query-builder .rule--func--arg-value > .rule--widget,
+.query-builder .widget--func {
+  display: contents;
+}
+.query-builder .rule--func, .query-builder .widget--widget {
+  margin-bottom: 2px;
+}
+.query-builder .rule--body--wrapper {
+  margin-bottom: -2px;
+}
+.query-builder .rule--body.can--shrink--value .rule--value {
+  flex: 1;
+}
+.query-builder .rule--body.can--shrink--value .rule--value > .rule--widget {
+  width: 100%;
+  display: flex;
+}
+.query-builder .rule--body.can--shrink--value .rule--value > .rule--widget .widget--widget {
+  flex: 1;
+}
+
+/******************************************************************************/
+/** Minimalism ****************************************************************/
+/******************************************************************************/
+.query-builder.qb-lite .group--drag-handler, .query-builder.qb-lite .group--actions {
+  transition: opacity 0.2s;
+}
+.query-builder.qb-lite .group--header:hover .group--header .group--drag-handler, .query-builder.qb-lite .group--header:hover .group--header .group--actions,
+.query-builder.qb-lite .group--header:not(:hover) .group--drag-handler,
+.query-builder.qb-lite .group--header:not(:hover) .group--actions,
+.query-builder.qb-lite .rule_group:not(:hover) .group--drag-handler,
+.query-builder.qb-lite .rule_group:not(:hover) .group--actions {
+  opacity: 0;
+}
+.query-builder.qb-lite .rule--fieldsrc, .query-builder.qb-lite .widget--valuesrc, .query-builder.qb-lite .rule--drag-handler, .query-builder.qb-lite .rule--header {
+  transition: opacity 0.2s;
+}
+.query-builder.qb-lite .rule:hover .rule .rule--fieldsrc, .query-builder.qb-lite .rule:hover .rule .widget--valuesrc, .query-builder.qb-lite .rule:hover .rule .rule--drag-handler, .query-builder.qb-lite .rule:hover .rule .rule--header,
+.query-builder.qb-lite .rule:not(:hover) .rule--fieldsrc,
+.query-builder.qb-lite .rule:not(:hover) .widget--valuesrc,
+.query-builder.qb-lite .rule:not(:hover) .rule--drag-handler,
+.query-builder.qb-lite .rule:not(:hover) .rule--header {
+  opacity: 0;
+}
+.query-builder.qb-lite.qb-dragging .rule--fieldsrc, .query-builder.qb-lite.qb-dragging .widget--valuesrc, .query-builder.qb-lite.qb-dragging .rule--drag-handler, .query-builder.qb-lite.qb-dragging .rule--header, .query-builder.qb-lite.qb-dragging .group--drag-handler, .query-builder.qb-lite.qb-dragging .group--actions {
+  opacity: 0 !important;
+}
