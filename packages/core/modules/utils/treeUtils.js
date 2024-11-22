@@ -1,7 +1,6 @@
 import Immutable, { fromJS } from "immutable";
 import {toImmutableList, isImmutable, applyToJS as immutableToJs} from "./stuff";
 import {getFieldConfig} from "./configUtils";
-import {jsToImmutable} from "../import/tree";
 import uuid from "./uuid";
 
 export {

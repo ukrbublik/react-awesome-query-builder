@@ -268,19 +268,19 @@ export const getNewValueForFieldOp = function (
 
   // build new values
   let newValue = currentValue;
-  if (valueFixes.length > 0 || !canReuseValue) {
+  if (valueFixes.length > 0 || !canReuseValue || operatorCardinality < currentOperatorCardinality) {
     newValue = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
       return valueFixes[i] !== undefined ? valueFixes[i] : (canReuseValue ? currentValue.get(i) : undefined);
     }));
   }
   let newValueSrc = currentValueSrc;
-  if (valueSrcFixes.length > 0 || !canReuseValue) {
+  if (valueSrcFixes.length > 0 || !canReuseValue || operatorCardinality < currentOperatorCardinality) {
     newValueSrc = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
       return valueSrcFixes[i] ?? (canReuseValue && currentValueSrc.get(i) || null);
     }));
   }
   let newValueType = currentValueType;
-  if (valueTypeFixes.length > 0 || !canReuseValue) {
+  if (valueTypeFixes.length > 0 || !canReuseValue || operatorCardinality < currentOperatorCardinality) {
     newValueType = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
       return valueTypeFixes[i] ?? (canReuseValue && currentValueType.get(i) || null);
     }));

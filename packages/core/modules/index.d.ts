@@ -663,7 +663,7 @@ export type MixType<T> = _MixType<Opt<T>>;
 interface OtherUtils {
   logger: typeof console;
   clone(obj: any): any;
-  moment: Moment;
+  moment: typeof moment;
   uuid(): string;
   mergeArraysSmart(arr1: any[], arr2: any[]): any[];
   setIn<O, T = any>(
@@ -720,7 +720,6 @@ export interface Utils extends Import, Export,
   OtherUtils: OtherUtils;
 
   i18n: i18n;
-  moment: typeof moment;
 }
 
 
