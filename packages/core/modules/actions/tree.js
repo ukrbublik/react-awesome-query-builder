@@ -20,14 +20,17 @@ export const setTree = (config, tree) => ({
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-export const addRule = (config, path, properties, ruleType = "rule", children = null, parentRuleGroupPath = null) => ({
+export const addRule = (config, path, properties, ruleType = "rule", children = null, parentRuleGroupField = null) => ({
   type: constants.ADD_RULE,
   ruleType: ruleType,
   children: children,
   path: toImmutableList(path),
   id: uuid(),
-  properties: defaultRuleProperties(config, parentRuleGroupPath).merge(fromJS(properties) || {}),
-  config: config
+  properties: defaultRuleProperties(config, parentRuleGroupField).merge(fromJS(properties) || {}),
+  config: config,
+  meta: {
+    parentRuleGroupField,
+  },
 });
 
 /**
@@ -76,13 +79,16 @@ export const addCaseGroup = (config, path, properties, children = null) => ({
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-export const addGroup = (config, path, properties, children = null) => ({
+export const addGroup = (config, path, properties, children = null, parentRuleGroupField = null) => ({
   type: constants.ADD_GROUP,
   path: toImmutableList(path),
   children: children,
   id: uuid(),
-  properties: defaultGroupProperties(config).merge(fromJS(properties) || {}),
-  config: config
+  properties: defaultGroupProperties(config, parentRuleGroupField).merge(fromJS(properties) || {}),
+  config: config,
+  meta: {
+    parentRuleGroupField,
+  },
 });
 
 /**

@@ -3,7 +3,7 @@ import {getOpCardinality, isJsonLogic, shallowEqual, logger} from "../utils/stuf
 import {getFieldConfig, extendConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
-import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
+import {defaultGroupConjunction} from "../utils/defaultUtils";
 
 import moment from "moment";
 
@@ -669,16 +669,16 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
 //   return arr;
 // };
 
-const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj = undefined, not = false) => {
+const wrapInDefaultConjRuleGroup = (rule, groupField, groupFieldConfig, config, conj = undefined, not = false) => {
   if (!rule) return undefined;
   return {
     type: "rule_group",
     id: uuid(),
     children1: { [rule.id]: rule },
     properties: {
-      conjunction: conj || defaultGroupConjunction(config, parentFieldConfig),
+      conjunction: conj || defaultGroupConjunction(config, groupFieldConfig),
       not: not,
-      field: parentField,
+      field: groupField,
     }
   };
 };
@@ -689,7 +689,7 @@ const wrapInDefaultConj = (rule, config, not = false) => {
     id: uuid(),
     children1: { [rule.id]: rule },
     properties: {
-      conjunction: defaultConjunction(config),
+      conjunction: defaultGroupConjunction(config),
       not: not
     }
   };

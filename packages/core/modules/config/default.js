@@ -33,6 +33,8 @@ export const settings = {
   setOpOnChangeField: ["keep", "default"], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
   groupOperators: ["some", "all", "none"],
 
+  defaultConjunction: "AND",
+  // todo: deprecated, remove this in favour of defaultConjunction
   defaultGroupConjunction: "AND",
 
   // localization
@@ -56,6 +58,7 @@ export const settings = {
   defaultCaseLabel: "Default:",
   addRuleLabel: "Add rule",
   addSubRuleLabel: "Add sub rule",
+  addSubGroupLabel: "Add sub group",
   delGroupLabel: "Delete",
   notLabel: "Not",
   fieldSourcesPopupTitle: "Select source",

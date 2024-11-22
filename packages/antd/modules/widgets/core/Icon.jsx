@@ -9,8 +9,9 @@ const typeToIcon = {
   "delRule": <DeleteFilled />,
   "delGroup": <DeleteFilled />,
   "delRuleGroup": <DeleteFilled />,
-  "addRuleGroup": <PlusOutlined />,
-  "addRuleGroupExt": <PlusOutlined />,
+  "addSubRuleSimple": <PlusOutlined />,
+  "addSubRule": <PlusOutlined />,
+  "addSubGroup": <PlusCircleOutlined />,
   "drag": <HolderOutlined />,
 };
 

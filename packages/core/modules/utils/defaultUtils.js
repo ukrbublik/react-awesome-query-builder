@@ -7,10 +7,10 @@ import { isImmutable, isImmutableList } from "./stuff";
 import { jsToImmutable } from "../import";
 
 
-export const getDefaultField = (config, canGetFirst = true, parentRuleGroupPath = null) => {
+export const getDefaultField = (config, canGetFirst = true, parentRuleGroupField = null) => {
   const {defaultField} = config.settings;
-  let f = (!parentRuleGroupPath ? defaultField : getDefaultSubField(config, parentRuleGroupPath))
-    || canGetFirst && getFirstField(config, parentRuleGroupPath)
+  let f = (!parentRuleGroupField ? defaultField : getDefaultSubField(config, parentRuleGroupField))
+    || canGetFirst && getFirstField(config, parentRuleGroupField)
     || null;
   // if default LHS is func, convert to Immutable
   if (f != null && typeof f !== "string" && !isImmutable(f)) {
@@ -19,14 +19,14 @@ export const getDefaultField = (config, canGetFirst = true, parentRuleGroupPath 
   return f;
 };
 
-export const getDefaultSubField = (config, parentRuleGroupPath = null) => {
-  if (!parentRuleGroupPath)
+export const getDefaultSubField = (config, parentRuleGroupField = null) => {
+  if (!parentRuleGroupField)
     return null;
   const fieldSeparator = config?.settings?.fieldSeparator || ".";
-  const parentRuleGroupConfig = getFieldConfig(config, parentRuleGroupPath);
+  const parentRuleGroupConfig = getFieldConfig(config, parentRuleGroupField);
   let f = parentRuleGroupConfig?.defaultField;
   if (f) {
-    f = [...getFieldParts(parentRuleGroupPath), f].join(fieldSeparator);
+    f = [...getFieldParts(parentRuleGroupField), f].join(fieldSeparator);
   }
   return f;
 };
@@ -59,7 +59,7 @@ export const defaultOperatorOptions = (config, operator, field) => {
   ) : null;
 };
 
-export const defaultRuleProperties = (config, parentRuleGroupPath = null, item = null, canUseDefaultFieldAndOp = true, canGetFirst = false) => {
+export const defaultRuleProperties = (config, parentRuleGroupField = null, item = null, canUseDefaultFieldAndOp = true, canGetFirst = false) => {
   let field = null, operator = null, fieldSrc = null;
   const {showErrorMessage} = config.settings;
   if (item) {
@@ -67,7 +67,7 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null, item =
     field = item?.properties?.field;
     operator = item?.properties?.operator;
   } else if (canUseDefaultFieldAndOp) {
-    field = getDefaultField(config, canGetFirst, parentRuleGroupPath);
+    field = getDefaultField(config, canGetFirst, parentRuleGroupField);
     if (field) {
       fieldSrc = isImmutable(field) ? "func" : "field";
     } else {
@@ -105,29 +105,39 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null, item =
         .set("fieldError", newFieldError);
     }
   }
+
+  const fieldConfig = getFieldConfig(config, field);
+  if (fieldConfig?.type === "!group") {
+    const conjunction = defaultGroupConjunction(config, fieldConfig);
+    current = current.set("conjunction", conjunction);
+  }
+
   return current; 
 };
 
 
-export const defaultGroupConjunction = (config, fieldConfig = null) => {
-  fieldConfig = getFieldConfig(config, fieldConfig); // if `fieldConfig` is field name, not config
-  const conjs = fieldConfig && fieldConfig.conjunctions || Object.keys(config.conjunctions);
+export const defaultGroupConjunction = (config, groupFieldConfig = null) => {
+  groupFieldConfig = getFieldConfig(config, groupFieldConfig); // if `groupFieldConfig` is field name, not config
+  const conjs = groupFieldConfig?.conjunctions || Object.keys(config.conjunctions);
   if (conjs.length == 1)
     return conjs[0];
-  return config.settings.defaultGroupConjunction || config.settings.defaultConjunction || conjs[0];
+  // todo: config.settings.defaultGroupConjunction is deprecated, defaultConjunction should be used instead
+  return groupFieldConfig?.defaultConjunction || config.settings.defaultConjunction || config.settings.defaultGroupConjunction || conjs[0];
 };
 
-export const defaultConjunction = (config) =>
-  config.settings.defaultConjunction || Object.keys(config.conjunctions)[0];
+// @deprecated Use defaultGroupConjunction
+export const defaultConjunction = (config) => defaultGroupConjunction(config);
 
-export const defaultGroupProperties = (config, fieldConfig = null) => new Immutable.Map({
-  conjunction: defaultGroupConjunction(config, fieldConfig),
-  not: false
-});
+export const defaultGroupProperties = (config, groupFieldConfig = null) => {
+  return new Immutable.Map({
+    conjunction: defaultGroupConjunction(config, groupFieldConfig),
+    not: false
+  });
+};
 
 export const defaultItemProperties = (config, item) => {
-  return item && item.type == "group" 
-    ? defaultGroupProperties(config, item?.properties?.field) 
+  return item?.type == "group" 
+    ? defaultGroupProperties(config) 
     : defaultRuleProperties(config, null, item);
 };
 

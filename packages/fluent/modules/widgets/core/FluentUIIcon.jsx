@@ -4,8 +4,9 @@ import { Utils } from "@react-awesome-query-builder/ui";
 const { DragIcon } = Utils;
 
 const typeToIcon = {
-  addRuleGroup: "CirclePlus",
-  addRuleGroupExt: "Add",
+  addSubRuleSimple: "CirclePlus",
+  addSubRule: "Add",
+  addSubGroup: "CirclePlus",
   addRule: "Add",
   addGroup: "CirclePlus",
   delGroup: "Delete",

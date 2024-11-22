@@ -321,7 +321,7 @@ Behaviour settings:
 |showNot |true |Show `NOT` together with `AND`/`OR`?
 |forceShowConj |false |Show conjuction for 1 rule in group?
 |maxNumberOfRules | |Maximum number of rules which can be added to the query builder
-|maxNesting | |Max nesting for rule groups. +
+|maxNesting | |Max nesting for groups. +
   Set `1` if you don't want to use groups at all. This will remove also `Add group` button.
 |maxNumberOfCases | |For ternary mode - maximum number of cases
 |canLeaveEmptyGroup |true |True - leave empty group after deletion of rules, false - automatically remove empty groups + add 1 empty rule to empty root
@@ -455,6 +455,7 @@ Localization:
 |addGroupLabel |Add group
 |addRuleLabel |Add rule
 |addSubRuleLabel |Add sub rule
+|addSubGroupLabel |Add sub group
 |notLabel |Not
 |fieldSourcesPopupTitle |Select source
 |valueSourcesPopupTitle |Select value source

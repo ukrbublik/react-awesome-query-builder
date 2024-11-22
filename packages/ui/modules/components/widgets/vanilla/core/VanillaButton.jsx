@@ -1,8 +1,9 @@
 import React from "react";
 
 const typeToLabel = {
-  "addRuleGroup": "+",
-  "addRuleGroupExt": "+",
+  "addSubRuleSimple": "+",
+  "addSubRule": "+",
+  "addSubGroup": "+",
   "delGroup": "x",
   "delRuleGroup": "x",
   "delRule": "x",

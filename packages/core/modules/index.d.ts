@@ -543,18 +543,21 @@ interface ConfigUtils {
   applyJsonLogic(logic: any, data?: any): any;
 }
 interface DefaultUtils {
-  getDefaultField(config: Config, canGetFirst?: boolean, parentRuleGroupPath?: IdPath): FieldValueI | null;
-  getDefaultSubField(config: Config, parentRuleGroupPath?: IdPath): FieldValueI | null;
+  getDefaultField(config: Config, canGetFirst?: boolean, parentRuleGroupField?: string): FieldValueI | null;
+  getDefaultSubField(config: Config, parentRuleGroupField?: string): FieldValueI | null;
   getDefaultFieldSrc(config: Config, canGetFirst?: boolean): string;
   getDefaultOperator(config: Config, field: Field, canGetFirst?: boolean): string;
   defaultRule(id: string, config: Config): Record<string, ImmutableRule>;
   defaultRoot(config: Config, canAddDefaultRule?: boolean): ImmutableGroup;
   defaultItemProperties(config: Config, item: JsonItem): ImmutableItemProperties;
-  defaultGroupProperties(config: Config, fieldConfig?: FieldValueOrConfig): ImmutableGroupProperties;
-  defaultRuleProperties(config: Config, parentRuleGroupPath?: IdPath, item?: JsonItem, canUseDefaultFieldAndOp?: boolean, canGetFirst?: boolean): ImmutableRuleProperties;
+  defaultGroupProperties(config: Config, groupFieldConfig?: FieldValueOrConfig): ImmutableGroupProperties;
+  defaultRuleProperties(config: Config, parentRuleGroupField?: string, item?: JsonItem, canUseDefaultFieldAndOp?: boolean, canGetFirst?: boolean): ImmutableRuleProperties;
+  /**
+   * @deprecated Use defaultGroupConjunction() instead
+   */
   defaultConjunction(config: Config): string;
   defaultOperatorOptions(config: Config, operator: string, field: Field): OperatorOptionsI | null;
-  defaultGroupConjunction(config: Config, fieldConfig?: FieldValueOrConfig): string;
+  defaultGroupConjunction(config: Config, groupFieldConfig?: FieldValueOrConfig): string;
 
   // createListWithOneElement<TItem>(el: TItem): ImmutableList<TItem>;
   // createListFromArray<TItem>(array: TItem[]): ImmutableList<TItem>;
@@ -590,7 +593,7 @@ interface TreeUtils {
   expandTreeSubpath(path: ImmutablePath, ...suffix: string[]): ImmutablePath;
   fixEmptyGroupsInTree(tree: ImmutableTree): ImmutableTree;
   fixPathsInTree(tree: ImmutableTree): ImmutableTree;
-  getFlatTree(tree: ImmutableTree): FlatTree;
+  getFlatTree(tree: ImmutableTree, config?: Config): FlatTree;
   getTotalReordableNodesCountInTree(tree: ImmutableTree): number;
   getTotalRulesCountInTree(tree: ImmutableTree): number;
   isEmptyTree(tree: ImmutableTree): boolean;
@@ -1269,6 +1272,11 @@ interface FieldGroupExt<FS = NumberFieldSettings<number>> extends BaseField {
   initialEmptyWhere?: boolean;
   showNot?: boolean;
   conjunctions?: Array<string>;
+  defaultConjunction?: string;
+  maxNesting?: number;
+  maxNumberOfRules?: number;
+  canRegroup?: boolean;
+  canReorder?: boolean;
   isSpelArray?: boolean;
   isSpelItemMap?: boolean;
 }
@@ -1339,6 +1347,7 @@ export interface LocaleSettings {
   defaultCaseLabel?: string;
   addRuleLabel?: string;
   addSubRuleLabel?: string;
+  addSubGroupLabel?: string;
   delGroupLabel?: string;
   notLabel?: string;
   fieldSourcesPopupTitle?: string;
@@ -1363,6 +1372,7 @@ export interface BehaviourSettings {
   canShortMongoQuery?: boolean;
   defaultField?: AnyFieldValue;
   defaultOperator?: string;
+  defaultConjunction?: string;
   fieldSources?: Array<FieldSource>;
   valueSourcesInfo?: ValueSourcesInfo;
   canCompareFieldWithField?: CanCompareFieldWithField | SerializedFunction;

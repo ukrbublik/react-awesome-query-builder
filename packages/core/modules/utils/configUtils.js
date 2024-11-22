@@ -349,10 +349,10 @@ export const getFieldWidgetConfig = (config, field, operator = null, widget = nu
   return mergedConfig;
 };
 
-export const getFirstField = (config, parentRuleGroupPath = null) => {
+export const getFirstField = (config, parentRuleGroupField = null) => {
   const fieldSeparator = config.settings.fieldSeparator;
-  const parentPathArr = getFieldParts(parentRuleGroupPath, config);
-  const parentField = parentRuleGroupPath ? getFieldRawConfig(config, parentRuleGroupPath) : config;
+  const parentPathArr = getFieldParts(parentRuleGroupField, config);
+  const parentField = parentRuleGroupField ? getFieldRawConfig(config, parentRuleGroupField) : config;
 
   let firstField = parentField, key = null, keysPath = [];
   do {
