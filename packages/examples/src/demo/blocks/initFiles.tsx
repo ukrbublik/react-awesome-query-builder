@@ -6,6 +6,9 @@ import type { DemoQueryBuilderState } from "../types";
 import { importFromInitFile } from "../utils";
 import { initFiles } from "../init_data";
 
+const stringify = JSON.stringify;
+const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
+
 
 export const useInitFiles = (
   state: DemoQueryBuilderState,
@@ -13,20 +16,22 @@ export const useInitFiles = (
 ) => {
   const changeInitFile = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newInitFile = e.target.value;
-    const importedTree: ImmutableTree = importFromInitFile(newInitFile,  state.config);
+    const {tree: importedTree, errors} = importFromInitFile(newInitFile,  state.config);
     setState({
       ...state,
       initFile: newInitFile,
       tree: importedTree,
+      initErrors: errors,
     });
     window._initFile = newInitFile;
   };
 
   const loadFromInitFile = () => {
-    const importedTree: ImmutableTree = importFromInitFile(state.initFile,  state.config);
+    const {tree: importedTree, errors} = importFromInitFile(state.initFile,  state.config);
     setState({
       ...state,
       tree: importedTree,
+      initErrors: errors,
     });
   };
 
@@ -45,7 +50,20 @@ export const useInitFiles = (
     );
   };
 
+  const renderInitErrors = () => {
+    return (
+      <>
+        { state.initErrors.length > 0 
+          && <pre style={preErrorStyle}>
+            {stringify(state.initErrors, undefined, 2)}
+          </pre> 
+        }
+      </>
+    );
+  };
+
   return {
     renderInitFilesHeader,
+    renderInitErrors,
   };
 };
