@@ -34,6 +34,7 @@ export interface Conv {
   conjunctions: Record<string, string>;
   operators: Record<string, string[]>;
   opFuncs: Record<string, SqlImportFunc[]>;
+  valueFuncs: Record<string, SqlImportFunc[]>;
 }
 
 export interface Meta {
@@ -45,6 +46,8 @@ export interface Meta {
   // call meta
   opKey?: string;
   funcKey?: string;
+  widgetKey?: string;
+  outType?: "op" | "func" | "value";
 }
 
 export interface OutLogic  {
@@ -74,6 +77,7 @@ export interface ValueObj {
   valueType?: string;
   value: RuleValue;
   valueSrc: ValueSource;
+  valueError?: string;
 }
 
 export type FuncArgsObj = Record<string, ValueObj>;

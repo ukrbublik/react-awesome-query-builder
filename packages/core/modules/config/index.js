@@ -953,8 +953,24 @@ const widgets = {
         return [undefined, "Invalid date"];
       }
     },
-    spelImport: function (sqlObj) {
-      // todo: TO_DATE
+    sqlImport: function (sqlObj, wgtDef) {
+      if (sqlObj?.func === "TO_DATE" && sqlObj?.children?.length >= 1) {
+        const [valArg, patternArg] = sqlObj.children;
+        if (valArg?.valueType == "single_quote_string") {
+          // tip: moment doesn't support SQL date format, so ignore patternArg
+          const dateVal = this.utils.moment(valArg.value);
+          if (dateVal.isValid()) {
+            return {
+              value: dateVal.format(wgtDef?.valueFormat),
+            };
+          } else {
+            return {
+              value: null,
+              error: "Invalid date",
+            };
+          }
+        }
+      }
     },
     jsonLogic: function (val, fieldDef, wgtDef) {
       return this.utils.moment(val, wgtDef.valueFormat).toDate();

@@ -984,6 +984,7 @@ export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   spelFormatValue?: SpelFormatValue | SerializedFunction;
   spelImportFuncs?: Array<string | object>;
   spelImportValue?: SpelImportValue | SerializedFunction;
+  sqlImport?: SqlImportFunc | SerializedFunction;
   mongoFormatValue?: MongoFormatValue | SerializedFunction;
   elasticSearchFormatValue?: ElasticSearchFormatValue | SerializedFunction;
   hideOperator?: boolean;

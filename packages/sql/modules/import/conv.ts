@@ -26,6 +26,7 @@ export const SqlPrimitiveTypes: Record<string, string> = {
 export const buildConv = (config: Config, meta: Meta): Conv => {
   const operators: Record<string, string[]> = {};
   const opFuncs: Record<string, SqlImportFunc[]> = {};
+  const valueFuncs: Record<string, SqlImportFunc[]> = {};
 
   for (const opKey in config.operators) {
     const opConfig = config.operators[opKey];
@@ -62,25 +63,15 @@ export const buildConv = (config: Config, meta: Meta): Conv => {
     conjunctions[ck] = conjKey;
   }
 
-  // let valueFuncs = {};
-  // for (let w in config.widgets) {
-  //   const widgetDef = config.widgets[w];
-  //   const {sqlImportFuncs, type} = widgetDef;
-  //   if (sqlImportFuncs) {
-  //     for (const fk of sqlImportFuncs) {
-  //       if (typeof fk === "string") {
-  //         const fs = fk.replace(/\${(\w+)}/g, (_, k) => "?");
-  //         const argsOrder = [...fk.matchAll(/\${(\w+)}/g)].map(([_, k]) => k);
-  //         if (!valueFuncs[fs])
-  //           valueFuncs[fs] = [];
-  //         valueFuncs[fs].push({
-  //           w,
-  //           argsOrder
-  //         });
-  //       }
-  //     }
-  //   }
-  // }
+  for (let w in config.widgets) {
+    const widgetDef = config.widgets[w];
+    const {sqlImport} = widgetDef;
+    if (sqlImport) {
+      if (!valueFuncs[w])
+        valueFuncs[w] = [] as SqlImportFunc[];
+      valueFuncs[w].push(sqlImport);
+    }
+  }
 
   // let opFuncs = {};
   // for (let op in config.operators) {
@@ -108,7 +99,7 @@ export const buildConv = (config: Config, meta: Meta): Conv => {
     operators,
     conjunctions,
     opFuncs,
+    valueFuncs,
     // funcs,
-    // valueFuncs,
   };
 };

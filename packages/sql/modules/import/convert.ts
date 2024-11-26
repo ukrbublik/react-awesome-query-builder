@@ -143,6 +143,7 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
     value: [],
     valueSrc: [],
     valueType: [],
+    valueError: [],
     field: undefined,
   };
   if (left?.valueSrc === "field") {
@@ -159,6 +160,9 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
       properties.valueSrc![i] = v?.valueSrc as ValueSource;
       properties.valueType![i] = v?.valueType!;
       properties.value[i] = v?.value;
+      if (v?.valueError) {
+        properties.valueError![i] = v.valueError;
+      }
     }
   });
   return {
@@ -171,11 +175,15 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
   const { fieldSeparator } = config.settings;
   if (logic?.valueType) {
     const sqlType = logic?.valueType;
-    const valueType = SqlPrimitiveTypes[sqlType];
+    let valueType: string | undefined = SqlPrimitiveTypes[sqlType];
     if (!valueType) {
       meta.warnings.push(`Unexpected value type ${sqlType}`);
     }
     const value = logic.value; // todo: convert ?
+    if (valueType === 'text') {
+      // fix issues with date/time values
+      valueType = undefined;
+    }
     return {
       valueSrc: "value",
       valueType,
@@ -191,7 +199,7 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
       value: field,
     };
   } else if (logic?.func) {
-    return convertFunc(logic, conv, config, meta, parentLogic);
+    return convertValueFunc(logic, conv, config, meta, parentLogic) || convertFunc(logic, conv, config, meta, parentLogic);
   } else {
     meta.errors.push(`Unexpected arg: ${getLogicDescr(logic)}`);
   }
@@ -212,22 +220,30 @@ const convertFuncArg = (logic: any, argConfig: FuncArg | undefined, conv: Conv, 
 // `meta` should contain either `funcKey` or `opKey`
 const useImportFunc = (
   sqlImport: SqlImportFunc, logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta
-): FuncWithArgsObj | OperatorObj | undefined => {
+): FuncWithArgsObj | OperatorObj | ValueObj | undefined => {
   let parsed: Record<string, any> | undefined;
+  const args: any[] = [config.ctx, logic!];
+  let widgetConfig: BaseWidget | undefined;
+  if (meta.widgetKey) {
+    widgetConfig = config.widgets[meta.widgetKey] as BaseWidget;
+    args.push(widgetConfig);
+  }
   try {
-    parsed = sqlImport.call(config.ctx, logic!);
+    parsed = (sqlImport as any).call(...args);
   } catch(_e) {
     // can't be parsed
   }
 
   if (parsed) {
+    const funcKey = parsed?.func as string ?? meta.funcKey;
+    const sqlFunc = logic?.func;
+    const parseKey = meta.opKey ?? meta.funcKey ?? meta.widgetKey ?? meta.outType ?? "?";
     if (parsed?.children) {
       return {
         operator: parsed.operator ?? meta.opKey,
         children: (parsed as OutLogic).children?.map(ch => convertArg(ch, conv, config, meta, logic)),
       } as OperatorObj;
     } else if (parsed?.args) {
-      const funcKey = parsed?.func as string ?? meta.funcKey;
       const funcConfig = Utils.ConfigUtils.getFuncConfig(config, funcKey);
       const args: FuncArgsObj = {};
       for (const argKey in parsed.args) {
@@ -240,8 +256,19 @@ const useImportFunc = (
         funcConfig,
         args,
       };
+    } else if (Object.keys(parsed).includes("value")) {
+      const { value, error } = parsed;
+      if (error) {
+        meta.errors.push(`Error while parsing ${parseKey} with func ${sqlFunc ?? "?"}: ${error}`);
+      }
+      return {
+        value,
+        valueType: widgetConfig?.type,
+        valueSrc: "value",
+        valueError: error,
+      };
     } else {
-      meta.errors.push(`Result of parsing as ${meta.opKey ?? meta.funcKey ?? "?"} should contain either 'children' or 'args'`);
+      meta.errors.push(`Result of parsing as ${parseKey} should contain either 'children' or 'args' or 'value'`);
     }
   }
 
@@ -252,9 +279,21 @@ const useImportFunc = (
 const convertOpFunc = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): OperatorObj | undefined => {
   for (const opKey in conv.opFuncs) {
     for (const f of conv.opFuncs[opKey]) {
-      const parsed = useImportFunc(f, logic, conv, config, {...meta, opKey: opKey});
+      const parsed = useImportFunc(f, logic, conv, config, {...meta, opKey: opKey, outType: "op"});
       if (parsed) {
         return parsed as OperatorObj;
+      }
+    }
+  }
+  return undefined;
+};
+
+const convertValueFunc = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): ValueObj | undefined => {
+  for (const widgetKey in conv.valueFuncs) {
+    for (const f of conv.valueFuncs[widgetKey]) {
+      const parsed = useImportFunc(f, logic, conv, config, {...meta, outType: "value", widgetKey});
+      if (parsed) {
+        return parsed as ValueObj;
       }
     }
   }
@@ -270,7 +309,7 @@ const convertFunc = (
     const { sqlFunc, sqlImport } = fc;
     if (sqlImport) {
       // todo: types: always SqlImportFunc
-      const parsed = useImportFunc(sqlImport as SqlImportFunc, logic, conv, config, {...meta, funcKey: f}) as FuncWithArgsObj;
+      const parsed = useImportFunc(sqlImport as SqlImportFunc, logic, conv, config, {...meta, funcKey: f, outType: "func"}) as FuncWithArgsObj;
       if (parsed) {
         funcKey = parsed.func;
         funcConfig = parsed.funcConfig;
