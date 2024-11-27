@@ -67,6 +67,7 @@ export const importFromInitFile = (fileKey: string, config?: Config) => {
 export const initTreeWithValidation = (initFileKey: string, config: Config, validationOptions?: Partial<SanitizeOptions>) => {
   let tree: ImmutableTree;
   let errors: string[];
+  // eslint-disable-next-line prefer-const
   ({tree, errors} = importFromInitFile(initFileKey, config));
   const {fixedTree, fixedErrors, nonFixedErrors} = Utils.sanitizeTree(tree, config, {
     ...(validationOptions ?? {}),

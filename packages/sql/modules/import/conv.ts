@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
-import type { Conv, Meta } from "./types";
+import type { Conv, Meta, OutLogic } from "./types";
 import {
-  Config, SqlImportFunc, Utils,
+  Config, SqlImportFunc, Utils, ConfigContext, DateTimeWidget,
+  BaseWidget, MomentInput
 } from "@react-awesome-query-builder/core";
 import { ValueExpr } from "node-sql-parser";
 
@@ -26,7 +27,11 @@ export const SqlPrimitiveTypes: Record<string, string> = {
 export const buildConv = (config: Config, meta: Meta): Conv => {
   const operators: Record<string, string[]> = {};
   const opFuncs: Record<string, SqlImportFunc[]> = {};
-  const valueFuncs: Record<string, SqlImportFunc[]> = {};
+  const valueFuncs: Record<string, SqlImportFunc[]> = {
+    datetime: [sqlImportDate],
+    date: [sqlImportDate],
+    time: [sqlImportDate],
+  };
 
   for (const opKey in config.operators) {
     const opConfig = config.operators[opKey];
@@ -63,8 +68,8 @@ export const buildConv = (config: Config, meta: Meta): Conv => {
     conjunctions[ck] = conjKey;
   }
 
-  for (let w in config.widgets) {
-    const widgetDef = config.widgets[w];
+  for (const w in config.widgets) {
+    const widgetDef = config.widgets[w] as BaseWidget;
     const {sqlImport} = widgetDef;
     if (sqlImport) {
       if (!valueFuncs[w])
@@ -73,33 +78,34 @@ export const buildConv = (config: Config, meta: Meta): Conv => {
     }
   }
 
-  // let opFuncs = {};
-  // for (let op in config.operators) {
-  //   const opDef = config.operators[op];
-  //   const {sqlOp} = opDef;
-  //   if (sqlOp?.includes("${0}")) {
-  //     const fs = sqlOp.replace(/\${(\w+)}/g, (_, k) => "?");
-  //     const argsOrder = [...sqlOp.matchAll(/\${(\w+)}/g)].map(([_, k]) => k);
-  //     if (!opFuncs[fs])
-  //       opFuncs[fs] = [];
-  //     opFuncs[fs].push({
-  //       op,
-  //       argsOrder
-  //     });
-  //   }
-  // }
-  // // Special .compareTo()
-  // const compareToSS = compareToSign.replace(/\${(\w+)}/g, (_, k) => "?");
-  // opFuncs[compareToSS] = [{
-  //   op: "!compare",
-  //   argsOrder: ["0", "1"]
-  // }];
-
   return {
     operators,
     conjunctions,
     opFuncs,
     valueFuncs,
-    // funcs,
   };
+};
+
+
+const sqlImportDate: SqlImportFunc = function (this: ConfigContext, sqlObj: OutLogic, wgtDef?: DateTimeWidget) {
+  if (sqlObj?.children && [
+    "TO_DATE", "TO_TIMESTAMP", "TO_TIMESTAMP_TZ", "TO_UTC_TIMESTAMP_TZ"
+  ].includes(sqlObj.func!) && sqlObj.children.length >= 1) {
+    const [valArg, _patternArg] = sqlObj!.children!;
+    if (valArg?.valueType == "single_quote_string") {
+      // tip: moment doesn't support SQL date format, so ignore patternArg
+      const dateVal = this.utils.moment(valArg.value as MomentInput);
+      if (dateVal.isValid()) {
+        return {
+          value: dateVal.format(wgtDef?.valueFormat),
+        };
+      } else {
+        return {
+          value: null,
+          error: "Invalid date",
+        };
+      }
+    }
+  }
+  return undefined;
 };

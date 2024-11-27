@@ -180,7 +180,7 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
       meta.warnings.push(`Unexpected value type ${sqlType}`);
     }
     const value = logic.value; // todo: convert ?
-    if (valueType === 'text') {
+    if (valueType === "text") {
       // fix issues with date/time values
       valueType = undefined;
     }

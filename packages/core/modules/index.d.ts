@@ -4,10 +4,10 @@
 import {List as ImmList, Map as ImmMap, OrderedMap as ImmOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";
 import moment from "moment";
-import type { Moment as MomentType } from "moment";
+import type { Moment, MomentInput } from "moment";
 import type { i18n } from "i18next";
 
-export type Moment = MomentType;
+export type { Moment, MomentInput };
 export type ImmutableList<T> = ImmList<T>;
 export type ImmutableMap<K, V> = ImmMap<K, V>;
 export type ImmutableOMap<K, V> = ImmOMap<K, V>;
@@ -25,12 +25,13 @@ interface ReactAttributes {
 export type FactoryWithContext<P> = (props: ReactAttributes & P, ctx?: ConfigContext) => ReactElement<P>;
 export type RenderedReactElement = ReactElement | string;
 export type SerializedFunction = JsonLogicFunction | string;
+export type SerializableType<T, SER = false> = SER extends true ? T | SerializedFunction : T;
 
 type AnyObject = Record<string, unknown>;
 type Empty = null | undefined;
 
-type ImmutablePath = ImmutableList<string>;
-type IdPath = Array<string> | ImmutablePath; // should be used in actions only
+export type ImmutablePath = ImmutableList<string>;
+export type IdPath = Array<string> | ImmutablePath; // should be used in actions only
 
 type Optional<T> = {
   [P in keyof T]?: T[P];
@@ -67,19 +68,19 @@ export type AsyncListValues = Array<any>;
 
 // for export/import
 
-type MongoValue = any;
-type ElasticSearchQueryType = string;
+export type MongoValue = any;
+export type ElasticSearchQueryType = string;
 
-type JsonLogicResult = {
+export type JsonLogicResult = {
   logic?: JsonLogicTree;
   data?: Object;
   errors?: Array<string>;
 }
-type JsonLogicFunction = Object;
-type JsonLogicTree = Object;
-type JsonLogicValue = any;
-type JsonLogicField = { "var": string };
-interface SpelRawValue {
+export type JsonLogicFunction = Object;
+export type JsonLogicTree = Object;
+export type JsonLogicValue = any;
+export type JsonLogicField = { "var": string };
+export interface SpelRawValue {
   type: string;
   children?: SpelRawValue[];
   val?: RuleValue;
@@ -1525,14 +1526,14 @@ export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettin
 // Funcs
 /////////////////
 
-type SqlFormatFunc        = (this: ConfigContext, formattedArgs: TypedMap<string>) => string;
-type SqlImportFunc        = (this: ConfigContext, sql: Object) => Record<string, RuleValue> | undefined; // can throw, should return {func?, args: {}} or {operator?, children: []}
-type FormatFunc           = (this: ConfigContext, formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
-type MongoFormatFunc      = (this: ConfigContext, formattedArgs: TypedMap<MongoValue>) => MongoValue;
-type JsonLogicFormatFunc  = (this: ConfigContext, formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
-type JsonLogicImportFunc  = (this: ConfigContext, val: JsonLogicValue) => Array<RuleValue> | undefined; // can throw
-type SpelImportFunc       = (this: ConfigContext, spel: SpelRawValue) => Record<string, RuleValue> | undefined; // can throw
-type SpelFormatFunc       = (this: ConfigContext, formattedArgs: TypedMap<string>) => string;
+export type SqlFormatFunc        = (this: ConfigContext, formattedArgs: TypedMap<string>) => string;
+export type SqlImportFunc        = (this: ConfigContext, sql: Object) => Record<string, RuleValue> | undefined; // can throw, should return {func?, args: {}} or {operator?, children: []}
+export type FormatFunc           = (this: ConfigContext, formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
+export type MongoFormatFunc      = (this: ConfigContext, formattedArgs: TypedMap<MongoValue>) => MongoValue;
+export type JsonLogicFormatFunc  = (this: ConfigContext, formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
+export type JsonLogicImportFunc  = (this: ConfigContext, val: JsonLogicValue) => Array<RuleValue> | undefined; // can throw
+export type SpelImportFunc       = (this: ConfigContext, spel: SpelRawValue) => Record<string, RuleValue> | undefined; // can throw
+export type SpelFormatFunc       = (this: ConfigContext, formattedArgs: TypedMap<string>) => string;
 
 interface FuncGroup extends BaseField {
   type: "!struct";
