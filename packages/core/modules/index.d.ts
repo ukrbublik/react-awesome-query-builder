@@ -403,7 +403,7 @@ interface _AnyRuleI extends _OmitI<_RuleI> {
   children1?: ImmOMap<string, ImmutableRule>;
 }
 // type _ItemI = _GroupI | _AnyRuleI;
-interface _ItemI extends _OmitI<_GroupI>, _OmitI<_AnyRuleI> {
+export interface _ItemI extends _OmitI<_GroupI>, _OmitI<_AnyRuleI> {
   type: "rule" | "rule_group" | "group";
   properties: ImmutableItemProperties;
   children1?: ImmOMap<string, ImmutableItem>;
@@ -415,7 +415,7 @@ interface _ItemOrCaseI extends _OmitI<_ItemI>, _OmitI<_CaseGroupI> {
   children1?: ImmOMap<string, ImmutableItem>;
 }
 // type _TreeI = _GroupI | _SwitchGroupI;
-interface _TreeI extends _OmitI<_GroupI>, _OmitI<_SwitchGroupI> {
+export interface _TreeI extends _OmitI<_GroupI>, _OmitI<_SwitchGroupI> {
   type: "group" | "switch_group";
   children1?: ImmOMap<string, ImmutableBasicItem<_ItemOrCaseI>>;
   properties: ImmutableGroupOrSwitchProperties;
@@ -980,22 +980,22 @@ export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   valuePlaceholder?: string;
   valueLabel?: string;
   fullWidth?: boolean;
-  formatValue?: FormatValue | SerializedFunction;
-  sqlFormatValue?: SqlFormatValue | SerializedFunction;
-  spelFormatValue?: SpelFormatValue | SerializedFunction;
+  formatValue?: SerializableType<FormatValue>;
+  sqlFormatValue?: SerializableType<SqlFormatValue>;
+  spelFormatValue?: SerializableType<SpelFormatValue>;
   spelImportFuncs?: Array<string | object>;
-  spelImportValue?: SpelImportValue | SerializedFunction;
-  sqlImport?: SqlImportFunc | SerializedFunction;
-  mongoFormatValue?: MongoFormatValue | SerializedFunction;
-  elasticSearchFormatValue?: ElasticSearchFormatValue | SerializedFunction;
+  spelImportValue?: SerializableType<SpelImportValue>;
+  sqlImport?: SerializableType<SqlImportFunc>;
+  mongoFormatValue?: SerializableType<MongoFormatValue>;
+  elasticSearchFormatValue?: SerializableType<ElasticSearchFormatValue>;
   hideOperator?: boolean;
   operatorInlineLabel?: string;
-  jsonLogic?: JsonLogicFormatValue | SerializedFunction;
-  jsonLogicImport?: JsonLogicImportValue | SerializedFunction;
+  jsonLogic?: SerializableType<JsonLogicFormatValue>;
+  jsonLogicImport?: SerializableType<JsonLogicImportValue>;
   //obsolete:
-  validateValue?: ValidateValue | SerializedFunction;
+  validateValue?: SerializableType<ValidateValue>;
   //@ui
-  factory: FactoryWithContext<WP> | SerializedFunction;
+  factory: SerializableType<FactoryWithContext<WP>>;
   customProps?: AnyObject;
 }
 export interface RangeableWidget<C = Config, WP = WidgetProps<C>> extends BaseWidget<C, WP> {
@@ -1005,14 +1005,14 @@ export interface RangeableWidget<C = Config, WP = WidgetProps<C>> extends BaseWi
 interface BaseFieldWidget<C = Config, WP = WidgetProps<C>> {
   valuePlaceholder?: string;
   valueLabel?: string;
-  formatValue: FormatValue | SerializedFunction; // with rightFieldDef
-  sqlFormatValue?: SqlFormatValue | SerializedFunction; // with rightFieldDef
-  spelFormatValue?: SpelFormatValue | SerializedFunction; // with rightFieldDef
+  formatValue?: SerializableType<FormatValue>; // with rightFieldDef
+  sqlFormatValue?: SerializableType<SqlFormatValue>; // with rightFieldDef
+  spelFormatValue?: SerializableType<SpelFormatValue>; // with rightFieldDef
   //obsolete:
-  validateValue?: ValidateValue | SerializedFunction;
+  validateValue?: SerializableType<ValidateValue>;
   //@ui
   customProps?: AnyObject;
-  factory?: FactoryWithContext<WP>;
+  factory: SerializableType<FactoryWithContext<WP>>;
 }
 export interface FieldWidget<C = Config, WP = WidgetProps<C>> extends BaseFieldWidget<C, WP> {
   valueSrc: "field";
@@ -1035,18 +1035,17 @@ export type TreeMultiSelectWidget<C = Config, WP = TreeMultiSelectWidgetProps<C>
  */
 export type CaseValueWidget<C = Config, WP = CaseValueWidgetProps<C>> = BaseWidget<C, WP> & CaseValueFieldSettings;
 
-// tip: use generic WidgetProps here, TS can't determine correct factory
 export type TypedWidget<C = Config> =
-  TextWidget<C, WidgetProps<C>>
-  | DateTimeWidget<C, WidgetProps<C>>
-  | BooleanWidget<C, WidgetProps<C>>
-  | NumberWidget<C, WidgetProps<C>>
-  | RangeSliderWidget<C, WidgetProps<C>>
-  | SelectWidget<C, WidgetProps<C>>
-  | MultiSelectWidget<C, WidgetProps<C>>
-  | TreeSelectWidget<C, WidgetProps<C>>
-  | TreeMultiSelectWidget<C, WidgetProps<C>>
-  | CaseValueWidget<C, WidgetProps<C>>;
+  TextWidget<C>
+  | DateTimeWidget<C>
+  | BooleanWidget<C>
+  | NumberWidget<C>
+  | RangeSliderWidget<C>
+  | SelectWidget<C>
+  | MultiSelectWidget<C>
+  | TreeSelectWidget<C>
+  | TreeMultiSelectWidget<C>
+  | CaseValueWidget<C>;
 
 export type Widget<C = Config> =
   FieldWidget<C>
@@ -1067,9 +1066,9 @@ type SpelFormatConj = (this: ConfigContext, children: ImmutableList<string>, con
 
 export interface Conjunction {
   label: string;
-  formatConj: FormatConj | SerializedFunction;
-  sqlFormatConj: SqlFormatConj | SerializedFunction;
-  spelFormatConj: SpelFormatConj | SerializedFunction;
+  formatConj: SerializableType<FormatConj>;
+  sqlFormatConj: SerializableType<SqlFormatConj>;
+  spelFormatConj: SerializableType<SpelFormatConj>;
   mongoConj: string;
   jsonLogicConj?: string;
   sqlConj?: string;
@@ -1139,7 +1138,7 @@ export interface ProximityProps<C = Config> extends ProximityConfig {
 }
 export interface ProximityOptions<C = Config, PP = ProximityProps<C>> extends ProximityConfig {
   //@ui
-  factory: FactoryWithContext<PP> | SerializedFunction;
+  factory?: SerializableType<FactoryWithContext<PP>>;
 }
 
 export interface BaseOperator {
@@ -1147,16 +1146,16 @@ export interface BaseOperator {
   reversedOp?: string;
   isNotOp?: boolean;
   cardinality?: number;
-  formatOp?: FormatOperator | SerializedFunction;
+  formatOp?: SerializableType<FormatOperator>;
   labelForFormat?: string;
-  mongoFormatOp?: MongoFormatOperator | SerializedFunction;
+  mongoFormatOp?: SerializableType<MongoFormatOperator>;
   sqlOp?: string;
   sqlOps?: string[];
-  sqlImport?: SqlImportFunc | SerializedFunction;
-  sqlFormatOp?: SqlFormatOperator | SerializedFunction;
+  sqlImport?: SerializableType<SqlImportFunc>;
+  sqlFormatOp?: SerializableType<SqlFormatOperator>;
   spelOp?: string;
   spelOps?: string[];
-  spelFormatOp?: SpelFormatOperator | SerializedFunction;
+  spelFormatOp?: SerializableType<SpelFormatOperator>;
   jsonLogic?: string | JsonLogicFormatOperator | JsonLogicFunction;
   jsonLogic2?: string;
   _jsonLogicIsExclamationOp?: boolean;
@@ -1197,7 +1196,7 @@ interface WidgetConfigForType {
   valuePlaceholder?: string;
 }
 
-interface Type {
+export interface Type {
   valueSources?: Array<ValueSource>;
   defaultOperator?: string;
   widgets: TypedMap<WidgetConfigForType>;
@@ -1248,7 +1247,7 @@ export type AsyncFetchListValuesFn = (this: ConfigContext | void, search: string
 
 
 export interface BasicFieldSettings<V = RuleValue> {
-  validateValue?: ValidateValue<V> | SerializedFunction;
+  validateValue?: SerializableType<ValidateValue<V>>;
   valuePlaceholder?: string;
 }
 export interface TextFieldSettings<V = string> extends BasicFieldSettings<V> {
@@ -1274,7 +1273,7 @@ export interface SelectFieldSettings<V = string | number> extends BasicFieldSett
   showSearch?: boolean;
   searchPlaceholder?: string;
   showCheckboxes?: boolean;
-  asyncFetch?: AsyncFetchListValuesFn | SerializedFunction;
+  asyncFetch?: SerializableType<AsyncFetchListValuesFn>;
   useLoadMore?: boolean;
   useAsyncSearch?: boolean;
   forceAsyncSearch?: boolean;
@@ -1471,7 +1470,7 @@ export interface BehaviourSettings {
   defaultConjunction?: string;
   fieldSources?: Array<FieldSource>;
   valueSourcesInfo?: ValueSourcesInfo;
-  canCompareFieldWithField?: CanCompareFieldWithField | SerializedFunction;
+  canCompareFieldWithField?: SerializableType<CanCompareFieldWithField>;
   canReorder?: boolean;
   canRegroup?: boolean;
   canRegroupCases?: boolean;
@@ -1510,12 +1509,12 @@ export interface OtherSettings {
   caseValueField?: Field;
   fieldSeparator?: string;
   fieldSeparatorDisplay?: string;
-  formatReverse?: FormatReverse | SerializedFunction;
-  sqlFormatReverse?: SqlFormatReverse | SerializedFunction;
-  spelFormatReverse?: SpelFormatReverse | SerializedFunction;
-  formatField?: FormatField | SerializedFunction;
-  formatSpelField?: FormatSpelField | SerializedFunction;
-  formatAggr?: FormatAggr | SerializedFunction;
+  formatReverse?: SerializableType<FormatReverse>;
+  sqlFormatReverse?: SerializableType<SqlFormatReverse>;
+  spelFormatReverse?: SerializableType<SpelFormatReverse>;
+  formatField?: SerializableType<FormatField>;
+  formatSpelField?: SerializableType<FormatSpelField>;
+  formatAggr?: SerializableType<FormatAggr>;
 }
 
 export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettings {
@@ -1553,15 +1552,15 @@ export interface Func extends Omit<BaseSimpleField, "type"> {
   // Calling methods on objects was remvoed in JsonLogic 2.x
   // https://github.com/jwadhams/json-logic-js/issues/86
   jsonLogicIsMethod?: boolean;
-  jsonLogicImport?: JsonLogicImportFunc | SerializedFunction;
-  spelImport?: SpelImportFunc | SerializedFunction;
-  formatFunc?: FormatFunc | SerializedFunction;
-  sqlFormatFunc?: SqlFormatFunc | SerializedFunction;
-  sqlImport?: SqlImportFunc | SerializedFunction;
-  mongoFormatFunc?: MongoFormatFunc | SerializedFunction;
+  jsonLogicImport?: SerializableType<JsonLogicImportFunc>;
+  spelImport?: SerializableType<SpelImportFunc>;
+  formatFunc?: SerializableType<FormatFunc>;
+  sqlFormatFunc?: SerializableType<SqlFormatFunc>;
+  sqlImport?: SerializableType<SqlImportFunc>;
+  mongoFormatFunc?: SerializableType<MongoFormatFunc>;
   renderBrackets?: Array<RenderedReactElement>;
   renderSeps?: Array<RenderedReactElement>;
-  spelFormatFunc?: SpelFormatFunc | SerializedFunction;
+  spelFormatFunc?: SerializableType<SpelFormatFunc>;
   allowSelfNesting?: boolean;
 }
 export interface FuncArg extends BaseSimpleField {

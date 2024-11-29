@@ -1,6 +1,6 @@
 import React from "react";
 import type {
-  Config, FieldOrGroup, Operator, Settings, Widget, ConfigMixin, PartialPartial,
+  Config, FieldOrGroup, Operator, Settings, Widget, ConfigMixin, PartialPartial, SerializedFunction,
 } from "@react-awesome-query-builder/ui";
 import merge from "lodash/merge";
 import pureServerConfig from "./config_base";
@@ -35,12 +35,14 @@ const fieldsMixin: Record<string, Partial<FieldOrGroup>> = {
   autocomplete: {
     fieldSettings: {
       // Real implementation of `autocompleteFetch` should be in `ctx`
-      asyncFetch: "autocompleteFetch",
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      asyncFetch: "autocompleteFetch" as SerializedFunction as any,
     },
   },
   autocompleteMultiple: {
     fieldSettings: {
-      asyncFetch: "autocompleteFetch",
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      asyncFetch: "autocompleteFetch" as SerializedFunction as any,
     },
   },
 };
@@ -48,6 +50,7 @@ const fieldsMixin: Record<string, Partial<FieldOrGroup>> = {
 // (Advanced) Demostrates how you can use JsonLogic function to customize `factory` with some logic
 const widgetsMixin: Record<string, Partial<Widget>> = {
   multiselect: {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     factory: {
       if: [
         { or: [ { var: "props.asyncFetch" }, { var: "props.showSearch" } ] },
@@ -57,16 +60,17 @@ const widgetsMixin: Record<string, Partial<Widget>> = {
         ]}] },
         { JSX: ["MuiMultiSelectWidget", {var: "props"}] }
       ]
-    }
+    } as SerializedFunction as any
   },
   select: {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     factory: {
       if: [
         { or: [ { var: "props.asyncFetch" }, { var: "props.showSearch" } ] },
         { JSX: ["MuiAutocompleteWidget", {var: "props"}] },
         { JSX: ["MuiSelectWidget", {var: "props"}] }
       ]
-    }
+    } as SerializedFunction as any
   },
 };
 
@@ -84,9 +88,12 @@ const operatorsMixin: Record<string, Partial<Operator>> = {
 };
 
 const settingsMixin: PartialPartial<Settings> = {
-  renderField: "myRenderField",
-  renderConfirm: "W.MuiConfirm",
-  useConfirm: "W.MuiUseConfirm",
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  renderField: "myRenderField" as SerializedFunction as any,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  renderConfirm: "W.MuiConfirm" as SerializedFunction as any,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  useConfirm: "W.MuiUseConfirm" as SerializedFunction as any,
   locale: {
     mui: { var: "ctx.ukUA" },
   },
