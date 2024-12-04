@@ -1,32 +1,12 @@
+import Immutable from "immutable";
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig, getFuncConfig, getFieldParts,
-  isFieldDescendantOfField, getFieldId, _getFromConfigCache, _saveToConfigCache,
+  isFieldDescendantOfField, _getFromConfigCache, _saveToConfigCache, _getWidgetsAndSrcsForFieldOp, filterValueSourcesForField,
 } from "./configUtils";
+import {isObject} from "./stuff";
 import last from "lodash/last";
-import {completeFuncValue} from "./funcUtils";
-
-export const selectTypes = [
-  "select",
-  "multiselect",
-  "treeselect",
-  "treemultiselect",
-];
 
 
-export const getOperatorsForType = (config, fieldType) => {
-  return config.types[fieldType]?.operators || null;
-};
-
-export const getOperatorsForField = (config, field) => {
-  const fieldConfig = getFieldConfig(config, field);
-  const fieldOps = fieldConfig ? fieldConfig.operators : [];
-  return fieldOps;
-};
-
-export const getFirstOperator = (config, field) => {
-  const fieldOps = getOperatorsForField(config, field);
-  return fieldOps?.[0] ?? null;
-};
 
 export const calculateValueType = (value, valueSrc, config) => {
   let calculatedValueType = null;
@@ -71,31 +51,6 @@ export const getFieldPathLabels = (field, config, parentField = null, fieldsKey 
   return res;
 };
 
-export const getFieldPartsConfigs = (field, config, parentField = null) => {
-  if (!field)
-    return null;
-  const parentFieldDef = parentField && getFieldRawConfig(config, parentField) || null;
-  const fieldSeparator = config.settings.fieldSeparator;
-  const parts = getFieldParts(field, config);
-  const isDescendant = isFieldDescendantOfField(field, parentField, config);
-  const parentParts = !isDescendant ? [] : getFieldParts(parentField, config);
-  return parts
-    .slice(parentParts.length)
-    .map((_curr, ind, arr) => arr.slice(0, ind+1))
-    .map((parts) => ({
-      part: [...parentParts, ...parts].join(fieldSeparator),
-      key: parts[parts.length - 1]
-    }))
-    .map(({part, key}) => {
-      const cnf = getFieldRawConfig(config, part);
-      return {key, cnf};
-    })
-    .map(({key, cnf}, ind, arr) => {
-      const parentCnf = ind > 0 ? arr[ind - 1].cnf : parentFieldDef;
-      return [key, cnf, parentCnf];
-    });
-};
-
 export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false) => {
   // const isFuncArg = field && typeof field == "object" && !!field.func && !!field.arg;
   // const {showLabels} = config.settings;
@@ -137,129 +92,7 @@ export const getValueLabel = (config, field, operator, delta, valueSrc = null, i
   return ret;
 };
 
-function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc = null) {
-  let widgets = [];
-  let valueSrcs = [];
-  if (!field)
-    return {widgets, valueSrcs};
-  const fieldCacheKey = getFieldId(field);
-  const cacheKey = fieldCacheKey ? `${fieldCacheKey}__${operator}__${valueSrc}` : null;
-  const cached = _getFromConfigCache(config, "_getWidgetsAndSrcsForFieldOp", cacheKey);
-  if (cached)
-    return cached;
-  const isFuncArg = typeof field === "object" && (!!field.func && !!field.arg || field._isFuncArg);
-  const fieldConfig = getFieldConfig(config, field);
-  const opConfig = operator ? config.operators[operator] : null;
-  
-  if (fieldConfig?.widgets) {
-    for (const widget in fieldConfig.widgets) {
-      const widgetConfig = fieldConfig.widgets[widget];
-      if (!config.widgets[widget]) {
-        continue;
-      }
-      const widgetValueSrc = config.widgets[widget].valueSrc || "value";
-      let canAdd = true;
-      if (widget === "field") {
-        canAdd = canAdd && filterValueSourcesForField(config, ["field"], fieldConfig).length > 0;
-      }
-      if (widget === "func") {
-        canAdd = canAdd && filterValueSourcesForField(config, ["func"], fieldConfig).length > 0;
-      }
-      // If can't check operators, don't add
-      // Func args don't have operators
-      if (valueSrc === "value" && !widgetConfig.operators && !isFuncArg && field !== "!case_value")
-        canAdd = false;
-      if (widgetConfig.operators && operator)
-        canAdd = canAdd && widgetConfig.operators.indexOf(operator) != -1;
-      if (valueSrc && valueSrc != widgetValueSrc && valueSrc !== "const")
-        canAdd = false;
-      if (opConfig && opConfig.cardinality == 0 && (widgetValueSrc !== "value"))
-        canAdd = false;
-      if (canAdd) {
-        widgets.push(widget);
-        let canAddValueSrc = fieldConfig.valueSources?.indexOf(widgetValueSrc) != -1;
-        if (opConfig?.valueSources?.indexOf(widgetValueSrc) == -1)
-          canAddValueSrc = false;
-        if (canAddValueSrc && !valueSrcs.find(v => v == widgetValueSrc))
-          valueSrcs.push(widgetValueSrc);
-      }
-    }
-  }
 
-  const widgetWeight = (w) => {
-    let wg = 0;
-    if (fieldConfig.preferWidgets) {
-      if (fieldConfig.preferWidgets.includes(w))
-        wg += (10 - fieldConfig.preferWidgets.indexOf(w));
-    } else if (w == fieldConfig.mainWidget) {
-      wg += 100;
-    }
-    if (w === "field") {
-      wg -= 1;
-    }
-    if (w === "func") {
-      wg -= 2;
-    }
-    return wg;
-  };
-
-  widgets.sort((w1, w2) => (widgetWeight(w2) - widgetWeight(w1)));
-
-  const res = { widgets, valueSrcs };
-  _saveToConfigCache(config, "_getWidgetsAndSrcsForFieldOp", cacheKey, res);
-  return res;
-}
-
-export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null) => {
-  const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
-  return widgets;
-};
-
-export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) => {
-  if (!fieldDefinition)
-    return valueSrcs;
-  let fieldType = fieldDefinition.type ?? fieldDefinition.returnType;
-  if (fieldType === "!group") {
-    // todo: aggregation can be not only number?
-    fieldType = "number";
-  }
-  // const { _isCaseValue } = fieldDefinition;
-  if (!valueSrcs)
-    valueSrcs = Object.keys(config.settings.valueSourcesInfo);
-  return valueSrcs.filter(vs => {
-    let canAdd = true;
-    if (vs === "field") {
-      if (config.__fieldsCntByType) {
-        // tip: LHS field can be used as arg in RHS function
-        const minCnt = fieldDefinition._isFuncArg ? 0 : 1;
-        canAdd = canAdd && config.__fieldsCntByType[fieldType] > minCnt;
-      }
-    }
-    if (vs === "func") {
-      if (fieldDefinition.funcs) {
-        canAdd = canAdd && fieldDefinition.funcs.length > 0;
-      }
-      if (config.__funcsCntByType) {
-        canAdd = canAdd && config.__funcsCntByType[fieldType] > 0;
-      }
-    }
-    return canAdd;
-  });
-};
-
-export const getValueSourcesForFieldOp = (config, field, operator, fieldDefinition = null) => {
-  const {valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, null);
-  const filteredValueSrcs = filterValueSourcesForField(config, valueSrcs, fieldDefinition);
-  return filteredValueSrcs;
-};
-
-export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) => {
-  const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
-  let widget = null;
-  if (widgets.length)
-    widget = widgets[0];
-  return widget;
-};
 
 // can use alias (fieldName)
 // even if `parentField` is provided, `field` is still a full path
@@ -452,6 +285,54 @@ export const completeValue = (value, valueSrc, config) => {
     return value;
 };
 
+/**
+ * @param {Immutable.Map} value
+ * @param {object} config
+ * @return {Immutable.Map | undefined} - undefined if func value is not complete (missing required arg vals); can return completed value != value
+ */
+export const completeFuncValue = (value, config) => {
+  if (!value)
+    return undefined;
+  const funcKey = value.get("func");
+  const funcConfig = funcKey && getFuncConfig(config, funcKey);
+  if (!funcConfig)
+    return undefined;
+  let complValue = value;
+  let tmpHasOptional = false;
+  for (const argKey in funcConfig.args) {
+    const argConfig = funcConfig.args[argKey];
+    const {valueSources, isOptional, defaultValue} = argConfig;
+    const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
+    const args = complValue.get("args");
+    const argDefaultValueSrc = filteredValueSources.length == 1 ? filteredValueSources[0] : undefined;
+    const argVal = args ? args.get(argKey) : undefined;
+    const argValue = argVal ? argVal.get("value") : undefined;
+    const argValueSrc = (argVal ? argVal.get("valueSrc") : undefined) || argDefaultValueSrc;
+    if (argValue !== undefined) {
+      const completeArgValue = completeValue(argValue, argValueSrc, config);
+      if (completeArgValue === undefined) {
+        return undefined;
+      } else if (completeArgValue !== argValue) {
+        complValue = complValue.setIn(["args", argKey, "value"], completeArgValue);
+      }
+      if (tmpHasOptional) {
+        // has gap
+        return undefined;
+      }
+    } else if (defaultValue !== undefined && !isObject(defaultValue)) {
+      complValue = complValue.setIn(["args", argKey, "value"], getDefaultArgValue(argConfig));
+      complValue = complValue.setIn(["args", argKey, "valueSrc"], "value");
+    } else if (isOptional) {
+      // optional
+      tmpHasOptional = true;
+    } else {
+      // missing value
+      return undefined;
+    }
+  }
+  return complValue;
+};
+
 // item - Immutable
 export const getOneChildOrDescendant = (item) => {
   const children = item.get("children1");
@@ -464,4 +345,71 @@ export const getOneChildOrDescendant = (item) => {
     return child;
   }
   return null;
+};
+
+
+/////  Func utils
+
+
+export const getDefaultArgValue = ({defaultValue: value}) => {
+  if (isObject(value) && !Immutable.Map.isMap(value) && value.func) {
+    return Immutable.fromJS(value, function (k, v) {
+      return Immutable.Iterable.isIndexed(v) ? v.toList() : v.toOrderedMap();
+    });
+  }
+  return value;
+};
+
+/**
+* Used @ FuncWidget
+* @param {Immutable.Map} value 
+* @param {string} argKey 
+* @param {*} argVal 
+* @param {object} argConfig 
+*/
+export const setArgValue = (value, argKey, argVal, argConfig, config) => {
+  if (value && value.get("func")) {
+    value = value.setIn(["args", argKey, "value"], argVal);
+
+    // set default arg value source
+    const valueSrc = value.getIn(["args", argKey, "valueSrc"]);
+    const {valueSources} = argConfig;
+    const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
+    let argDefaultValueSrc = filteredValueSources.length == 1 ? filteredValueSources[0] : undefined;
+    if (!argDefaultValueSrc && filteredValueSources.includes("value")) {
+      argDefaultValueSrc = "value";
+    }
+    if (!valueSrc && argDefaultValueSrc) {
+      value = value.setIn(["args", argKey, "valueSrc"], argDefaultValueSrc);
+    }
+  }
+  return value;
+};
+
+export const setFuncDefaultArgs = (config, funcValue, funcConfig) => {
+  if (funcConfig) {
+    for (const argKey in funcConfig.args) {
+      funcValue = setFuncDefaultArg(config, funcValue, funcConfig, argKey);
+    }
+  }
+  return funcValue;
+};
+
+export const setFuncDefaultArg = (config, funcValue, funcConfig, argKey) => {
+  const argConfig = funcConfig.args[argKey];
+  const {valueSources, defaultValue} = argConfig;
+  const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
+  const firstValueSrc = filteredValueSources.length ? filteredValueSources[0] : undefined;
+  const defaultValueSrc = defaultValue ? (isObject(defaultValue) && !!defaultValue.func ? "func" : "value") : undefined;
+  const argDefaultValueSrc = defaultValueSrc || firstValueSrc;
+  const hasValue = funcValue.getIn(["args", argKey]);
+  if (!hasValue) {
+    if (defaultValue !== undefined) {
+      funcValue = funcValue.setIn(["args", argKey, "value"], getDefaultArgValue(argConfig));
+    }
+    if (argDefaultValueSrc) {
+      funcValue = funcValue.setIn(["args", argKey, "valueSrc"], argDefaultValueSrc);
+    }
+  }
+  return funcValue;
 };

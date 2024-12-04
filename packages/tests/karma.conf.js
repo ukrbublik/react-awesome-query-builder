@@ -88,7 +88,7 @@ module.exports = function(config) {
     browsers: isDebug ? ["ChromeWithDebugging"] : ["ChromeHeadlessNoSandbox"],
     customLaunchers: {
       ChromeWithDebugging: {
-        base: 'Chrome',
+        base: "Chrome",
         flags: [
           "--no-sandbox", 
           "--remote-debugging-port=9333",

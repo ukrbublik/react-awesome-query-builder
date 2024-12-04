@@ -5,11 +5,15 @@ import {
 
 export interface DemoQueryBuilderState {
   tree: ImmutableTree;
+  initErrors: Array<string>;
   config: Config;
   skin: string;
   renderBocks: Record<string, boolean>;
   spelStr: string;
+  sqlStr: string;
   spelErrors: Array<string>;
+  sqlErrors: Array<string>;
+  sqlWarnings: Array<string>;
   initFile: string;
 }
 

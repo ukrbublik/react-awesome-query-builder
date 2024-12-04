@@ -1,7 +1,9 @@
 import Immutable, { Map } from "immutable";
 import {default as uuid} from "./uuid";
+import {default as clone} from "clone";
+import {default as moment} from "moment";
 
-export {uuid};
+export {uuid, clone, moment};
 
 export const widgetDefKeysToOmit = [
   "formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue", "spelImportFuncs", "spelImportValue"
@@ -14,6 +16,24 @@ export const opDefKeysToOmit = [
 export const isObject = (v) => {
   return typeof v === "object" && v !== null && Object.prototype.toString.call(v) === "[object Object]";
 };
+// export const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
+export const isObjectOrArray = (v) => (typeof v === "object" && v !== null);
+
+export const typeOf = (v) => {
+  const t = (typeof v);
+  if (t && v !== null && Array.isArray(v))
+    return "array";
+  else
+    return t;
+};
+
+export const isTypeOf = (v, type) => {
+  if (typeOf(v) === type)
+    return true;
+  if (type === "number" && !isNaN(v))
+    return true; //can be casted
+  return false;
+};
 
 export const shallowCopy = (v) => {
   if (typeof v === "object" && v !== null) {
@@ -24,6 +44,187 @@ export const shallowCopy = (v) => {
     }
   }
   return v;
+};
+
+export const setIn = (obj, path, newValue, opts) => {
+  const defaultOpts = {
+    canCreate: false, canIgnore: false, canChangeType: false,
+  };
+  opts = { ...defaultOpts, ...(opts ?? {}) };
+  const { canCreate, canIgnore, canChangeType } = opts;
+  if (!Array.isArray(path)) {
+    throw new Error("path is not an array");
+  }
+  if (!path.length) {
+    throw new Error("path is empty");
+  }
+  const expectedObjType = typeof path[0] === "number" ? "array" : "object";
+  if (!isTypeOf(obj, expectedObjType)) {
+    throw new Error(`obj is not of type ${expectedObjType}`);
+  }
+
+  let newObj = shallowCopy(obj);
+
+  let target = newObj;
+  const pathToTarget = [...path];
+  const targetKey = pathToTarget.pop();
+  const goodPath = [];
+  for (const k of pathToTarget) {
+    const nextKey = path[goodPath.length];
+    const expectedType = typeof nextKey === "number" ? "array" : "object";
+    if (!isTypeOf(target[k], expectedType)) {
+      // value at path has another type
+      if (target[k] ? canChangeType : canCreate) {
+        target[k] = expectedType === "array" ? [] : {};
+      } else if (canIgnore) {
+        target = undefined;
+        newObj = obj; // return initial obj as-is
+        break;
+      } else {
+        throw new Error(`Value by path ${goodPath.join(".")} should have type ${expectedType} but got ${typeOf(target[k])}`);
+      }
+    }
+    goodPath.push(k);
+    target[k] = shallowCopy(target[k]);
+    target = target[k];
+  }
+
+  if (target) {
+    if (newValue === undefined) {
+      delete target[targetKey];
+    } else {
+      const oldValue = target[targetKey];
+      if (typeof newValue === "function") {
+        target[targetKey] = newValue(oldValue);
+      } else {
+        target[targetKey] = newValue;
+      }
+    }
+  }
+
+  return newObj;
+};
+
+export const mergeIn = (obj, mixin, opts) => {
+  const defaultOpts = {
+    canCreate: true, canChangeType: true,
+    deepCopyObj: false, deepCopyMixin: false,
+    arrayMergeMode: "merge", // "merge" | "join" | "joinMissing" | "joinRespectOrder" | "overwrite"
+    circularRefs: false,
+    specialSymbols: true,
+  };
+  opts = { ...defaultOpts, ...(opts ?? {}) };
+  const { deepCopyObj, deepCopyMixin, circularRefs, specialSymbols } = opts;
+  if (!isTypeOf(obj, "object")) {
+    throw new Error("obj is not an object");
+  }
+  if (!isTypeOf(mixin, "object")) {
+    throw new Error("mixin is not an object");
+  }
+
+  // symbols
+  const $v = Symbol.for("_v");
+  const $type = Symbol.for("_type");
+  const $canCreate = Symbol.for("_canCreate");
+  const $canChangeType = Symbol.for("_canChangeType");
+  const $arrayMergeMode = Symbol.for("_arrayMergeMode");
+
+  const newObj = deepCopyObj ? clone(obj, circularRefs) : shallowCopy(obj);
+  let newObjChanged = false;
+  const _process = (path, targetMix, target, {
+    isMixingArray, isMixingRealArray,
+  } = {}) => {
+    let indexDelta = 0;
+    for (const mk in targetMix) {
+      const k = isMixingArray ? Number(mk) + indexDelta : mk;
+      const useSymbols = specialSymbols && isObjectOrArray(targetMix[mk]);
+      let canCreate = opts.canCreate, canChangeType = opts.canChangeType, arrayMergeMode = opts.arrayMergeMode;
+      let targetMixValue = targetMix[mk];
+      let isMixValueExplicit = false;
+      let expectedType = typeOf(targetMixValue);
+      if (useSymbols) {
+        if ($v in targetMix[mk]) {
+          isMixValueExplicit = true;
+          targetMixValue = targetMix[mk][$v];
+        }
+        expectedType = targetMix[mk]?.[$type] || typeOf(targetMixValue);
+        canCreate = targetMix[mk]?.[$canCreate] ?? canCreate;
+        canChangeType = targetMix[mk]?.[$canChangeType] ?? canChangeType;
+        arrayMergeMode = targetMix[mk]?.[$arrayMergeMode] ?? arrayMergeMode;
+        if (expectedType === "array" && arrayMergeMode === "overwrite") {
+          isMixValueExplicit = true;
+        }
+      }
+      if (expectedType !== "array") {
+        arrayMergeMode = undefined;
+      }
+      if (!isTypeOf(target[k], expectedType)) {
+        // value at path has another type
+        if (target[k] ? canChangeType : canCreate) {
+          if (expectedType === "array" || expectedType === "object") {
+            target[k] = expectedType === "array" ? [] : {};
+            newObjChanged = true;
+          } else {
+            // primitive
+          }
+        } else {
+          continue;
+        }
+      }
+      if (expectedType === "array" || expectedType === "object") {
+        if (isMixValueExplicit) {
+          // deep copy from mix to target
+          newObjChanged = true;
+          target[k] = deepCopyMixin ? clone(targetMixValue, circularRefs) : shallowCopy(targetMixValue);
+        } else {
+          if (arrayMergeMode && ["join", "joinMissing", "joinRespectOrder"].includes(arrayMergeMode)) {
+            // join 2 arrays
+            newObjChanged = true;
+            const left = (deepCopyObj ? target[k] : clone(target[k], circularRefs));
+            let right = (deepCopyMixin ? clone(targetMixValue, circularRefs) : targetMixValue);
+            if (arrayMergeMode === "joinRespectOrder") {
+              target[k] = mergeArraysSmart(left, right);
+            } else {
+              if (arrayMergeMode === "joinMissing") {
+                right = right.filter(v => !left.includes(v));
+              }
+              target[k] = [ ...left, ...right ];
+            }
+          } else {
+            // recursive merge
+            if (!deepCopyObj) {
+              target[k] = shallowCopy(target[k]);
+            }
+            _process([...path, mk], targetMixValue, target[k], {
+              isMixingArray: expectedType === "array",
+              isMixingRealArray: expectedType === "array" && !targetMix[mk]?.[$type],
+            });
+          }
+        }
+      } else {
+        const needDelete = targetMixValue === undefined && !isMixingRealArray && !isMixValueExplicit;
+        const valueExists = (k in target);
+        if (needDelete) {
+          if (valueExists) {
+            newObjChanged = true;
+            if (Array.isArray(target)) {
+              target.splice(k, 1);
+              indexDelta--;
+            } else {
+              delete target[k];
+            }
+          }
+        } else {
+          newObjChanged = true;
+          target[k] = targetMixValue;
+        }
+      }
+    }
+  };
+
+  _process([], mixin, newObj);
+
+  return newObjChanged ? newObj : obj;
 };
 
 export const omit = (obj, keys) => {
@@ -237,30 +438,42 @@ export function mergeArraysSmart(arr1, arr2) {
     .map(([op, ind], i, orig) => {
       if (ind == -1) {
         const next = orig.slice(i+1);
-        const prev = orig.slice(0, i);
-        const after = prev.reverse().find(([_cop, ci]) => ci != -1);
+        const prevs = orig.slice(0, i);
+        const after = [...prevs].reverse().find(([_cop, ci]) => ci != -1);
+        const prev = prevs[prevs.length - 1];
         const before = next.find(([_cop, ci]) => ci != -1);
-        if (before)
-          return [op, "before", before[0]];
-        else if (after)
+        const isAfterDirectly = after && after === prevs[prevs.length-1];
+        const isBeforeDirectly = before && next === next[0];
+        if (isAfterDirectly) {
           return [op, "after", after[0]];
-        else
+        } else if (isBeforeDirectly) {
+          return [op, "before", before[0]];
+        } else if (after) {
+          if (prev) {
+            return [op, "after", prev[0]];
+          }
+          return [op, "after", after[0]];
+        } else if (before) {
+          return [op, "before", before[0]];
+        } else {
           return [op, "append", null];
+        }
       } else {
-      // already exists
+        // already exists
         return null;
       }
     })
     .filter(x => x !== null)
     .reduce((acc, [newOp, rel, relOp]) => {
       const ind = acc.indexOf(relOp);
-      if (acc.indexOf(newOp) == -1) {
+      if (acc.indexOf(newOp) === -1) {
         if (ind > -1) {
-        // insert after or before
-          acc.splice( ind + (rel == "after" ? 1 : 0), 0, newOp );
+          // insert after or before
+          const offset = (rel === "after" ? 1 : 0);
+          acc.splice( ind + offset, 0, newOp );
         } else {
-        // insert to end or start
-          acc.splice( (rel == "append" ? Infinity : 0), 0, newOp );
+          // insert to end or start
+          acc.splice( (rel === "append" ? Infinity : 0), 0, newOp );
         }
       }
       return acc;
@@ -308,10 +521,19 @@ export const isJsonCompatible = (tpl, obj, bag = {}, path = []) => {
   }
 };
 
-const isDev = () => (typeof process !== "undefined" && process.env && process.env.NODE_ENV == "development");
+const isDev = () => (process?.env?.NODE_ENV == "development");
+const isTest = () => (process?.env?.NODE_ENV_TEST == "true");
 
-export const getLogger = (devMode = false) => {
-  const verbose = devMode != undefined ? devMode : isDev(); 
+export const getLogger = (devMode) => {
+  if (isTest()) {
+    return {
+      ...console,
+      log: () => {},
+      debug: () => {},
+      info: () => {},
+    };
+  }
+  const verbose = devMode != undefined ? devMode : isDev();
   return verbose ? console : {
     error: () => {},
     log: () => {},

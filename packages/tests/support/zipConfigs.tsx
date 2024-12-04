@@ -2,7 +2,7 @@ import React from "react";
 import {
   Config, Fields, Funcs, BasicFuncs, Func, Types, Type, Operator, Operators, Settings,
   SelectField, AsyncFetchListValuesFn, SelectFieldSettings, NumberFieldSettings,
-  FieldProps, ConfigContext, VanillaWidgets,
+  FieldProps, ConfigContext, VanillaWidgets, SerializedFunction,
 } from "@react-awesome-query-builder/ui";
 import sinon from "sinon";
 import omit from "lodash/omit";
@@ -47,21 +47,24 @@ const fields: Fields = {
       useLoadMore: true,
       forceAsyncSearch: false,
       allowCustomValues: false,
-      asyncFetch: "autocompleteFetch",
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      asyncFetch: "autocompleteFetch" as SerializedFunction as any,
     } as SelectFieldSettings,
   },
   autocomplete2: {
     type: "select",
     fieldSettings: {
       useAsyncSearch: true,
-      asyncFetch: { CALL: [ {var: "ctx.autocompleteFetch"}, null, {var: "search"}, {var: "offset"} ] },
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      asyncFetch: { CALL: [ {var: "ctx.autocompleteFetch"}, null, {var: "search"}, {var: "offset"} ] } as SerializedFunction as any,
     } as SelectFieldSettings,
   },
   autocomplete3: {
     type: "select",
     fieldSettings: {
       useAsyncSearch: true,
-      asyncFetch: "autocompleteFetch__does_not_exist",
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      asyncFetch: "autocompleteFetch__does_not_exist" as SerializedFunction as any,
     } as SelectFieldSettings,
   },
   slider: {
@@ -180,11 +183,16 @@ const funcs: Funcs = {
 };
 
 const settings: Partial<Settings> = {
-  renderField: "myRenderField",
-  renderButton: "button", // missing in ctx, so will try to render <button>
-  renderOperator: { JSX: ["VanillaFieldSelect", {var: "props"}] },
-  renderConfirm: { CALL: [ {var: "ctx.W.vanillaConfirm"}, null, {var: "props"} ] },
-  renderConjs: { "if": [ { var: "props.someFlag" }, "VanillaConjs", "VanillaConjs" ] }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  renderField: "myRenderField" as SerializedFunction as any,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  renderButton: "button" as SerializedFunction as any, // missing in ctx, so will try to render <button>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  renderOperator: { JSX: ["VanillaFieldSelect", {var: "props"}] } as SerializedFunction as any,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  renderConfirm: { CALL: [ {var: "ctx.W.vanillaConfirm"}, null, {var: "props"} ] } as SerializedFunction as any,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  renderConjs: { "if": [ { var: "props.someFlag" }, "VanillaConjs", "VanillaConjs" ] } as SerializedFunction as any,
 };
 
 export const makeCtx = (BaseConfig: Config) => {

@@ -29,6 +29,9 @@
       "@react-awesome-query-builder/core": [
         "../core/modules"
       ],
+      "@react-awesome-query-builder/sql": [
+        "../sql/modules"
+      ],
       "@react-awesome-query-builder/ui": [
         "../ui/modules"
       ],
