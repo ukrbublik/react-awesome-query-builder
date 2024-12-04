@@ -196,7 +196,21 @@ const LINEAR_REGRESSION = {
       }
     }
   },
-  // todo: sqlImport
+  sqlImport: (sqlObj) => {
+    if (["+"].includes(sqlObj?.operator) && sqlObj.children?.length === 2) {
+      const [left, bias] = sqlObj.children;
+      if (["*"].includes(left?.operator) && left.children?.length === 2) {
+        const [coef, val] = left.children;
+        return {
+          args: {
+            coef,
+            val,
+            bias,
+          }
+        };
+      }
+    }
+  },
   mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
   jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
   jsonLogicImport: (v) => {

@@ -137,7 +137,6 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
   }
 
   const [left, ...right] = (convChildren || []).filter(c => !!c);
-  // todo: 2 right for between
   const properties: RuleProperties = {
     operator: opKey,
     value: [],
@@ -198,11 +197,14 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
       valueType,
       value: field,
     };
-  } else if (logic?.func) {
-    return convertValueFunc(logic, conv, config, meta, parentLogic) || convertFunc(logic, conv, config, meta, parentLogic);
   } else {
-    meta.errors.push(`Unexpected arg: ${getLogicDescr(logic)}`);
+    const maybeFunc = convertValueFunc(logic, conv, config, meta, parentLogic) || convertFunc(logic, conv, config, meta, parentLogic);
+    if (maybeFunc) {
+      return maybeFunc;
+    }
   }
+
+  meta.errors.push(`Unexpected arg: ${getLogicDescr(logic)}`);
   return undefined;
 };
 
@@ -288,7 +290,7 @@ const convertOpFunc = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, 
   return undefined;
 };
 
-const convertValueFunc = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): ValueObj | undefined => {
+const convertValueFunc = (logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): ValueObj | undefined => {
   for (const widgetKey in conv.valueFuncs) {
     for (const f of conv.valueFuncs[widgetKey]) {
       const parsed = useImportFunc(f, logic, conv, config, {...meta, outType: "value", widgetKey});
