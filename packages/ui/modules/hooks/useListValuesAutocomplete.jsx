@@ -157,14 +157,14 @@ const useListValuesAutocomplete = ({
     // Initial loading
     if (canInitialLoad && loadingCnt == 0 && asyncFectchCnt.current == 0) {
       (async () => {
-        await loadListValues();
+        await loadListValues(selectedValue);
       })();
     }
     // Unmount
     return () => {
       componentIsMounted.current--;
     };
-  }, [canInitialLoad]);
+  }, [canInitialLoad, selectedValue]);
 
   // Event handlers
   const onOpen = () => {
