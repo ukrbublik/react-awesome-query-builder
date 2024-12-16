@@ -10,7 +10,7 @@ const testsFilter = [
   // "OtherUtils",
 ];
 const specFilter = [
-  "@sql",
+  // "@sql",
   // "OtherUtils"
 ];
 
