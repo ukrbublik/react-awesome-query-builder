@@ -220,6 +220,29 @@ export const isJsonLogic = (logic) => {
   return isJL;
 };
 
+export const isValidFieldObject = (obj, conv) => {
+  // Check if the input is an object and not null
+  if (typeof obj !== "object" || obj === null) return false;
+
+  // Get the keys of the object
+  const keys = Object.keys(obj);
+
+  // Check if it has exactly one key and that key is "var"
+  if (keys.length !== 1 || !conv.varKeys.includes(keys[0])) return false;
+
+  // Check if the value of the "var" key is a non-empty string
+  const varValue = obj[keys[0]];
+  return typeof varValue === "string" && varValue.trim() !== "";
+};
+
+export const isVarEmptyObject = (obj) => {
+  // Check if the input is an object and not null
+  if (typeof obj !== "object" || obj === null) return false;
+
+  // Ensure the object has exactly one key, and it is "var" with an empty string value
+  return Object.keys(obj).length === 1 && obj.var === "";
+};
+
 export function sleep(delay) {
   return new Promise((resolve) => {
     setTimeout(resolve, delay);
