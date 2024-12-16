@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
 import type { Meta, OutLogic, OutSelect } from "./types";
+import { SqlPrimitiveTypes } from "./conv";
 import {
   // ext
   ConjExpr, BinaryExpr, UnaryExpr, AnyExpr, Logic, BaseExpr,
@@ -151,9 +152,20 @@ const processExprList = (expr: ExprList, meta: Meta, not = false): OutLogic | un
   const children = expr.value
     .map(ev => processLogic(ev, meta, false))
     .filter(ev => !!ev) as OutLogic[];
+  const valueTypes = children.map(ch => ch.valueType).filter(ev => !!ev);
+  const uniqValueTypes = Array.from(new Set(valueTypes));
+  const oneValueType = valueTypes.length === children.length && uniqValueTypes.length === 1 ? uniqValueTypes[0] : undefined;
+  let values;
+  if (oneValueType && SqlPrimitiveTypes[oneValueType]) {
+    // it's list of primitive values
+    values = children.map(ch => ch.value);
+  }
   return {
     children,
     not,
+    _type: "expr_list",
+    oneValueType,
+    values,
   };
 };
 

@@ -352,6 +352,17 @@ const operators = {
     label: "Is null",
     labelForFormat: "IS NULL",
     sqlOp: "IS NULL",
+    // tip: this function covers import of 2 operators
+    sqlImport: (sqlObj) => {
+      if (sqlObj?.operator === "IS" || sqlObj?.operator === "IS NOT") {
+        const [left, right] = sqlObj.children || [];
+        if (right?.valueType == "null") {
+          sqlObj.operator = sqlObj?.operator === "IS" ? "is_null" : "is_not_null";
+          sqlObj.value = left;
+          return sqlObj;
+        }
+      }
+    },
     cardinality: 0,
     reversedOp: "is_not_null",
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
@@ -460,6 +471,7 @@ const operators = {
   multiselect_contains: {
     label: "Contains",
     labelForFormat: "CONTAINS",
+    valueTypes: ["multiselect"],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       if (valueSrc == "value")
         return `${field} CONTAINS [${values.join(", ")}]`;
@@ -480,6 +492,7 @@ const operators = {
     isNotOp: true,
     label: "Not contains",
     labelForFormat: "NOT CONTAINS",
+    valueTypes: ["multiselect"],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       if (valueSrc == "value")
         return `${field} NOT CONTAINS [${values.join(", ")}]`;
@@ -497,6 +510,7 @@ const operators = {
     label: "Equals",
     labelForFormat: "==",
     sqlOp: "=",
+    valueTypes: ["multiselect"],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       const opStr = isForDisplay ? "=" : "==";
       if (valueSrc == "value")
@@ -527,6 +541,7 @@ const operators = {
     labelForFormat: "!=",
     sqlOp: "<>",
     sqlOps: ["<>", "!="],
+    valueTypes: ["multiselect"],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       if (valueSrc == "value")
         return `${field} != [${values.join(", ")}]`;

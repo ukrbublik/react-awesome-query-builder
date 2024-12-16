@@ -59,7 +59,9 @@ export interface OutLogic  {
   field?: string;
   table?: string;
   value?: any;
+  values?: any[]; // for expr_list
   valueType?: /* ValueExpr["type"] */ string;
+  oneValueType?: string;
   operator?: string;
   func?: string;
   _type?: string;

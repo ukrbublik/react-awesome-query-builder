@@ -113,27 +113,36 @@ const convertConj = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pa
 
 
 const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonRule | undefined => {
-  const opKeys = conv.operators[logic.operator!];
+  let opKeys = conv.operators[logic.operator!];
   let opKey = opKeys?.[0];
   let convChildren, convFuncOp;
-  if (opKeys.length != 1) {
-    // todo: cover other cases like is_empty, proximity
-    convFuncOp = convertOpFunc(logic, conv, config, meta, parentLogic)!;
-    if (convFuncOp) {
-      opKey = convFuncOp.operator!;
-      convChildren = convFuncOp.children;
-    } else {
-      if (!opKeys.length) {
-        meta.errors.push(`Can't convert op ${getLogicDescr(logic)}`);
-        return undefined;
-      } else {
-        // todo
-        meta.warnings.push(`SQL operator "${logic.operator}" can be converted to several operators: ${opKeys.join(", ")}`);
-      }
+  convChildren = (logic.children || []).map(a => convertArg(a, conv, config, meta, logic));
+  const isMultiselect = convChildren.filter(ch => ch?.valueType === "multiselect").length > 0;
+  const isSelect = convChildren.filter(ch => ch?.valueType === "select").length > 0;
+  if (opKeys?.length > 1) {
+    if (isMultiselect) {
+      opKeys = opKeys.filter(op => !["equal", "not_equal", "select_equals", "select_not_equals"].includes(op));
+    } else if (isSelect) {
+      opKeys = opKeys.filter(op => !["equal", "not_equal"].includes(op));
     }
+    opKey = opKeys?.[0];
   }
-  if (!convChildren) {
-    convChildren = (logic.children || []).map(a => convertArg(a, conv, config, meta, logic));
+
+  // tip: Even if opKeys.length === 1, still try to use `convertOpFunc` to let `sqlImport` be applied (eg. `not_like` op)
+  // todo: cover other cases like is_empty, proximity
+  convFuncOp = convertOpFunc(logic, conv, config, meta, parentLogic)!;
+  if (convFuncOp) {
+    opKey = convFuncOp.operator!;
+    convChildren = convFuncOp.children;
+  } else {
+    if (!opKeys?.length) {
+      // todo: don't throw error now, SQL operator can be converted to eg. custom func (see linear regression)
+      meta.errors.push(`Can't convert op ${getLogicDescr(logic)}`);
+      return undefined;
+    } else {
+      // todo
+      meta.warnings.push(`SQL operator "${logic.operator}" can be converted to several operators: ${opKeys.join(", ")}`);
+    }
   }
 
   const [left, ...right] = (convChildren || []).filter(c => !!c);
@@ -153,12 +162,28 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
     properties.field = left.value;
     properties.fieldSrc = left.valueSrc;
   }
+
+  const opDef = Utils.ConfigUtils.getOperatorConfig(config, opKey, properties.field ?? undefined);
+  // const opCardinality = opDef?.cardinality;
+  const opValueTypes = opDef?.valueTypes;
+
   // todo: left/right can be func
   right.forEach((v, i) => {
     if (v) {
       properties.valueSrc![i] = v?.valueSrc as ValueSource;
-      properties.valueType![i] = v?.valueType!;
-      properties.value[i] = v?.value;
+      let valueType: string = v?.valueType;
+      let finalVal = v?.value;
+      if (valueType && opValueTypes && !opValueTypes.includes(valueType)) {
+        meta.warnings.push(`Operator "${opKey}" supports value types [${opValueTypes.join(", ")}] but got ${valueType}`);
+      }
+      if (opValueTypes?.length === 1) {
+        valueType = opValueTypes[0];
+      }
+      if (valueType) {
+        finalVal = checkValueType(finalVal, valueType);
+      }
+      properties.valueType![i] = valueType;
+      properties.value[i] = finalVal;
       if (v?.valueError) {
         properties.valueError![i] = v.valueError;
       }
@@ -196,6 +221,12 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
       valueSrc: "field",
       valueType,
       value: field,
+    };
+  } else if (logic?.children && logic._type === "expr_list") {
+    return {
+      valueSrc: "value",
+      valueType: "multiselect",
+      value: logic.values,
     };
   } else {
     const maybeFunc = convertValueFunc(logic, conv, config, meta, parentLogic) || convertFunc(logic, conv, config, meta, parentLogic);
@@ -386,4 +417,13 @@ const wrapInDefaultConj = (rule: JsonAnyRule, config: Config, not = false): Json
       not: not || false
     }
   };
+};
+
+const checkValueType = (val: any, valueType: string) => {
+  if (valueType === "text") {
+    val = "" + val;
+  } else if (valueType === "multiselect" && val != null && val?.map === undefined) {
+    val = [val];
+  }
+  return val;
 };
