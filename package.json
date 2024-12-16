@@ -45,6 +45,7 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "workspaces": [
     "packages/core",
+    "packages/sql",
     "packages/ui",
     "packages/antd",
     "packages/mui",
@@ -111,6 +112,7 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-react": "^7.34.1",
     "lerna": "^8.1.9",
+    "madge": "^8.0.0",
     "typescript": "~5.4.5"
   },
   "engines": {

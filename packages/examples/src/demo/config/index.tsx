@@ -31,7 +31,8 @@ const { simulateAsyncFetch } = Utils.Autocomplete;
 
 
 export default (skin: string) => {
-  const InitialConfig = skinToConfig[skin] as BasicConfig;
+  const originalConfig = skinToConfig[skin] as BasicConfig;
+  const InitialConfig = originalConfig as BasicConfig;
 
   const demoListValues = [
     { title: "A", value: "a" },

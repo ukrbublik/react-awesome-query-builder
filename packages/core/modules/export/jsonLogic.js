@@ -1,8 +1,9 @@
 import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, getWidgetForFieldOp
 } from "../utils/configUtils";
-import {getWidgetForFieldOp, formatFieldName, completeValue, getOneChildOrDescendant} from "../utils/ruleUtils";
+import { extendConfig } from "../utils/configExtend";
+import {formatFieldName, completeValue, getOneChildOrDescendant} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 import pick from "lodash/pick";

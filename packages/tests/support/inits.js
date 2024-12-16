@@ -842,6 +842,8 @@ export const with_ops = {
   ]
 };
 
+export const with_ops_sql = "(text = 'Long\\nText' AND num <> 2 AND str LIKE '%abc%' AND str NOT LIKE '%xyz%' AND num BETWEEN 1 AND 2 AND num NOT BETWEEN 3 AND 4 AND num IS NULL AND color IN ('yellow') AND color NOT IN ('green') AND multicolor != 'yellow')";
+
 export const with_ops_and_negation_groups = {
   "and": [
     {
@@ -1718,6 +1720,8 @@ export const spel_with_cases = "(str == '222' ? is_string : (num == 4 ? is_numbe
 export const spel_with_cases_simple = "(str == '222' ? foo : bar)";
 export const spel_with_cases_and_concat = "(str == '222' ? foo : foo + bar)";
 
+export const sql_with_cases = "IF(str = '222', 'is_string', IF(num = 4, 'is_number', 'unknown'))";
+
 export const with_cases = {"if": [
   {"==":[{"var":"str"},"222"]},
   "is_string",
@@ -1735,6 +1739,8 @@ export const with_cases_simple = {
     "bar"
   ]
 };
+
+export const sql_with_lhs_toLowerCase = "LOWER(str) LIKE 'aaa%'";
 
 export const spel_with_lhs_toLowerCase = "str.toLowerCase().startsWith('aaa')";
 export const spel_with_lhs_toLowerCase_toUpperCase = "str.toLowerCase().toUpperCase() == str.toUpperCase()";

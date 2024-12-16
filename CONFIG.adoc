@@ -19,6 +19,7 @@ endif::[]
 :renderSwitch: https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/antd/modules/config/index.jsx#L54
 :config_ser:   https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/sandbox_next/lib/config_ser.js
 :d_ts:         https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/core/modules/index.d.ts
+:ts-pattern:   https://github.com/gvergnaud/ts-pattern
 
 = Config format
 
@@ -37,7 +38,7 @@ Optionally you can override some options in basic config or add your own types/w
 There are functions for building query string: `formatConj`, `formatValue`, `formatOp`, `formatField`, `formatFunc` which are used for `QbUtils.queryString()`. +
 They have common param `isForDisplay` - false by default, true will be used for {queryString}[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc`, `mongoFormatFunc`, `mongoArgsAsObject` for building MongoDb query with `QbUtils.mongodbFormat()`. +
-And `sqlFormatConj`, `sqlOp`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `formatSpelField`, `sqlFunc`, `sqlFormatFunc` for building SQL where query with `QbUtils.sqlFormat()`. +
+And `sqlFormatConj`, `sqlOp`, `sqlOps`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `formatSpelField`, `sqlFunc`, `sqlFormatFunc`, `sqlImport` for building SQL where query with `QbUtils.sqlFormat()`. +
 And `spelFormatConj`, `spelOp`, `spelFormatOp`, `spelFormatValue`, `spelFormatReverse`, `spelFunc`, `spelFormatFunc` for building query in (https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)[Spring Expression Language (SpEL)] with `QbUtils.spelFormat()`. +
 And `jsonLogic` for building http://jsonlogic.com[JsonLogic] with `QbUtils.jsonLogicFormat()`. +
 
@@ -347,7 +348,7 @@ Behaviour settings:
 |removeEmptyGroupsOnLoad |true |Remove empty groups during initial validation of `value` prop passed to `<Query>`
 |removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during initial validation of `value` prop passed to `<Query>`? +
   By default `true`, but `false` for AntDesign as can be removed manually
-|useConfigCompress |false |Set to `true` if you use `Utils.decompressConfig()`
+|useConfigCompress |false |Set to `true` if you use `Utils.ConfigUtils.decompressConfig()`
 |fieldItemKeysForSearch |`["label", "path", "altLabel", "grouplabel"]` |Keys in field item (see {d_ts}[type] `FieldItem`) available for search. Available keys: "key", "path", "label", "altLabel" (label2), "tooltip", "grouplabel" (label of parent group, for subfields of complex fields)
 |listKeysForSearch |`["title", "value"]` |Keys in list item (see {d_ts}[type] `ListItem`) available for search. Available keys: "title", "value", "groupTitle"
 |reverseOperatorsForNot |false |True to convert "!(x == 1)" to "x != 1" on import and export
@@ -549,9 +550,11 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2` +
   `useExpr` - true if resulted expression will be wrapped in https://docs.mongodb.com/manual/reference/operator/query/expr/index.html[`{'$expr': {...}}`] (used only if you compare field with another field or function) (you need to use aggregation operators in this case, like https://docs.mongodb.com/manual/reference/operator/aggregation/eq/[$eq (aggregation)] instead of https://docs.mongodb.com/manual/reference/operator/query/eq/[$eq])
 |sqlOp |+ for SQL format | |Operator name in SQL
+|sqlOps |- for SQL format | |Operator names in SQL
 |sqlFormatOp |- for SQL format | |Function for advanced formatting SQL WHERE query when just `sqlOp` is not enough. +
   `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, Object fieldDef) => string` +
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2`
+|sqlImport |- for SQL format | |Function to convert given raw SQL value (not string, but object got from `node-sql-parser`) to `{ children: Array }`. If given expression can't be parsed into current operator, throw an error.
 |spelOp |+ for SpEL format | |Operator name in SpEL
 |spelFormatOp |- for SpEL format | |Function for advanced formatting query in SpEL when just `spelOp` is not enough. +
   `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, Object fieldDef) => string` +
@@ -768,6 +771,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |sqlFunc |- for SQL format |same as func key |Func name in SQL
 |sqlFormatFunc |- for SQL format | |Can be used instead of `sqlFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression string. +
   Example: SUM function can be formatted with `({a, b}) => a + " + " + b`
+|sqlImport |- for SQL format | |Function to convert given raw SQL value (not string, but object got from `node-sql-parser`) to `{args: Object}`. If given expression can't be parsed into current function, throw an error.
 |spelFunc |- for SpEL format |same as func key |Func name in SpEL
 |spelFormatFunc |- for SpEL format | |Can be used instead of `spelFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression string. +
   Example: SUM function can be formatted with `({a, b}) => a + " + " + b`
@@ -776,7 +780,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |mongoFormatFunc |- for MongoDB format | |Can be used instead of `mongoFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression object.
 |jsonLogic |+ for http://jsonlogic.com[JsonLogic] | |String (function name) or function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression for JsonLogic.
 |jsonLogicImport | | |Function to convert given JsonLogic expression to array of arguments of current function. If given expression can't be parsed into current function, throw an error.
-|spelImport | | |Function to convert given raw SpEL value to array of arguments of current function. If given value can't be parsed into current function, throw an error.
+|spelImport | | |Function to convert given raw SpEL value to object of arguments of current function. If given value can't be parsed into current function, throw an error or return undefined.
 |args.* | | |Arguments of function. Config is almost same as for simple link:#configfields[fields]
 |args.<arg>.label | |arg's key |Label to be displayed in arg's label or placeholder (if `config.settings.showLabels` is false)
 |args.<arg>.type |+ | |One of types described in link:#configtypes[config.types]
@@ -850,13 +854,13 @@ const ctx = {
 const zipConfig = {
   fields,
   settings: {
-    useConfigCompress: true, // this is required to use Utils.decompressConfig()
+    useConfigCompress: true, // this is required to use Utils.ConfigUtils.decompressConfig()
   },
   // you can add here other sections like `widgets` or `types`, but don't add `ctx`
 };
 
 // Config can be loaded from backend with providing `ctx`
-const config = Utils.decompressConfig(zipConfig, BasicConfig, ctx);
+const config = Utils.ConfigUtils.decompressConfig(zipConfig, BasicConfig, ctx);
 ----
 
 You _can't_ just pass JS function to `validateValue` in `fieldSettings` because functions can't be serialized to JSON. 
@@ -932,7 +936,7 @@ const zipConfig = {
 To build zip config from full config you can use this util:
 [source,javascript]
 ----
-const zipConfig = Utils.compressConfig(config, BasicConfig);
+const zipConfig = Utils.ConfigUtils.compressConfig(config, BasicConfig);
 ----
 In order to generate zip config corretly (to JSON-serializable object), you should put your custom functions to `ctx` and refer to them by names as in examples above.
 [source,javascript]
@@ -954,11 +958,11 @@ const config = merge({}, BasicConfig, {
   },
   ctx,
 });
-const zipConfig = Utils.compressConfig(config, BasicConfig);
-const config2 = Utils.decompressConfig(zipConfig, BasicConfig, ctx); // should be same as `config`
+const zipConfig = Utils.ConfigUtils.compressConfig(config, BasicConfig);
+const config2 = Utils.ConfigUtils.decompressConfig(zipConfig, BasicConfig, ctx); // should be same as `config`
 ----
 
-NOTE: `settings.useConfigCompress` should be `true` if you use `Utils.decompressConfig()`
+NOTE: `settings.useConfigCompress` should be `true` if you use `Utils.ConfigUtils.decompressConfig()`
 
 
 {nbsp} +

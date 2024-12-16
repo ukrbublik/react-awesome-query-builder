@@ -59,10 +59,15 @@ const conjunctions = {
         ? (not ? "NOT " : "") + "(" + children.join(" " + (isForDisplay ? "OR" : "||") + " ") + ")"
         : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
     },
-    sqlFormatConj: (children, conj, not) => {
-      return children.size > 1
-        ? (not ? "NOT " : "") + "(" + children.join(" " + "OR" + " ") + ")"
-        : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
+    sqlFormatConj: function (children, conj, not) {
+      let ret = (children.size > 1 ? children.join(" " + "OR" + " ") : children.first());
+      if (children.size > 1 || not) {
+        ret = this.utils.wrapWithBrackets(ret);
+      }
+      if (not) {
+        ret = "NOT " + ret;
+      }
+      return ret;
     },
     spelFormatConj: (children, conj, not, omitBrackets) => {
       if (not) omitBrackets = false;
@@ -101,6 +106,7 @@ const operators = {
     label: "!=",
     labelForFormat: "!=",
     sqlOp: "<>",
+    sqlOps: ["<>", "!="],
     spelOp: "!=",
     spelOps: ["!=", "ne"],
     reversedOp: "equal",
@@ -162,6 +168,28 @@ const operators = {
     labelForFormat: "Contains",
     reversedOp: "not_like",
     sqlOp: "LIKE",
+    // tip: this function covers import of 3 operators
+    sqlImport: (sqlObj) => {
+      if (sqlObj?.operator == "LIKE" || sqlObj?.operator == "NOT LIKE") {
+        const not = sqlObj?.operator == "NOT LIKE";
+        const [_left, right] = sqlObj.children || [];
+        if (right?.valueType == "single_quote_string") {
+          if (right?.value.startsWith("%") && right?.value.endsWith("%")) {
+            right.value = right.value.substring(1, right.value.length - 1);
+            sqlObj.operator = not ? "not_like" : "like";
+            return sqlObj;
+          } else if (right?.value.startsWith("%")) {
+            right.value = right.value.substring(1);
+            sqlObj.operator = "ends_with";
+            return sqlObj;
+          } else if (right?.value.endsWith("%")) {
+            right.value = right.value.substring(0, right.value.length - 1);
+            sqlObj.operator = "starts_with";
+            return sqlObj;
+          }
+        }
+      }
+    },
     spelOp: "${0}.contains(${1})",
     valueTypes: ["text"],
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) : undefined), false, ...args); },
@@ -213,6 +241,7 @@ const operators = {
       else
         return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
     },
+    // tip: this op can be imported from SpEL manually without using config
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       const valFrom = values[0];
       const valTo = values[1];
@@ -290,6 +319,7 @@ const operators = {
       const empty = this.utils.sqlEmptyValue(fieldDef);
       return `COALESCE(${field}, ${empty}) = ${empty}`;
     },
+    // tip: this op can be imported from SpEL manually without using config
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       //tip: is empty or null
       return `${field} <= ''`;
@@ -322,11 +352,23 @@ const operators = {
     label: "Is null",
     labelForFormat: "IS NULL",
     sqlOp: "IS NULL",
+    // tip: this function covers import of 2 operators
+    sqlImport: (sqlObj) => {
+      if (sqlObj?.operator === "IS" || sqlObj?.operator === "IS NOT") {
+        const [left, right] = sqlObj.children || [];
+        if (right?.valueType == "null") {
+          sqlObj.operator = sqlObj?.operator === "IS" ? "is_null" : "is_not_null";
+          sqlObj.value = left;
+          return sqlObj;
+        }
+      }
+    },
     cardinality: 0,
     reversedOp: "is_not_null",
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS NULL` : `!${field}`;
     },
+    // tip: this op can be imported from SpEL manually without using config
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       return `${field} == null`;
     },
@@ -371,6 +413,7 @@ const operators = {
     label: "!=",
     labelForFormat: "!=",
     sqlOp: "<>", // enum/set
+    sqlOps: ["<>", "!="],
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return `${field} != ${value}`;
     },
@@ -428,6 +471,7 @@ const operators = {
   multiselect_contains: {
     label: "Contains",
     labelForFormat: "CONTAINS",
+    valueTypes: ["multiselect"],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       if (valueSrc == "value")
         return `${field} CONTAINS [${values.join(", ")}]`;
@@ -448,6 +492,7 @@ const operators = {
     isNotOp: true,
     label: "Not contains",
     labelForFormat: "NOT CONTAINS",
+    valueTypes: ["multiselect"],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       if (valueSrc == "value")
         return `${field} NOT CONTAINS [${values.join(", ")}]`;
@@ -465,6 +510,7 @@ const operators = {
     label: "Equals",
     labelForFormat: "==",
     sqlOp: "=",
+    valueTypes: ["multiselect"],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       const opStr = isForDisplay ? "=" : "==";
       if (valueSrc == "value")
@@ -494,6 +540,8 @@ const operators = {
     label: "Not equals",
     labelForFormat: "!=",
     sqlOp: "<>",
+    sqlOps: ["<>", "!="],
+    valueTypes: ["multiselect"],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       if (valueSrc == "value")
         return `${field} != [${values.join(", ")}]`;
@@ -920,6 +968,26 @@ const widgets = {
         return [undefined, "Invalid date"];
       }
     },
+    // Moved to `sqlImportDate` in `packages/sql/modules/import/conv`
+    // sqlImport: function (sqlObj, wgtDef) {
+    //   if (["TO_DATE"].includes(sqlObj?.func) && sqlObj?.children?.length >= 1) {
+    //     const [valArg, patternArg] = sqlObj.children;
+    //     if (valArg?.valueType == "single_quote_string") {
+    //       // tip: moment doesn't support SQL date format, so ignore patternArg
+    //       const dateVal = this.utils.moment(valArg.value);
+    //       if (dateVal.isValid()) {
+    //         return {
+    //           value: dateVal.format(wgtDef?.valueFormat),
+    //         };
+    //       } else {
+    //         return {
+    //           value: null,
+    //           error: "Invalid date",
+    //         };
+    //       }
+    //     }
+    //   }
+    // },
     jsonLogic: function (val, fieldDef, wgtDef) {
       return this.utils.moment(val, wgtDef.valueFormat).toDate();
     },

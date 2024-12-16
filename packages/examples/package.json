@@ -44,6 +44,7 @@
     "@react-awesome-query-builder/antd": "workspace:^",
     "@react-awesome-query-builder/bootstrap": "workspace:^",
     "@react-awesome-query-builder/core": "workspace:^",
+    "@react-awesome-query-builder/sql": "workspace:^",
     "@react-awesome-query-builder/fluent": "workspace:^",
     "@react-awesome-query-builder/material": "workspace:^",
     "@react-awesome-query-builder/mui": "workspace:^",
