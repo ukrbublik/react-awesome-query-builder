@@ -115,7 +115,7 @@ const convertConj = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pa
 const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonRule | undefined => {
   let opKeys = conv.operators[logic.operator!];
   let opKey = opKeys?.[0];
-  let convChildren, convFuncOp;
+  let convChildren;
   convChildren = (logic.children || []).map(a => convertArg(a, conv, config, meta, logic));
   const isMultiselect = convChildren.filter(ch => ch?.valueType === "multiselect").length > 0;
   const isSelect = convChildren.filter(ch => ch?.valueType === "select").length > 0;
@@ -130,7 +130,7 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
 
   // tip: Even if opKeys.length === 1, still try to use `convertOpFunc` to let `sqlImport` be applied (eg. `not_like` op)
   // todo: cover other cases like is_empty, proximity
-  convFuncOp = convertOpFunc(logic, conv, config, meta, parentLogic)!;
+  const convFuncOp = convertOpFunc(logic, conv, config, meta, parentLogic)!;
   if (convFuncOp) {
     opKey = convFuncOp.operator!;
     convChildren = convFuncOp.children;
@@ -425,5 +425,6 @@ const checkValueType = (val: any, valueType: string) => {
   } else if (valueType === "multiselect" && val != null && val?.map === undefined) {
     val = [val];
   }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return val;
 };

@@ -158,6 +158,7 @@ const processExprList = (expr: ExprList, meta: Meta, not = false): OutLogic | un
   let values;
   if (oneValueType && SqlPrimitiveTypes[oneValueType]) {
     // it's list of primitive values
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     values = children.map(ch => ch.value);
   }
   return {
