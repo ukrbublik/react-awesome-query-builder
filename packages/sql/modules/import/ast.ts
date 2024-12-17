@@ -277,6 +277,6 @@ export const getLogicDescr = (logic?: OutLogic) => {
   } else if (logic?.func) {
     return `${logic.func}()`;
   }
-  // todo
+  // todo: aggr?
   return JSON.stringify(logic);
 };

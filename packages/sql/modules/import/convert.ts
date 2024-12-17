@@ -30,7 +30,7 @@ export const convertToTree = (
     meta.errors.push(`Unexpected logic: ${getLogicDescr(logic)}`);
   }
 
-  // todo
+  // todo: other cases?
 
   if (returnGroup && res && res.type != "group" && res.type != "switch_group") {
     res = wrapInDefaultConj(res, config, logic.not);
@@ -139,8 +139,7 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
       // todo: don't throw error now, SQL operator can be converted to eg. custom func (see linear regression)
       meta.errors.push(`Can't convert op ${getLogicDescr(logic)}`);
       return undefined;
-    } else {
-      // todo
+    } else if (opKeys.length > 1 && !["=", "!=", "<>"].includes(logic.operator!)) {
       meta.warnings.push(`SQL operator "${logic.operator}" can be converted to several operators: ${opKeys.join(", ")}`);
     }
   }
@@ -179,8 +178,8 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
       if (opValueTypes?.length === 1) {
         valueType = opValueTypes[0];
       }
-      if (valueType) {
-        finalVal = checkValueType(finalVal, valueType);
+      if (valueType && v?.valueSrc === "value") {
+        finalVal = checkSimpleValueType(finalVal, valueType);
       }
       properties.valueType![i] = valueType;
       properties.value[i] = finalVal;
@@ -419,11 +418,13 @@ const wrapInDefaultConj = (rule: JsonAnyRule, config: Config, not = false): Json
   };
 };
 
-const checkValueType = (val: any, valueType: string) => {
-  if (valueType === "text") {
-    val = "" + val;
-  } else if (valueType === "multiselect" && val != null && val?.map === undefined) {
-    val = [val];
+const checkSimpleValueType = (val: any, valueType: string) => {
+  if (val != null && val?.func === undefined) {
+    if (valueType === "text") {
+      val = "" + val;
+    } else if (valueType === "multiselect" && val?.map === undefined) {
+      val = [val];
+    }
   }
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return val;
