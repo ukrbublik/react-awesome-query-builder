@@ -1,6 +1,6 @@
 # Changelog
 - 6.6.5
- - Support import fom SQL (PR #1103) (issue #911, #593)
+ - Support import fom SQL (`SqlUtils.loadFromSql`) (PR #1103) (issue #911, #593)
  - Fixed type issue with SerializedFunction (PR #1103) (issue #1024)
 - 6.6.4
   - Support groups inside rule-group (PR #1111) (issue #1108)

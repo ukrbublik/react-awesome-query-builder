@@ -14,14 +14,17 @@ npm i @react-awesome-query-builder/sql --save
 
 ## Usage
 
-todo
-
 ```js
-// >>>
-// import type { JsonGroup, Config, ImmutableTree, BuilderProps } from '@react-awesome-query-builder/mui'; // for TS example
-// import { Query, Builder, Utils as QbUtils } from '@react-awesome-query-builder/mui';
-// import { MuiConfig, MuiWidgets } from '@react-awesome-query-builder/mui';
-// import '@react-awesome-query-builder/mui/css/styles.css';
-// const InitialConfig = MuiConfig;
-// <<<
+import { SqlUtils } from "@react-awesome-query-builder/sql";
+
+const importFromSql = () => {
+  const sqlStr = "num <> 2";
+  const {tree, errors: sqlErrors, warnings: sqlWarnings} = SqlUtils.loadFromSql(sqlStr, state.config);
+  const {fixedTree} = Utils.sanitizeTree(tree, state.config);
+  setState({
+    ...state, 
+    tree: fixedTree,
+  });
+};
+
 ```

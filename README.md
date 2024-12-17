@@ -532,7 +532,8 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   #### `loadFromSql`
   `SqlUtils.loadFromSql (string, config) -> {tree: Immutable, errors: string[]}`  
   Convert query value from SQL format to internal Immutable format.  
-  Requires import of `@react-awesome-query-builder/sql`. 
+  Requires import of `@react-awesome-query-builder/sql`:  
+  `import { SqlUtils } from "@react-awesome-query-builder/sql"`
 
 ### Save/load config from server
 
