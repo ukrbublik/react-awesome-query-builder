@@ -234,7 +234,7 @@ const operators = {
       "and"
     ],
     reversedOp: "not_between",
-    jsonLogic:  ({field, twoVals}) => ({ "<=": [twoVals[0], field, twoVals[1]] }),
+    jsonLogic: ({field, twoVals}) => ({ "<=": [twoVals[0], field, twoVals[1]] }),
     validateValues: (values) => {
       if (values[0] != undefined && values[1] != undefined) {
         return values[0] <= values[1];

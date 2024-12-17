@@ -1,5 +1,5 @@
 import uuid from "../utils/uuid";
-import {getOpCardinality, isJsonLogic, isValidFieldObject, shallowEqual, isVarEmptyObject, logger} from "../utils/stuff";
+import {getOpCardinality, isJsonLogic, isValidFieldObject, isValidForFieldMarker, shallowEqual, isVarEmptyObject, logger} from "../utils/stuff";
 import {getFieldConfig, extendConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
@@ -144,7 +144,7 @@ const matchAgainstTemplates = (jsonlogic, conv, meta, config, parentField, opera
           tempResponse["op"] = key;
           // With default config operators this should only be used to tell "equal" and "select_equals"
           // apart from each other
-          if (response && isValidFieldObject(tempResponse.jlField, conv)) {
+          if (response && isValidForFieldMarker(tempResponse.jlField, conv)) {
             const fieldKey = Object.keys(tempResponse.jlField)[0];
             if (conv.varKeys.includes(fieldKey) && typeof tempResponse.jlField[fieldKey] == "string") {
               const field = normalizeField(config, tempResponse.jlField[fieldKey], parentField);
@@ -202,8 +202,10 @@ const isTemplateMatch = (template, jsonlogic, conv, response = {"match": true, "
     const realValue = jsonlogic[key];
     if (value === jlTemplateInput.field) {
       // If jlFieldMarker is found in template we take the value from corresponding place in jsonlogic
-      // If the value is not in correct form then this is not a match.
-      if (isValidFieldObject(realValue, conv) || (typeof realValue === "object" && realValue !== null && "reduce" in realValue)) {
+      // If the value is not in correct form then this is not a match. Correct forms are field object, reduce and funcs.
+      if (
+        isValidForFieldMarker(realValue, conv)
+      ) {
         response.jlField = realValue;
       } else {
         response.match = false;

@@ -243,6 +243,14 @@ export const isVarEmptyObject = (obj) => {
   return Object.keys(obj).length === 1 && obj.var === "";
 };
 
+export const isValidForFieldMarker = (obj, conv) => {
+  return (
+    isValidFieldObject(obj, conv) ||
+    (typeof obj === "object" && obj !== null && "reduce" in obj) ||
+    (typeof obj === "object" && obj !== null && Object.keys(obj).some(key => key in conv.funcs))
+  );
+};
+
 export function sleep(delay) {
   return new Promise((resolve) => {
     setTimeout(resolve, delay);
