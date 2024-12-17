@@ -15,16 +15,18 @@ npm i @react-awesome-query-builder/sql --save
 ## Usage
 
 ```js
+import { Utils } from '@react-awesome-query-builder/core';
 import { SqlUtils } from "@react-awesome-query-builder/sql";
 
-const importFromSql = () => {
-  const sqlStr = "num <> 2";
+const importFromSql = (sqlStr) => {
   const {tree, errors: sqlErrors, warnings: sqlWarnings} = SqlUtils.loadFromSql(sqlStr, state.config);
+  if (sqlErrors.length) {
+    console.log("Import errors: ", sqlErrors);
+  }
   const {fixedTree} = Utils.sanitizeTree(tree, state.config);
   setState({
     ...state, 
     tree: fixedTree,
   });
 };
-
 ```

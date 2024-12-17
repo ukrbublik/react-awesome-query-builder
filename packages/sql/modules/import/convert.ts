@@ -8,6 +8,7 @@ import {
   Func,
   FuncValue,
   Field,
+  JsonRuleGroup,
 } from "@react-awesome-query-builder/core";
 import { getLogicDescr } from "./ast";
 import { SqlPrimitiveTypes } from "./conv";
@@ -16,7 +17,7 @@ import { ValueExpr } from "node-sql-parser";
 
 export const convertToTree = (
   logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic, returnGroup = false
-): JsonRule | JsonGroup | JsonSwitchGroup | JsonCaseGroup | undefined => {
+): JsonRule | JsonGroup | JsonRuleGroup | JsonSwitchGroup | JsonCaseGroup | undefined => {
   if (!logic) return undefined;
 
   let res;
@@ -30,7 +31,9 @@ export const convertToTree = (
     meta.errors.push(`Unexpected logic: ${getLogicDescr(logic)}`);
   }
 
-  // todo: other cases?
+  if (res?.type === "group") {
+    res = groupToMaybeRuleGroup(res, config);
+  }
 
   if (returnGroup && res && res.type != "group" && res.type != "switch_group") {
     res = wrapInDefaultConj(res, config, logic.not);
@@ -101,7 +104,7 @@ const convertConj = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pa
   const { conj, children } = logic;
   const conjunction = conv.conjunctions[conj!];
   const convChildren = (children || []).map(a => convertToTree(a, conv, config, meta, logic)).filter(c => !!c) as JsonGroup[];
-  return {
+  const res: JsonGroup = {
     type: "group",
     properties: {
       conjunction,
@@ -109,8 +112,40 @@ const convertConj = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pa
     },
     children1: convChildren,
   };
+  return res;
 };
 
+const getCommonGroupField = (fields: string[], config: Config): string | undefined => {
+  if (fields.length > 0) {
+    const closestGroupFields = fields.map(f => {
+      const paths = Utils.ConfigUtils.getFieldParts(f, config);
+      const groupFields = paths.filter(path => (Utils.ConfigUtils.getFieldConfig(config, path) as Field)?.type === "!group");
+      const closestGroupField = groupFields.reverse()?.[0];
+      return closestGroupField;
+    }).filter(gf => !!gf);
+    const isSameGroupField = Array.from(new Set(closestGroupFields)).length === 1;
+    const allFieldsAreInsideGroup = closestGroupFields.length === fields.length;
+    if (allFieldsAreInsideGroup && isSameGroupField) {
+      return closestGroupFields[0];
+    }
+  }
+  return undefined;
+};
+
+const groupToMaybeRuleGroup = (grp: JsonGroup, config: Config): JsonRuleGroup | JsonGroup => {
+  const fields = grp.children1?.filter(ch => ch.type === "rule" || ch.type === "rule_group").map(rule => rule.properties?.field).filter(f => !!f) as string[];  
+  if (fields?.length === grp.children1?.length) {
+    const commonGroupField = getCommonGroupField(fields, config);
+    if (commonGroupField) {
+      const rgr = grp as any as JsonRuleGroup;
+      rgr.type = "rule_group";
+      rgr.properties!.field = commonGroupField;
+      (rgr.properties as any).fieldSrc = "field";
+      return rgr;
+    }
+  }
+  return grp;
+};
 
 const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): JsonRule | undefined => {
   let opKeys = conv.operators[logic.operator!];

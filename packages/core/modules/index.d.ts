@@ -560,6 +560,8 @@ interface ConfigUtils {
   compileConfig(config: Config): Config;
   extendConfig(config: Config, configId?: string, canCompile?: boolean): Config;
   getFieldConfig(config: Config, field: AnyFieldValue): FieldConfig | null;
+  getFieldParts(field: AnyFieldValue, config?: Config): string[];
+  getFieldPathParts(field: AnyFieldValue, config: Config): string[];
   getFuncConfig(config: Config, func: string): Func | null;
   getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
   getOperatorConfig(config: Config, operator: string, field?: AnyFieldValue): Operator | null;

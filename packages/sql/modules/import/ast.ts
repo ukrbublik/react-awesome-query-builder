@@ -138,7 +138,6 @@ const getExprValue = (expr: ValueExpr, meta: Meta, not = false): string | number
   if (expr.type === "boolean" && not) {
     value = !value;
   }
-  // todo: '' for single_quote_string
   // todo: date literals?
   return value;
 };
@@ -191,11 +190,19 @@ const processField = (expr: ColumnRef, meta: Meta, not = false): OutLogic | unde
   const parentheses = (expr as BaseExpr).parentheses;
   const field = typeof expr.column === "string" ? expr.column : getExprStringValue(expr.column.expr, meta, not);
   const table = expr.table ?? undefined;
-  return {
-    parentheses,
-    field,
-    table,
-  };
+  if (field === "") {
+    // fix for empty string
+    return {
+      valueType: "single_quote_string",
+      value: "",
+    };
+  } else {
+    return {
+      parentheses,
+      field,
+      table,
+    };
+  }
 };
 
 const flatizeTernary = (children: OutLogic[], meta: Meta) => {
@@ -276,7 +283,8 @@ export const getLogicDescr = (logic?: OutLogic) => {
     return `INTERVAL ${JSON.stringify(logic.value)} ${logic.unit}`;
   } else if (logic?.func) {
     return `${logic.func}()`;
+  } else if (logic?._type === "expr_list") {
+    return JSON.stringify(logic.values);
   }
-  // todo: aggr?
   return JSON.stringify(logic);
 };

@@ -173,7 +173,7 @@ const operators = {
       if (sqlObj?.operator == "LIKE" || sqlObj?.operator == "NOT LIKE") {
         const not = sqlObj?.operator == "NOT LIKE";
         const [_left, right] = sqlObj.children || [];
-        if (right?.valueType == "single_quote_string") {
+        if (right?.valueType?.endsWith("_quote_string")) {
           if (right?.value.startsWith("%") && right?.value.endsWith("%")) {
             right.value = right.value.substring(1, right.value.length - 1);
             sqlObj.operator = not ? "not_like" : "like";

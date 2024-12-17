@@ -17,6 +17,7 @@ export const unsupportedOps: string[] = [
 // sql type => raqb type
 export const SqlPrimitiveTypes: Record<string, string> = {
   single_quote_string: "text",
+  double_quote_string: "text",
   number: "number",
   null: "null",
   bool: "boolean",
@@ -92,7 +93,7 @@ const sqlImportDate: SqlImportFunc = function (this: ConfigContext, sqlObj: OutL
     "TO_DATE", "TO_TIMESTAMP", "TO_TIMESTAMP_TZ", "TO_UTC_TIMESTAMP_TZ"
   ].includes(sqlObj.func!) && sqlObj.children.length >= 1) {
     const [valArg, _patternArg] = sqlObj!.children!;
-    if (valArg?.valueType == "single_quote_string") {
+    if (valArg?.valueType?.endsWith("_quote_string")) {
       // tip: moment doesn't support SQL date format, so ignore patternArg
       const dateVal = this.utils.moment(valArg.value as MomentInput);
       if (dateVal.isValid()) {
