@@ -75,14 +75,6 @@ const conjunctions = {
 
 //----------------------------  operators
 
-// Helper constants
-const jlTemplateInput = {
-  field: "jlField",
-  val: "jlArgs",  // For functions that use `val`
-  vals: ["jlArgs"], // For functions that use `vals`
-  twoVals: ["jlArgsFirst", "jlArgsSecond"]
-};
-
 const operators = {
   equal: {
     label: "==",
@@ -1643,7 +1635,6 @@ export const ConfigMixins = {
 
 let config = {
   conjunctions,
-  jlTemplateInput,
   operators,
   widgets,
   types,
