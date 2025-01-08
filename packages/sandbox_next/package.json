@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/sandbox-next",
-  "version": "6.6.4",
+  "version": "6.6.5",
   "description": "Demo for @react-awesome-query-builder",
   "repository": {
     "type": "git",
@@ -42,8 +42,8 @@
     "@mui/system": "^5.15.15",
     "@mui/x-date-pickers": "^7.9.0",
     "@react-awesome-query-builder/core": "workspace:^",
-    "@react-awesome-query-builder/sql": "workspace:^",
     "@react-awesome-query-builder/mui": "workspace:^",
+    "@react-awesome-query-builder/sql": "workspace:^",
     "@upstash/redis": "^1.31.1",
     "iron-session": "^6.3.1",
     "jsonfile": "^6.1.0",

@@ -976,8 +976,8 @@ importers:
         specifier: ^2.1.2
         version: 2.1.2
       node-sql-parser:
-        specifier: ^5.2.0
-        version: 5.2.0
+        specifier: ^5.3.5
+        version: 5.3.5
       sqlstring:
         specifier: ^2.3.3
         version: 2.3.3
@@ -11855,8 +11855,8 @@ packages:
       '@babel/parser': 7.24.5
     dev: true
 
-  /node-sql-parser@5.2.0:
-    resolution: {integrity: sha512-lO/9ox0fLl47ksqlwGrorXm8BD+5UbxvUhj6T1XiCXnvoVwWWn7gC2l396p9OXNii19dc4MkyTN3XeJGNUZ8jw==}
+  /node-sql-parser@5.3.5:
+    resolution: {integrity: sha512-DOR2PAe3gY5/fXmSvpTOpyv8+HkQ5jA9KShAEy7fVLaV8kVbeg8aa7qo0MdfqCDskwqjcakp0lS/Rnmg+iY/XQ==}
     engines: {node: '>=8'}
     dependencies:
       '@types/pegjs': 0.10.6
