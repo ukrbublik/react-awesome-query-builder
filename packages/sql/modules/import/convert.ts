@@ -136,7 +136,10 @@ const getCommonGroupField = (fields: string[], config: Config): string | undefin
 };
 
 const groupToMaybeRuleGroup = (grp: JsonGroup, config: Config): JsonRuleGroup | JsonGroup => {
-  const fields = grp.children1?.filter(ch => ch.type === "rule" || ch.type === "rule_group").map(rule => rule.properties?.field).filter(f => !!f) as string[];  
+  const fields = (grp.children1 ?? [])
+    .filter(ch => ch.type === "rule" || ch.type === "rule_group")
+    .map(rule => (rule as JsonRule | JsonRuleGroup).properties?.field)
+    .filter(f => !!f) as string[];  
   if (fields?.length === grp.children1?.length) {
     const commonGroupField = getCommonGroupField(fields, config);
     if (commonGroupField) {
