@@ -38,10 +38,11 @@
   "scripts": {
     "build": "sh ./scripts/build-npm.sh",
     "eslint": "eslint --ext .js --ext .ts  ./modules/",
-    "lint": "npm run eslint && npm run tsc",
+    "lint": "npm run eslint && npm run tsc && npm run circular",
     "lint-fix": "eslint --ext .js --ext .ts --fix  ./modules/",
     "prepare": "npm run build",
-    "tsc": "tsc -p . --noEmit"
+    "tsc": "tsc -p . --noEmit",
+    "circular": "madge --circular ./modules"
   },
   "dependencies": {
     "@babel/runtime": "^7.24.5",

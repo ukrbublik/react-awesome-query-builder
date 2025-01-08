@@ -1,5 +1,4 @@
 import pick from "lodash/pick";
-import { extendConfig } from "./configExtend";
 import { configKeys } from "./configUtils";
 
 let memoId = 0;
@@ -7,12 +6,13 @@ let configId = 0;
 let commonMemo;
 const memos = {};
 
-export const getCommonMemo = () => {
+export const getCommonMemo = (extendConfig) => {
   if (!commonMemo) {
     commonMemo = createConfigMemo({
       reactIndex: undefined,
       maxSize: 3,
       canCompile: undefined, // default is true
+      extendConfig,
     });
   }
   return commonMemo;
@@ -34,6 +34,7 @@ export const createConfigMemo = (meta = {
   reactIndex: undefined,
   maxSize: 2, // current and prev
   canCompile: true,
+  extendConfig: undefined, // should be passed!
 }) => {
   const configStore = new Map();
   const maxSize = meta.maxSize || 2;
@@ -46,7 +47,7 @@ export const createConfigMemo = (meta = {
   };
 
   const extendAndStore = (config) => {
-    const extendedConfig = extendConfig(config, ++configId, meta.canCompile);
+    const extendedConfig = meta.extendConfig(config, ++configId, meta.canCompile);
     storeConfigPair(config, extendedConfig);
     return extendedConfig;
   };

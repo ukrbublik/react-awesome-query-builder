@@ -72,7 +72,7 @@ export const extendConfig = (config, configId, canCompile = true) => {
   deepFreeze(config);
 
   // Save to memo (cache)
-  const memo = getCommonMemo();
+  const memo = getCommonMemo(extendConfig);
   memo.storeConfigPair(origConfig, config);
 
   return config;

@@ -4,10 +4,10 @@
 import {List as ImmList, Map as ImmMap, OrderedMap as ImmOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";
 import moment from "moment";
-import type { Moment as MomentType } from "moment";
+import type { Moment, MomentInput } from "moment";
 import type { i18n } from "i18next";
 
-export type Moment = MomentType;
+export type { Moment, MomentInput };
 export type ImmutableList<T> = ImmList<T>;
 export type ImmutableMap<K, V> = ImmMap<K, V>;
 export type ImmutableOMap<K, V> = ImmOMap<K, V>;
@@ -25,16 +25,28 @@ interface ReactAttributes {
 export type FactoryWithContext<P> = (props: ReactAttributes & P, ctx?: ConfigContext) => ReactElement<P>;
 export type RenderedReactElement = ReactElement | string;
 export type SerializedFunction = JsonLogicFunction | string;
+export type SerializableType<T, SER = false> = SER extends true ? T | SerializedFunction : T;
 
 type AnyObject = Record<string, unknown>;
 type Empty = null | undefined;
 
-type ImmutablePath = ImmutableList<string>;
-type IdPath = Array<string> | ImmutablePath; // should be used in actions only
+export type ImmutablePath = ImmutableList<string>;
+export type IdPath = Array<string> | ImmutablePath; // should be used in actions only
 
 type Optional<T> = {
   [P in keyof T]?: T[P];
-}
+};
+
+type PickDeprecated<T, K extends keyof T> = {
+  /**
+   * @deprecated
+   */
+  [P in K]: T[P];
+};
+
+export type PartialPartial<T> = {
+  [P in keyof T]?: T[P] extends Object ? Partial<T[P]> : T[P];
+};
 
 type OptionalBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
@@ -45,7 +57,7 @@ type TypedMap<T> = Record<string, T>;
 type TypedKeyMap<K extends string|number, T> = {
   [key: string]: T;
   [key: number]: T;
-}
+};
 
 interface ObjectToImmOMap<P> extends ImmutableOMap<keyof P, any> {
   get<K extends keyof P>(name: K): P[K];
@@ -56,19 +68,19 @@ export type AsyncListValues = Array<any>;
 
 // for export/import
 
-type MongoValue = any;
-type ElasticSearchQueryType = string;
+export type MongoValue = any;
+export type ElasticSearchQueryType = string;
 
-type JsonLogicResult = {
+export type JsonLogicResult = {
   logic?: JsonLogicTree;
   data?: Object;
   errors?: Array<string>;
 }
-type JsonLogicFunction = Object;
-type JsonLogicTree = Object;
-type JsonLogicValue = any;
-type JsonLogicField = { "var": string };
-interface SpelRawValue {
+export type JsonLogicFunction = Object;
+export type JsonLogicTree = Object;
+export type JsonLogicValue = any;
+export type JsonLogicField = { "var": string };
+export interface SpelRawValue {
   type: string;
   children?: SpelRawValue[];
   val?: RuleValue;
@@ -79,8 +91,23 @@ interface SpelRawValue {
   cls: string[];
 }
 
+export type ConfigContextUtils = {
+  SqlString: ExportUtils["SqlString"];
+  sqlEmptyValue: ExportUtils["sqlEmptyValue"];
+  spelFixList: ExportUtils["spelFixList"];
+  wrapWithBrackets: ExportUtils["wrapWithBrackets"];
+  stringifyForDisplay: ExportUtils["stringifyForDisplay"];
+  mongoEmptyValue: ExportUtils["mongoEmptyValue"];
+  spelEscape: ExportUtils["spelEscape"];
+
+  moment: OtherUtils["moment"];
+  escapeRegExp: OtherUtils["escapeRegExp"];
+
+  getTitleInListValues: ListUtils["getTitleInListValues"];
+};
+
 export type ConfigContext = {
-  utils: TypedMap<any>;
+  utils: ConfigContextUtils;
   W: TypedMap<ElementType<any>>;
   O: TypedMap<ElementType<any>>;
   components?: TypedMap<ElementType<any>>;
@@ -376,7 +403,7 @@ interface _AnyRuleI extends _OmitI<_RuleI> {
   children1?: ImmOMap<string, ImmutableRule>;
 }
 // type _ItemI = _GroupI | _AnyRuleI;
-interface _ItemI extends _OmitI<_GroupI>, _OmitI<_AnyRuleI> {
+export interface _ItemI extends _OmitI<_GroupI>, _OmitI<_AnyRuleI> {
   type: "rule" | "rule_group" | "group";
   properties: ImmutableItemProperties;
   children1?: ImmOMap<string, ImmutableItem>;
@@ -388,7 +415,7 @@ interface _ItemOrCaseI extends _OmitI<_ItemI>, _OmitI<_CaseGroupI> {
   children1?: ImmOMap<string, ImmutableItem>;
 }
 // type _TreeI = _GroupI | _SwitchGroupI;
-interface _TreeI extends _OmitI<_GroupI>, _OmitI<_SwitchGroupI> {
+export interface _TreeI extends _OmitI<_GroupI>, _OmitI<_SwitchGroupI> {
   type: "group" | "switch_group";
   children1?: ImmOMap<string, ImmutableBasicItem<_ItemOrCaseI>>;
   properties: ImmutableGroupOrSwitchProperties;
@@ -531,8 +558,10 @@ interface ConfigUtils {
   compressConfig(config: Config, baseConfig: Config): ZipConfig;
   decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
   compileConfig(config: Config): Config;
-  extendConfig(config: Config): Config;
-  getFieldConfig(config: Config, field: AnyFieldValue): FieldConfig;
+  extendConfig(config: Config, configId?: string, canCompile?: boolean): Config;
+  getFieldConfig(config: Config, field: AnyFieldValue): FieldConfig | null;
+  getFieldParts(field: AnyFieldValue, config?: Config): string[];
+  getFieldPathParts(field: AnyFieldValue, config: Config): string[];
   getFuncConfig(config: Config, func: string): Func | null;
   getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
   getOperatorConfig(config: Config, operator: string, field?: AnyFieldValue): Operator | null;
@@ -541,6 +570,8 @@ interface ConfigUtils {
   isDirtyJSX(jsx: any): boolean;
   cleanJSX(jsx: any): Object;
   applyJsonLogic(logic: any, data?: any): any;
+  iterateFuncs(config: Config): Iterable<[funcPath: string, funcConfig: Func]>;
+  iterateFields(config: Config): Iterable<[fieldPath: string, fieldConfig: Field, fieldKey: string]>;
 }
 interface DefaultUtils {
   getDefaultField(config: Config, canGetFirst?: boolean, parentRuleGroupField?: string): FieldValueI | null;
@@ -563,8 +594,17 @@ interface DefaultUtils {
   // createListFromArray<TItem>(array: TItem[]): ImmutableList<TItem>;
 }
 interface ExportUtils {
-  wrapWithBrackets(val: string): string;
+  wrapWithBrackets(val?: string): string;
   spelEscape(val: any): string;
+  spelFixList(listStr: string): string;
+  sqlEmptyValue(fieldDef?: Field): string;
+  mongoEmptyValue(fieldDef?: Field): string;
+  SqlString: {
+    trim(val?: string): string;
+    escape(val?: string): string;
+    escapeLike(val?: string, any_start?: boolean, any_end?: boolean): string;
+  },
+  stringifyForDisplay(val: any): string;
   /**
    * @deprecated
    */
@@ -600,8 +640,55 @@ interface TreeUtils {
   // case mode
   getSwitchValues(tree: ImmutableTree): Array<any | null>;
 }
+
+interface MixSymbols<T> {
+  /**
+   * Symbols:
+   * _v?: T | undefined;
+   * _type?: string;
+   * _canCreate?: boolean;
+   * _canChangeType?: boolean;
+   * _arrayMergeMode?: "join" | "joinMissing" | "joinRespectOrder" | "overwrite" | "merge";
+   */
+  [key: symbol]: boolean | string | T;
+}
+type MixObject<T extends Record<string, any>> = {
+  [P in keyof T]?: MixType<T[P]>;
+} & {
+  [P in Exclude<string, keyof T>]: any;
+} & MixSymbols<T>;
+type MixArray<T extends Array<any>> = (T /* & MixinSymbols<T> */);
+type _Opt<T> = T extends Function ? T : T extends Array<any> ? T : T extends Record<string, any> ? Partial<T> : T;
+type Opt<T> = _Opt<Exclude<T, undefined>>;
+type _MixType<T> = T extends Function ? T : T extends Array<any> ? MixArray<T> : T extends Record<string, any> ? MixObject<T> : Opt<T>;
+export type MixType<T> = _MixType<Opt<T>>;
+
 interface OtherUtils {
+  logger: typeof console;
+  clone(obj: any): any;
+  moment: typeof moment;
   uuid(): string;
+  mergeArraysSmart(arr1: any[], arr2: any[]): any[];
+  setIn<O, T = any>(
+    obj: O,
+    path: string[],
+    newValue: T | undefined | ((old: T) => T),
+    options?: {
+      canCreate?: boolean,
+      canIgnore?: boolean,
+      canChangeType?: boolean,
+    }
+  ): O;
+  mergeIn(
+    obj: Record<string, AnyValue>,
+    mixin: MixType<Record<string, AnyValue>>,
+    options?: {
+      canCreate?: boolean,
+      canChangeType?: boolean,
+      deepCopyObj?: boolean,
+      arrayMergeMode?: "join" | "joinMissing" | "joinRespectOrder" | "overwrite" | "merge",
+    }
+  ): Record<string, AnyValue>;
   deepFreeze(obj: any): any;
   deepEqual(a: any, b: any): boolean;
   shallowEqual(a: any, b: any, deep?: boolean): boolean;
@@ -618,10 +705,11 @@ interface OtherUtils {
 }
 
 export interface Utils extends Import, Export,
-  Pick<Validation, "sanitizeTree" | "validateTree" | "isValidTree" | "checkTree">,
-  Pick<ConfigUtils, "compressConfig" | "decompressConfig">,
-  Pick<OtherUtils, "uuid">,
-  Pick<TreeUtils, "getSwitchValues">
+  Pick<OtherUtils, "uuid" | "clone" | "moment">,
+  Pick<Validation, "sanitizeTree" | "validateTree" | "isValidTree">,
+  PickDeprecated<Validation, "checkTree">,
+  PickDeprecated<ConfigUtils, "compressConfig" | "decompressConfig">,
+  PickDeprecated<TreeUtils, "getSwitchValues">
 {
   Import: Import;
   Export: Export;
@@ -633,9 +721,8 @@ export interface Utils extends Import, Export,
   ListUtils: ListUtils;
   TreeUtils: TreeUtils;
   OtherUtils: OtherUtils;
-  // libs
+
   i18n: i18n;
-  moment: typeof moment;
 }
 
 
@@ -656,15 +743,18 @@ export interface Config {
 
 export type ZipConfig = Omit<Config, "ctx">;
 
-export interface ConfigMixin<C = Config, S = Settings> {
-  conjunctions?: Record<string, Partial<Conjunction>>;
-  operators?: Record<string, Partial<Operator<C>>>;
-  widgets?: Record<string, Partial<Widget<C>>>;
-  types?: Record<string, Partial<Type>>;
-  settings?: Partial<S>;
-  fields?: Record<string, Partial<FieldOrGroup>>;
-  funcs?: Record<string, Partial<FuncOrGroup>>;
-  ctx?: Partial<ConfigContext>;
+
+export type ConfigMixinExt<C extends Config = Config> = MixType<C>;
+
+export interface ConfigMixin<C extends Config = Config> {
+  conjunctions?: Record<string, PartialPartial<Conjunction>>;
+  operators?: Record<string, PartialPartial<Operator<C>>>;
+  widgets?: Record<string, PartialPartial<Widget<C>>>;
+  types?: Record<string, PartialPartial<Type>>;
+  settings?: PartialPartial<C["settings"]>;
+  fields?: Record<string, PartialPartial<FieldOrGroup>>;
+  funcs?: Record<string, PartialPartial<FuncOrGroup>>;
+  ctx?: PartialPartial<ConfigContext>;
 }
 
 /////////////////
@@ -871,17 +961,18 @@ export interface FieldProps<C = Config> {
 // Widgets
 /////////////////
 
-type SpelImportValue = (val: any, wgtDef?: Widget, args?: TypedMap<any>) => [any, string[] | string | undefined];
-type JsonLogicImportValue = (val: any, wgtDef?: Widget, args?: TypedMap<any>) => any | undefined; // can throw
+type SpelImportValue = (this: ConfigContext, val: any, wgtDef?: Widget, args?: TypedMap<any>) => [any, string[] | string | undefined];
+type JsonLogicImportValue = (this: ConfigContext, val: any, wgtDef?: Widget, args?: TypedMap<any>) => any | undefined; // can throw
 
-type FormatValue =                  (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
-type SqlFormatValue =               (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
-type SpelFormatValue =              (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
-type MongoFormatValue =             (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
-type JsonLogicFormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
-export type ValidateValue<V = RuleValue> = (val: V, fieldSettings: FieldSettings, op: string, opDef: Operator, rightFieldDef?: Field) => boolean | string | { error: string | {key: string, args?: Object}, fixedValue?: V } | null;
-type ElasticSearchFormatValue =     (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: FieldPath, config: Config) => AnyObject | null;
+// tip: for multiselect widget `val` is Array, and return type is also Array
+type FormatValue =                  (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string | string[];
+type SqlFormatValue =               (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string | string[];
+type SpelFormatValue =              (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string | string[];
+type MongoFormatValue =             (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
+type JsonLogicFormatValue =         (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
+type ElasticSearchFormatValue =     (this: ConfigContext, queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: FieldPath, config: Config) => AnyObject | null;
 
+export type ValidateValue<V = RuleValue> = (this: ConfigContext, val: V, fieldSettings: FieldSettings, op: string, opDef: Operator, rightFieldDef?: Field) => boolean | string | { error: string | {key: string, args?: Object}, fixedValue?: V } | null;
 
 export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   type: string;
@@ -891,21 +982,22 @@ export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   valuePlaceholder?: string;
   valueLabel?: string;
   fullWidth?: boolean;
-  formatValue?: FormatValue | SerializedFunction;
-  sqlFormatValue?: SqlFormatValue | SerializedFunction;
-  spelFormatValue?: SpelFormatValue | SerializedFunction;
+  formatValue?: SerializableType<FormatValue>;
+  sqlFormatValue?: SerializableType<SqlFormatValue>;
+  spelFormatValue?: SerializableType<SpelFormatValue>;
   spelImportFuncs?: Array<string | object>;
-  spelImportValue?: SpelImportValue | SerializedFunction;
-  mongoFormatValue?: MongoFormatValue | SerializedFunction;
-  elasticSearchFormatValue?: ElasticSearchFormatValue | SerializedFunction;
+  spelImportValue?: SerializableType<SpelImportValue>;
+  sqlImport?: SerializableType<SqlImportFunc>;
+  mongoFormatValue?: SerializableType<MongoFormatValue>;
+  elasticSearchFormatValue?: SerializableType<ElasticSearchFormatValue>;
   hideOperator?: boolean;
   operatorInlineLabel?: string;
-  jsonLogic?: JsonLogicFormatValue | SerializedFunction;
-  jsonLogicImport?: JsonLogicImportValue | SerializedFunction;
+  jsonLogic?: SerializableType<JsonLogicFormatValue>;
+  jsonLogicImport?: SerializableType<JsonLogicImportValue>;
   //obsolete:
-  validateValue?: ValidateValue | SerializedFunction;
+  validateValue?: SerializableType<ValidateValue>;
   //@ui
-  factory: FactoryWithContext<WP> | SerializedFunction;
+  factory: SerializableType<FactoryWithContext<WP>>;
   customProps?: AnyObject;
 }
 export interface RangeableWidget<C = Config, WP = WidgetProps<C>> extends BaseWidget<C, WP> {
@@ -915,14 +1007,14 @@ export interface RangeableWidget<C = Config, WP = WidgetProps<C>> extends BaseWi
 interface BaseFieldWidget<C = Config, WP = WidgetProps<C>> {
   valuePlaceholder?: string;
   valueLabel?: string;
-  formatValue: FormatValue | SerializedFunction; // with rightFieldDef
-  sqlFormatValue?: SqlFormatValue | SerializedFunction; // with rightFieldDef
-  spelFormatValue?: SpelFormatValue | SerializedFunction; // with rightFieldDef
+  formatValue?: SerializableType<FormatValue>; // with rightFieldDef
+  sqlFormatValue?: SerializableType<SqlFormatValue>; // with rightFieldDef
+  spelFormatValue?: SerializableType<SpelFormatValue>; // with rightFieldDef
   //obsolete:
-  validateValue?: ValidateValue | SerializedFunction;
+  validateValue?: SerializableType<ValidateValue>;
   //@ui
   customProps?: AnyObject;
-  factory?: FactoryWithContext<WP>;
+  factory: SerializableType<FactoryWithContext<WP>>;
 }
 export interface FieldWidget<C = Config, WP = WidgetProps<C>> extends BaseFieldWidget<C, WP> {
   valueSrc: "field";
@@ -945,18 +1037,17 @@ export type TreeMultiSelectWidget<C = Config, WP = TreeMultiSelectWidgetProps<C>
  */
 export type CaseValueWidget<C = Config, WP = CaseValueWidgetProps<C>> = BaseWidget<C, WP> & CaseValueFieldSettings;
 
-// tip: use generic WidgetProps here, TS can't determine correct factory
 export type TypedWidget<C = Config> =
-  TextWidget<C, WidgetProps<C>>
-  | DateTimeWidget<C, WidgetProps<C>>
-  | BooleanWidget<C, WidgetProps<C>>
-  | NumberWidget<C, WidgetProps<C>>
-  | RangeSliderWidget<C, WidgetProps<C>>
-  | SelectWidget<C, WidgetProps<C>>
-  | MultiSelectWidget<C, WidgetProps<C>>
-  | TreeSelectWidget<C, WidgetProps<C>>
-  | TreeMultiSelectWidget<C, WidgetProps<C>>
-  | CaseValueWidget<C, WidgetProps<C>>;
+  TextWidget<C>
+  | DateTimeWidget<C>
+  | BooleanWidget<C>
+  | NumberWidget<C>
+  | RangeSliderWidget<C>
+  | SelectWidget<C>
+  | MultiSelectWidget<C>
+  | TreeSelectWidget<C>
+  | TreeMultiSelectWidget<C>
+  | CaseValueWidget<C>;
 
 export type Widget<C = Config> =
   FieldWidget<C>
@@ -971,15 +1062,15 @@ export type Widgets<C = Config> = TypedMap<Widget<C>>;
 // Conjunctions
 /////////////////
 
-type FormatConj = (children: ImmutableList<string>, conj: string, not: boolean, isForDisplay?: boolean) => string;
-type SqlFormatConj = (children: ImmutableList<string>, conj: string, not: boolean) => string;
-type SpelFormatConj = (children: ImmutableList<string>, conj: string, not: boolean, omitBrackets?: boolean) => string;
+type FormatConj = (this: ConfigContext, children: ImmutableList<string>, conj: string, not: boolean, isForDisplay?: boolean) => string;
+type SqlFormatConj = (this: ConfigContext, children: ImmutableList<string>, conj: string, not: boolean) => string;
+type SpelFormatConj = (this: ConfigContext, children: ImmutableList<string>, conj: string, not: boolean, omitBrackets?: boolean) => string;
 
 export interface Conjunction {
   label: string;
-  formatConj: FormatConj | SerializedFunction;
-  sqlFormatConj: SqlFormatConj | SerializedFunction;
-  spelFormatConj: SpelFormatConj | SerializedFunction;
+  formatConj: SerializableType<FormatConj>;
+  sqlFormatConj: SerializableType<SqlFormatConj>;
+  spelFormatConj: SerializableType<SpelFormatConj>;
   mongoConj: string;
   jsonLogicConj?: string;
   sqlConj?: string;
@@ -1023,12 +1114,13 @@ export interface ConjsProps {
 // Operators
 /////////////////
 
-type FormatOperator = (field: FieldPath, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, isForDisplay?: boolean, fieldDef?: Field) => string;
-type MongoFormatOperator = (field: FieldPath, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => Object;
-type SqlFormatOperator = (field: FieldPath, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string;
-type SpelFormatOperator = (field: FieldPath, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string;
-type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => JsonLogicTree;
-type ElasticSearchFormatQueryType = (valueType: string) => ElasticSearchQueryType;
+// tip: for multiselect widget `vals` is always Array, for between/proximity op `vals` can be Array or ImmutableList (only for sql, simple string - TODO: onvert to [])
+type FormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[] | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, isForDisplay?: boolean, fieldDef?: Field) => string | undefined;
+type MongoFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => Object | undefined;
+type SqlFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[] | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string | undefined;
+type SpelFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[], valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string | undefined;
+type JsonLogicFormatOperator = (this: ConfigContext, field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => JsonLogicTree | undefined;
+type ElasticSearchFormatQueryType = (this: ConfigContext, valueType: string) => ElasticSearchQueryType;
 
 interface ProximityConfig {
   optionLabel: string;
@@ -1048,7 +1140,7 @@ export interface ProximityProps<C = Config> extends ProximityConfig {
 }
 export interface ProximityOptions<C = Config, PP = ProximityProps<C>> extends ProximityConfig {
   //@ui
-  factory: FactoryWithContext<PP> | SerializedFunction;
+  factory?: SerializableType<FactoryWithContext<PP>>;
 }
 
 export interface BaseOperator {
@@ -1056,14 +1148,16 @@ export interface BaseOperator {
   reversedOp?: string;
   isNotOp?: boolean;
   cardinality?: number;
-  formatOp?: FormatOperator | SerializedFunction;
+  formatOp?: SerializableType<FormatOperator>;
   labelForFormat?: string;
-  mongoFormatOp?: MongoFormatOperator | SerializedFunction;
+  mongoFormatOp?: SerializableType<MongoFormatOperator>;
   sqlOp?: string;
-  sqlFormatOp?: SqlFormatOperator | SerializedFunction;
+  sqlOps?: string[];
+  sqlImport?: SerializableType<SqlImportFunc>;
+  sqlFormatOp?: SerializableType<SqlFormatOperator>;
   spelOp?: string;
   spelOps?: string[];
-  spelFormatOp?: SpelFormatOperator | SerializedFunction;
+  spelFormatOp?: SerializableType<SpelFormatOperator>;
   jsonLogic?: string | JsonLogicFormatOperator | JsonLogicFunction;
   jsonLogic2?: string;
   _jsonLogicIsExclamationOp?: boolean;
@@ -1104,7 +1198,7 @@ interface WidgetConfigForType {
   valuePlaceholder?: string;
 }
 
-interface Type {
+export interface Type {
   valueSources?: Array<ValueSource>;
   defaultOperator?: string;
   widgets: TypedMap<WidgetConfigForType>;
@@ -1151,11 +1245,11 @@ export interface AsyncFetchListValuesResult {
   values: ListItems;
   hasMore?: boolean;
 }
-export type AsyncFetchListValuesFn = (search: string | null, offset: number) => Promise<AsyncFetchListValuesResult>;
+export type AsyncFetchListValuesFn = (this: ConfigContext | void, search: string | null, offset: number) => Promise<AsyncFetchListValuesResult>;
 
 
 export interface BasicFieldSettings<V = RuleValue> {
-  validateValue?: ValidateValue<V> | SerializedFunction;
+  validateValue?: SerializableType<ValidateValue<V>>;
   valuePlaceholder?: string;
 }
 export interface TextFieldSettings<V = string> extends BasicFieldSettings<V> {
@@ -1181,7 +1275,7 @@ export interface SelectFieldSettings<V = string | number> extends BasicFieldSett
   showSearch?: boolean;
   searchPlaceholder?: string;
   showCheckboxes?: boolean;
-  asyncFetch?: AsyncFetchListValuesFn | SerializedFunction;
+  asyncFetch?: SerializableType<AsyncFetchListValuesFn>;
   useLoadMore?: boolean;
   useAsyncSearch?: boolean;
   forceAsyncSearch?: boolean;
@@ -1285,8 +1379,11 @@ export type Field = SimpleField;
 export type FieldOrGroup = FieldStruct | FieldGroup | FieldGroupExt | Field;
 export type Fields = TypedMap<FieldOrGroup>;
 
-export type FieldConfig = Field | Func | null;
-export type FieldValueOrConfig = FieldConfig | AnyFieldValue;
+export type FieldConfig = Field | Func;
+export type FieldValueOrConfig = FieldConfig | AnyFieldValue | null;
+
+export type FieldConfigExt = Field & Type;
+export type FuncConfigExt = Func & Type;
 
 export type NumberField = SimpleField<NumberFieldSettings>;
 export type DateTimeField = SimpleField<DateTimeFieldSettings>;
@@ -1311,13 +1408,13 @@ type ValueSourcesInfo = {[vs in ValueSource]?: {label: string, widget?: string}}
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
 type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
-type FormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: boolean) => string;
-type SqlFormatReverse = (q: string) => string;
-type SpelFormatReverse = (q: string) => string;
-type FormatField = (field: FieldPath, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
-type FormatSpelField = (field: FieldPath, parentField: FieldPath | null, parts: Array<string>, partsExt: Array<SpelFieldMeta>, fieldDefinition: Field, config: Config) => string;
-type CanCompareFieldWithField = (leftField: FieldPath, leftFieldConfig: Field, rightField: FieldPath, rightFieldConfig: Field, op: string) => boolean;
-type FormatAggr = (whereStr: string, aggrField: FieldPath, operator: string, value: string | ImmutableList<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: OperatorOptionsI, isForDisplay: boolean, aggrFieldDef: Field) => string;
+type FormatReverse = (this: ConfigContext, q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: boolean) => string;
+type SqlFormatReverse = (this: ConfigContext, q: string) => string;
+type SpelFormatReverse = (this: ConfigContext, q: string) => string;
+type FormatField = (this: ConfigContext, field: FieldPath, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
+type FormatSpelField = (this: ConfigContext, field: FieldPath, parentField: FieldPath | null, parts: Array<string>, partsExt: Array<SpelFieldMeta>, fieldDefinition: Field, config: Config) => string;
+type CanCompareFieldWithField = (this: ConfigContext, leftField: FieldPath, leftFieldConfig: Field, rightField: FieldPath, rightFieldConfig: Field, op: string) => boolean;
+type FormatAggr = (this: ConfigContext, whereStr: string, aggrField: FieldPath, operator: string, value: string | ImmutableList<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: OperatorOptionsI, isForDisplay: boolean, aggrFieldDef: Field) => string;
 
 export interface LocaleSettings {
   locale?: {
@@ -1375,7 +1472,7 @@ export interface BehaviourSettings {
   defaultConjunction?: string;
   fieldSources?: Array<FieldSource>;
   valueSourcesInfo?: ValueSourcesInfo;
-  canCompareFieldWithField?: CanCompareFieldWithField | SerializedFunction;
+  canCompareFieldWithField?: SerializableType<CanCompareFieldWithField>;
   canReorder?: boolean;
   canRegroup?: boolean;
   canRegroupCases?: boolean;
@@ -1414,12 +1511,12 @@ export interface OtherSettings {
   caseValueField?: Field;
   fieldSeparator?: string;
   fieldSeparatorDisplay?: string;
-  formatReverse?: FormatReverse | SerializedFunction;
-  sqlFormatReverse?: SqlFormatReverse | SerializedFunction;
-  spelFormatReverse?: SpelFormatReverse | SerializedFunction;
-  formatField?: FormatField | SerializedFunction;
-  formatSpelField?: FormatSpelField | SerializedFunction;
-  formatAggr?: FormatAggr | SerializedFunction;
+  formatReverse?: SerializableType<FormatReverse>;
+  sqlFormatReverse?: SerializableType<SqlFormatReverse>;
+  spelFormatReverse?: SerializableType<SpelFormatReverse>;
+  formatField?: SerializableType<FormatField>;
+  formatSpelField?: SerializableType<FormatSpelField>;
+  formatAggr?: SerializableType<FormatAggr>;
 }
 
 export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettings {
@@ -1430,13 +1527,14 @@ export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettin
 // Funcs
 /////////////////
 
-type SqlFormatFunc = (formattedArgs: TypedMap<string>) => string;
-type FormatFunc = (formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
-type MongoFormatFunc = (formattedArgs: TypedMap<MongoValue>) => MongoValue;
-type JsonLogicFormatFunc = (formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
-type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue> | undefined; // can throw
-type SpelImportFunc = (spel: SpelRawValue) => Array<RuleValue>;
-type SpelFormatFunc = (formattedArgs: TypedMap<string>) => string;
+export type SqlFormatFunc        = (this: ConfigContext, formattedArgs: TypedMap<string>) => string;
+export type SqlImportFunc        = (this: ConfigContext, sql: Object) => Record<string, RuleValue> | undefined; // can throw, should return {func?, args: {}} or {operator?, children: []}
+export type FormatFunc           = (this: ConfigContext, formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
+export type MongoFormatFunc      = (this: ConfigContext, formattedArgs: TypedMap<MongoValue>) => MongoValue;
+export type JsonLogicFormatFunc  = (this: ConfigContext, formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
+export type JsonLogicImportFunc  = (this: ConfigContext, val: JsonLogicValue) => Array<RuleValue> | undefined; // can throw
+export type SpelImportFunc       = (this: ConfigContext, spel: SpelRawValue) => Record<string, RuleValue> | undefined; // can throw
+export type SpelFormatFunc       = (this: ConfigContext, formattedArgs: TypedMap<string>) => string;
 
 interface FuncGroup extends BaseField {
   type: "!struct";
@@ -1456,14 +1554,15 @@ export interface Func extends Omit<BaseSimpleField, "type"> {
   // Calling methods on objects was remvoed in JsonLogic 2.x
   // https://github.com/jwadhams/json-logic-js/issues/86
   jsonLogicIsMethod?: boolean;
-  jsonLogicImport?: JsonLogicImportFunc | SerializedFunction;
-  spelImport?: SpelImportFunc | SerializedFunction;
-  formatFunc?: FormatFunc | SerializedFunction;
-  sqlFormatFunc?: SqlFormatFunc | SerializedFunction;
-  mongoFormatFunc?: MongoFormatFunc | SerializedFunction;
+  jsonLogicImport?: SerializableType<JsonLogicImportFunc>;
+  spelImport?: SerializableType<SpelImportFunc>;
+  formatFunc?: SerializableType<FormatFunc>;
+  sqlFormatFunc?: SerializableType<SqlFormatFunc>;
+  sqlImport?: SerializableType<SqlImportFunc>;
+  mongoFormatFunc?: SerializableType<MongoFormatFunc>;
   renderBrackets?: Array<RenderedReactElement>;
   renderSeps?: Array<RenderedReactElement>;
-  spelFormatFunc?: SpelFormatFunc | SerializedFunction;
+  spelFormatFunc?: SerializableType<SpelFormatFunc>;
   allowSelfNesting?: boolean;
 }
 export interface FuncArg extends BaseSimpleField {

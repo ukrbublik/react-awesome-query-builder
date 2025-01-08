@@ -13,6 +13,10 @@ const { uuid } = Utils;
 export const emptyTree: JsonTree = {id: uuid(), type: "group"};
 export const emptySwitchTree: JsonTree = {id: uuid(), type: "switch_group"};
 
+
+const initSqlSimple = "LOWER(user.firstName) = UPPER('gg') AND (DATE_ADD(NOW(), INTERVAL 2 DAY) > TO_DATE('2024-07-26 00:00:00.000', 'yyyy-mi-dd hh:mm:ss.mmm') OR DATE_SUB(NOW(), INTERVAL 4 MONTH ) > '2024-05-10 00:00:00.000') AND num <> 2 AND bio = 'Long\\nText'" ;
+
+
 export const initFiles: Record<string, any> = {
   "logic/complex": initLogicComplex,
   "logic/simple": initLogicSimple,
@@ -24,4 +28,6 @@ export const initFiles: Record<string, any> = {
   "tree/complex": initTreeComplex,
   "tree/empty": emptyTree,
   "tree/empty_switch": emptySwitchTree,
+
+  "sql/simple": initSqlSimple,
 };

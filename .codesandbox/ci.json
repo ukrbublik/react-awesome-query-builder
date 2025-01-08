@@ -1,6 +1,7 @@
 {
   "packages": [
     "packages/core",
+    "packages/sql",
     "packages/ui",
     "packages/antd",
     "packages/mui",

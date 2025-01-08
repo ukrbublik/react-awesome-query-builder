@@ -8,7 +8,7 @@ export default Demo;
 
 // Get current `jsonTree` and `zipConfig` from session
 // If `jsonTree` is missing, will be loaded from `data` dir
-// If `zipConfig` is missing, will be created in `lib/config` and compressed with `Utils.compressConfig()`
+// If `zipConfig` is missing, will be created in `lib/config` and compressed with `Utils.ConfigUtils.compressConfig()`
 export const getServerSideProps = withSessionSsr<DemoQueryBuilderProps>(
   async function getServerSideProps({ req }) {
     const sessionData = await getSessionData(req);

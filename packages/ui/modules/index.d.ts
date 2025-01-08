@@ -12,7 +12,7 @@ import {
   ItemType,
   ItemProperties,
   ValueSource,
-  ConfigContext, FactoryWithContext, RenderedReactElement, SerializedFunction,
+  ConfigContext, FactoryWithContext, RenderedReactElement, SerializableType,
   ConjsProps,
 
   ImmutableList, ImmutableMap, ImmutableOMap,
@@ -61,6 +61,7 @@ import {
   CoreOperators as _CoreOperators,
   CoreWidgets as _CoreWidgets,
   ConfigMixin as _ConfigMixin,
+  ConfigMixinExt as _ConfigMixinExt,
   ImmutableItem,
 } from "@react-awesome-query-builder/core";
 
@@ -113,7 +114,8 @@ export type TreeMultiSelectWidgetProps<C = Config> = _TreeMultiSelectWidgetProps
 export type CaseValueWidgetProps<C = Config> = _CaseValueWidgetProps<C>;
 export type CoreOperators<C = Config> = _CoreOperators<C>;
 export type CoreWidgets<C = Config> = _CoreWidgets<C>;
-export type ConfigMixin<C = Config, S = Settings> = _ConfigMixin<C, S>;
+export type ConfigMixin<C extends Config = Config> = _ConfigMixin<C>;
+export type ConfigMixinExt<C extends Config = Config> = _ConfigMixinExt<C>;
 
 /////////////////
 // extend config
@@ -318,35 +320,35 @@ type AntdSize = "small" | "large" | "medium";
 
 
 export interface RenderSettings {
-  renderField?: FactoryWithContext<FieldProps> | SerializedFunction;
-  renderOperator?: FactoryWithContext<FieldProps> | SerializedFunction;
-  renderFunc?: FactoryWithContext<FieldProps> | SerializedFunction;
-  renderConjs?: FactoryWithContext<ConjsProps> | SerializedFunction;
-  renderButton?: FactoryWithContext<ButtonProps> | SerializedFunction;
-  renderIcon?: FactoryWithContext<IconProps> | SerializedFunction;
-  renderButtonGroup?: FactoryWithContext<ButtonGroupProps> | SerializedFunction;
-  renderSwitch?: FactoryWithContext<SwitchProps> | SerializedFunction;
-  renderProvider?: FactoryWithContext<ProviderProps> | SerializedFunction;
-  renderValueSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction;
-  renderFieldSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction;
-  renderConfirm?: ConfirmFunc | SerializedFunction;
-  useConfirm?: (() => Function) | SerializedFunction;
+  renderField?: SerializableType<FactoryWithContext<FieldProps>>;
+  renderOperator?: SerializableType<FactoryWithContext<FieldProps>>;
+  renderFunc?: SerializableType<FactoryWithContext<FieldProps>>;
+  renderConjs?: SerializableType<FactoryWithContext<ConjsProps>>;
+  renderButton?: SerializableType<FactoryWithContext<ButtonProps>>;
+  renderIcon?: SerializableType<FactoryWithContext<IconProps>>;
+  renderButtonGroup?: SerializableType<FactoryWithContext<ButtonGroupProps>>;
+  renderSwitch?: SerializableType<FactoryWithContext<SwitchProps>>;
+  renderProvider?: SerializableType<FactoryWithContext<ProviderProps>>;
+  renderValueSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
+  renderFieldSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
+  renderConfirm?: SerializableType<ConfirmFunc>;
+  useConfirm?: SerializableType<(() => Function)>;
   renderSize?: AntdSize;
-  renderItem?: FactoryWithContext<ItemBuilderProps> | SerializedFunction;
+  renderItem?: SerializableType<FactoryWithContext<ItemBuilderProps>>;
   dropdownPlacement?: AntdPosition;
   groupActionsPosition?: AntdPosition;
   showLabels?: boolean;
   maxLabelsLength?: number;
   customFieldSelectProps?: AnyObject;
   customOperatorSelectProps?: AnyObject;
-  renderBeforeWidget?: FactoryWithContext<RuleProps> | SerializedFunction;
-  renderAfterWidget?: FactoryWithContext<RuleProps> | SerializedFunction;
-  renderBeforeActions?: FactoryWithContext<RuleProps> | SerializedFunction;
-  renderAfterActions?: FactoryWithContext<RuleProps> | SerializedFunction;
-  renderBeforeCaseValue?: FactoryWithContext<RuleProps> | SerializedFunction;
-  renderAfterCaseValue?: FactoryWithContext<RuleProps> | SerializedFunction;
-  renderRuleError?: FactoryWithContext<RuleErrorProps> | SerializedFunction;
-  renderSwitchPrefix?: RenderedReactElement | SerializedFunction;
+  renderBeforeWidget?: SerializableType<FactoryWithContext<RuleProps>>;
+  renderAfterWidget?: SerializableType<FactoryWithContext<RuleProps>>;
+  renderBeforeActions?: SerializableType<FactoryWithContext<RuleProps>>;
+  renderAfterActions?: SerializableType<FactoryWithContext<RuleProps>>;
+  renderBeforeCaseValue?: SerializableType<FactoryWithContext<RuleProps>>;
+  renderAfterCaseValue?: SerializableType<FactoryWithContext<RuleProps>>;
+  renderRuleError?: SerializableType<FactoryWithContext<RuleErrorProps>>;
+  renderSwitchPrefix?: SerializableType<RenderedReactElement>;
   defaultSliderWidth?: string;
   defaultSelectWidth?: string;
   defaultSearchWidth?: string;

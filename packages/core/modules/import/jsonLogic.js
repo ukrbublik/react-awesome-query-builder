@@ -1,7 +1,7 @@
 import uuid from "../utils/uuid";
-import {getOpCardinality, isJsonLogic, shallowEqual, logger} from "../utils/stuff";
-import {getFieldConfig, extendConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts} from "../utils/configUtils";
-import {getWidgetForFieldOp} from "../utils/ruleUtils";
+import {getOpCardinality, isJsonLogic, shallowEqual} from "../utils/stuff";
+import {getFieldConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts, getWidgetForFieldOp} from "../utils/configUtils";
+import {extendConfig} from "../utils/configExtend";
 import {loadTree} from "./tree";
 import {defaultGroupConjunction} from "../utils/defaultUtils";
 
@@ -482,7 +482,7 @@ const convertFuncRhs = (op, vals, conv, config, not, fieldConfig = null, meta, p
       if (fc.jsonLogicImport && (returnType ? fc.returnType == returnType : true)) {
         let parsed;
         try {
-          parsed = fc.jsonLogicImport(v);
+          parsed = fc.jsonLogicImport.call(config.ctx, v);
         } catch(_e) {
           // given expression `v` can't be parsed into function
         }

@@ -1,11 +1,10 @@
-import Immutable  from "immutable";
+import Immutable, { fromJS } from "immutable";
 import {toImmutableList, isImmutable, applyToJS as immutableToJs} from "./stuff";
 import {getFieldConfig} from "./configUtils";
-import {jsToImmutable} from "../import/tree";
 import uuid from "./uuid";
 
 export {
-  toImmutableList, jsToImmutable, immutableToJs, isImmutable,
+  toImmutableList, immutableToJs, isImmutable,
 };
 
 /**
@@ -545,3 +544,43 @@ export const _fixImmutableValue = (v) => {
     return v;
   }
 };
+
+export function jsToImmutable(tree) {
+  const imm = fromJS(tree, function (key, value, path) {
+    const isFuncArg = path
+      && path.length > 3
+      && path[path.length-1] === "value"
+      && path[path.length-3] === "args";
+    const isRuleValue = path
+      && path.length > 3
+      && path[path.length-1] === "value"
+      && path[path.length-2] === "properties";
+
+    let outValue;
+    if (key == "properties") {
+      outValue = value.toOrderedMap();
+
+      // `value` should be undefined instead of null
+      // JSON doesn't support undefined and replaces undefined -> null
+      // So fix: null -> undefined
+      for (let i = 0 ; i < 2 ; i++) {
+        if (outValue.get("value")?.get?.(i) === null) {
+          outValue = outValue.setIn(["value", i], undefined);
+        }
+      }
+    } else if (isFuncArg) {
+      outValue = _fixImmutableValue(value);
+    } else if ((path ? isRuleValue : key == "value") && Immutable.Iterable.isIndexed(value)) {
+      outValue = value.map(_fixImmutableValue).toList();
+    } else if (key == "asyncListValues") {
+      // keep in JS format
+      outValue = value.toJS();
+    } else if (key == "children1" && Immutable.Iterable.isIndexed(value)) {
+      outValue = new Immutable.OrderedMap(value.map(child => [child?.get("id") || uuid(), child]));
+    } else {
+      outValue = Immutable.Iterable.isIndexed(value) ? value.toList() : value.toOrderedMap();
+    }
+    return outValue;
+  });
+  return imm;
+}

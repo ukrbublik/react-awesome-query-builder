@@ -1,11 +1,13 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, getWidgetForFieldOp,
+  getFieldPartsConfigs,
 } from "../utils/configUtils";
+import {extendConfig} from "../utils/configExtend";
 import {
-  getWidgetForFieldOp, formatFieldName, getFieldPartsConfigs, completeValue
+  formatFieldName, completeValue
 } from "../utils/ruleUtils";
 import pick from "lodash/pick";
-import {getOpCardinality, logger, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 import {spelEscape} from "../utils/export";
@@ -467,7 +469,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
       argValue = argValue.toJS();
     }
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
-    const doEscape = argConfig.spelEscapeForFormat ?? true;
+    const doEscape = argConfig.escapeForFormat ?? true;
     const operator = null;
     const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
     const fieldWidgetDef = getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc, { forExport: true });

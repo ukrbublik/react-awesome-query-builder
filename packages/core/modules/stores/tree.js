@@ -5,19 +5,19 @@ import {
 } from "../utils/treeUtils";
 import {
   defaultRuleProperties, defaultGroupProperties, getDefaultOperator, 
-  defaultOperatorOptions, defaultItemProperties
-} from "../utils/defaultUtils";
+  defaultOperatorOptions, defaultItemProperties,
+} from "../utils/defaultRuleUtils";
 import * as constants from "./constants";
 import uuid from "../utils/uuid";
 import {
-  getFuncConfig, getFieldConfig, getOperatorConfig
+  getFuncConfig, getFieldConfig, getOperatorConfig, selectTypes, getOperatorsForType, getOperatorsForField, getFirstOperator,
 } from "../utils/configUtils";
 import {
-  getOperatorsForField, getOperatorsForType, getFirstOperator,
-  isEmptyItem, selectTypes, calculateValueType
+  isEmptyItem, calculateValueType
 } from "../utils/ruleUtils";
 import {deepEqual, getOpCardinality, applyToJS} from "../utils/stuff";
-import {validateValue, validateRange, getNewValueForFieldOp} from "../utils/validation";
+import {validateValue, validateRange} from "../utils/validation";
+import {getNewValueForFieldOp} from "../utils/getNewValueForFieldOp";
 import {translateValidation} from "../i18n";
 import omit from "lodash/omit";
 import mapValues from "lodash/mapValues";
@@ -588,6 +588,7 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
   if (isRuleGroup) {
     state = state.setIn(expandTreePath(path, "type"), "rule_group");
     const {canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality} = getNewValueForFieldOp(
+      { validateValue, validateRange },
       config, config, currentProperties, newField, newOperator, "field", canFix, isEndValue, canDropArgs
     );
     let groupProperties = defaultGroupProperties(config, newFieldConfig, newField).merge({
@@ -616,6 +617,7 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
       const {
         canReuseValue, newValue, newValueSrc, newValueType, newValueError, newFieldError, fixedField
       } = getNewValueForFieldOp(
+        { validateValue, validateRange },
         config, config, current, newField, newOperator, "field", canFix, isEndValue, canDropArgs
       );
       // const newValueErrorStr = newValueError?.join?.("|");
@@ -684,6 +686,7 @@ const setOperator = (state, path, newOperator, config) => {
     const _currentOperator = current.get("operator");
 
     const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
+      { validateValue, validateRange },
       config, config, current, currentField, newOperator, "operator", canFix
     );
     if (showErrorMessage) {
@@ -857,6 +860,7 @@ const setValueSrc = (state, path, delta, srcKey, config, _meta = {}) => {
     // this call should return canReuseValue = false and provide default value
     const canFix = true;
     const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
+      { validateValue, validateRange },
       config, config, properties, field, operator, "valueSrc", canFix
     );
     if (!canReuseValue && newValueSrc.get(delta) == srcKey) {
