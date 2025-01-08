@@ -319,6 +319,17 @@ const operators = {
       const empty = this.utils.sqlEmptyValue(fieldDef);
       return `COALESCE(${field}, ${empty}) = ${empty}`;
     },
+    // tip: this function covers import of 2 operators
+    sqlImport: (sqlObj) => {
+      if (sqlObj?.operator === "=" || sqlObj?.operator === "<>") {
+        const [left, right] = sqlObj.children || [];
+        if (right?.value === "" && left?.func === "COALESCE" && left?.children?.[1]?.value === "") {
+          sqlObj.operator = sqlObj?.operator === "=" ? "is_empty" : "is_not_empty";
+          sqlObj.children = [ left.children[0] ];
+          return sqlObj;
+        }
+      }
+    },
     // tip: this op can be imported from SpEL manually without using config
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       //tip: is empty or null
@@ -589,6 +600,27 @@ const operators = {
       const aVal2 = this.utils.SqlString.trim(val2);
       const prox = operatorOptions?.get("proximity");
       return `CONTAINS(${field}, 'NEAR((${aVal1}, ${aVal2}), ${prox})')`;
+    },
+    sqlImport: (sqlObj) => {
+      if (sqlObj?.func === "CONTAINS") {
+        const [left, right] = sqlObj.children || [];
+        if (right?.value?.includes("NEAR(")) {
+          const m = right.value.match(/NEAR\(\((\w+), (\w+)\), (\d+)\)/);
+          if (m) {
+            delete sqlObj.func;
+            sqlObj.operator = "proximity";
+            sqlObj.children = [
+              left,
+              { value: m[1] },
+              { value: m[2] },
+            ];
+            sqlObj.operatorOptions = {
+              proximity: parseInt(m[3])
+            };
+            return sqlObj;
+          }
+        }
+      }
     },
     mongoFormatOp: undefined, // not supported
     jsonLogic: undefined, // not supported

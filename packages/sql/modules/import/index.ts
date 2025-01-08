@@ -74,7 +74,6 @@ export const loadFromSql = (
 // };
 
 // todo: 
-// prox: CONTAINS(prox1, 'NEAR((a, b), 3)')
 // funcs: LENGTH("sql"), LCASE(""), CONCAT("1", "2"), CONCAT_WS(",", "1", "2"), SUBSTRING("", 1, 1), SUBSTR(), ADDDATE/DATEADD
 // json funcs: JSON_VALUE(a, "$.info.address.town")
 // CASE mode: https://www.w3schools.com/sql/sql_case.asp

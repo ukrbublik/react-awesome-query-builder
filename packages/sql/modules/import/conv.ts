@@ -18,10 +18,18 @@ export const unsupportedOps: string[] = [
 export const SqlPrimitiveTypes: Record<string, string> = {
   single_quote_string: "text",
   double_quote_string: "text",
+  backticks_quote_string: "text",
+  var_string: "text",
+  natural_string: "text",
+  hex_string: "text",
+  full_hex_string: "text",
+  bit_string: "text",
+  string: "text",
+  regex_string: "text", // ?
   number: "number",
   null: "null",
   bool: "boolean",
-  // todo: others? see ValueExpr["type"]
+  boolean: "boolean",
 };
 
 

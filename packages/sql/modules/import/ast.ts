@@ -63,7 +63,7 @@ const processLogic = (logic: Logic | null | undefined, meta: Meta, not = false):
   } else if ((logic as Value).value !== undefined) {
     ret = processValue(logic as Value, meta, not);
   } else {
-    // todo: aggr_func, cast
+    // todo: aggr_func (like COUNT)
     meta.errors.push(`Unexpected logic type ${logic.type}`);
   }
   return ret;
@@ -283,6 +283,8 @@ export const getLogicDescr = (logic?: OutLogic) => {
     return `INTERVAL ${JSON.stringify(logic.value)} ${logic.unit}`;
   } else if (logic?.func) {
     return `${logic.func}()`;
+  } else if (logic?.operator) {
+    return `operator ${logic.operator}`;
   } else if (logic?._type === "expr_list") {
     return JSON.stringify(logic.values);
   }

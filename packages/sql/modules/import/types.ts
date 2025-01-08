@@ -91,4 +91,5 @@ export interface FuncWithArgsObj {
 export interface OperatorObj {
   operator: string;
   children: Array<any>;
+  operatorOptions?: Record<string, any>;
 }

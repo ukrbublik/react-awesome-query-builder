@@ -27,6 +27,9 @@ export const convertToTree = (
     res = convertConj(logic, conv, config, meta, parentLogic);
   } else if (logic.ternaryChildren) {
     res = convertTernary(logic, conv, config, meta, parentLogic);
+  } else if (logic.func) {
+    // try to use `sqlImport` in operator definitions
+    res = convertOp(logic, conv, config, meta, parentLogic);
   } else {
     meta.errors.push(`Unexpected logic: ${getLogicDescr(logic)}`);
   }
@@ -151,32 +154,37 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
   let opKeys = conv.operators[logic.operator!];
   let opKey = opKeys?.[0];
   let convChildren;
-  convChildren = (logic.children || []).map(a => convertArg(a, conv, config, meta, logic));
-  const isMultiselect = convChildren.filter(ch => ch?.valueType === "multiselect").length > 0;
-  const isSelect = convChildren.filter(ch => ch?.valueType === "select").length > 0;
-  if (opKeys?.length > 1) {
-    if (isMultiselect) {
-      opKeys = opKeys.filter(op => !["equal", "not_equal", "select_equals", "select_not_equals"].includes(op));
-    } else if (isSelect) {
-      opKeys = opKeys.filter(op => !["equal", "not_equal"].includes(op));
-    }
-    opKey = opKeys?.[0];
-  }
+  let operatorOptions;
 
-  // tip: Even if opKeys.length === 1, still try to use `convertOpFunc` to let `sqlImport` be applied (eg. `not_like` op)
-  // todo: cover other cases like is_empty, proximity
+  // tip: Even if opKeys.length === 1, still try to use `convertOpFunc` to let `sqlImport` be applied first (eg. `not_like` op)
   const convFuncOp = convertOpFunc(logic, conv, config, meta, parentLogic)!;
   if (convFuncOp) {
     opKey = convFuncOp.operator!;
     convChildren = convFuncOp.children;
-  } else {
+    operatorOptions = convFuncOp.operatorOptions;
+  } else if (logic.operator) {
+    convChildren = (logic.children || []).map(a => convertArg(a, conv, config, meta, logic));
+    const isMultiselect = convChildren.filter(ch => ch?.valueType === "multiselect").length > 0;
+    const isSelect = convChildren.filter(ch => ch?.valueType === "select").length > 0;
+    if (opKeys?.length > 1) {
+      if (isMultiselect) {
+        opKeys = opKeys.filter(op => !["equal", "not_equal", "select_equals", "select_not_equals"].includes(op));
+      } else if (isSelect) {
+        opKeys = opKeys.filter(op => !["equal", "not_equal"].includes(op));
+      }
+      opKey = opKeys?.[0];
+    }
+
     if (!opKeys?.length) {
       // todo: don't throw error now, SQL operator can be converted to eg. custom func (see linear regression)
-      meta.errors.push(`Can't convert op ${getLogicDescr(logic)}`);
+      meta.errors.push(`Can't convert ${getLogicDescr(logic)}`);
       return undefined;
     } else if (opKeys.length > 1 && !["=", "!=", "<>"].includes(logic.operator!)) {
       meta.warnings.push(`SQL operator "${logic.operator}" can be converted to several operators: ${opKeys.join(", ")}`);
     }
+  } else {
+    meta.errors.push(`Can't convert ${getLogicDescr(logic)}`);
+    return undefined;
   }
 
   const [left, ...right] = (convChildren || []).filter(c => !!c);
@@ -188,6 +196,9 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
     valueError: [],
     field: undefined,
   };
+  if (operatorOptions) {
+    properties.operatorOptions = operatorOptions;
+  }
   if (left?.valueSrc === "field") {
     properties.field = left.value;
     properties.fieldSrc = "field";
@@ -262,6 +273,12 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
       valueType: "multiselect",
       value: logic.values,
     };
+  } else if (logic?.value) {
+    const value = logic.value; // todo: convert ?
+    return {
+      valueSrc: "value",
+      value,
+    };
   } else {
     const maybeFunc = convertValueFunc(logic, conv, config, meta, parentLogic) || convertFunc(logic, conv, config, meta, parentLogic);
     if (maybeFunc) {
@@ -309,6 +326,7 @@ const useImportFunc = (
       return {
         operator: parsed.operator ?? meta.opKey,
         children: (parsed as OutLogic).children?.map(ch => convertArg(ch, conv, config, meta, logic)),
+        operatorOptions: parsed.operatorOptions,
       } as OperatorObj;
     } else if (parsed?.args) {
       const funcConfig = Utils.ConfigUtils.getFuncConfig(config, funcKey);
