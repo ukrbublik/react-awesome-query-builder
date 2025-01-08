@@ -189,7 +189,8 @@ const processValue = (expr: Value, meta: Meta, not = false): OutLogic | undefine
 const processField = (expr: ColumnRef, meta: Meta, not = false): OutLogic | undefined => {
   const parentheses = (expr as BaseExpr).parentheses;
   // @ts-ignore
-  const field = typeof expr.column === "string" ? expr.column : getExprStringValue(expr.column.expr as ValueExpr, meta, not);
+  const field = typeof expr.column === "string" ? expr.column : getExprStringValue(expr.column.expr, meta, not);
+  // @ts-ignore
   const table = expr.table ?? undefined;
   if (field === "") {
     // fix for empty string
