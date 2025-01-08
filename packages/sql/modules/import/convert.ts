@@ -210,7 +210,6 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
   // const opCardinality = opDef?.cardinality;
   const opValueTypes = opDef?.valueTypes;
 
-  // todo: left/right can be func
   right.forEach((v, i) => {
     if (v) {
       properties.valueSrc![i] = v?.valueSrc as ValueSource;
@@ -397,8 +396,7 @@ const convertFunc = (
   for (const [f, fc] of Utils.ConfigUtils.iterateFuncs(config)) {
     const { sqlFunc, sqlImport } = fc;
     if (sqlImport) {
-      // todo: types: always SqlImportFunc
-      const parsed = useImportFunc(sqlImport as SqlImportFunc, logic, conv, config, {...meta, funcKey: f, outType: "func"}) as FuncWithArgsObj;
+      const parsed = useImportFunc(sqlImport, logic, conv, config, {...meta, funcKey: f, outType: "func"}) as FuncWithArgsObj;
       if (parsed) {
         funcKey = parsed.func;
         funcConfig = parsed.funcConfig;
