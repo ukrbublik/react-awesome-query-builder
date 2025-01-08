@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "clone": "^2.1.2",
-    "node-sql-parser": "^5.2.0",
+    "node-sql-parser": "^5.3.5",
     "sqlstring": "^2.3.3"
   },
   "devDependencies": {
