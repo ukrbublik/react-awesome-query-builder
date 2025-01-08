@@ -571,7 +571,7 @@ interface ConfigUtils {
   cleanJSX(jsx: any): Object;
   applyJsonLogic(logic: any, data?: any): any;
   iterateFuncs(config: Config): Iterable<[funcPath: string, funcConfig: Func]>;
-  iterateFields(config: Config): Iterable<[fieldPath: string, fieldConfig: Field]>;
+  iterateFields(config: Config): Iterable<[fieldPath: string, fieldConfig: Field, fieldKey: string]>;
 }
 interface DefaultUtils {
   getDefaultField(config: Config, canGetFirst?: boolean, parentRuleGroupField?: string): FieldValueI | null;

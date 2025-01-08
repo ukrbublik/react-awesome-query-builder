@@ -29,7 +29,8 @@ function* _iterateFields(config, subfields, path, subfieldsKey = "subfields") {
     } else {
       yield [
         [...path, fieldKey].join(fieldSeparator),
-        fieldConfig
+        fieldConfig,
+        fieldKey
       ];
     }
   }

@@ -176,7 +176,6 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
     }
 
     if (!opKeys?.length) {
-      // todo: don't throw error now, SQL operator can be converted to eg. custom func (see linear regression)
       meta.errors.push(`Can't convert ${getLogicDescr(logic)}`);
       return undefined;
     } else if (opKeys.length > 1 && !["=", "!=", "<>"].includes(logic.operator!)) {
@@ -202,7 +201,6 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
   if (left?.valueSrc === "field") {
     properties.field = left.value;
     properties.fieldSrc = "field";
-    // todo: support tableName ?
   } else if (left?.valueSrc === "func") {
     properties.field = left.value;
     properties.fieldSrc = left.valueSrc;
@@ -259,7 +257,13 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
       value,
     };
   } else if (logic?.field) {
-    const field = [logic.table, logic.field].filter(v => !!v).join(fieldSeparator);
+    let field = [logic.table, logic.field].filter(v => !!v).join(fieldSeparator);
+    for (const [fieldPath, fieldConfig, fieldKey] of Utils.ConfigUtils.iterateFields(config)) {
+      if (fieldConfig.tableName === logic.table && fieldKey === logic.field) {
+        field = fieldPath;
+        break;
+      }
+    }
     const fieldConfig = Utils.ConfigUtils.getFieldConfig(config, field) as Field | undefined;
     const valueType = fieldConfig?.type;
     return {
