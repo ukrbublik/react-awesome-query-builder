@@ -85,7 +85,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   Functions nesting is supported (function argument can be a function)
 * [Ternary mode](#ternary-mode) (if-then-else)
 * Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
-* Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)
+* Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), SQL
 * Reordering (drag-n-drop) support for rules and groups of rules
 * Query value and config can be saved/loaded from server
 * Themes: [Ant Design](https://ant.design/), [Material-UI](https://mui.com/), [Bootstrap](https://reactstrap.github.io/), [Fluent UI](https://developer.microsoft.com/en-us/fluentui), vanilla
