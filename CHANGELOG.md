@@ -1,4 +1,6 @@
 # Changelog
+- 6.6.6
+  - Fix issue with process global (PR #1166) (issue #1165)
 - 6.6.5
   - Support import fom SQL (`SqlUtils.loadFromSql`) (PR #1103) (issue #911, #593)
   - Fixed type issue with SerializedFunction (PR #1103) (issue #1024)

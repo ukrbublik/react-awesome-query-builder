@@ -97,8 +97,8 @@ function shallowEqualObjects(objA, objB, deep = false) {
 }
 
 
-const isDev = () => (process?.env?.NODE_ENV == "development");
-const isTest = () => (process?.env?.NODE_ENV_TEST == "true");
+const isDev = () => (typeof process !== "undefined" && process?.env?.NODE_ENV == "development");
+const isTest = () => (typeof process !== "undefined" && process?.env?.NODE_ENV_TEST == "true");
 
 export const getLogger = (devMode) => {
   if (isTest()) {
