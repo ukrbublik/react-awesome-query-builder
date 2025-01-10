@@ -622,6 +622,27 @@ export const with_allow_any_src_for_all_ops = (BasicConfig) => ({
       ...BasicConfig.operators.ends_with,
       valueSources: ["value", "field", "func"],
     },
+  },
+  types: {
+    ...BasicConfig.types,
+    text: {
+      ...BasicConfig.types.text,
+      widgets: {
+        ...BasicConfig.types.text.widgets,
+        field: {
+          ...BasicConfig.types.text.widgets.field,
+          operators: [
+            "equal",
+            "not_equal",
+            "like",
+            "not_like",
+            "starts_with",
+            "ends_with",
+            "proximity",
+          ],
+        }
+      }
+    }
   }
 });
 export const with_all_types = (BasicConfig) => ({

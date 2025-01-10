@@ -98,9 +98,12 @@ export default class ValueField extends Component {
     const _relyOnWidgetType = false; //TODO: remove this, see issue #758
     const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
     const widgetConfig = config.widgets[widget];
+    const opConfig = config.operators[operator];
     let expectedType;
     if (isFuncArg) {
       expectedType = fieldDefinition?.type;
+    } else if (opConfig?.valueTypes) {
+      expectedType = opConfig?.valueTypes[0];
     } else if (_relyOnWidgetType && widgetConfig) {
       expectedType = widgetConfig.type;
     } else if (leftFieldConfig) {
