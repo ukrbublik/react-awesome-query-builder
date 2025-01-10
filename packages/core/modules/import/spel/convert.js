@@ -552,8 +552,7 @@ const convertFuncToOp = (spel, conv, config, meta, parentSpel, fsigns, convertFu
       );
       const field = argsObj["0"];
       const convertedArgs = Object.keys(argsObj).filter(k => parseInt(k) > 0).map(k => argsObj[k]);
-      
-      const valueType = argsArr.filter(a => !!a).find(({valueSrc}) => valueSrc === "value")?.valueType;
+      const valueType = argsArr.filter(a => !!a && a !== field)?.[0]?.valueType;
       if (valueTypes && valueType && !valueTypes.includes(valueType)) {
         errs.push(`Op supports types ${valueTypes}, but got ${valueType}`);
       }
