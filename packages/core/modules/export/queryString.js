@@ -275,6 +275,8 @@ const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, f
     ret = formatField(config, meta, value, parentField);
   } else if (valueSrc == "func") {
     ret = formatFunc(config, meta, value, parentField);
+  } else if (value == undefined) {
+    ret = undefined;
   } else {
     if (typeof fieldWidgetDef?.formatValue === "function") {
       const fn = fieldWidgetDef.formatValue;

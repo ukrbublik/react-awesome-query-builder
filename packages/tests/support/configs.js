@@ -602,6 +602,49 @@ export const with_group_and_struct_deep = (BasicConfig) => ({
   }
 });
 
+export const with_allow_any_src_for_all_ops = (BasicConfig) => ({
+  ...BasicConfig,
+  operators: {
+    ...BasicConfig.operators,
+    like: {
+      ...BasicConfig.operators.like,
+      valueSources: ["value", "field", "func"],
+    },
+    not_like: {
+      ...BasicConfig.operators.not_like,
+      valueSources: ["value", "field", "func"],
+    },
+    starts_with: {
+      ...BasicConfig.operators.starts_with,
+      valueSources: ["value", "field", "func"],
+    },
+    ends_with: {
+      ...BasicConfig.operators.ends_with,
+      valueSources: ["value", "field", "func"],
+    },
+  },
+  types: {
+    ...BasicConfig.types,
+    text: {
+      ...BasicConfig.types.text,
+      widgets: {
+        ...BasicConfig.types.text.widgets,
+        field: {
+          ...BasicConfig.types.text.widgets.field,
+          operators: [
+            "equal",
+            "not_equal",
+            "like",
+            "not_like",
+            "starts_with",
+            "ends_with",
+            "proximity",
+          ],
+        }
+      }
+    }
+  }
+});
 export const with_all_types = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -671,6 +714,7 @@ export const with_all_types = (BasicConfig) => ({
     color: {
       label: "Color",
       type: "select",
+      valueSources: ["value", "field"],
       fieldSettings: {
         listValues: [
           { value: "yellow", title: "Yellow" },
@@ -682,6 +726,7 @@ export const with_all_types = (BasicConfig) => ({
     multicolor: {
       label: "Colors",
       type: "multiselect",
+      valueSources: ["value", "field"],
       fieldSettings: {
         listValues: {
           yellow: "Yellow",
@@ -1625,6 +1670,19 @@ export const with_fieldSources = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     fieldSources: ["field", "func"],
+    valueSourcesInfo: {
+      value: {
+        label: "Value"
+      },
+      field: {
+        label: "Field",
+        widget: "field",
+      },
+      func: {
+        label: "Function",
+        widget: "func",
+      }
+    },
   }
 });
 

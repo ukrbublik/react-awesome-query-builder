@@ -543,3 +543,20 @@ describe("query with exclamation operators in array group", () => {
     });
   });
 });
+
+
+describe("dual meaning ops", () => {
+  describe("(JL) in", () => {
+    export_checks([configs.with_all_types, configs.with_allow_any_src_for_all_ops], inits.with_in_ops, "JsonLogic", {
+      "logic": inits.with_in_ops,
+      "spel": inits.with_in_ops_spel
+    });
+  });
+
+  describe("(SpEL) contains", () => {
+    export_checks([configs.with_all_types, configs.with_allow_any_src_for_all_ops], inits.with_in_ops_spel, "SpEL", {
+      "logic": inits.with_in_ops,
+      "spel": inits.with_in_ops_spel
+    });
+  });
+});

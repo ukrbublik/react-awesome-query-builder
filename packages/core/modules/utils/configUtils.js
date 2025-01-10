@@ -396,10 +396,10 @@ export function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, va
       const widgetValueSrc = config.widgets[widget].valueSrc || "value";
       let canAdd = true;
       if (widget === "field") {
-        canAdd = canAdd && filterValueSourcesForField(config, ["field"], fieldConfig).length > 0;
+        canAdd = canAdd && filterValueSourcesForField(config, ["field"], fieldConfig, operator).length > 0;
       }
       if (widget === "func") {
-        canAdd = canAdd && filterValueSourcesForField(config, ["func"], fieldConfig).length > 0;
+        canAdd = canAdd && filterValueSourcesForField(config, ["func"], fieldConfig, operator).length > 0;
       }
       // If can't check operators, don't add
       // Func args don't have operators
@@ -447,13 +447,22 @@ export function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, va
 }
 
 
-export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) => {
+export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition, operator = null) => {
   if (!fieldDefinition)
     return valueSrcs;
   let fieldType = fieldDefinition.type ?? fieldDefinition.returnType;
   if (fieldType === "!group") {
     // todo: aggregation can be not only number?
     fieldType = "number";
+  }
+  let isOtherType = false;
+  if (operator) {
+    const opConfig = config.operators[operator];
+    if (opConfig.valueTypes) {
+      // Important: for "select" field and "select_any_in" op valueTypes are ["multiselect"]
+      fieldType = opConfig.valueTypes[0];
+      isOtherType = true;
+    }
   }
   // const { _isCaseValue } = fieldDefinition;
   if (!valueSrcs)
@@ -463,7 +472,7 @@ export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) =
     if (vs === "field") {
       if (config.__fieldsCntByType) {
         // tip: LHS field can be used as arg in RHS function
-        const minCnt = fieldDefinition._isFuncArg ? 0 : 1;
+        const minCnt = fieldDefinition._isFuncArg || isOtherType ? 0 : 1;
         canAdd = canAdd && config.__fieldsCntByType[fieldType] > minCnt;
       }
     }
@@ -489,7 +498,7 @@ export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) =>
 
 export const getValueSourcesForFieldOp = (config, field, operator, fieldDefinition = null) => {
   const {valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, null);
-  const filteredValueSrcs = filterValueSourcesForField(config, valueSrcs, fieldDefinition);
+  const filteredValueSrcs = filterValueSourcesForField(config, valueSrcs, fieldDefinition, operator);
   return filteredValueSrcs;
 };
 

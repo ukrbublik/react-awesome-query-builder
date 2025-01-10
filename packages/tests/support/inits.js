@@ -842,6 +842,26 @@ export const with_ops = {
   ]
 };
 
+
+export const with_in_ops = {
+  "and": [
+    {
+      "in": [
+        { "var": "color" },
+        { "var": "multicolor" },
+      ]
+    },
+    {
+      "in": [
+        { "var": "text" },
+        { "var": "str" },
+      ]
+    },
+  ]
+};
+
+export const with_in_ops_spel = "(multicolor.contains(color) && str.contains(text))";
+
 export const with_ops_sql = "(text = 'Long\\nText' AND num <> 2 AND str LIKE '%abc%' AND str NOT LIKE '%xyz%' AND num BETWEEN 1 AND 2 AND num NOT BETWEEN 3 AND 4 AND num IS NULL AND color IN ('yellow') AND color NOT IN ('green') AND multicolor != 'yellow')";
 
 export const with_ops_and_negation_groups = {
