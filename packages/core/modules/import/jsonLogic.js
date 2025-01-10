@@ -17,6 +17,7 @@ const jlFieldMarker = "jlField";
 const jlArgsMarker = "jlArgs";
 const jlEqOps = ["==", "!="];
 const jlRangeOps = ["<", "<=", ">", ">="];
+const jlDualMeaningOps = ["in", "!in"]; // can be mapped to "select_any_in" or "like"
 const multiselectOps = [
   "multiselect_equals", "multiselect_not_equals",
   "multiselect_contains", "multiselect_not_contains"
@@ -45,6 +46,8 @@ export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
   const jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, ["rule", "group", "switch"], meta) : undefined;
   const immTree = jsTree ? loadTree(jsTree) : undefined;
 
+  meta.errors = Array.from(new Set(meta.errors));
+
   if (returnErrors) {
     return [immTree, meta.errors];
   } else {
@@ -68,7 +71,9 @@ const buildConv = (config) => {
       operators[opk].push(opKey);
     } else if(typeof opConfig.jsonLogic2 == "string") {
       // example: all-in/1"
-      const opk = opConfig.jsonLogic2 + "/" + getOpCardinality(opConfig);
+      const isRevArgs = opConfig.jsonLogic2.startsWith("#");
+      const jsonLogic = (""+opConfig.jsonLogic2).replace(/^#/, "");
+      const opk = jsonLogic + "/" + getOpCardinality(opConfig);
       if (!operators[opk])
         operators[opk] = [];
       operators[opk].push(opKey);
@@ -77,8 +82,9 @@ const buildConv = (config) => {
         combinationOperators[opKey] = {};
       combinationOperators[opKey] = {
         "template": opConfig.jsonLogic(jlFieldMarker, opKey, jlArgsMarker), 
-        "jsonLogic2": opConfig.jsonLogic2,
-        "_jsonLogicIsExclamationOp": !!opConfig._jsonLogicIsExclamationOp
+        "jsonLogic2": jsonLogic,
+        "_jsonLogicIsExclamationOp": !!opConfig._jsonLogicIsExclamationOp,
+        "isRevArgs": isRevArgs
       };
     }
   }
@@ -139,7 +145,9 @@ const matchAgainstTemplates = (jsonlogic, conv, meta, operatorsToCheck = null) =
         if (tempResponse.match) {
           if (!response) response = tempResponse;
           // Templates should be spesific enough that only one match can be found. This should not happen
-          else meta.errors.push(`Operator matched against 2 templates: ${response.newOp} and ${key}`);
+          else {
+            meta.errors.push(`Operator matched against 2 templates: ${response.newOp} and ${key}`);
+          }
           // New op that is used to represent operator that is combosed of multiple operators
           response["newOp"] = value.jsonLogic2;
         }
@@ -174,9 +182,11 @@ const isTemplateMatch = (template, jsonlogic, response = {"match": true, "jlFiel
     response.match = false;
     return response;      
   }
+  response.vals = [];
   for (let index = 0; index < tKeys.length; index++) {
     const key = tKeys[index];
     const value = template[key];
+    response.vals.push(jsonlogic[key]);
     if (key !== jKeys[index]) { 
       // Checks that both have exact same key at exact same place. Kind of pointless for arrays but whatever
       response.match = false;
@@ -223,6 +233,10 @@ const convertFromLogic = (logic, conv, config, expectedTypes, meta, not = false,
     match.jlArgs.forEach(arg => vals.push(arg));
     // We reset op to new op that represents multiple jsonlogic operators
     op = match.newOp;
+    if (jlDualMeaningOps.includes(op)) {
+      // use original order of args
+      vals = match.vals;
+    }
   }
   const isNot = op == "!" && !isEmptyOp;
   const isLocked = lockedOp && op == lockedOp;
@@ -699,7 +713,7 @@ const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
   const submeta = createMeta(meta);
   let res = _parseRule(op, arity, vals, parentField, conv, config, submeta);
   if (!res) {
-    meta.errors.push(submeta.errors.join("; ") || `Unknown op ${op}/${arity}`);
+    meta.errors.push(Array.from(new Set(submeta.errors)).join("; ") || `Unknown op ${op}/${arity}`);
     return undefined;
   }
   
@@ -726,46 +740,48 @@ const _parseRule = (op, arity, vals, parentField, conv, config, meta) => {
   let opKeys = conv.operators[opk];
   if (!opKeys)
     return;
+
+  const returnVariants = [];
+  for (const opKey of opKeys) {
+    let jlField, jlArgs = [];
+    if (jlRangeOps.includes(op) && arity == 3) {
+      jlField = vals[1];
+      jlArgs = [ vals[0], vals[2] ];
+    } else {
+      [jlField, ...jlArgs] = vals;
+    }
+    if (conv.combinationOperators[opKey]?.isRevArgs) {
+      jlField = vals[vals.length-1];
+      jlArgs = vals.slice(0, vals.length-1);
+    }
   
-  let jlField, jlArgs = [];
-  if (jlRangeOps.includes(op) && arity == 3) {
-    jlField = vals[1];
-    jlArgs = [ vals[0], vals[2] ];
-  } else {
-    [jlField, ...jlArgs] = vals;
-  }
+    if (!isJsonLogic(jlField)) {
+      continue; // try another operator
+    }
 
-  if (!isJsonLogic(jlField)) {
-    meta.errors.push(`Incorrect operands for ${op}: ${JSON.stringify(vals)}`);
-    return;
-  }
-
-  const lhs = convertLhs(isGroup0, jlField, jlArgs, conv, config, null, null, meta, parentField);
-  if (!lhs) return;
-  const {
-    field, fieldSrc, having, isGroup, args
-  } = lhs;
-  const fieldConfig = getFieldConfig(config, field);
-  if (!fieldConfig && !meta.settings?.allowUnknownFields) {
-    meta.errors.push(`No config for LHS ${field}`);
-    return;
-  }
-
-  let opKey = opKeys[0];
-  if (opKeys.length > 1 && fieldConfig && fieldConfig.operators) {
-    // eg. for "equal" and "select_equals"
-    opKeys = opKeys
-      .filter(k => fieldConfig.operators.includes(k));
-    if (opKeys.length == 0) {
-      meta.errors.push(`No corresponding ops for LHS ${field}`);
+    const lhs = convertLhs(isGroup0, jlField, jlArgs, conv, config, null, null, meta, parentField);
+    if (!lhs) {
+      continue; // try another operator
+    }
+    const {
+      field, fieldSrc, having, isGroup, args
+    } = lhs;
+    const fieldConfig = getFieldConfig(config, field);
+    if (!fieldConfig && !meta.settings?.allowUnknownFields) {
+      meta.errors.push(`No config for LHS ${field}`);
       return;
     }
-    opKey = opKeys[0];
+    const isValidOp = fieldConfig?.operators && fieldConfig.operators.includes(opKey);
+
+    returnVariants.push({
+      field, fieldSrc, fieldConfig, opKey, args, having,
+      isValidOp,
+    });
   }
-  
-  return {
-    field, fieldSrc, fieldConfig, opKey, args, having
-  };
+
+  returnVariants.sort(({isValidOp}) => isValidOp ? -1 : +1);
+
+  return returnVariants[0];
 };
 
 const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOneRuleInRuleGroup = false) => {
