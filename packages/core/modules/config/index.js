@@ -1035,7 +1035,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, fieldSettings.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;
     },
-    // todo: $toDate
+    // todo: $toDate (works onliny in $expr)
     // https://www.mongodb.com/docs/manual/reference/operator/aggregation/toDate/
     mongoFormatValue: function (val, fieldDef, wgtDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);

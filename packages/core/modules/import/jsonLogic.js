@@ -332,6 +332,7 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
     if (["date", "datetime"].includes(fieldType) && val && !(val instanceof Date)) {
       try {
         const isEpoch = typeof val === "number" || typeof val === "string" && !isNaN(val);
+        // Note: can import only from ms timestamp, not seconds timestamp
         const epoch = isEpoch && typeof val === "string" ? parseInt(val) : val;
         const dateVal = new Date(isEpoch ? epoch : val);
         if (dateVal instanceof Date && (dateVal.toISOString() === val || isEpoch)) {
