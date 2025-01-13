@@ -1209,6 +1209,33 @@ export const with_funcs = (BasicConfig) => ({
   },
 });
 
+
+export const with_spel_safe_nav = (BasicConfig) => ({
+  ...BasicConfig,
+  operators: {
+    ...BasicConfig.operators,
+    like: {
+      ...BasicConfig.operators.like,
+      spelOp: "${0}?.contains(${1})",
+    },
+    starts_with: {
+      ...BasicConfig.operators.starts_with,
+      spelOp: "${0}?.startsWith(${1})",
+    },
+    ends_with: {
+      ...BasicConfig.operators.ends_with,
+      spelOp: "${0}?.endsWith(${1})",
+    },
+  },
+  funcs: {
+    ...BasicConfig.funcs,
+    LOWER: {
+      ...BasicConfig.funcs.LOWER,
+      spelFunc: "${str}?.toLowerCase()",
+    }
+  }
+});
+
 export const with_struct = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
