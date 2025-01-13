@@ -496,6 +496,20 @@ const operators = {
     }),
     //spelOp: "${0}.containsAll(${1})",
     spelOp: "T(CollectionUtils).containsAny(${0}, ${1})",
+    spelImportFuncs: [
+      // just for backward compatibility (issue #1007)
+      {
+        obj: {
+          type: "property",
+          val: "CollectionUtils"
+        },
+        methodName: "containsAny",
+        args: [
+          {var: "0"},
+          {var: "1"},
+        ],
+      }
+    ],
     elasticSearchQueryType: "term",
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$in", v => v, false, ...args); },
   },

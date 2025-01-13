@@ -523,12 +523,13 @@ const convertFuncToValue = (spel, conv, config, meta, parentSpel, fsigns, conver
 };
 
 const convertFuncToOp = (spel, conv, config, meta, parentSpel, fsigns, convertFuncArg) => {
-  let errs, opKey, foundSign;
+  const candidates = [];
+
   for (const {s, params} of fsigns) {
     const found = conv.opFuncs[s] || [];
     for (const {op, argsOrder} of found) {
       const argsArr = params.map(convertFuncArg);
-      opKey = op;
+      const errs = [];
       if (op === "!compare") {
         if (
           parentSpel.type.startsWith("op-")
@@ -544,9 +545,7 @@ const convertFuncToOp = (spel, conv, config, meta, parentSpel, fsigns, convertFu
           errs.push("Result of compareTo() should be compared to 0");
         }
       }
-      foundSign = s;
-      errs = [];
-      const opDef = config.operators[opKey];
+      const opDef = config.operators[op];
       const {valueTypes} = opDef;
       const argsObj = Object.fromEntries(
         argsOrder.map((argKey, i) => [argKey, argsArr[i]])
@@ -557,14 +556,50 @@ const convertFuncToOp = (spel, conv, config, meta, parentSpel, fsigns, convertFu
       if (valueTypes && valueType && !valueTypes.includes(valueType)) {
         errs.push(`Op supports types ${valueTypes}, but got ${valueType}`);
       }
-      if (!errs.length) {
-        return buildRule(config, meta, field, opKey, convertedArgs, spel);
+      candidates.push({
+        opKey: op, foundSign: s, field, convertedArgs, errs,
+      });
+    }
+  }
+
+  for (let op in config.operators) {
+    const opDef = config.operators[op];
+    const {spelImportFuncs, valueTypes} = opDef;
+    if (spelImportFuncs) {
+      for (let i = 0 ; i < spelImportFuncs.length ; i++) {
+        const fj = spelImportFuncs[i];
+        if (isObject(fj)) {
+          const argsObj = {};
+          if (isJsonCompatible(fj, spel, argsObj)) {
+            const errs = [];
+            for (const k in argsObj) {
+              argsObj[k] = convertFuncArg(argsObj[k]);
+            }
+            const field = argsObj["0"];
+            const convertedArgs = Object.keys(argsObj).filter(k => parseInt(k) > 0).map(k => argsObj[k]);
+            const valueType = argsObj["1"]?.valueType;
+            if (valueTypes && valueType && !valueTypes.includes(valueType)) {
+              errs.push(`Op supports types ${valueTypes}, but got ${valueType}`);
+            }
+            candidates.push({
+              opKey: op, foundSign: `spelImportFuncs[${i}]`, field, convertedArgs, errs,
+            });
+          }
+        }
       }
     }
   }
 
-  if (opKey && errs.length) {
-    meta.errors.push(`Signature ${foundSign} - looks like convertable to ${opKey}, but: ${errs.join("; ")}`);
+  const bestCandidate = candidates.find(({errs}) => !errs.length);
+  if (bestCandidate) {
+    const {opKey, foundSign, field, convertedArgs, errs} = bestCandidate;
+    return buildRule(config, meta, field, opKey, convertedArgs, spel);
+  } else if (candidates.length) {
+    const allErrs = candidates.map(
+      ({foundSign, opKey, errs}) =>
+        `Looks like convertable to ${opKey} with signature ${foundSign}, but: ${errs.join("; ")}`
+    ).join(".  ");
+    meta.errors.push(allErrs);
   }
 
   return undefined;

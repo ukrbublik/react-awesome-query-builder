@@ -487,6 +487,18 @@ describe("query with ops", () => {
       "sql": inits.with_ops_sql,
     });
   });
+
+  describe("@spel multiselect_contains import works", () => {
+    export_checks([configs.with_all_types], "T(CollectionUtils).containsAny(multicolor, {'yellow'})", "SpEL", {
+      spel: "T(CollectionUtils).containsAny(multicolor, {'yellow'})",
+    });
+  });
+
+  describe("@spel multiselect_contains import is backward compatible", () => {
+    export_checks([configs.with_all_types], "CollectionUtils.containsAny(multicolor, {'yellow'})", "SpEL", {
+      spel: "T(CollectionUtils).containsAny(multicolor, {'yellow'})",
+    });
+  });
 });
 
 describe("query with exclamation operators", () => {
