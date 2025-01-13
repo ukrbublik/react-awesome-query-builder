@@ -1,4 +1,6 @@
 # Changelog
+- 6.6.8
+  - Support safe navigation operator in SpEL operators/functions (PR #1172) (issue #1010)
 - 6.6.7
   - Fix import of ambiguous operators (like, select_any_in) (PR #1168) (issue #1159)
   - Allow import of epoch for date/datetime widgets from JsonLogic (PR #1171) (issue #1154)
