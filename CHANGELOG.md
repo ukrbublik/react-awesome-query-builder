@@ -1,6 +1,7 @@
 # Changelog
 - 6.6.7
   - Fix import of ambiguous operators (like, select_any_in) (PR #1168) (issue #1159)
+  - Allow import of epoch for date/datetime widgets from JsonLogic (PR #1171) (issue #1154)
 - 6.6.6
   - Fix issue with process global (PR #1166) (issue #1165)
 - 6.6.5
