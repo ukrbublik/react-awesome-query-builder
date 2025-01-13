@@ -765,6 +765,25 @@ const config = {
 export default config;
 ```
 
+
+**Note:** If you override `render*` function(s) in config setttings and call original `render*` function from imported config, be aware that you should pass `ctx` as 2nd param.
+Example:
+```js
+config = {
+  ...MuiConfig,
+  settings: {
+    ...MuiConfig.settings,
+    renderField: (props) => (
+      <WithTheme theme={theme}>
+        { MuiConfig.settings.renderField?.(props, MuiConfig.ctx) }  // please pass `ctx`
+      </WithTheme>
+    ),
+  }
+};
+```
+See issue [#996](https://github.com/ukrbublik/react-awesome-query-builder/issues/996)
+
+
 ### Migration to 6.2.0
 
 If you use `treeselect` or `treemultiselect` type (for AntDesign), please rename `listValues` to `treeValues`
