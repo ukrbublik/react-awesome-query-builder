@@ -4,6 +4,7 @@ import { with_qb, with_qb_ant, export_checks, export_checks_in_it } from "../sup
 const {
   with_all_types,
   with_funcs,
+  with_spel_safe_nav
 } = configs;
 import { expect } from "chai";
 
@@ -44,6 +45,12 @@ describe("query with func", () => {
       sql: "LOWER('AAA') LIKE '%aa%'",
       spel: "'AAA'.toLowerCase().contains('aa')",
       logic: inits.with_func_tolower_and_contains_op
+    });
+  });
+
+  describe("support safe navigation operator in @spel import functions", () => {
+    export_checks([with_all_types, with_funcs, with_spel_safe_nav], "'AAA'?.toLowerCase()?.contains('aa')", "SpEL", {
+      spel: "'AAA'?.toLowerCase()?.contains('aa')",
     });
   });
 

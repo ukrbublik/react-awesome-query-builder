@@ -440,8 +440,9 @@ const convertFunc = (spel, conv, config, meta, parentSpel = null) => {
   }
 
   const {methodName} = spel;
-  if (methodName)
+  if (methodName) {
     meta.errors.push(`Signature ${firstSign} - failed to convert`);
+  }
   
   return undefined;
 };
