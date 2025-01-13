@@ -229,6 +229,46 @@ describe("basic query", () => {
       ]);
     });
 
+    describe("should import @epoch timestamp ms from JL", () => {
+      export_checks([configs.with_date_and_time], inits.with_date_epoch_ms, "JsonLogic", {
+        logic: {
+          "and": [
+            {
+              "==": [
+                {
+                  "var": "datetime"
+                },
+                "2025-01-13T15:39:28.000Z"
+              ]
+            }
+          ]
+        }
+      });
+    });
+
+    describe("should import @epoch timestamp sec from JL if configured", () => {
+      export_checks([configs.with_date_and_time, configs.with_datetime_import_epoch_sec_jl], inits.with_date_epoch, "JsonLogic", {
+        logic: {
+          "and": [
+            {
+              "==": [
+                {
+                  "var": "datetime"
+                },
+                "2025-01-13T15:39:28.000Z"
+              ]
+            }
+          ]
+        }
+      });
+    });
+
+    describe("should export @epoch timestamp ms to JL if configured", () => {
+      export_checks([configs.with_date_and_time, configs.with_datetime_export_epoch_ms_jl], inits.with_date_epoch_ms, "JsonLogic", {
+        logic: inits.with_date_epoch_ms
+      });
+    });
+
   });
 
   describe("export", () => {

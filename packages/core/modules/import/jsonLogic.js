@@ -300,32 +300,51 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
     return undefined;
   }
 
-  // number of seconds -> time string
-  if (fieldType === "time" && typeof val === "number") {
-    const [h, m, s] = [Math.floor(val / 60 / 60) % 24, Math.floor(val / 60) % 60, val % 60];
-    const valueFormat = widgetConfig.valueFormat;
-    if (valueFormat) {
-      const dateVal = new Date(val);
-      dateVal.setMilliseconds(0);
-      dateVal.setHours(h);
-      dateVal.setMinutes(m);
-      dateVal.setSeconds(s);
-      val = moment(dateVal).format(valueFormat);
-    } else {
-      val = `${h}:${m}:${s}`;
-    }
-  }
 
-  // "2020-01-08T22:00:00.000Z" -> Date object
-  if (["date", "datetime"].includes(fieldType) && val && !(val instanceof Date)) {
+  if (widgetConfig?.jsonLogicImport) {
     try {
-      const dateVal = new Date(val);
-      if (dateVal instanceof Date && dateVal.toISOString() === val) {
-        val = dateVal;
-      }
+      val = widgetConfig.jsonLogicImport.call(
+        config.ctx, val,
+        {...widgetConfig, ...(fieldConfig?.fieldSettings ?? {})}
+      );
     } catch(e) {
-      meta.errors.push(`Can't convert value ${val} as Date`);
+      meta.errors.push(`Can't import value ${val} using import func of widget ${widget}: ${e?.message ?? e}`);
       val = undefined;
+    }
+  } else {
+    // number of seconds -> time string
+    if (fieldType === "time" && typeof val === "number") {
+      const [h, m, s] = [Math.floor(val / 60 / 60) % 24, Math.floor(val / 60) % 60, val % 60];
+      const valueFormat = widgetConfig.valueFormat;
+      if (valueFormat) {
+        const dateVal = new Date(val);
+        dateVal.setMilliseconds(0);
+        dateVal.setHours(h);
+        dateVal.setMinutes(m);
+        dateVal.setSeconds(s);
+        val = moment(dateVal).format(valueFormat);
+      } else {
+        val = `${h}:${m}:${s}`;
+      }
+    }
+
+    // "2020-01-08T22:00:00.000Z" -> Date object
+    if (["date", "datetime"].includes(fieldType) && val && !(val instanceof Date)) {
+      try {
+        const isEpoch = typeof val === "number" || typeof val === "string" && !isNaN(val);
+        // Note: can import only from ms timestamp, not seconds timestamp
+        const epoch = isEpoch && typeof val === "string" ? parseInt(val) : val;
+        const dateVal = new Date(isEpoch ? epoch : val);
+        if (dateVal instanceof Date) {
+          val = dateVal;
+        }
+        if (isNaN(dateVal)) {
+          throw new Error("Invalid date");
+        }
+      } catch(e) {
+        meta.errors.push(`Can't convert value ${val} as Date`);
+        val = undefined;
+      }
     }
   }
 
@@ -341,15 +360,6 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
   if (val && fieldConfig?.fieldSettings?.asyncFetch) {
     const vals = Array.isArray(val) ? val : [val];
     asyncListValues = vals;
-  }
-
-  if (widgetConfig?.jsonLogicImport) {
-    try {
-      val = widgetConfig.jsonLogicImport.call(config.ctx, val);
-    } catch(e) {
-      meta.errors.push(`Can't import value ${val} using import func of widget ${widget}: ${e?.message ?? e}`);
-      val = undefined;
-    }
   }
 
   return {

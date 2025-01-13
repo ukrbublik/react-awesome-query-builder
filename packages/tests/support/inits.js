@@ -290,6 +290,22 @@ export const with_date_and_time = {
   }]
 };
 
+export const with_date_epoch = {
+  "and": [
+    {
+      "==": [ { "var": "datetime" }, "1736782768" ]
+    }
+  ]
+};
+
+export const with_date_epoch_ms = {
+  "and": [
+    {
+      "==": [ { "var": "datetime" }, "1736782768000" ]
+    }
+  ]
+};
+
 export const with_select_and_multiselect = {
   "and": [{
     "==": [ { "var": "color" }, "yellow" ]
