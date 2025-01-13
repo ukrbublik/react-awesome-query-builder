@@ -497,6 +497,7 @@ const operators = {
     //spelOp: "${0}.containsAll(${1})",
     spelOp: "T(CollectionUtils).containsAny(${0}, ${1})",
     spelImportFuncs: [
+      // just for backward compatibility (issue #1007)
       {
         obj: {
           type: "property",
