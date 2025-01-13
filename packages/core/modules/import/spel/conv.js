@@ -55,6 +55,8 @@ export const buildConv = (config) => {
         .reverse()
         .filter(argKey => !!funcConfig.args[argKey].isOptional || funcConfig.args[argKey].defaultValue != undefined);
       const funcSignMain = spelFunc
+        // Tip: convert "?." to "." to support safe navigation operator (issue #1010)
+        .replace(/\?\./g, ".")
         .replace(/\${(\w+)}/g, (_, _k) => "?");
       const funcSignsOptional = optionalArgs
         .reduce((acc, argKey) => (
@@ -71,6 +73,7 @@ export const buildConv = (config) => {
             .replace(/(?:, )?\${(\w+)}/g, (found, a) => (
               optionalArgKeys.includes(a) ? "" : found
             ))
+            .replace(/\?\./g, ".")
             .replace(/\${(\w+)}/g, (_, _k) => "?")
         ));
       fks = [
@@ -92,7 +95,7 @@ export const buildConv = (config) => {
     if (spelImportFuncs) {
       for (const fk of spelImportFuncs) {
         if (typeof fk === "string") {
-          const fs = fk.replace(/\${(\w+)}/g, (_, k) => "?");
+          const fs = fk.replace(/\?\./g, ".").replace(/\${(\w+)}/g, (_, k) => "?");
           const argsOrder = [...fk.matchAll(/\${(\w+)}/g)].map(([_, k]) => k);
           if (!valueFuncs[fs])
             valueFuncs[fs] = [];
@@ -111,7 +114,7 @@ export const buildConv = (config) => {
     const spelOps = opDef.spelOps ? opDef.spelOps : opDef.spelOp ? [opDef.spelOp] : undefined;
     spelOps?.forEach(spelOp => {
       if (spelOp?.includes("${0}")) {
-        const fs = spelOp.replace(/\${(\w+)}/g, (_, k) => "?");
+        const fs = spelOp.replace(/\?\./g, ".").replace(/\${(\w+)}/g, (_, k) => "?");
         const argsOrder = [...spelOp.matchAll(/\${(\w+)}/g)].map(([_, k]) => k);
         if (!opFuncs[fs])
           opFuncs[fs] = [];
@@ -123,7 +126,7 @@ export const buildConv = (config) => {
     });
   }
   // Special .compareTo()
-  const compareToSS = compareToSign.replace(/\${(\w+)}/g, (_, k) => "?");
+  const compareToSS = compareToSign.replace(/\?\./g, ".").replace(/\${(\w+)}/g, (_, k) => "?");
   opFuncs[compareToSS] = [{
     op: "!compare",
     argsOrder: ["0", "1"]
