@@ -1023,6 +1023,14 @@ const widgets = {
     jsonLogic: function (val, fieldDef, wgtDef) {
       return this.utils.moment(val, wgtDef.valueFormat).toDate();
     },
+    // Example of importing and exporting to epoch timestamp (in ms) for JsonLogic:
+    // jsonLogicImport: function(timestamp, wgtDef) {
+    //   const momentVal = this.utils.moment(timestamp, "x");
+    //   return momentVal.isValid() ? momentVal.toDate() : undefined;
+    // },
+    // jsonLogic: function (val, fieldDef, wgtDef) {
+    //   return this.utils.moment(val, wgtDef.valueFormat).format("x");
+    // },
     toJS: function (val, fieldSettings) {
       const dateVal = this.utils.moment(val, fieldSettings.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;

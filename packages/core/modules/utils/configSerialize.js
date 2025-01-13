@@ -70,7 +70,7 @@ const compileMetaWidget = {
   mongoFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef"] },
   elasticSearchFormatValue: { type: "f", args: ["queryType", "val", "op", "field", "config"] },
   jsonLogic: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef"] },
-  jsonLogicImport: { type: "f", args: ["val"] },
+  jsonLogicImport: { type: "f", args: ["val", "wgtDef"] },
   validateValue: { type: "f", args: ["val", "fieldSettings", "op", "opDef", "rightFieldDef"] }, // obsolete
   toJS: { type: "f", args: ["val"] },
 };
