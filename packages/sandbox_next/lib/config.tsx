@@ -53,7 +53,7 @@ const widgetsMixin: Record<string, Partial<Widget>> = {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     factory: {
       if: [
-        { or: [ { var: "props.asyncFetch" }, { var: "props.showSearch" } ] },
+        { or: [ { var: "props.asyncFetch" }, { var: "props.showSearch" }, { var: "props.allowCustomValues" } ] },
         { JSX: ["MuiAutocompleteWidget", { mergeObjects: [
           { var: "props" },
           { fromEntries: [ [ [ "multiple", true ] ] ] }
@@ -66,7 +66,7 @@ const widgetsMixin: Record<string, Partial<Widget>> = {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     factory: {
       if: [
-        { or: [ { var: "props.asyncFetch" }, { var: "props.showSearch" } ] },
+        { or: [ { var: "props.asyncFetch" }, { var: "props.showSearch" }, { var: "props.allowCustomValues" } ] },
         { JSX: ["MuiAutocompleteWidget", {var: "props"}] },
         { JSX: ["MuiSelectWidget", {var: "props"}] }
       ]
