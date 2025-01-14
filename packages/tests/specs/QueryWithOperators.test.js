@@ -495,6 +495,13 @@ describe("query with ops", () => {
     });
   });
 
+  describe("@sql LIKE escape for BigQuery", () => {
+    export_checks([configs.with_all_types, configs.with_sql_dialect("BigQuery")], "str LIKE '%h\\\\%\\\\_h%'", "SQL", {
+      "sql": "str LIKE '%h\\\\%\\\\_h%'",
+      "spel": "str.contains('h%_h')"
+    });
+  });
+
   describe("@spel multiselect_contains import works", () => {
     export_checks([configs.with_all_types], "T(CollectionUtils).containsAny(multicolor, {'yellow'})", "SpEL", {
       spel: "T(CollectionUtils).containsAny(multicolor, {'yellow'})",

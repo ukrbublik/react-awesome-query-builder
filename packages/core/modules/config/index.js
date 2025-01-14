@@ -169,21 +169,21 @@ const operators = {
     reversedOp: "not_like",
     sqlOp: "LIKE",
     // tip: this function covers import of 3 operators
-    sqlImport: function (sqlObj) {
+    sqlImport: function (sqlObj, _, sqlDialect) {
       if (sqlObj?.operator == "LIKE" || sqlObj?.operator == "NOT LIKE") {
         const not = sqlObj?.operator == "NOT LIKE";
         const [_left, right] = sqlObj.children || [];
         if (right?.valueType?.endsWith("_quote_string")) {
           if (right?.value.startsWith("%") && right?.value.endsWith("%")) {
-            right.value = this.utils.SqlString.unescapeLike(right.value.substring(1, right.value.length - 1));
+            right.value = this.utils.SqlString.unescapeLike(right.value.substring(1, right.value.length - 1), sqlDialect);
             sqlObj.operator = not ? "not_like" : "like";
             return sqlObj;
           } else if (right?.value.startsWith("%")) {
-            right.value = this.utils.SqlString.unescapeLike(right.value.substring(1));
+            right.value = this.utils.SqlString.unescapeLike(right.value.substring(1), sqlDialect);
             sqlObj.operator = "ends_with";
             return sqlObj;
           } else if (right?.value.endsWith("%")) {
-            right.value = this.utils.SqlString.unescapeLike(right.value.substring(0, right.value.length - 1));
+            right.value = this.utils.SqlString.unescapeLike(right.value.substring(0, right.value.length - 1), sqlDialect);
             sqlObj.operator = "starts_with";
             return sqlObj;
           }
@@ -320,7 +320,7 @@ const operators = {
       return `COALESCE(${field}, ${empty}) = ${empty}`;
     },
     // tip: this function covers import of 2 operators
-    sqlImport: (sqlObj) => {
+    sqlImport: function (sqlObj, _, sqlDialect) {
       if (sqlObj?.operator === "=" || sqlObj?.operator === "<>") {
         const [left, right] = sqlObj.children || [];
         if (right?.value === "" && left?.func === "COALESCE" && left?.children?.[1]?.value === "") {
@@ -364,7 +364,7 @@ const operators = {
     labelForFormat: "IS NULL",
     sqlOp: "IS NULL",
     // tip: this function covers import of 2 operators
-    sqlImport: (sqlObj) => {
+    sqlImport: function (sqlObj, _, sqlDialect) {
       if (sqlObj?.operator === "IS" || sqlObj?.operator === "IS NOT") {
         const [left, right] = sqlObj.children || [];
         if (right?.valueType == "null") {
@@ -615,7 +615,7 @@ const operators = {
       const prox = operatorOptions?.get("proximity");
       return `CONTAINS(${field}, 'NEAR((${aVal1}, ${aVal2}), ${prox})')`;
     },
-    sqlImport: (sqlObj) => {
+    sqlImport: function (sqlObj, _, sqlDialect) {
       if (sqlObj?.func === "CONTAINS") {
         const [left, right] = sqlObj.children || [];
         if (right?.value?.includes("NEAR(")) {
@@ -694,9 +694,9 @@ const widgets = {
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       return this.utils.spelEscape(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
-        return this.utils.SqlString.escapeLike(val, op != "starts_with", op != "ends_with");
+        return this.utils.SqlString.escapeLike(val, op != "starts_with", op != "ends_with", sqlDialect);
       } else {
         return this.utils.SqlString.escape(val);
       }
@@ -713,9 +713,9 @@ const widgets = {
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
       return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
-        return this.utils.SqlString.escapeLike(val, op != "starts_with", op != "ends_with");
+        return this.utils.SqlString.escapeLike(val, op != "starts_with", op != "ends_with", sqlDialect);
       } else {
         return this.utils.SqlString.escape(val);
       }
@@ -738,7 +738,7 @@ const widgets = {
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
       return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val, fieldDef, wgtDef) {
@@ -757,7 +757,7 @@ const widgets = {
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
       return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val) { return this.utils.spelEscape(val); },
@@ -774,7 +774,7 @@ const widgets = {
       let valLabel = this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
       return isForDisplay ? this.utils.stringifyForDisplay(valLabel) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val) { return this.utils.spelEscape(val); },
@@ -791,7 +791,7 @@ const widgets = {
       let valsLabels = vals.map(v => this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
       return isForDisplay ? valsLabels.map(this.utils.stringifyForDisplay) : vals.map(JSON.stringify);
     },
-    sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       return vals.map(v => this.utils.SqlString.escape(v));
     },
     spelFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
@@ -823,7 +823,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return isForDisplay ? dateVal.format(wgtDef.dateFormat) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.format("YYYY-MM-DD"));
     },
@@ -896,7 +896,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return isForDisplay ? dateVal.format(wgtDef.timeFormat) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.format("HH:mm:ss"));
     },
@@ -970,7 +970,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return isForDisplay ? dateVal.format(wgtDef.dateFormat + " " + wgtDef.timeFormat) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.toDate());
     },
@@ -1015,7 +1015,7 @@ const widgets = {
       }
     },
     // Moved to `sqlImportDate` in `packages/sql/modules/import/conv`
-    // sqlImport: function (sqlObj, wgtDef) {
+    // sqlImport: function (sqlObj, wgtDef, sqlDialect) {
     //   if (["TO_DATE"].includes(sqlObj?.func) && sqlObj?.children?.length >= 1) {
     //     const [valArg, patternArg] = sqlObj.children;
     //     if (valArg?.valueType == "single_quote_string") {
@@ -1065,7 +1065,7 @@ const widgets = {
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
       return isForDisplay ? (val ? "Yes" : "No") : JSON.stringify(!!val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
@@ -1080,7 +1080,7 @@ const widgets = {
     formatValue: (val, fieldDef, wgtDef, isForDisplay, op, opDef, rightFieldDef) => {
       return isForDisplay ? (rightFieldDef.label || val) : val;
     },
-    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef, rightFieldDef) => {
+    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef, rightFieldDef, sqlDialect) => {
       return val;
     },
     spelFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
@@ -1576,7 +1576,7 @@ const mixinWidgetRangeslider = (config, addMixin = true) => {
       formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
         return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
       },
-      sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+      sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
         return this.utils.SqlString.escape(val);
       },
       spelFormatValue: function (val) { return this.utils.spelEscape(val); },
@@ -1648,7 +1648,7 @@ const mixinWidgetTreeselect = (config, addMixin = true) => {
         let valLabel = this.utils.getTitleInListValues(treeData, val);
         return isForDisplay ? this.utils.stringifyForDisplay(valLabel) : JSON.stringify(val);
       },
-      sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+      sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
         return this.utils.SqlString.escape(val);
       },
       spelFormatValue: function (val) { return this.utils.spelEscape(val); },
@@ -1713,7 +1713,7 @@ const mixinWidgetTreemultiselect = (config, addMixin = true) => {
         let valsLabels = vals.map(v => this.utils.getTitleInListValues(treeData, v));
         return isForDisplay ? valsLabels.map(this.utils.stringifyForDisplay) : vals.map(JSON.stringify);
       },
-      sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
+      sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
         return vals.map(v => this.utils.SqlString.escape(v));
       },
       spelFormatValue: function (val) { return this.utils.spelEscape(val); },

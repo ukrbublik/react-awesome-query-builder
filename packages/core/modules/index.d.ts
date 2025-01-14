@@ -12,6 +12,7 @@ export type ImmutableList<T> = ImmList<T>;
 export type ImmutableMap<K, V> = ImmMap<K, V>;
 export type ImmutableOMap<K, V> = ImmOMap<K, V>;
 export type AnyImmutable = ImmutableList<any> | ImmutableMap<string, any> | ImmutableOMap<string, any>;
+export type SqlDialect = "BigQuery" | "PostgreSQL" | "MySQL";
 
 ////////////////
 // common
@@ -602,8 +603,8 @@ interface ExportUtils {
   SqlString: {
     trim(val?: string): string;
     escape(val?: string): string;
-    escapeLike(val?: string, any_start?: boolean, any_end?: boolean): string;
-    unescapeLike(val?: string): string;
+    escapeLike(val?: string, any_start?: boolean, any_end?: boolean, sqlDialect?: SqlDialect): string;
+    unescapeLike(val?: string, sqlDialect?: SqlDialect): string;
   },
   stringifyForDisplay(val: any): string;
   /**
@@ -967,7 +968,7 @@ type JsonLogicImportValue = (this: ConfigContext, val: any, wgtDef?: Widget, arg
 
 // tip: for multiselect widget `val` is Array, and return type is also Array
 type FormatValue =                  (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string | string[];
-type SqlFormatValue =               (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string | string[];
+type SqlFormatValue =               (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field, sqlDialect?: SqlDialect) => string | string[];
 type SpelFormatValue =              (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string | string[];
 type MongoFormatValue =             (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
 type JsonLogicFormatValue =         (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
@@ -1506,6 +1507,7 @@ export interface BehaviourSettings {
   keepInputOnChangeFieldSrc?: boolean;
   fieldItemKeysForSearch?: FieldItemSearchableKey[];
   listKeysForSearch?: ListItemSearchableKey[];
+  sqlDialect?: SqlDialect;
 }
 
 export interface OtherSettings {
@@ -1529,7 +1531,7 @@ export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettin
 /////////////////
 
 export type SqlFormatFunc        = (this: ConfigContext, formattedArgs: TypedMap<string>) => string;
-export type SqlImportFunc        = (this: ConfigContext, sql: Object) => Record<string, RuleValue> | undefined; // can throw, should return {func?, args: {}} or {operator?, children: []}
+export type SqlImportFunc        = (this: ConfigContext, sql: Object, wgtDef?: Widget, sqlDialect?: SqlDialect) => Record<string, RuleValue> | undefined; // can throw, should return {func?, args: {}} or {operator?, children: []}
 export type FormatFunc           = (this: ConfigContext, formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
 export type MongoFormatFunc      = (this: ConfigContext, formattedArgs: TypedMap<MongoValue>) => MongoValue;
 export type JsonLogicFormatFunc  = (this: ConfigContext, formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;

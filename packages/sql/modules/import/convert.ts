@@ -312,12 +312,11 @@ const useImportFunc = (
   sqlImport: SqlImportFunc, logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta
 ): FuncWithArgsObj | OperatorObj | ValueObj | undefined => {
   let parsed: Record<string, any> | undefined;
-  const args: any[] = [config.ctx, logic!];
   let widgetConfig: BaseWidget | undefined;
   if (meta.widgetKey) {
     widgetConfig = config.widgets[meta.widgetKey] as BaseWidget;
-    args.push(widgetConfig);
   }
+  const args: any[] = [config.ctx, logic!, widgetConfig, config.settings.sqlDialect];
   try {
     parsed = (sqlImport as any).call(...args);
   } catch(_e) {
