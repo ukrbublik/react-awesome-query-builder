@@ -603,6 +603,7 @@ interface ExportUtils {
     trim(val?: string): string;
     escape(val?: string): string;
     escapeLike(val?: string, any_start?: boolean, any_end?: boolean): string;
+    unescapeLike(val?: string): string;
   },
   stringifyForDisplay(val: any): string;
   /**

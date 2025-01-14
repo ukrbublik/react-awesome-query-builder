@@ -9,6 +9,16 @@ SqlString.trim = (val) => {
     return val;
 };
 
+SqlString.unescapeLike = (val) => {
+  if (typeof val !== "string") {
+    return val;
+  }
+  let res = val;
+  // unescape % and _
+  res = res.replace(/\\([%_])/g, "$1");
+  return res;
+};
+
 SqlString.escapeLike = (val, any_start = true, any_end = true) => {
   if (typeof val !== "string") {
     return val;

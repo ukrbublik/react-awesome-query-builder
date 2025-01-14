@@ -169,21 +169,21 @@ const operators = {
     reversedOp: "not_like",
     sqlOp: "LIKE",
     // tip: this function covers import of 3 operators
-    sqlImport: (sqlObj) => {
+    sqlImport: function (sqlObj) {
       if (sqlObj?.operator == "LIKE" || sqlObj?.operator == "NOT LIKE") {
         const not = sqlObj?.operator == "NOT LIKE";
         const [_left, right] = sqlObj.children || [];
         if (right?.valueType?.endsWith("_quote_string")) {
           if (right?.value.startsWith("%") && right?.value.endsWith("%")) {
-            right.value = right.value.substring(1, right.value.length - 1);
+            right.value = this.utils.SqlString.unescapeLike(right.value.substring(1, right.value.length - 1));
             sqlObj.operator = not ? "not_like" : "like";
             return sqlObj;
           } else if (right?.value.startsWith("%")) {
-            right.value = right.value.substring(1);
+            right.value = this.utils.SqlString.unescapeLike(right.value.substring(1));
             sqlObj.operator = "ends_with";
             return sqlObj;
           } else if (right?.value.endsWith("%")) {
-            right.value = right.value.substring(0, right.value.length - 1);
+            right.value = this.utils.SqlString.unescapeLike(right.value.substring(0, right.value.length - 1));
             sqlObj.operator = "starts_with";
             return sqlObj;
           }
