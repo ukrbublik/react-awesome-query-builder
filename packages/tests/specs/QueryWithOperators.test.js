@@ -482,9 +482,16 @@ describe("query with ops", () => {
     });
   });
 
-  describe("@sql", () => {
+  describe("@sql operators", () => {
     export_checks([configs.with_all_types], inits.with_ops_sql, "SQL", {
       "sql": inits.with_ops_sql,
+    });
+  });
+
+  describe("@sql LIKE escape", () => {
+    export_checks([configs.with_all_types], "str LIKE '%h\\%\\_h%'", "SQL", {
+      "sql": "str LIKE '%h\\%\\_h%'",
+      "spel": "str.contains('h%_h')"
     });
   });
 
