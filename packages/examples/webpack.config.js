@@ -157,6 +157,18 @@ module.exports = {
         host: '0.0.0.0',
         client: {
             webSocketURL: 'ws://0.0.0.0:0/ws',
+            overlay: {
+                errors: true,
+                runtimeErrors: (error) => {
+                    // https://github.com/ant-design/ant-design/issues/26621
+                    // MultiSelectWidget (antd) can throw this error
+                    if (error.message === 'ResizeObserver loop completed with undelivered notifications.') {
+                        return false;
+                    }
+                    return true;
+                },
+                warnings: false,
+            },
         },
         allowedHosts: [
             'localhost',

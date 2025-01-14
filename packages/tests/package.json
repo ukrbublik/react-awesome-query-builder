@@ -22,7 +22,7 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.3.7",
+    "@ant-design/icons": "^5.5.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@fluentui/font-icons-mdl2": "^8.5.39",
@@ -49,7 +49,7 @@
     "@react-awesome-query-builder/mui": "workspace:^",
     "@react-awesome-query-builder/sql": "workspace:^",
     "@react-awesome-query-builder/ui": "workspace:^",
-    "antd": "^5.18.3",
+    "antd": "^5.23.1",
     "bootstrap": "^5.3.3",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",

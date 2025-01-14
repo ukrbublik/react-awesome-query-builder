@@ -35,7 +35,7 @@
     ]
   },
   "dependencies": {
-    "@ant-design/icons": "^5.3.7",
+    "@ant-design/icons": "^5.5.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/base": "^5.0.0-beta.68",
@@ -45,7 +45,7 @@
     "@mui/x-date-pickers": "^7.23.6",
     "@react-awesome-query-builder/antd": "workspace:^",
     "@react-awesome-query-builder/mui": "workspace:^",
-    "antd": "^5.18.3",
+    "antd": "^5.23.1",
     "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

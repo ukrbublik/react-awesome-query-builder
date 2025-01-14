@@ -1,4 +1,6 @@
 # Changelog
+- 6.6.9
+  - Force autocomplete widget when `fieldSettings.allowCustomValues` is true (MIU/antd) (PR #1176) (issue #1150)
 - 6.6.8
   - Support safe navigation operator in SpEL operators/functions (PR #1172) (issue #1010)
   - SpEL: backward compatibility for import of `CollectionUtils.containsAny` (PR #1174) (issue #1007)
