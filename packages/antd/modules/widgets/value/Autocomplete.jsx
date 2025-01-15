@@ -48,8 +48,6 @@ export default (props) => {
     }
   }
 
-  console.log(1, filteredOptions, value)
-
   const optionsMaxWidth = useMemo(() => {
     return filteredOptions.reduce((max, option) => {
       return Math.max(max, calcTextWidth(option.title, null));
