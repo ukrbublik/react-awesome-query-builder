@@ -407,7 +407,7 @@ Other settings:
 [cols="1m,1,3a",options="header",]
 |===
 |key |default |meaning
-|locale.moment |"en" |Locale (string or array of strings) used for https://momentjs.com/docs/#/i18n/[moment]
+|locale.moment |`en` |Locale (string or array of strings) used for https://momentjs.com/docs/#/i18n/[moment]
 |locale.antd |`en_US` |Locale object used for https://ant.design/docs/react/i18n[AntDesign] widgets
 |locale.material |`enUS` |Locale object used for https://v4.mui.com/getting-started/installation/[MaterialUI v4] widgets
 |locale.mui |`enUS` |Locale object used for https://mui.com/material-ui/guides/localization/[MUI] widgets
@@ -434,6 +434,7 @@ Other settings:
 |defaultOperator | |Operator to be selected by default for new rule.
 |caseValueField | |(For ternary mode) Special field config to be used for displaying widget in "then" parts. +
   Example: `{type: "text"}` for simple text input in "then" part
+|sqlDialect | |Affects import/export to SQL. Possible values: `BigQuery`, `PostgreSQL`, `MySQL`.
 |===
 
 Localization:
