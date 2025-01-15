@@ -482,9 +482,23 @@ describe("query with ops", () => {
     });
   });
 
-  describe("@sql", () => {
+  describe("@sql operators", () => {
     export_checks([configs.with_all_types], inits.with_ops_sql, "SQL", {
       "sql": inits.with_ops_sql,
+    });
+  });
+
+  describe("@sql LIKE escape", () => {
+    export_checks([configs.with_all_types], "str LIKE '%h\\%\\_h%'", "SQL", {
+      "sql": "str LIKE '%h\\%\\_h%'",
+      "spel": "str.contains('h%_h')"
+    });
+  });
+
+  describe("@sql LIKE escape for BigQuery", () => {
+    export_checks([configs.with_all_types, configs.with_sql_dialect("BigQuery")], "str LIKE '%h\\\\%\\\\_h%'", "SQL", {
+      "sql": "str LIKE '%h\\\\%\\\\_h%'",
+      "spel": "str.contains('h%_h')"
     });
   });
 

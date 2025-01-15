@@ -671,6 +671,7 @@ export const with_allow_any_src_for_all_ops = (BasicConfig) => ({
     }
   }
 });
+
 export const with_all_types = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -857,6 +858,14 @@ export const simple_with_number_max_nesting_1 = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     maxNesting: 1,
+  }
+});
+
+export const with_sql_dialect = (sqlDialect) => (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    sqlDialect,
   }
 });
 

@@ -3,7 +3,7 @@
 import type { Conv, Meta, OutLogic } from "./types";
 import {
   Config, SqlImportFunc, Utils, ConfigContext, DateTimeWidget,
-  BaseWidget, MomentInput
+  BaseWidget, MomentInput, SqlDialect, Widget
 } from "@react-awesome-query-builder/core";
 import { ValueExpr } from "node-sql-parser";
 
@@ -96,17 +96,18 @@ export const buildConv = (config: Config, meta: Meta): Conv => {
 };
 
 
-const sqlImportDate: SqlImportFunc = function (this: ConfigContext, sqlObj: OutLogic, wgtDef?: DateTimeWidget) {
+const sqlImportDate: SqlImportFunc = function (this: ConfigContext, sqlObj: OutLogic, wgtDef?: Widget, sqlDialect?: SqlDialect) {
   if (sqlObj?.children && [
     "TO_DATE", "TO_TIMESTAMP", "TO_TIMESTAMP_TZ", "TO_UTC_TIMESTAMP_TZ"
   ].includes(sqlObj.func!) && sqlObj.children.length >= 1) {
     const [valArg, _patternArg] = sqlObj!.children!;
     if (valArg?.valueType?.endsWith("_quote_string")) {
+      const dateWidgetDef = wgtDef as DateTimeWidget;
       // tip: moment doesn't support SQL date format, so ignore patternArg
       const dateVal = this.utils.moment(valArg.value as MomentInput);
       if (dateVal.isValid()) {
         return {
-          value: dateVal.format(wgtDef?.valueFormat),
+          value: dateVal.format(dateWidgetDef?.valueFormat),
         };
       } else {
         return {

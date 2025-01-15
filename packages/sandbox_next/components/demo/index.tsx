@@ -173,21 +173,21 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
         <div>
           stringFormat: 
           <pre style={preStyle}>
-            {stringify(qs, undefined, 2)}
+            {qs}
           </pre>
         </div>
         <hr/>
         <div>
           humanStringFormat: 
           <pre style={preStyle}>
-            {stringify(qsh, undefined, 2)}
+            {qsh}
           </pre>
         </div>
         <hr/>
         <div>
           sqlFormat: 
           <pre style={preStyle}>
-            {stringify(sql, undefined, 2)}
+            {sql}
           </pre>
         </div>
         <hr/>

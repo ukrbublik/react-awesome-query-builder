@@ -212,6 +212,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   } else {
     if (typeof fieldWidgetDef?.sqlFormatValue === "function") {
       const fn = fieldWidgetDef.sqlFormatValue;
+      const valFieldDefinition = valueSrc == "field" && getFieldConfig(config, currentValue) || {}; 
       const args = [
         currentValue,
         {
@@ -220,15 +221,11 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
         },
         //useful options: valueFormat for date/time
         omit(fieldWidgetDef, widgetDefKeysToOmit),
+        operator,
+        operatorDef,
+        valFieldDefinition,
+        config.settings.sqlDialect,
       ];
-      if (operator) {
-        args.push(operator);
-        args.push(operatorDef);
-      }
-      if (valueSrc == "field") {
-        const valFieldDefinition = getFieldConfig(config, currentValue) || {}; 
-        args.push(valFieldDefinition);
-      }
       ret = fn.call(config.ctx, ...args);
     } else {
       if (Array.isArray(currentValue)) {

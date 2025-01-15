@@ -64,7 +64,7 @@ const RELATIVE_DATETIME = {
   // MySQL
   //todo: other SQL dialects?
   sqlFormatFunc: ({date, op, val, dim}) => `DATE_ADD(${date}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, "")})`,
-  sqlImport: (sqlObj) => {
+  sqlImport: function (sqlObj, _, sqlDialect) {
     if (["DATE_ADD", "DATE_SUB"].includes(sqlObj?.func) && sqlObj.children?.length === 2) {
       const [date, interval] = sqlObj.children;
       if (interval._type == "interval") {
@@ -196,7 +196,7 @@ const LINEAR_REGRESSION = {
       }
     }
   },
-  sqlImport: (sqlObj) => {
+  sqlImport: function (sqlObj, _, sqlDialect) {
     if (["+"].includes(sqlObj?.operator) && sqlObj.children?.length === 2) {
       const [left, bias] = sqlObj.children;
       if (["*"].includes(left?.operator) && left.children?.length === 2) {
