@@ -23,9 +23,9 @@ const useListValuesAutocomplete = ({
   isFieldAutocomplete,
 }) => {
   const knownSpecialValues = ["LOAD_MORE", "LOADING_MORE"];
-  const loadMoreTitle = "Load more...";
-  const loadingMoreTitle = "Loading more...";
-  const aPlaceholder = forceAsyncSearch ? "Type to search" : placeholder;
+  const loadMoreTitle = config.settings.loadMoreLabel ?? "Load more...";
+  const loadingMoreTitle = config.settings.loadingMoreLabel ?? "Loading more...";
+  const aPlaceholder = forceAsyncSearch ? (config.settings.typeToSearchLabel ?? "Type to search") : placeholder;
 
   // state
   const [open, setOpen] = React.useState(false);
@@ -223,9 +223,12 @@ const useListValuesAutocomplete = ({
       val = [...(selectedValue || []), val];
       option = null;
     }
+    const valHasDuplicates = multiple && val?.length && (new Set(val)).size !== val.length;
+    const isBadCallAfterTokenization = multiple && uif === "antd" && e === null && option === null && valHasDuplicates;
     // if there are tags AND input and select is opened, clear input first
     const shouldIgnore = isClearingAll && val.length === 0 && inputValue && open
-      || isClearingInput;
+      || isClearingInput
+      || isBadCallAfterTokenization;
     if (shouldIgnore) {
       return;
     }
@@ -245,7 +248,6 @@ const useListValuesAutocomplete = ({
       if (multiple) {
         const [newSelectedValues, newSelectedListValues] = optionsToListValues(val, listValues, allowCustomValues);
         setValue(newSelectedValues, asyncFetch ? newSelectedListValues : undefined);
-        
         if (isAddingCustomOptionFromSearch) {
           await sleep(0);
           await onInputChange(null, "", "my-reset");
@@ -332,7 +334,7 @@ const useListValuesAutocomplete = ({
       return true;
     const val = valueOrOption?.value ?? valueOrOption;
     const lv = getListValue(val, listValues);
-    return lv?.isCustom || false;
+    return lv?.isCustom || (lv == null);
   };
 
   const getOptionLabel = (valueOrOption) => {

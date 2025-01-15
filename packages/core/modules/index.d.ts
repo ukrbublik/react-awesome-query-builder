@@ -1463,6 +1463,11 @@ export interface LocaleSettings {
     okType?: string;
     cancelText?: string;
   };
+  loadMoreLabel?: string;
+  loadingMoreLabel?: string;
+  typeToSearchLabel?: string;
+  loadingLabel?: string;
+  notFoundLabel?: string;
 }
 
 

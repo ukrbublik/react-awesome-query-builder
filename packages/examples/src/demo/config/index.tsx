@@ -223,6 +223,11 @@ export default (skin: string) => {
       okType: "danger",
       cancelText: "Cancel"
     },
+    loadMoreLabel: "Load more...",
+    loadingMoreLabel: "Loading more...",
+    typeToSearchLabel: "Type to search",
+    loadingLabel: "Loading...",
+    notFoundLabel: "Not found",
   };
 
   const settings: Settings = {
