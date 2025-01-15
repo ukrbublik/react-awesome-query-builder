@@ -40,6 +40,8 @@ export default (props) => {
   });
 
   const filteredOptions = extendOptions(options);
+
+  // To colorize custom options
   if (multiple && allowCustomValues && value?.length) {
     for (const v of value) {
       if (getOptionIsCustom(v) && !options.find(({value}) => value === v)) {
