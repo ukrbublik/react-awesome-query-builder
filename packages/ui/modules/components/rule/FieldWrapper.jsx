@@ -35,7 +35,7 @@ export default class FieldWrapper extends Component {
     const fieldSourcesOptions = fieldSources.map((srcKey) => [
       srcKey,
       {
-        label: valueSourcesInfo[srcKey].label,
+        label: valueSourcesInfo[srcKey]?.label,
       },
     ]);
     return {

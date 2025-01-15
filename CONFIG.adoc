@@ -277,8 +277,8 @@ const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
       widget: "field",
     },
     func: {
-        label: "Function",
-        widget: "func",
+      label: "Function",
+      widget: "func",
     }
   },
   fieldSources: ["field", "func"],
@@ -309,9 +309,9 @@ Behaviour settings:
 [cols="1m,1,3a",options="header",]
 |===
 |key |default |meaning
-|valueSourcesInfo |`{value: {}}` |By default fields can be compared with values. +
-  If you want to enable comparing with another fields, add `field` like in example above. +
-  If you want to enable comparing with result of function, add `func` like in example above.
+|valueSourcesInfo |`{ value: { label: "Value" }, field: { label: "Field", widget: "field", }, func: { label: "Function", widget: "func" } }` |By default fields can be compared with values, another fields and functions. +
+  If you want to disable comparing with another fields, remove `field` key. +
+  If you want to disable comparing with result of function, remove `func` key.
 |fieldSources |`["field"]` |To enable functions in LHS, set to `["field", "func"]`
 |keepInputOnChangeFieldSrc |true |Keep value entered in RHS after changing source of LHS? 
 |showErrorMessage |false |Show error message in QueryBuilder if `validateValue()` in field config returns false for the value or if input value does not satisfy `max`, `min` constraints in `fieldSettings`

@@ -170,7 +170,7 @@ export default class Widget extends Component {
         valueSources = Object.keys(valueSourcesInfo);
       }
       valueSourcesOptions = valueSources.map(srcKey => [srcKey, {
-        label: valueSourcesInfo[srcKey].label
+        label: valueSourcesInfo[srcKey]?.label
       }]);
     }
     const widgets = range(0, cardinality).map(delta => {
