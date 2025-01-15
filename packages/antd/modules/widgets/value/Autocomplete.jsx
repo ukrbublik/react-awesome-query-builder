@@ -63,7 +63,9 @@ export default (props) => {
     width: dropdownWidth,
   };
 
-  const mode = !multiple ? undefined : (allowCustomValues ? "multiple" : "multiple");
+  const mode = !multiple ? undefined : (
+    customProps?.mode || (allowCustomValues && customProps?.tokenSeparators ? "tags" : "multiple")
+  );
   const dynamicPlaceholder = !readonly ? aPlaceholder : "";
 
   const nestByGroup = (opts, fix = false) => {
