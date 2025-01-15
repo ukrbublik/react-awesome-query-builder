@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/sql",
-  "version": "6.6.9",
+  "version": "6.6.10",
   "description": "User-friendly query builder for React. SQL support",
   "keywords": [
     "query-builder",
