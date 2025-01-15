@@ -235,6 +235,7 @@ Example:
   For server-side select `listValues` will not be used. See also `useLoadMore`, `useAsyncSearch`.
 |fieldSettings.useAsyncSearch |- for `select` widget |false |If true, `asyncFetch` supports search.
 |fieldSettings.useLoadMore |- for `select` widget |false |If true, `asyncFetch` supports pagination.
+|fieldSettings.forceAsyncSearch |- for `select` widget |false |If true, list of options will be loaded only when user types into search string (if search is empty, no options to be presented).
 |defaultValue | | |Default value
 |preferWidgets | | |See usecase at {config3}[`packages/examples/src/demo/config`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
@@ -479,6 +480,11 @@ Localization:
 |defaultCaseLabel |Default:
 |addCaseLabel |Add condition
 |addDefaultCaseLabel |Add default condition
+|loadMoreLabel |Load more...
+|loadingMoreLabel |Loading more...
+|typeToSearchLabel |Type to search
+|loadingLabel |Loading...
+|notFoundLabel |Not found
 |===
 
 

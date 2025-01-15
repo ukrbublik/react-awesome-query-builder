@@ -23,9 +23,9 @@ const useListValuesAutocomplete = ({
   isFieldAutocomplete,
 }) => {
   const knownSpecialValues = ["LOAD_MORE", "LOADING_MORE"];
-  const loadMoreTitle = "Load more...";
-  const loadingMoreTitle = "Loading more...";
-  const aPlaceholder = forceAsyncSearch ? "Type to search" : placeholder;
+  const loadMoreTitle = config.settings.loadMoreLabel ?? "Load more...";
+  const loadingMoreTitle = config.settings.loadingMoreLabel ?? "Loading more...";
+  const aPlaceholder = forceAsyncSearch ? (config.settings.typeToSearchLabel ?? "Type to search") : placeholder;
 
   // state
   const [open, setOpen] = React.useState(false);

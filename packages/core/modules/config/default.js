@@ -65,5 +65,9 @@ export const settings = {
   valueSourcesPopupTitle: "Select value source",
   removeRuleConfirmOptions: null,
   removeGroupConfirmOptions: null,
-
+  loadMoreLabel: "Load more...",
+  loadingMoreLabel: "Loading more...",
+  typeToSearchLabel: "Type to search",
+  loadingLabel: "Loading...",
+  notFoundLabel: "Not found",
 };
