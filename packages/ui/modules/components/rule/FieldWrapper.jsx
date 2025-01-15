@@ -31,11 +31,16 @@ export default class FieldWrapper extends Component {
   getMeta({
     config
   }) {
+    const defaultValueSourcesLabels = {
+      value: "Value",
+      field: "Field",
+      func: "Function"
+    };
     const {valueSourcesInfo, fieldSources} = config.settings;
     const fieldSourcesOptions = fieldSources.map((srcKey) => [
       srcKey,
       {
-        label: valueSourcesInfo[srcKey]?.label,
+        label: valueSourcesInfo[srcKey]?.label ?? defaultValueSourcesLabels[srcKey] ?? srcKey,
       },
     ]);
     return {

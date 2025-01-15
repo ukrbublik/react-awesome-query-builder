@@ -309,7 +309,7 @@ Behaviour settings:
 [cols="1m,1,3a",options="header",]
 |===
 |key |default |meaning
-|valueSourcesInfo |`{ value: { label: "Value" }, field: { label: "Field", widget: "field", }, func: { label: "Function", widget: "func" } }` |By default fields can be compared with values, another fields and functions. +
+|valueSourcesInfo |`{ value: { label: "Value" }, field: { label: "Field" }, func: { label: "Function" } }` |By default fields can be compared with values, another fields and functions. +
   If you want to disable comparing with another fields, remove `field` key. +
   If you want to disable comparing with result of function, remove `func` key.
 |fieldSources |`["field"]` |To enable functions in LHS, set to `["field", "func"]`
