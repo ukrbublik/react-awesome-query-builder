@@ -584,6 +584,11 @@ export default (skin: string) => {
           orange: "Orange"
         },
         allowCustomValues: true,
+      },
+      mainWidgetProps: {
+        customProps: {
+          tokenSeparators: [","]
+        }
       }
     },
     selecttree: {
