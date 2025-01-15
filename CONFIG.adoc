@@ -313,10 +313,10 @@ Behaviour settings:
   value: { label: "Value" },
   field: { label: "Field" },
   func: { label: "Function" }
-}` |By default fields can be compared with values, another fields and functions. +
-  If you want to disable comparing with another fields, remove `field` key. +
-  If you want to disable comparing with result of function, remove `func` key.
-|fieldSources |`["field"]` |To enable functions in LHS, set to `["field", "func"]`
+}` |Sources for RHS (right side of rule, after operator). By default LHS (left side of rule) can be compared with values, another fields and functions in RHS. +
+  If you want to disable comparing with another fields in RHS, remove `field` key. +
+  If you want to disable comparing with result of function in RHS, remove `func` key.
+|fieldSources |`["field"]` |Sources for LHS. To enable functions in LHS, set to `["field", "func"]`
 |keepInputOnChangeFieldSrc |true |Keep value entered in RHS after changing source of LHS? 
 |showErrorMessage |false |Show error message in QueryBuilder if `validateValue()` in field config returns false for the value or if input value does not satisfy `max`, `min` constraints in `fieldSettings`
 |canReorder |true |Activate reordering support for rules and groups of rules?
