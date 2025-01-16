@@ -417,9 +417,9 @@ Render this component only inside `Query.renderBuilder()` like in example above:
   )
 ```
 
-Wrapping `<Builder />` in `div.query-builder` is necessary.  
+Wrapping `<Builder />` in `div.query-builder` is **necessary** for drag-n-drop support.  
 Optionally you can add class `.qb-lite` to it for showing action buttons (like delete rule/group, add, etc.) only on hover, which will look cleaner.  
-Wrapping in `div.query-builder-container` is necessary if you put query builder inside scrollable block.  
+Wrapping in `div.query-builder-container` is necessary for correct drag-n-drop support if you put query builder inside scrollable block.  
 
 ## `Utils`
 
