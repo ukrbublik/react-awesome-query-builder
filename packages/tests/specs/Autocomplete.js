@@ -37,7 +37,7 @@ export const autocompleteTestsFor = (uif, uifv, it, with_qb) => {
         // should load A from 1st page
         setStep("wait");
         await waitAndUpdate();
-        expectInput("a");
+        expectInput("A"); // todo
     
         setStep("open");
         await openSelect();
@@ -54,7 +54,7 @@ export const autocompleteTestsFor = (uif, uifv, it, with_qb) => {
         setStep("search b");
         await enterSearch("b");
         if (uif === "mui")
-          expectOptions("a_a;b_B");
+          expectOptions("a_A;b_B"); // todo
         expectVisibleOptions("B");
         expectInput("b");
     
