@@ -15,7 +15,7 @@ const useListValuesAutocomplete = ({
   asyncListValues: selectedAsyncListValues,
   listValues: staticListValues, allowCustomValues,
   value: selectedValue, setValue, placeholder, 
-  config
+  config, field
 }, {
   debounceTimeout,
   multiple,
@@ -39,6 +39,8 @@ const useListValuesAutocomplete = ({
   const asyncFectchCnt = React.useRef(0);
   const componentIsMounted = React.useRef(0);
   const isSelectedLoadMore = React.useRef(false);
+  const laestSelectedValue = React.useRef();
+  laestSelectedValue.current = selectedValue;
 
   // compute
   const nSelectedAsyncListValues = React.useMemo(() => (
@@ -46,6 +48,9 @@ const useListValuesAutocomplete = ({
   ), [
     selectedAsyncListValues,
   ]);
+  // if selectedAsyncListValues is array of strings/numbers => needs to be resolved
+  const areSelectedAsyncListValuesNotResolved = selectedAsyncListValues && Array.isArray(selectedAsyncListValues)
+    && selectedAsyncListValues.filter(v => v !== null && typeof v !== "object").length > 0;
   const listValues = React.useMemo(() => (
     asyncFetch
       ? (selectedAsyncListValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
@@ -76,10 +81,11 @@ const useListValuesAutocomplete = ({
   }
   //const isDirtyInitialListValues = asyncListValues == undefined && selectedAsyncListValues && selectedAsyncListValues.length && typeof selectedAsyncListValues[0] != "object";
   const isLoading = loadingCnt > 0;
-  const canInitialLoad = open && asyncFetch
-    && asyncListValues === undefined
+  const canInitialLoadSelected = !open && asyncFetch && areSelectedAsyncListValuesNotResolved && selectedValue != null;
+  const canFirstLoadOnOpened = open && asyncFetch
+    && (asyncListValues === undefined)
     && (forceAsyncSearch ? inputValue : true);
-  const isInitialLoading = canInitialLoad && isLoading;
+  const isInitialLoading = (canFirstLoadOnOpened || canInitialLoadSelected) && isLoading;
   const canLoadMore = !isInitialLoading && listValues && listValues.length > 0
     && asyncFetchMeta && asyncFetchMeta.hasMore && (asyncFetchMeta.filter || "") === inputValue;
   const canShowLoadMore = !isLoading && canLoadMore;
@@ -88,7 +94,7 @@ const useListValuesAutocomplete = ({
   const selectedListValue = !multiple && hasValue ? getListValue(selectedValue, listValues) : null;
   // const selectedListValues = multiple && hasValue ? selectedValue.map(v => getItemInListValues(listValues, v)) : [];
 
-  // fetch
+  // fetch - search
   const fetchListValues = async (filter = null, isLoadMore = false) => {
     // clear obsolete meta
     if (!isLoadMore && asyncFetchMeta) {
@@ -136,6 +142,44 @@ const useListValuesAutocomplete = ({
     return newValues;
   };
 
+  // fetch - selected values only
+  const fetchSelectedListValues = async () => {
+    const selectedValues = laestSelectedValue.current == null ? [] : (multiple ? laestSelectedValue.current : [laestSelectedValue.current]);
+    if (!selectedValues.length) {
+      return null;
+    }
+
+    const meta = { fetchSelectedValues: true };
+
+    const newAsyncFetchCnt = ++asyncFectchCnt.current;
+    const res = await asyncFetch.call(config?.ctx, selectedValues, -1, meta);
+    const isFetchCancelled = asyncFectchCnt.current != newAsyncFetchCnt;
+    if (isFetchCancelled || !componentIsMounted.current) {
+      return null;
+    }
+
+    const { values: selectedListValues } = res?.values
+      ? res
+      : { values: res } // fallback, if response contains just array, not object
+    ;
+    const latestSelectedValues = laestSelectedValue.current == null ? [] : (multiple ? laestSelectedValue.current : [laestSelectedValue.current]);
+    const nValues = latestSelectedValues.map(v => getItemInListValues(selectedListValues, v) ?? makeCustomListValue(v))
+
+    return nValues.length ? nValues : null;
+  };
+
+  const loadSelectedListValues = async () => {
+    setLoadingCnt(x => (x + 1));
+    const list = await fetchSelectedListValues();
+    if (!componentIsMounted.current) {
+      return;
+    }
+    if (list != null) {
+      setValue(laestSelectedValue.current, list);
+    }
+    setLoadingCnt(x => (x - 1));
+  };
+
   const loadListValues = async (filter = null, isLoadMore = false) => {
     setLoadingCnt(x => (x + 1));
     setIsLoadingMore(isLoadMore);
@@ -154,17 +198,28 @@ const useListValuesAutocomplete = ({
 
   React.useEffect(() => {
     componentIsMounted.current++;
+    // Unmount
+    return () => {
+      componentIsMounted.current--;
+      // if (!componentIsMounted.current && field) {
+      //   console.log(`Autocomplete for ${field} has been unmounted`)
+      // }
+    };
+  }, []);
+
+  React.useEffect(() => {
     // Initial loading
-    if (canInitialLoad && loadingCnt == 0 && asyncFectchCnt.current == 0) {
+    if (canFirstLoadOnOpened && loadingCnt == 0) {
       (async () => {
         await loadListValues();
       })();
     }
-    // Unmount
-    return () => {
-      componentIsMounted.current--;
-    };
-  }, [canInitialLoad]);
+    if (canInitialLoadSelected && loadingCnt == 0) {
+      (async () => {
+        await loadSelectedListValues();
+      })();
+    }
+  }, [canFirstLoadOnOpened, canInitialLoadSelected, loadingCnt]);
 
   // Event handlers
   const onOpen = () => {
