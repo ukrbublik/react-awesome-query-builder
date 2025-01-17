@@ -213,29 +213,38 @@ Example:
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
   Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`, `useKeyboard`. +
   Available settings for text widget: `maxLength`, `maxRows`.
-|fieldSettings.listValues |+ for (multi)select | |List of values for (multi)select widget. +
+|fieldSettings.listValues |+? | |Static list of values. *Required* for `(multi)select` widgets without `asyncFetch`. +
   Example: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
    (or alternatively `{ yellow: 'Yellow', green: 'Green' }`) +
   You can also use `groupTitle` to group values. 
   Example: `[{value: 'red', groupTitle: 'Warm colors'}, {value: 'orange', groupTitle: 'Warm colors'} ...]`
-|fieldSettings.treeValues |+ for tree (multi)select | |List of values for tree (multi)select widget. +
+|fieldSettings.treeValues |+ | |Static list of values. Required for `tree(multi)select` widgets. +
   Example: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]` 
    (or alternatively `[{value: 'warm', title: 'Warm colors', children: [ {value: 'red', title: 'Red'}, {value: 'orange', title: 'Orange'} ]}]`)
 |fieldSettings.validateValue | | |Function to validate input value. +
   Simple way: return true/false. Advanced: if value is valid, return `null`, otherwise return error string or object `{error, fixedValue?}`. +
   `error` can be a string or an object `{key, args}` to use {i18n}[i18n]. +
   `(val: any, fieldSettings: Object) => boolean \| string \| {error: string \| Object, fixedValue?: any} \| null`
-|fieldSettings.allowCustomValues |- for `multiselect` widget |false |If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
-|fieldSettings.showSearch |- for (multi)select, tree (multi)select|false |Show search (autocomplete)?
-|fieldSettings.treeExpandAll |- for `treeselect/treemultiselect` widgets|false |Whether to expand all nodes by default
-|fieldSettings.treeSelectOnlyLeafs |- for `treeselect` widget|true |Can select only leafs or any node?
-|fieldSettings.asyncFetch |- for `select` widget| |Async function to load list of options for `select` from server. +
+|fieldSettings.allowCustomValues |- |false |For `(multi)select` widgets. If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
+|fieldSettings.showSearch |- |false |For `(multi)select` and `tree(multi)select` widgets. Show search (autocomplete)?
+|fieldSettings.treeExpandAll |- |false |For `tree(multi)select` widgets. Whether to expand all nodes by default
+|fieldSettings.treeSelectOnlyLeafs |- |true |For `treeselect` widget. Can select only leafs or any node?
+|fieldSettings.asyncFetch |-? | |For `(multi)select` widgets. *Required* if `listValues` is not provided. +
+  Async function to load list of options from server. +
   Function format: `async (string search, int offset) => { values: Array, hasMore: boolean }` +
   `values` - list of `{title: string, value: mixed, groupTitle?: string}` +
-  For server-side select `listValues` will not be used. See also `useLoadMore`, `useAsyncSearch`.
-|fieldSettings.useAsyncSearch |- for `select` widget |false |If true, `asyncFetch` supports search.
-|fieldSettings.useLoadMore |- for `select` widget |false |If true, `asyncFetch` supports pagination.
-|fieldSettings.forceAsyncSearch |- for `select` widget |false |If true, list of options will be loaded only when user types into search string (if search is empty, no options to be presented).
+  See also `useLoadMore`, `useAsyncSearch`, `fetchSelectedValuesOnInit`.
+|fieldSettings.useAsyncSearch |- |false |For `(multi)select` widgets with `asyncFetch` provided. +
+  If true, `asyncFetch` supports server-side search. +
+  Otherwise search will be performed locally only within already loaded list values from server.
+|fieldSettings.useLoadMore |- |false |For `(multi)select` widgets with `asyncFetch` defined. +
+  If true, `asyncFetch` supports pagination.
+|fieldSettings.forceAsyncSearch |- |false |For `(multi)select` widgets with `asyncFetch` provided. +
+  If true, list of options will be loaded only when user types into search string (if search is empty, no options to be presented).
+|fieldSettings.fetchSelectedValuesOnInit |- |false |For `(multi)select` widgets with `asyncFetch` provided. +
+  If true, selected list values will be fetched on load from server to resolve their titles. +
+  `asyncFetch` should support format `async (Array selectedValues) => { values: Array }` +
+  where `selectedValues` - array of values (like `['yellow', 'green']`) and `values` - list of `{title: string, value: mixed, groupTitle?: string}`
 |defaultValue | | |Default value
 |preferWidgets | | |See usecase at {config3}[`packages/examples/src/demo/config`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +

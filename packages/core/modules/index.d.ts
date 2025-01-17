@@ -1281,6 +1281,7 @@ export interface SelectFieldSettings<V = string | number> extends BasicFieldSett
   useLoadMore?: boolean;
   useAsyncSearch?: boolean;
   forceAsyncSearch?: boolean;
+  fetchSelectedValuesOnInit?: boolean;
 }
 export interface MultiSelectFieldSettings<V = string[] | number[]> extends SelectFieldSettings<V> {
 }

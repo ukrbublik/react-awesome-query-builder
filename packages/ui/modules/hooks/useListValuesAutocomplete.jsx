@@ -11,7 +11,7 @@ function sleep(delay) {
 }
 
 const useListValuesAutocomplete = ({
-  asyncFetch, useLoadMore, useAsyncSearch, forceAsyncSearch,
+  asyncFetch, useLoadMore, useAsyncSearch, forceAsyncSearch, fetchSelectedValuesOnInit,
   asyncListValues: selectedAsyncListValues,
   listValues: staticListValues, allowCustomValues,
   value: selectedValue, setValue, placeholder, 
@@ -81,7 +81,8 @@ const useListValuesAutocomplete = ({
   }
   //const isDirtyInitialListValues = asyncListValues == undefined && selectedAsyncListValues && selectedAsyncListValues.length && typeof selectedAsyncListValues[0] != "object";
   const isLoading = loadingCnt > 0;
-  const canInitialLoadSelected = !open && asyncFetch && areSelectedAsyncListValuesNotResolved && selectedValue != null;
+  const canInitialLoadSelected = fetchSelectedValuesOnInit && !open && asyncFetch
+    && areSelectedAsyncListValuesNotResolved && selectedValue != null;
   const canFirstLoadOnOpened = open && asyncFetch
     && (asyncListValues === undefined)
     && (forceAsyncSearch ? inputValue : true);
