@@ -348,6 +348,11 @@ const useListValuesAutocomplete = ({
       return;
     }
 
+    if (uif === "mui" && !multiple && eventType === "selectOption" && newInputValue !== "") {
+      // parity with Antd
+      return;
+    }
+
     if (newInputValue != inputValue) {
       setInputValue(val);
 

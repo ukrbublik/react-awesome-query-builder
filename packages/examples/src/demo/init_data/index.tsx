@@ -2,6 +2,7 @@ import initTreeComplex from "./tree/complex";
 import initLogicComplex from "./logic/complex";
 import initLogicSimple from "./logic/simple";
 import initLogicWithNot from "./logic/with_not";
+import initLogicAutocomplete from "./logic/autocomplete";
 import initLogicWithNotInSome from "./logic/with_not_in_some";
 import initLogicWithFuncInLhs from "./logic/with_func_in_lhs";
 
@@ -24,6 +25,7 @@ export const initFiles: Record<string, any> = {
   "logic/with_not": initLogicWithNot,
   "logic/with_not_in_some": initLogicWithNotInSome,
   "logic/with_func_in_lhs": initLogicWithFuncInLhs,
+  "logic/autocomplete": initLogicAutocomplete,
 
   "tree/complex": initTreeComplex,
   "tree/empty": emptyTree,
