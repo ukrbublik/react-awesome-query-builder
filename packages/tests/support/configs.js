@@ -1544,7 +1544,8 @@ export const with_autocomplete = (BasicConfig) => ({
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
-        allowCustomValues: false
+        allowCustomValues: false,
+        fetchSelectedValuesOnInit: false,
       },
     },
     autocompleteMultipleStrict: {
@@ -1556,7 +1557,8 @@ export const with_autocomplete = (BasicConfig) => ({
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
-        allowCustomValues: false
+        allowCustomValues: false,
+        fetchSelectedValuesOnInit: false
       },
     },
     autocomplete: {
@@ -1568,7 +1570,8 @@ export const with_autocomplete = (BasicConfig) => ({
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
-        allowCustomValues: true
+        allowCustomValues: true,
+        fetchSelectedValuesOnInit: false
       },
     },
     autocompleteMultiple: {
@@ -1580,10 +1583,45 @@ export const with_autocomplete = (BasicConfig) => ({
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
-        allowCustomValues: true
+        allowCustomValues: true,
+        fetchSelectedValuesOnInit: false
       },
     },
   },
+});
+
+export const with_autocomplete_fetchSelectedValuesOnInit = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    autocompleteStrict: {
+      ...BasicConfig.fields.autocompleteStrict,
+      fieldSettings: {
+        ...BasicConfig.fields.autocompleteStrict.fieldSettings,
+        fetchSelectedValuesOnInit: true,
+      }
+    },
+    autocompleteMultipleStrict: {
+      ...BasicConfig.fields.autocompleteMultipleStrict,
+      fieldSettings: {
+        ...BasicConfig.fields.autocompleteMultipleStrict.fieldSettings,
+        fetchSelectedValuesOnInit: true,
+      }
+    },
+    autocomplete: {
+      ...BasicConfig.fields.autocomplete,
+      fieldSettings: {
+        ...BasicConfig.fields.autocomplete.fieldSettings,
+        fetchSelectedValuesOnInit: true,
+      }
+    },
+    autocompleteMultiple: {
+      ...BasicConfig.fields.autocompleteMultiple,
+      fieldSettings: {
+        ...BasicConfig.fields.autocompleteMultiple.fieldSettings,
+        fetchSelectedValuesOnInit: true,
+      }
+    },
+  }
 });
 
 export const with_different_groups = (BasicConfig) => ({

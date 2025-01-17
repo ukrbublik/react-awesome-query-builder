@@ -25,10 +25,13 @@ export const autocompleteTestsFor = (uif, uifv, it, with_qb) => {
     clickLoadMore,
   } = getAutocompleteUtils(uif, uifv);
 
-
-  const testsSingleStrict = () => {
+  const testsSingleStrict = (fetchSelectedValuesOnInit = false) => {
     it("should load more, search, close", async () => {
-      await with_qb(configs.with_autocomplete, inits.with_autocomplete_strict_a, "JsonLogic", async (qb, {expect_jlogic}) => {
+      const configsForTest = [configs.with_autocomplete];
+      if (fetchSelectedValuesOnInit) {
+        configsForTest.push(configs.with_autocomplete_fetchSelectedValuesOnInit);
+      }
+      await with_qb(configsForTest, inits.with_autocomplete_strict_a, "JsonLogic", async (qb, {expect_jlogic}) => {
         createCtx({qb, multiple: false, strict: true});
         expectInput("a");
         if (uif === "mui")
@@ -37,7 +40,14 @@ export const autocompleteTestsFor = (uif, uifv, it, with_qb) => {
         // should load A from 1st page
         setStep("wait");
         await waitAndUpdate();
-        expectInput("a");
+        if (fetchSelectedValuesOnInit) {
+          // title should be resolved
+          expectInput("A");
+          if (uif === "mui")
+            expectOptions("a_A");
+        } else {
+          expectInput("a");
+        }
     
         setStep("open");
         await openSelect();
@@ -53,8 +63,13 @@ export const autocompleteTestsFor = (uif, uifv, it, with_qb) => {
 
         setStep("search b");
         await enterSearch("b");
-        if (uif === "mui")
-          expectOptions("a_a;b_B");
+        if (uif === "mui") {
+          if (fetchSelectedValuesOnInit) {
+            expectOptions("a_A;b_B");
+          } else {
+            expectOptions("a_a;b_B");
+          }
+        }
         expectVisibleOptions("B");
         expectInput("b");
     
@@ -73,15 +88,32 @@ export const autocompleteTestsFor = (uif, uifv, it, with_qb) => {
   };
 
 
-  const testsMultipleStrict = () => {
+  const testsMultipleStrict = (fetchSelectedValuesOnInit = false) => {
     it("should select, unselect, del tag", async () => {
-      await with_qb(configs.with_autocomplete, inits.with_autocomplete_multi_strict_a, "JsonLogic", async (qb, {expect_jlogic}) => {
+      const configsForTest = [configs.with_autocomplete];
+      if (fetchSelectedValuesOnInit) {
+        configsForTest.push(configs.with_autocomplete_fetchSelectedValuesOnInit);
+      }
+      await with_qb(configsForTest, inits.with_autocomplete_multi_strict_a, "JsonLogic", async (qb, {expect_jlogic}) => {
         createCtx({qb, multiple: true, strict: true});
         expectInput("");
         if (uif === "mui")
           expectOptions("a_a");
         expectTags("a");
     
+        setStep("wait");
+        await waitAndUpdate();
+        if (fetchSelectedValuesOnInit) {
+          // title should be resolved
+          expectTags("A");
+          if (uif === "mui")
+            expectOptions("a_A");
+        } else {
+          expectTags("a");
+          if (uif === "mui")
+            expectOptions("a_a");
+        }
+
         setStep("open");
         await openSelect();
         expectInput("");

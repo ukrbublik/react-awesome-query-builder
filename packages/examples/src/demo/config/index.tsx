@@ -660,6 +660,7 @@ export default (skin: string) => {
       fieldSettings: {
         asyncFetch: simulatedAsyncFetch,
         useAsyncSearch: true,
+        fetchSelectedValuesOnInit: true,
         useLoadMore: true,
         forceAsyncSearch: false,
         allowCustomValues: false
@@ -672,6 +673,7 @@ export default (skin: string) => {
       fieldSettings: {
         asyncFetch: simulatedAsyncFetch,
         useAsyncSearch: true,
+        fetchSelectedValuesOnInit: true,
         useLoadMore: true,
         forceAsyncSearch: false,
         allowCustomValues: false
