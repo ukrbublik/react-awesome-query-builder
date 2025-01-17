@@ -52,7 +52,7 @@ function callContextFn(_this, fn, args, path) {
 //    Will be compiled with compileJsonLogic() into function with any args and `this` should be `ctx`
 
 const compileMetaFieldSettings = {
-  asyncFetch: { type: "f", args: ["search", "offset"] },
+  asyncFetch: { type: "f", args: ["searchOrValues", "offset"] },
   labelYes: { type: "r" },
   labelNo: { type: "r" },
   marks: { type: "r", isArr: true },

@@ -2,7 +2,7 @@
 - 6.6.10
   - Fix escape/unescape for LIKE operator (PR #1177) (issue #982)
   - Fix tags tokenization (antd) (PR #1182) (issue #1115)
-  - Added `fieldSettings.fetchSelectedValuesOnInit` (PR #1184)
+  - Added `fieldSettings.fetchSelectedValuesOnInit` (see description in [`CONFIG.adoc`](/CONFIG.adoc)) (PR #1184)
 - 6.6.9
   - Force autocomplete widget when `fieldSettings.allowCustomValues` is true (MIU/antd) (PR #1176) (issue #1150)
   - Fix disabling !struct (PR #1178) (issue #1121)
