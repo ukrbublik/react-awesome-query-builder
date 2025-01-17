@@ -39,8 +39,10 @@ const useListValuesAutocomplete = ({
   const asyncFectchCnt = React.useRef(0);
   const componentIsMounted = React.useRef(0);
   const isSelectedLoadMore = React.useRef(false);
-  const laestSelectedValue = React.useRef();
-  laestSelectedValue.current = selectedValue;
+  const latestSelectedValue = React.useRef();
+  latestSelectedValue.current = selectedValue;
+  const latestInputValue = React.useRef();
+  latestInputValue.current = inputValue;
 
   // compute
   const nSelectedAsyncListValues = React.useMemo(() => (
@@ -145,7 +147,7 @@ const useListValuesAutocomplete = ({
 
   // fetch - selected values only
   const fetchSelectedListValues = async () => {
-    const selectedValues = laestSelectedValue.current == null ? [] : (multiple ? laestSelectedValue.current : [laestSelectedValue.current]);
+    const selectedValues = latestSelectedValue.current == null ? [] : (multiple ? latestSelectedValue.current : [latestSelectedValue.current]);
     if (!selectedValues.length) {
       return null;
     }
@@ -163,7 +165,7 @@ const useListValuesAutocomplete = ({
       ? res
       : { values: res } // fallback, if response contains just array, not object
     ;
-    const latestSelectedValues = laestSelectedValue.current == null ? [] : (multiple ? laestSelectedValue.current : [laestSelectedValue.current]);
+    const latestSelectedValues = latestSelectedValue.current == null ? [] : (multiple ? latestSelectedValue.current : [latestSelectedValue.current]);
     const nValues = latestSelectedValues.map(v => getItemInListValues(selectedListValues, v) ?? makeCustomListValue(v));
 
     return nValues.length ? nValues : null;
@@ -176,7 +178,7 @@ const useListValuesAutocomplete = ({
       return;
     }
     if (list != null) {
-      setValue(laestSelectedValue.current, list);
+      setValue(latestSelectedValue.current, list);
     }
     setLoadingCnt(x => (x - 1));
   };
@@ -329,7 +331,8 @@ const useListValuesAutocomplete = ({
     // - (multiple v4) delete tag while searching - e = null, newInputValue = ''  # unwanted
     // - (multiple v4) select option while searching - e = null, newInputValue = ''  # unwanted
 
-    const shouldIgnore = uif === "mui" && eventType === "reset"
+    const isSelectOption = uif === "mui" && eventType === "selectOption" && newInputValue === "";
+    const shouldIgnore = uif === "mui" && eventType === "reset" || isSelectOption
     // && (
     //   e != null
     //   // for MUI 4 if search "A" and select any option -> should NOT reset search
