@@ -163,7 +163,7 @@ const useListValuesAutocomplete = ({
       : { values: res } // fallback, if response contains just array, not object
     ;
     const latestSelectedValues = laestSelectedValue.current == null ? [] : (multiple ? laestSelectedValue.current : [laestSelectedValue.current]);
-    const nValues = latestSelectedValues.map(v => getItemInListValues(selectedListValues, v) ?? makeCustomListValue(v))
+    const nValues = latestSelectedValues.map(v => getItemInListValues(selectedListValues, v) ?? makeCustomListValue(v));
 
     return nValues.length ? nValues : null;
   };
