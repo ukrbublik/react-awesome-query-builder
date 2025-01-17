@@ -255,7 +255,7 @@ Example:
 |asyncFetch | |For `(multi)select` widgets. *Required* if `listValues` is not provided. +
   Async function to load list of options from server. +
   Function format: `async (string search, int offset) => { values: Array, hasMore: boolean }` +
-  `values` - list of `{title: string, value: mixed, groupTitle?: string}` +
+  `values` - list of `{title: string, value: string/number, groupTitle?: string}` +
   See also `useLoadMore`, `useAsyncSearch`, `fetchSelectedValuesOnInit`.
 |useAsyncSearch |false |For `(multi)select` widgets with `asyncFetch` provided. +
   If true, `asyncFetch` supports server-side search. +
@@ -267,7 +267,7 @@ Example:
 |fetchSelectedValuesOnInit |false |For `(multi)select` widgets with `asyncFetch` provided. +
   If true, selected list values will be initially fetched from server (on query load) to resolve their titles for UI. +
   `asyncFetch` should support format `async (Array selectedValues) => { values: Array }` +
-  where `selectedValues` - array of values and `values` - list of `{title: string, value: mixed, groupTitle?: string}` +
+  where `selectedValues` - array of values (string/number) and `values` - list of `{title: string, value: mixed, groupTitle?: string}` +
   Example for `multiselect`: `asyncFetch(['#FFFF00', '#008000', '#20B2A2'])` should be resolved with `[{title: "Yellow", value: "#FFFF00"}, {title: "Green", value: "#008000"}]` to display color names in UI. (Assuming `#20B2A2` is a custom value entered by user) +
   Example for `select`: `asyncFetch(['#FFFF00'])` should be resolved with `[{title: "Yellow", value: "#FFFF00"}]`.
 |===
