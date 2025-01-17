@@ -331,14 +331,17 @@ const useListValuesAutocomplete = ({
     // - (multiple v4) delete tag while searching - e = null, newInputValue = ''  # unwanted
     // - (multiple v4) select option while searching - e = null, newInputValue = ''  # unwanted
 
-    const isSelectOption = uif === "mui" && eventType === "selectOption" && newInputValue === "";
-    const shouldIgnore = uif === "mui" && eventType === "reset" || isSelectOption
+    const isRemoveOption = uif === "mui" && eventType === "removeOption" && newInputValue === "" && multiple;
+    const isSelectOption = uif === "mui" && eventType === "selectOption" && newInputValue === "" && multiple;
+    const isIgnoredBlur = uif === "mui" && !multiple && eventType === "blur" && newInputValue === selectedListValue?.title;
+    const shouldIgnore = uif === "mui" && eventType === "reset"
     // && (
     //   e != null
     //   // for MUI 4 if search "A" and select any option -> should NOT reset search
     //   // for MUI 5 if search "A" and close -> let's hold search but hide, as it's done in antd
     //   || e === null && inputValue && multiple
     // )
+      || isSelectOption || isRemoveOption || isIgnoredBlur
     ;
     const val = newInputValue;
     if (val === loadMoreTitle || val === loadingMoreTitle || shouldIgnore) {
