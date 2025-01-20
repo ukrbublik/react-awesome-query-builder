@@ -269,7 +269,8 @@ Example:
   `asyncFetch` should support format `async (Array selectedValues) => { values: Array }` +
   where `selectedValues` - array of values (string/number) and `values` - list of `{title: string, value: mixed, groupTitle?: string}` +
   Example for `multiselect`: `asyncFetch(['#FFFF00', '#008000', '#20B2A2'])` should be resolved with `[{title: "Yellow", value: "#FFFF00"}, {title: "Green", value: "#008000"}]` to display color names in UI. (Assuming `#20B2A2` is a custom value entered by user) +
-  Example for `select`: `asyncFetch(['#FFFF00'])` should be resolved with `[{title: "Yellow", value: "#FFFF00"}]`.
+  Example for `select`: `asyncFetch(['#FFFF00'])` should be resolved with `[{title: "Yellow", value: "#FFFF00"}]`. +
+  See `logic/autocomplete` data in demo app.
 |===
 
 {nbsp} +
