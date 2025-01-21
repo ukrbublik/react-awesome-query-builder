@@ -59,29 +59,35 @@ const MuiProvider = ({config, children}) => {
 
   const UpdCssVars = () => {
     const theme = useTheme();
-    console.log('MUI theme', theme);
-    const { palette, typography } = theme;
-    const r = document.querySelector(":root");
-
-    const cssVars = {
-      "--rule-background": palette.mode === "dark" ? palette.grey[800] : palette.background.paper,
-      "--group-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[50],
-      "--rulegroup-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[100],
-      "--rulegroupext-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[100],
-      "--rule-border-color": palette.primary.main,
-      "--group-border-color": palette.primary.main,
-      "--rulegroup-border-color": palette.primary.main,
-      "--rulegroupext-border-color": palette.primary.main,
-      "--treeline-color": palette.secondary.main,
-      '--treeline-disabled-color': palette.action.disabledBackground,
-      "--main-text-color": palette.text.secondary,
-      "--main-font-family": typography.fontFamily,
-      "--main-font-size": typography.fontSize,
-    };
-    console.log('MUI cssVars', cssVars);
-    for (const k in cssVars) {
-      r.style.setProperty(k, cssVars[k]);
-    }
+    React.useEffect(() => {
+      console.log('MUI theme', theme);
+      const { palette, typography } = theme;
+      const r = document.querySelector(":root");
+      const cssVars = {
+        "--rule-background": palette.mode === "dark" ? palette.grey[800] : palette.background.paper,
+        "--group-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[50],
+        "--rulegroup-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[100],
+        "--rulegroupext-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[100],
+        "--rule-border-color": palette.primary.main,
+        "--group-border-color": palette.primary.main,
+        "--rulegroup-border-color": palette.primary.main,
+        "--rulegroupext-border-color": palette.primary.main,
+        "--treeline-color": palette.secondary.main,
+        '--treeline-disabled-color': palette.action.disabledBackground,
+        "--main-text-color": palette.text.secondary,
+        "--main-font-family": typography.fontFamily,
+        "--main-font-size": typography.fontSize,
+      };
+      console.log('MUI cssVars', cssVars);
+      for (const k in cssVars) {
+        r.style.setProperty(k, cssVars[k]);
+      }
+      return () => {
+        for (const k in cssVars) {
+          r.style.removeProperty(k);
+        }
+      };
+    }, [theme]);
     return null;
   };
 
