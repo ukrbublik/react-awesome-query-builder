@@ -197,8 +197,8 @@
 
     &::after {
       border-width: 0 0 0 $treeline-thick;
-      top: calc(50% + $treeline-thick / 2 );
-      height: calc(50% - $treeline-thick / 2 + $item-offset + $item-border * 2);
+      top: calc(50% + $treeline-thick / 2);
+      height: calc(50% - $treeline-thick / 2 + $item-offset + $item-border);
     }
 
     &::before, &::after {
@@ -264,23 +264,23 @@
           border-width: $treeline-thick 0 0 $treeline-thick;
         }
         &::after {
-          top: calc(50% - $treeline-thick / 2 );
-          height: calc(50% + $treeline-thick / 2 + $item-offset + $rule-border * 2);
+          top: calc(50% - $treeline-thick / 2);
+          height: calc(50% + $treeline-thick / 2 + $item-offset + $rule-border);
         }
       }
       & > .group {
         &::after {
-          height: calc(50% + $treeline-thick / 2 + $item-offset + $group-border * 2);
+          height: calc(50% + $treeline-thick / 2 + $item-offset + $group-border);
         }
       }
       & > .rule_group {
         &::after {
-          height: calc(50% + $treeline-thick / 2 + $item-offset + $rulegroup-border * 2);
+          height: calc(50% + $treeline-thick / 2 + $item-offset + $rulegroup-border);
         }
       }
       & > .rule_group_ext {
         &::after {
-          height: calc(50% + $treeline-thick / 2 + $item-offset + $rulegroupext-border * 2);
+          height: calc(50% + $treeline-thick / 2 + $item-offset + $rulegroupext-border);
         }
       }
     }
@@ -432,7 +432,7 @@
     align-items: stretch;
 
     padding: {
-      left: $item-offset;
+      left: calc($item-offset-left / 2 - $treeline-thick);
       right: $item-offset;
     }
     margin: {
@@ -554,25 +554,25 @@
     flex-wrap: wrap;
     padding-left: $rule-padding;
 
-    .group--field {
+    > .group--field {
       margin-top: $item-offset;
       margin-bottom: $item-offset;
       align-self: center;
     }
-    .group--actions {
+    > .group--actions {
       margin-left: $rule-group-actions-offset-left;
       align-self: center;
       flex: 0;
     }
 
-    .rule_group--children {
+    > .rule_group--children {
       flex: 1;
 
       margin-top: $rulegroup-offset;
       margin-bottom: $rulegroup-offset;
       padding-left: $rulegroup-offset-left;
 
-      .group-or-rule-container {
+      > .group-or-rule-container {
         margin-bottom: $rulegroup-offset;
         margin-top: $rulegroup-offset;
         padding-right: $rulegroup-offset;
