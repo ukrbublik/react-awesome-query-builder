@@ -248,6 +248,9 @@ export default (skin: string) => {
         palette: {
           mode: 'dark',
         }
+      },
+      antd: {
+        darkMode: true,
       }
     },
 

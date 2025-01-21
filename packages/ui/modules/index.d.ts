@@ -325,6 +325,7 @@ export interface ThemeSettings {
   theme?: {
     material?: Object;
     mui?: Object;
+    antd?: Object;
   };
   renderSize?: AntdSize;
   dropdownPlacement?: AntdPosition;

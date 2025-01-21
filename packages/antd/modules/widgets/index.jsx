@@ -31,8 +31,51 @@ import Switch from "./core/Switch";
 import ValueSources from "./core/ValueSources";
 import confirm from "./core/confirm";
 
-import { ConfigProvider } from "antd";
-const Provider = ({ config, children }) => <ConfigProvider locale={config.settings.locale.antd}>{children}</ConfigProvider>;
+import { ConfigProvider, theme } from "antd";
+const Provider = ({ config, children }) => {
+  const darkMode = config.settings.theme?.antd?.darkMode ?? false;
+  const algorithm = darkMode ? theme.darkAlgorithm : theme.compactAlgorithm;
+  const palette = algorithm(theme.defaultSeed);
+  React.useEffect(() => {
+    console.log('antd palette', palette);
+    const r = document.querySelector(":root");
+    const cssVars = {
+      "--rule-background": palette.colorBgElevated,
+      "--group-background": darkMode ? palette.colorBgMask : palette.colorFillSecondary,
+      "--rulegroup-background": darkMode ? palette.colorBgSpotlight : palette.colorSecondaryBg,
+      "--rulegroupext-background": darkMode ? palette.colorBgSpotlight : palette.colorSecondaryBg,
+      "--rule-border-color": palette.colorBorder,
+      "--group-border-color": palette.colorBorderSecondary,
+      "--rulegroup-border-color": palette.colorBorderSecondary,
+      "--rulegroupext-border-color": palette.colorBorderSecondary,
+      "--treeline-color": darkMode ? palette.colorInfo : palette.colorInfoBorder,
+      '--treeline-disabled-color': palette.colorFillSecondary,
+      "--main-text-color": palette.colorText,
+      "--main-font-family": palette.fontFamily,
+      "--main-font-size": palette.fontSize,
+      "--group-in-rulegroupext-border-color": palette.colorBorderSecondary,
+    };
+    console.log('antd cssVars', cssVars);
+    for (const k in cssVars) {
+      if (cssVars[k] != undefined) {
+        r.style.setProperty(k, cssVars[k]);
+      }
+    }
+    return () => {
+      for (const k in cssVars) {
+        r.style.removeProperty(k);
+      }
+    };
+  }, [darkMode]);
+  return (
+    <ConfigProvider
+      locale={config.settings.locale.antd}
+      theme={{
+        algorithm
+      }}
+    >{children}</ConfigProvider>
+  );
+};
 
 export default {
   DateWidget,
