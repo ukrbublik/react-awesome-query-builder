@@ -1,17 +1,19 @@
-.query-builder.qb-compact {
-  // $item-offset-left: 10px !default;
-  // $item-offset: 5px !default;
-  // $rulegroup-offset-left: 10px !default;
-  // $rulegroup-offset: 5px !default;
-  // $rule-padding: 5px !default;
-  // $rule-parts-distance: 5px !default;
-  // $drag-offset-right: 5px !default;
-  // $rule-group-actions-offset-left: 5px !default;
-}
+$compact-item-offset-left: 10px;
+$compact-item-offset: 5px;
+$compact-rulegroup-offset-left: 10px;
+$compact-rulegroup-offset: 5px;
+$compact-rule-padding: 5px;
+$compact-rule-parts-distance: 5px;
+$compact-drag-offset-right: 5px;
+$compact-rule-group-actions-offset-left: 5px;
 
-.query-builder {
-  .group--conjunctions {
-    // margin-left: -1px !important;
-    // margin-top: -1px !important;
-  }
+.query-builder.qb-compact {
+  --item-offset-left: #{$compact-item-offset-left};
+  --item-offset: #{$compact-item-offset};
+  --rulegroup-offset-left: #{$compact-rulegroup-offset-left};
+  --rulegroup-offset: #{$compact-rulegroup-offset};
+  --rule-padding: #{$compact-rule-padding};
+  --rule-parts-distance: #{$compact-rule-parts-distance};
+  --drag-offset-right: #{$compact-drag-offset-right};
+  --rule-group-actions-offset-left: #{$compact-rule-group-actions-offset-left};
 }
