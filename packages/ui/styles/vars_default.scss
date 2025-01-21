@@ -1,0 +1,30 @@
+// borders
+$default-rule-border: 1px !default;
+$default-group-border: 1px !default;
+$default-case-border: 3px !default;
+$default-rulegroup-border: 1px !default;
+$default-rulegroupext-border: 1px !default;
+$default-item-radius: 5px !default;
+// treeline
+$default-treeline-radius: 4px !default;
+$default-treeline-thick: 2px !default;
+$default-treeline-switch-thick: 3px !default;
+$default-treeline-rulegroup-thick: 1px !default;
+$default-treeline-rulegroupext-thick: 1px !default;
+// colors
+$default-treeline-color: #ccc !default;
+$default-treeline-disabled-color: rgba(128, 128, 128, 0.1) !default;
+$default-group-background: rgba(250, 240, 210, 0.5) !default;
+$default-group-border-color: #DCC896 !default;
+$default-group-with-error-border-color: #e0a1a1 !default;
+$default-rule-background: white !default;
+$default-rule-border-color: transparent !default;
+$default-rule-with-error-border-color: #e0a1a1 !default;
+$default-rule-error-color: red !default;
+$default-rulegroup-background: rgba(255, 252, 242, 0.5) !default;
+$default-rulegroupext-background: rgba(255, 252, 242, 0.5) !default;
+$default-rulegroup-border-color: #f5e4b5 !default;
+$default-rulegroupext-border-color: #f5e4b5 !default;
+$default-placeholder-border-color: gray !default;
+$default-locked-border-color: red !default;
+$default-custom-select-option-color: lightcoral !default;
