@@ -1443,8 +1443,6 @@ type SpelFieldMeta = {
   isSpelVariable?: boolean;
 };
 type ValueSourcesInfo = {[vs in ValueSource]?: {label: string, widget?: string}};
-type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
-type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
 type FormatReverse = (this: ConfigContext, q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: boolean) => string;
 type SqlFormatReverse = (this: ConfigContext, q: string) => string;
@@ -1454,17 +1452,7 @@ type FormatSpelField = (this: ConfigContext, field: FieldPath, parentField: Fiel
 type CanCompareFieldWithField = (this: ConfigContext, leftField: FieldPath, leftFieldConfig: Field, rightField: FieldPath, rightFieldConfig: Field, op: string) => boolean;
 type FormatAggr = (this: ConfigContext, whereStr: string, aggrField: FieldPath, operator: string, value: string | ImmutableList<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: OperatorOptionsI, isForDisplay: boolean, aggrFieldDef: Field) => string;
 
-export interface LocaleSettings {
-  locale?: {
-    moment?: string;
-    antd?: Object;
-    material?: Object;
-    mui?: Object;
-  };
-  theme?: {
-    material?: Object;
-    mui?: Object;
-  };
+export interface LocaleTranslations {
   valueLabel?: string;
   valuePlaceholder?: string;
   fieldLabel?: string;
@@ -1504,6 +1492,15 @@ export interface LocaleSettings {
   typeToSearchLabel?: string;
   loadingLabel?: string;
   notFoundLabel?: string;
+}
+
+export interface LocaleSettings extends LocaleTranslations {
+  locale?: {
+    moment?: string;
+    antd?: Object;
+    material?: Object;
+    mui?: Object;
+  };
 }
 
 
