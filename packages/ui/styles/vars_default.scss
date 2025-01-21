@@ -28,3 +28,23 @@ $default-rulegroupext-border-color: #f5e4b5 !default;
 $default-placeholder-border-color: gray !default;
 $default-locked-border-color: red !default;
 $default-custom-select-option-color: lightcoral !default;
+// colors for complex nesting
+$default-group-in-rulegroupext-border-color: transparent !default;
+// offsets
+$default-treeline-offset-from-conjs: 20px !default;
+$default-treeline-offset-from-switch: 20px !default;
+$default-item-offset: 10px !default;
+$default-item-offset-left: 24px !default;
+$default-rulegroup-offset: 5px !default;
+$default-rulegroup-offset-left: 18px !default;
+$default-rule-padding: 10px !default;
+$default-rule-parts-distance: 10px !default;
+$default-seps-offset-bottom: 3px !default;
+$default-drag-offset-right: 8px !default;
+$default-group-actions-offset-left: 10px !default;
+$default-group-drag-offset-left: 10px !default;
+$default-rule-group-actions-offset-left: 10px !default;
+// fonts
+$default-main-font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !default;;
+$default-main-font-size: 14px !default;
+$default-main-text-color: initial !default;

@@ -68,19 +68,22 @@ const MuiProvider = ({config, children}) => {
         "--group-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[50],
         "--rulegroup-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[100],
         "--rulegroupext-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[100],
-        "--rule-border-color": palette.primary.main,
-        "--group-border-color": palette.primary.main,
-        "--rulegroup-border-color": palette.primary.main,
-        "--rulegroupext-border-color": palette.primary.main,
-        "--treeline-color": palette.secondary.main,
+        "--rule-border-color": palette.mode === "dark" ? palette.primary.main : palette.primary.main,
+        "--group-border-color": palette.mode === "dark" ? palette.secondary.main : palette.secondary.main,
+        "--rulegroup-border-color": palette.mode === "dark" ? palette.secondary.main : palette.secondary.main,
+        "--rulegroupext-border-color": palette.mode === "dark" ? palette.secondary.main : palette.secondary.main,
+        "--treeline-color": palette.divider,
         '--treeline-disabled-color': palette.action.disabledBackground,
         "--main-text-color": palette.text.secondary,
         "--main-font-family": typography.fontFamily,
         "--main-font-size": typography.fontSize,
+        "--group-in-rulegroupext-border-color": palette.secondary.main,
       };
       console.log('MUI cssVars', cssVars);
       for (const k in cssVars) {
-        r.style.setProperty(k, cssVars[k]);
+        if (cssVars[k] != undefined) {
+          r.style.setProperty(k, cssVars[k]);
+        }
       }
       return () => {
         for (const k in cssVars) {

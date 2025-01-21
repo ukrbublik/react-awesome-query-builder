@@ -1,4 +1,5 @@
 @import './vars_default.scss';
+@import './vars_compact.scss';
 
 // borders
 $rule-border: var(--rule-border, $default-rule-border);
@@ -50,35 +51,35 @@ $placeholder-border-color: var(--placeholder-border-color, $default-placeholder-
 $locked-border-color: var(--locked-border-color, $default-locked-border-color);
 $custom-select-option-color: var(--custom-select-option-color, $default-custom-select-option-color);
 // colors for complex nesting
-$rule-in-rulegroup-background: $rule-background !default;
-$rulegroup-in-rulegroup-background: $rulegroup-background !default;
-$rulegroupext-in-rulegroup-background: $rulegroupext-background !default;
-$rule-in-rulegroup-border-color: $rule-border-color !default;
-$rulegroup-in-rulegroup-border-color: $rulegroup-border-color !default;
-$rulegroupext-in-rulegroup-border-color: $rulegroupext-border-color !default;
-$rule-in-rulegroupext-background: $rule-background !default;
-$group-in-rulegroupext-background: $group-background !default;
-$rulegroupext-in-rulegroupext-background: $rulegroupext-background !default;
-$rulegroup-in-rulegroupext-background: $rulegroup-background !default;
-$rule-in-rulegroupext-border-color: $rule-border-color !default;
-$group-in-rulegroupext-border-color: transparent !default;
-$rulegroupext-in-rulegroupext-border-color: $rulegroupext-border-color !default;
-$rulegroup-in-rulegroupext-border-color: $rulegroup-border-color !default;
+$rule-in-rulegroup-background: var(--rule-in-rulegroup-background, $rule-background);
+$rulegroup-in-rulegroup-background: var(--rulegroup-in-rulegroup-background, $rulegroup-background);
+$rulegroupext-in-rulegroup-background: var(--rulegroupext-in-rulegroup-background, $rulegroupext-background);
+$rule-in-rulegroup-border-color: var(--rule-in-rulegroup-border-color, $rule-border-color);
+$rulegroup-in-rulegroup-border-color: var(--rulegroup-in-rulegroup-border-color, $rulegroup-border-color);
+$rulegroupext-in-rulegroup-border-color: var(--rulegroupext-in-rulegroup-border-color, $rulegroupext-border-color);
+$rule-in-rulegroupext-background: var(--rule-in-rulegroupext-background, $rule-background);
+$group-in-rulegroupext-background: var(--group-in-rulegroupext-background, $group-background);
+$rulegroupext-in-rulegroupext-background: var(--rulegroupext-in-rulegroupext-background, $rulegroupext-background);
+$rulegroup-in-rulegroupext-background: var(--rulegroup-in-rulegroupext-background, $rulegroup-background);
+$rule-in-rulegroupext-border-color: var(--rule-in-rulegroupext-border-color, $rule-border-color);
+$group-in-rulegroupext-border-color: var(--group-in-rulegroupext-border-color, $default-group-in-rulegroupext-border-color);
+$rulegroupext-in-rulegroupext-border-color: var(--rulegroupext-in-rulegroupext-border-color, $rulegroupext-border-color);
+$rulegroup-in-rulegroupext-border-color: var(--rulegroup-in-rulegroupext-border-color, $rulegroup-border-color);
 // offsets
-$treeline-offset-from-conjs: 20px !default;
-$treeline-offset-from-switch: 20px !default;
-$item-offset: 10px !default;
-$item-offset-left: 24px !default;
-$rulegroup-offset: 5px !default;
-$rulegroup-offset-left: 18px !default;
-$rule-padding: 10px !default;
-$rule-parts-distance: 10px !default;
-$seps-offset-bottom: 3px !default;
-$drag-offset-right: 8px !default;
-$group-actions-offset-left: 10px !default;
-$group-drag-offset-left: 10px !default;
-$rule-group-actions-offset-left: 10px !default;
+$treeline-offset-from-conjs: var(--treeline-offset-from-conjs, $default-treeline-offset-from-conjs);
+$treeline-offset-from-switch: var(--treeline-offset-from-switch, $default-treeline-offset-from-switch);
+$item-offset: var(--item-offset, $default-item-offset);
+$item-offset-left: var(--item-offset-left, $default-item-offset-left);
+$rulegroup-offset: var(--rulegroup-offset, $default-rulegroup-offset);
+$rulegroup-offset-left: var(--rulegroup-offset-left, $default-rulegroup-offset-left);
+$rule-padding: var(--rule-padding, $default-rule-padding);
+$rule-parts-distance: var(--rule-parts-distance, $default-rule-parts-distance);
+$seps-offset-bottom: var(--seps-offset-bottom, $default-seps-offset-bottom);
+$drag-offset-right: var(--drag-offset-right, $default-drag-offset-right);
+$group-actions-offset-left: var(--group-actions-offset-left, $default-group-actions-offset-left);
+$group-drag-offset-left: var(--group-drag-offset-left, $default-group-drag-offset-left);
+$rule-group-actions-offset-left: var(--rule-group-actions-offset-left, $default-rule-group-actions-offset-left);
 // fonts
-$main-font-family: var(--main-font-family, 'Helvetica Neue', Helvetica, Arial, sans-serif);
-$main-font-size: var(--main-font-size, 14px);
-$main-text-color: var(--main-text-color, 'default');
+$main-font-family: var(--main-font-family, $default-main-font-family);
+$main-font-size: var(--main-font-size, $default-main-font-size);
+$main-text-color: var(--main-text-color, $default-main-text-color);
