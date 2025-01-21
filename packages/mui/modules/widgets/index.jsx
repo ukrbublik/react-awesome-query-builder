@@ -1,5 +1,5 @@
 import React from "react";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider, createTheme, useTheme } from "@mui/material/styles";
 import { ConfirmProvider, useConfirm } from "material-ui-confirm";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"; // TODO: set moment to dayjs
@@ -57,7 +57,35 @@ const MuiProvider = ({config, children}) => {
     adapterLocale: momentLocale,
   };
 
-  const base = (<div className="mui">{children}</div>);
+  const UpdCssVars = () => {
+    const theme = useTheme();
+    console.log('MUI theme', theme);
+    const { palette, typography } = theme;
+    const r = document.querySelector(":root");
+
+    const cssVars = {
+      "--rule-background": palette.mode === "dark" ? palette.grey[800] : palette.background.paper,
+      "--group-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[50],
+      "--rulegroup-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[100],
+      "--rulegroupext-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[100],
+      "--rule-border-color": palette.primary.main,
+      "--group-border-color": palette.primary.main,
+      "--rulegroup-border-color": palette.primary.main,
+      "--rulegroupext-border-color": palette.primary.main,
+      "--treeline-color": palette.secondary.main,
+      '--treeline-disabled-color': palette.action.disabledBackground,
+      "--main-text-color": palette.text.secondary,
+      "--main-font-family": typography.fontFamily,
+      "--main-font-size": typography.fontSize,
+    };
+    console.log('MUI cssVars', cssVars);
+    for (const k in cssVars) {
+      r.style.setProperty(k, cssVars[k]);
+    }
+    return null;
+  };
+
+  const base = (<div className="mui"><UpdCssVars />{children}</div>);
   const withProviders = (
     <LocalizationProvider dateAdapter={AdapterMoment} {...locProviderProps} >
       <ConfirmProvider>

@@ -1,0 +1,84 @@
+@import './vars_default.scss';
+
+// borders
+$rule-border: var(--rule-border, $default-rule-border);
+$rule-border-left: var(--rule-border-left, $rule-border);
+$group-border: var(--group-border, $default-group-border);
+$group-border-left: var(--group-border-left, $group-border);
+$case-border: var(--case-border, $default-case-border);
+$case-border-left: var(--case-border-left, $case-border);
+$rulegroup-border: var(--rulegroup-border, $default-rulegroup-border);
+$rulegroup-border-left: var(--rulegroup-border-left, $rulegroup-border);
+$rulegroupext-border: var(--rulegroupext-border, $default-rulegroupext-border);
+$rulegroupext-border-left: var(--rulegroupext-border-left, $rulegroupext-border);
+$item-radius: var(--item-radius, $default-item-radius);
+// borders for complex nesting
+$group-in-rulegroupext-border: var(--group-in-rulegroupext-border, $group-border);
+$group-in-rulegroupext-border-left: var(--group-in-rulegroupext-border, $group-border-left);
+$rulegroup-in-rulegroupext-border: var(--rulegroup-in-rulegroupext-border, $rulegroup-border);
+$rulegroup-in-rulegroupext-border-left: var(--rulegroup-in-rulegroupext-border-left, $rulegroup-border-left);
+$rulegroupext-in-rulegroupext-border: var(--rulegroupext-in-rulegroupext-border, $rulegroupext-border);
+$rulegroupext-in-rulegroupext-border-left: var(--rulegroupext-in-rulegroupext-border-left, $rulegroupext-border-left);
+$rulegroup-in-rulegroup-border: var(--rulegroup-in-rulegroup-border, $rulegroup-border);
+$rulegroup-in-rulegroup-border-left: var(--rulegroup-in-rulegroup-border-left, $rulegroup-border-left);
+$rulegroupext-in-rulegroup-border: var(--rulegroupext-in-rulegroup-border, $rulegroupext-border);
+$rulegroupext-in-rulegroup-border-left: var(--rulegroupext-in-rulegroup-border-left, $rulegroupext-border-left);
+// treeline
+$treeline-radius: var(--treeline-radius, $default-treeline-radius);
+$treeline-thick: var(--treeline-thick, $default-treeline-thick);
+$treeline-switch-thick: var(--treeline-switch-thick, $default-treeline-switch-thick);
+$treeline-rulegroup-thick: var(--treeline-rulegroup-thick, $default-treeline-rulegroup-thick);
+$treeline-rulegroupext-thick: var(--treeline-rulegroup-thick, $default-treeline-rulegroup-thick);
+// colors
+$treeline-color: var(--treeline-color, $default-treeline-color);
+$treeline-rulegroup-color: var(--treeline-rulegroup-color, $treeline-color);
+$treeline-rulegroupext-color: var(--treeline-rulegroupext-color, $treeline-color);
+$treeline-switch-color: var(--treeline-switch-color, $treeline-color);
+$treeline-disabled-color: var(--treeline-disabled-color, $default-treeline-disabled-color);
+$group-background: var(--group-background, $default-group-background);
+$group-border-color: var(--group-border-color, $default-group-border-color);
+$group-with-error-border-color: var(--group-with-error-border-color, $default-group-with-error-border-color);
+$rule-background: var(--rule-background, $default-rule-background);
+$rule-border-color: var(--rule-border-color, $default-rule-border-color);
+$rule-with-error-border-color: var(--rule-with-error-border-color, $default-rule-with-error-border-color);
+$rule-error-color: var(--rule-error-color, $default-rule-error-color);
+$rulegroup-background: var(--rulegroup-background, $default-rulegroup-background);
+$rulegroupext-background: var(--rulegroupext-background, $default-rulegroupext-background);
+$rulegroup-border-color: var(--rulegroup-border-color, $default-rulegroup-border-color);
+$rulegroupext-border-color: var(--rulegroupext-border-color, $default-rulegroupext-border-color);
+$placeholder-border-color: var(--placeholder-border-color, $default-placeholder-border-color);
+$locked-border-color: var(--locked-border-color, $default-locked-border-color);
+$custom-select-option-color: var(--custom-select-option-color, $default-custom-select-option-color);
+// colors for complex nesting
+$rule-in-rulegroup-background: $rule-background !default;
+$rulegroup-in-rulegroup-background: $rulegroup-background !default;
+$rulegroupext-in-rulegroup-background: $rulegroupext-background !default;
+$rule-in-rulegroup-border-color: $rule-border-color !default;
+$rulegroup-in-rulegroup-border-color: $rulegroup-border-color !default;
+$rulegroupext-in-rulegroup-border-color: $rulegroupext-border-color !default;
+$rule-in-rulegroupext-background: $rule-background !default;
+$group-in-rulegroupext-background: $group-background !default;
+$rulegroupext-in-rulegroupext-background: $rulegroupext-background !default;
+$rulegroup-in-rulegroupext-background: $rulegroup-background !default;
+$rule-in-rulegroupext-border-color: $rule-border-color !default;
+$group-in-rulegroupext-border-color: transparent !default;
+$rulegroupext-in-rulegroupext-border-color: $rulegroupext-border-color !default;
+$rulegroup-in-rulegroupext-border-color: $rulegroup-border-color !default;
+// offsets
+$treeline-offset-from-conjs: 20px !default;
+$treeline-offset-from-switch: 20px !default;
+$item-offset: 10px !default;
+$item-offset-left: 24px !default;
+$rulegroup-offset: 5px !default;
+$rulegroup-offset-left: 18px !default;
+$rule-padding: 10px !default;
+$rule-parts-distance: 10px !default;
+$seps-offset-bottom: 3px !default;
+$drag-offset-right: 8px !default;
+$group-actions-offset-left: 10px !default;
+$group-drag-offset-left: 10px !default;
+$rule-group-actions-offset-left: 10px !default;
+// fonts
+$main-font-family: var(--main-font-family, 'Helvetica Neue', Helvetica, Arial, sans-serif);
+$main-font-size: var(--main-font-size, 14px);
+$main-text-color: var(--main-text-color, 'default');
