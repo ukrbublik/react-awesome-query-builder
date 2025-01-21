@@ -239,6 +239,14 @@ export default (skin: string) => {
     defaultSearchWidth: "100px",
     defaultMaxRows: 5,
 
+    theme: {
+      mui: {
+        palette: {
+          mode: 'dark',
+        }
+      }
+    },
+
     // Example of how to correctly configure default LHS funtion with args:
     // defaultField: {
     //   func: "date.RELATIVE_DATETIME",
