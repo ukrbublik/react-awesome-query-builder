@@ -40,13 +40,8 @@
     },
     "./package.json": "./package.json",
     "./css/styles.css": "./css/styles.css",
-    "./css/compact_styles.css": "./css/compact_styles.css",
     "./css/styles.scss": {
       "sass": "./css/styles.scss",
-      "default": "./css/styles.scss"
-    },
-    "./css/compact_styles.scss": {
-      "sass": "./css/compact_styles.scss",
       "default": "./css/styles.scss"
     }
   },
