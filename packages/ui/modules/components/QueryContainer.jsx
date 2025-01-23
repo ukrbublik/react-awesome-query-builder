@@ -96,6 +96,7 @@ export default class QueryContainer extends Component {
     const currentTree = isTreeChanged ? (nextProps.value || defaultRoot(nextProps)) : storeValue;
     const isTreeTrulyChanged = isTreeChanged && !immutableEqual(nextProps.value, this.prevTree) && !immutableEqual(nextProps.value, this.prevprevTree);
     this.sanitizeTree = isTreeTrulyChanged || isConfigChanged;
+    const canUseOldConfig = isConfigChanged && !isTreeChanged;
 
     if (isConfigChanged) {
       if (prevProps.settings.renderProvider !== nextProps.settings.renderProvider) {
@@ -105,7 +106,7 @@ export default class QueryContainer extends Component {
     }
     
     if (isTreeChanged || isConfigChanged) {
-      const validatedTree = this.getMemoizedTree(nextConfig, currentTree, oldConfig, this.sanitizeTree);
+      const validatedTree = this.getMemoizedTree(nextConfig, currentTree, canUseOldConfig ? oldConfig : undefined, this.sanitizeTree);
       //return Promise.resolve().then(() => {
       this.state.store.dispatch(
         actions.tree.setTree(nextConfig, validatedTree)
