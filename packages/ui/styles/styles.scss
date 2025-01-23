@@ -802,19 +802,22 @@
   }
 }
 
-@mixin display_only_for_hovered_group($inactive, $active) {
+@mixin display_conjs_only_for_hovered_group($inactive, $active) {
   @if $inactive {
     #{$inactive} {
-      transition: padding 0.2s;
+      transition: 0.2s;
     }
-    .group--header:hover .group--header,
-    .group--header:not(:hover),
+    .group-or-rule:not(.qb-draggable, .qb-placeholder) > .group--header:hover .group--header,
+    .group-or-rule:not(.qb-draggable, .qb-placeholder) > .group--header:not(:hover),
     .rule_group:not(:hover) {
-      #{$inactive} {
-        width: 0;
-        padding: 0;
-        overflow: hidden;
-        opacity: 0;
+      .group--conjunctions {
+        #{$inactive} {
+          width: 0;
+          min-width: 0;
+          padding: 0;
+          overflow: hidden;
+          opacity: 0;
+        }
       }
     }
   }
@@ -842,13 +845,18 @@
   }
 }
 
-@mixin force_not_display($what) {
+@mixin force_not_display_conjs($what) {
   @if $what {
-    #{$what} {
-      width: 0 !important;
-      padding: 0 !important;
-      overflow: hidden !important;
-      opacity: 0 !important;
+    .group-or-rule:not(.qb-draggable, .qb-placeholder) > .group--header {
+      .group--conjunctions {
+        #{$what} {
+          width: 0 !important;
+          min-width: 0 !important;
+          padding: 0 !important;
+          overflow: hidden !important;
+          opacity: 0 !important;
+        }
+      }
     }
   }
 }
@@ -861,11 +869,11 @@ $rule_actions: (".rule--fieldsrc", ".widget--valuesrc", ".rule--drag-handler", "
 
 .query-builder.qb-lite {
   @include visible_only_for_hovered_group($group_actions);
-  @include display_only_for_hovered_group($inactive_conjs, $active_conjs);
+  @include display_conjs_only_for_hovered_group($inactive_conjs, $active_conjs);
   @include show_only_for_hovered_rule($rule_actions);
 
   &.qb-dragging {
     @include force_unvisible(#{$rule_actions, $group_actions});
-    @include force_not_display($inactive_conjs);
+    @include force_not_display_conjs($inactive_conjs);
   }
 }
