@@ -4,26 +4,39 @@
 // borders
 $rule-border: var(--rule-border, $default-rule-border);
 $rule-border-left: var(--rule-border-left, $rule-border);
+$rule-border-left-hover: var(--rule-border-left-hover, $rule-border);
 $group-border: var(--group-border, $default-group-border);
 $group-border-left: var(--group-border-left, $group-border);
+$group-border-left-hover: var(--group-border-left-hover, $group-border);
 $case-border: var(--case-border, $default-case-border);
 $case-border-left: var(--case-border-left, $case-border);
+$case-border-left-hover: var(--case-border-left-hover, $case-border);
 $rulegroup-border: var(--rulegroup-border, $default-rulegroup-border);
 $rulegroup-border-left: var(--rulegroup-border-left, $rulegroup-border);
+$rulegroup-border-left-hover: var(--rulegroup-border-left-hover, $rulegroup-border);
 $rulegroupext-border: var(--rulegroupext-border, $default-rulegroupext-border);
 $rulegroupext-border-left: var(--rulegroupext-border-left, $rulegroupext-border);
+$rulegroupext-border-left-hover: var(--rulegroupext-border-left-hover, $rulegroupext-border);
 $item-radius: var(--item-radius, $default-item-radius);
+// shadows
+$rule-shadow: var(--rule-shadow, $default-rule-shadow);
+$rule-shadow-hover: var(--rule-shadow-hover, $default-rule-shadow-hover);
 // borders for complex nesting
 $group-in-rulegroupext-border: var(--group-in-rulegroupext-border, $group-border);
 $group-in-rulegroupext-border-left: var(--group-in-rulegroupext-border, $group-border-left);
+$group-in-rulegroupext-border-left-hover: var(--group-in-rulegroupext-border-hover, $group-border-left);
 $rulegroup-in-rulegroupext-border: var(--rulegroup-in-rulegroupext-border, $rulegroup-border);
 $rulegroup-in-rulegroupext-border-left: var(--rulegroup-in-rulegroupext-border-left, $rulegroup-border-left);
+$rulegroup-in-rulegroupext-border-left-hover: var(--rulegroup-in-rulegroupext-border-left-hover, $rulegroup-border-left);
 $rulegroupext-in-rulegroupext-border: var(--rulegroupext-in-rulegroupext-border, $rulegroupext-border);
 $rulegroupext-in-rulegroupext-border-left: var(--rulegroupext-in-rulegroupext-border-left, $rulegroupext-border-left);
+$rulegroupext-in-rulegroupext-border-left-hover: var(--rulegroupext-in-rulegroupext-border-left-hover, $rulegroupext-border-left);
 $rulegroup-in-rulegroup-border: var(--rulegroup-in-rulegroup-border, $rulegroup-border);
 $rulegroup-in-rulegroup-border-left: var(--rulegroup-in-rulegroup-border-left, $rulegroup-border-left);
+$rulegroup-in-rulegroup-border-left-hover: var(--rulegroup-in-rulegroup-border-left-hover, $rulegroup-border-left);
 $rulegroupext-in-rulegroup-border: var(--rulegroupext-in-rulegroup-border, $rulegroupext-border);
 $rulegroupext-in-rulegroup-border-left: var(--rulegroupext-in-rulegroup-border-left, $rulegroupext-border-left);
+$rulegroupext-in-rulegroup-border-left-hover: var(--rulegroupext-in-rulegroup-border-left-hover, $rulegroupext-border-left);
 // treeline
 $treeline-radius: var(--treeline-radius, $default-treeline-radius);
 $treeline-thick: var(--treeline-thick, $default-treeline-thick);
