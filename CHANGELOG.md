@@ -1,4 +1,6 @@
 # Changelog
+- 6.6.11
+  - Fix issue with updating both config & tree value (PR #1190) (issue #1187)
 - 6.6.10
   - Fix escape/unescape for LIKE operator (PR #1177) (issue #982)
   - Fix tags tokenization (antd) (PR #1182) (issue #1115)
