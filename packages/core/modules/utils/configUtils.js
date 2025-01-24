@@ -254,7 +254,7 @@ export const getFieldSrc = (field) => {
         return "func";
       }
     }
-    if (!!field.type) {
+    if (field.type) {
       // it's already a config
       return "field";
     }
