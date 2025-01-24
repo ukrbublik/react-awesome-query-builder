@@ -1,0 +1,152 @@
+@mixin clearfix {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+@mixin noselect {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+
+
+@mixin fix_paddings_for_hovered_group($item-offset-left, $treeline-thick, $border-left, $border-left-hover) {
+  & > .group--header,
+  & > .group--footer {
+    padding-left: calc($item-offset-left / 2 - $treeline-thick - $border-left-hover + $border-left);
+  }
+  & > .group--children {
+    padding-left: calc($item-offset-left - $border-left-hover + $border-left);
+  }
+}
+
+@mixin fix_padding_for_hovered($padding, $border-left, $border-left-hover) {
+  padding-left: calc($padding - ($border-left-hover - $border-left));
+}
+
+@mixin line_position_for_header($treeline-offset-from-conjs, $item-offset-left, $treeline-thick, $treeline-color) {
+  &::before {
+    border-color: $treeline-color;
+    border-width: 0 0 0 $treeline-thick;
+    top: calc($treeline-offset-from-conjs);
+    height: calc(100% + $item-offset - $treeline-offset-from-conjs);
+    left: calc(+1 * ($item-offset-left / 2 - $treeline-thick / 2));
+    width: calc($item-offset-left / 2 + $treeline-thick / 2);
+  }
+}
+
+@mixin fix_line_position_for_hovered_header($item-offset-left, $treeline-thick, $border-left, $border-left-hover) {
+  &::before {
+    left: calc(+1 * ($item-offset-left / 2 - $treeline-thick / 2) - ($border-left-hover - $border-left));
+  }
+}
+
+
+
+/******************************************************************************/
+/** TREE LINES ****************************************************************/
+/******************************************************************************/
+
+
+@mixin hide_conjs_for_group(
+  $item-offset, $treeline-thick, $treeline-radius,
+  $rule-border, $group-border, $rulegroup-border, $rulegroupext-border
+) {
+  & > .group-or-rule-container:first-child {
+    & > .group-or-rule {
+      &::before {
+        display: none;
+      }
+      &::after {
+        border-radius: $treeline-radius 0 0 0;
+        border-width: $treeline-thick 0 0 $treeline-thick;
+      }
+      &::after {
+        top: calc(50% - $treeline-thick / 2);
+        height: calc(50% + $treeline-thick / 2 + $item-offset + $rule-border);
+      }
+    }
+    & > .simple_group {
+      &::after {
+        height: calc(50% + $treeline-thick / 2 + $item-offset + $group-border);
+      }
+    }
+    & > .rule_group {
+      &::after {
+        height: calc(50% + $treeline-thick / 2 + $item-offset + $rulegroup-border);
+      }
+    }
+    & > .rule_group_ext {
+      &::after {
+        height: calc(50% + $treeline-thick / 2 + $item-offset + $rulegroupext-border);
+      }
+    }
+  }
+}
+
+@mixin line_position_for_item($item-border-left, $item-border-left-hover, $item-border, $item-offset-left, $item-offset, $treeline-thick) {
+  &::before {
+    border-width: 0 0 $treeline-thick $treeline-thick;
+    top: calc(-1 * $item-border);
+    height: calc(50% + $treeline-thick / 2 + $item-border);
+  }
+
+  &::after {
+    border-width: 0 0 0 $treeline-thick;
+    top: calc(50% + $treeline-thick / 2);
+    height: calc(50% - $treeline-thick / 2 + $item-offset + $item-border);
+  }
+
+  &::before, &::after {
+    left: calc(-1 * ($item-offset-left / 2 + $treeline-thick / 2 + $item-border-left));
+    width: calc($item-offset-left / 2 + $treeline-thick / 2);
+  }
+
+  &:hover {
+    &::before, &::after {
+      left: calc(-1 * ($item-offset-left / 2 + $treeline-thick / 2 + $item-border-left-hover));
+    }
+  }
+}
+
+@mixin line_positions_for_group(
+  $item-offset-left, $item-offset,
+  $treeline-thick, $treeline-radius, $treeline-color,
+  $rule-border, $group-border, $rulegroup-border, $rulegroupext-border,
+  $rule-border-left, $group-border-left, $rulegroup-border-left, $rulegroupext-border-left,
+  $rule-border-left-hover, $group-border-left-hover, $rulegroup-border-left-hover, $rulegroupext-border-left-hover
+) {
+  & > .group-or-rule-container:last-child {
+    & > .group-or-rule {
+      &::before {
+        border-radius: 0 0 0 $treeline-radius;
+      }
+    }
+  }
+  & > .group-or-rule-container {
+    & > .group-or-rule {
+      &::before, &::after {
+        border-color: $treeline-color;
+      }
+    }
+    & > .rule {
+      @include line_position_for_item($rule-border-left, $rule-border-left-hover, $rule-border, $item-offset-left, $item-offset, $treeline-thick);
+    }
+    & > .simple_group {
+      @include line_position_for_item($group-border-left, $group-border-left-hover, $group-border, $item-offset-left, $item-offset, $treeline-thick);
+    }
+    & > .rule_group {
+      @include line_position_for_item($rulegroup-border-left, $rulegroup-border-left-hover, $rulegroup-border, $item-offset-left, $item-offset, $treeline-thick);
+    }
+    & > .rule_group_ext {
+      @include line_position_for_item($rulegroupext-border-left, $rulegroupext-border-left-hover, $rulegroupext-border, $item-offset-left, $item-offset, $treeline-thick);
+    }
+  }
+}
+
