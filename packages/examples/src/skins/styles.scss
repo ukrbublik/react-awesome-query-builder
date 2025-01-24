@@ -1,7 +1,17 @@
 .query-builder {
-  --rule-border-left: 2px;
-  --group-border-left: 3px;
-  --rulegroup-border-left: 3px;
-  --rulegroupext-border-left: 3px;
-  --item-radius: 8px;
+  //--rule-border-left: 5px;
+  // --rule-border-left-hover: 2px;
+  // --group-border-left-hover: 3px;
+  // --rulegroup-border-left-hover: 3px;
+  // --rulegroupext-border-left-hover: 4px;
+  
+  // for mui
+  --rule-border-color: transparent;
+  --group-border-color: transparent;
+  --rulegroup-border-color: transparent;
+  --rulegroupext-border-color: transparent;
+
+  // --rulegroup-border-left: 3px;
+  // --rulegroupext-border-left: 3px;
+  // --item-radius: 8px;
 }
