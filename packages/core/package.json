@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/core",
-  "version": "6.6.11",
+  "version": "6.6.12",
   "description": "User-friendly query builder for React. Core",
   "keywords": [
     "query-builder",
