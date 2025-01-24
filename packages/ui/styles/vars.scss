@@ -21,22 +21,8 @@ $item-radius: var(--item-radius, $default-item-radius);
 // shadows
 $rule-shadow: var(--rule-shadow, $default-rule-shadow);
 $rule-shadow-hover: var(--rule-shadow-hover, $default-rule-shadow-hover);
-// borders for complex nesting
-$group-in-rulegroupext-border: var(--group-in-rulegroupext-border, $group-border);
-$group-in-rulegroupext-border-left: var(--group-in-rulegroupext-border, $group-border-left);
-$group-in-rulegroupext-border-left-hover: var(--group-in-rulegroupext-border-hover, $group-border-left);
-$rulegroup-in-rulegroupext-border: var(--rulegroup-in-rulegroupext-border, $rulegroup-border);
-$rulegroup-in-rulegroupext-border-left: var(--rulegroup-in-rulegroupext-border-left, $rulegroup-border-left);
-$rulegroup-in-rulegroupext-border-left-hover: var(--rulegroup-in-rulegroupext-border-left-hover, $rulegroup-border-left);
-$rulegroupext-in-rulegroupext-border: var(--rulegroupext-in-rulegroupext-border, $rulegroupext-border);
-$rulegroupext-in-rulegroupext-border-left: var(--rulegroupext-in-rulegroupext-border-left, $rulegroupext-border-left);
-$rulegroupext-in-rulegroupext-border-left-hover: var(--rulegroupext-in-rulegroupext-border-left-hover, $rulegroupext-border-left);
-$rulegroup-in-rulegroup-border: var(--rulegroup-in-rulegroup-border, $rulegroup-border);
-$rulegroup-in-rulegroup-border-left: var(--rulegroup-in-rulegroup-border-left, $rulegroup-border-left);
-$rulegroup-in-rulegroup-border-left-hover: var(--rulegroup-in-rulegroup-border-left-hover, $rulegroup-border-left);
-$rulegroupext-in-rulegroup-border: var(--rulegroupext-in-rulegroup-border, $rulegroupext-border);
-$rulegroupext-in-rulegroup-border-left: var(--rulegroupext-in-rulegroup-border-left, $rulegroupext-border-left);
-$rulegroupext-in-rulegroup-border-left-hover: var(--rulegroupext-in-rulegroup-border-left-hover, $rulegroupext-border-left);
+$group-shadow: var(--group-shadow, $default-group-shadow);
+$group-shadow-hover: var(--group-shadow-hover, $default-group-shadow-hover);
 // treeline
 $treeline-radius: var(--treeline-radius, $default-treeline-radius);
 $treeline-thick: var(--treeline-thick, $default-treeline-thick);
@@ -96,3 +82,5 @@ $rule-group-actions-offset-left: var(--rule-group-actions-offset-left, $default-
 $main-font-family: var(--main-font-family, $default-main-font-family);
 $main-font-size: var(--main-font-size, $default-main-font-size);
 $main-text-color: var(--main-text-color, $default-main-text-color);
+// main
+$main-margin: var(--main-margin, $default-main-margin);
