@@ -60,7 +60,7 @@ export const createConfigMemo = (meta = {
     if ((configStore.size + 1) > maxSize) {
       configStore.delete(configStore.keys().next().value);
     }
-    configStore.set(config, extendedConfig);
+    configStore.set({...config}, extendedConfig);
   };
 
   const findBasic = (findConfig) => {
