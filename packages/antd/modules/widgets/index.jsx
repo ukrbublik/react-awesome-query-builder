@@ -53,7 +53,7 @@ const Provider = ({ config, children }) => {
       "--main-text-color": palette.colorText,
       "--main-font-family": palette.fontFamily,
       "--main-font-size": palette.fontSize,
-      "--group-in-rulegroupext-border-color": palette.colorBorderSecondary,
+      //"--group-in-rulegroupext-border-color": palette.colorBorderSecondary,
     };
     console.log('antd cssVars', cssVars);
     for (const k in cssVars) {

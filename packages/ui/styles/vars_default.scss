@@ -8,6 +8,8 @@ $default-item-radius: 5px !default;
 // shadows
 $default-rule-shadow: none !default;
 $default-rule-shadow-hover: none !default;
+$default-group-shadow: none !default;
+$default-group-shadow-hover: none !default;
 // treeline
 $default-treeline-radius: 4px !default;
 $default-treeline-thick: 2px !default;
@@ -51,3 +53,5 @@ $default-rule-group-actions-offset-left: 10px !default;
 $default-main-font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !default;;
 $default-main-font-size: 14px !default;
 $default-main-text-color: initial !default;
+// main
+$default-main-margin: 0px;

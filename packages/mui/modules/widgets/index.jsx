@@ -59,39 +59,45 @@ const MuiProvider = ({config, children}) => {
 
   const UpdCssVars = () => {
     const theme = useTheme();
+    const ref = React.createRef();
     React.useEffect(() => {
       console.log('MUI theme', theme);
-      const { palette, typography } = theme;
+      const { palette, typography, shadows } = theme;
+      const setOpacity = (hex, alpha) => `${hex}${Math.floor(alpha * 255).toString(16).padStart(2, 0)}`;
       const r = document.querySelector(":root");
+      const w = ref.current?.closest(".mui");
+      const cssVarsTarget = w ?? r;
       const cssVars = {
-        "--rule-background": palette.mode === "dark" ? palette.grey[800] : palette.background.paper,
-        "--group-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[50],
-        "--rulegroup-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[100],
-        "--rulegroupext-background": palette.mode === "dark" ? palette.grey[900] : palette.grey[100],
-        "--rule-border-color": palette.mode === "dark" ? palette.primary.main : palette.primary.main,
+        "--rule-background": palette.mode === "dark" ? setOpacity(palette.grey[800], 0.3) : palette.background.paper,
+        "--group-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.8) : setOpacity(palette.grey[600], 0.1),
+        "--rulegroup-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.3) : setOpacity(palette.grey[400], 0.1),
+        "--rulegroupext-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.3) : setOpacity(palette.grey[400], 0.1),
+        "--rule-border-color": palette.mode === "dark" ? palette.primary.main : palette.action.active,
         "--group-border-color": palette.mode === "dark" ? palette.secondary.main : palette.secondary.main,
         "--rulegroup-border-color": palette.mode === "dark" ? palette.secondary.main : palette.secondary.main,
         "--rulegroupext-border-color": palette.mode === "dark" ? palette.secondary.main : palette.secondary.main,
+        //"--group-in-rulegroupext-border-color": palette.secondary.main,
         "--treeline-color": palette.divider,
         '--treeline-disabled-color': palette.action.disabledBackground,
         "--main-text-color": palette.text.secondary,
         "--main-font-family": typography.fontFamily,
         "--main-font-size": typography.fontSize,
-        "--group-in-rulegroupext-border-color": palette.secondary.main,
+        "--rule-shadow": shadows[0],
+        "--rule-shadow-hover": shadows[1]
       };
       console.log('MUI cssVars', cssVars);
       for (const k in cssVars) {
         if (cssVars[k] != undefined) {
-          r.style.setProperty(k, cssVars[k]);
+          cssVarsTarget.style.setProperty(k, cssVars[k]);
         }
       }
       return () => {
         for (const k in cssVars) {
-          r.style.removeProperty(k);
+          cssVarsTarget.style.removeProperty(k);
         }
       };
     }, [theme]);
-    return null;
+    return <div ref={ref} style={{display: "none"}} />;
   };
 
   const base = (<div className="mui"><UpdCssVars />{children}</div>);
