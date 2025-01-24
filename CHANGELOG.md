@@ -1,4 +1,6 @@
 # Changelog
+- 6.6.12
+  - Fix issue with getting field config for func arg signature object (PR #1193) (issue #1192)
 - 6.6.11
   - Fix issue with updating both config & tree value (PR #1190) (issue #1187)
 - 6.6.10
