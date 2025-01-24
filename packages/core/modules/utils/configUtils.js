@@ -237,7 +237,16 @@ export const getFieldSrc = (field) => {
   if (!field)
     return null;
   if (typeof field === "object") {
-    if (!field.func && !!field.type) {
+    // should not be possible
+    // if (field._isFuncArg) {
+    //   // it's func arg
+    //   return null;
+    // }
+    // if (field._isFunc) {
+    //   // it's field func
+    //   return "func";
+    // }
+    if (!field.func && field.type) {
       // it's already a config
       return "field";
     }
@@ -267,16 +276,25 @@ export const getFieldConfig = (config, field) => {
   if (!field)
     return null;
   if (typeof field == "object") {
-    if (!field.func && !!field.type) {
+    if (!field.func && !!field.type && !!field.widgets) {
       // it's already a config
+      // but don't mess up with obj from `getFuncSignature`, it has `type` but no `widgets` and other keys !
       return field;
+    }
+    if (field._isFuncArg) {
+      // it's func arg
+      return getFuncArgConfig(config, field._funcKey, field._argKey);
+    }
+    if (field._isFunc) {
+      // it's a func
+      return getFuncConfig(config, field._funcKey);
     }
     if (field.func) {
       if (field.func && field.arg) {
         // it's func arg
         return getFuncArgConfig(config, field.func, field.arg);
       } else {
-        // it's field func
+        // it's a func
         return getFuncConfig(config, field.func);
       }
     }
