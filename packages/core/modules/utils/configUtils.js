@@ -237,13 +237,18 @@ export const getFieldSrc = (field) => {
   if (!field)
     return null;
   if (typeof field === "object") {
-    if (field._isFuncArg) {
-      // it's func arg
-      return null;
-    }
-    if (field._isFunc) {
-      // it's field func
-      return "func";
+    // should not be possible
+    // if (field._isFuncArg) {
+    //   // it's func arg
+    //   return null;
+    // }
+    // if (field._isFunc) {
+    //   // it's field func
+    //   return "func";
+    // }
+    if (!field.func && field.type) {
+      // it's already a config
+      return "field";
     }
     if (field.func) {
       if (field.func && field.arg) {
@@ -253,10 +258,6 @@ export const getFieldSrc = (field) => {
         // it's field func
         return "func";
       }
-    }
-    if (field.type) {
-      // it's already a config
-      return "field";
     }
   }
   if (field?.get?.("func")) { // immutable
