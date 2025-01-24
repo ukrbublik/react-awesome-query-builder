@@ -60,6 +60,9 @@ export const createConfigMemo = (meta = {
     if ((configStore.size + 1) > maxSize) {
       configStore.delete(configStore.keys().next().value);
     }
+    // Note: because of desctructing, strict find would not be possible
+    //  (see commented line in `findExtended`)
+    //  (see issue #1187)
     configStore.set({...config}, extendedConfig);
   };
 
