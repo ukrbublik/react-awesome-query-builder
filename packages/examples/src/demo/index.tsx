@@ -9,6 +9,7 @@ import ImportSkinStyles from "../skins";
 import loadConfig from "./config";
 import {
   useActions, useValidation, useBenchmark, useOutput, useInput, useInitFiles, useConfigChange, useSkins, useBlocksSwitcher,
+  useThemeing,
 } from "./blocks";
 import { initTreeWithValidation, dispatchHmrUpdate, useHmrUpdate } from "./utils";
 import type { DemoQueryBuilderState, DemoQueryBuilderMemo } from "./types";
@@ -46,6 +47,8 @@ const DemoQueryBuilder: React.FC = () => {
     sqlWarnings: [] as Array<string>,
     renderBocks: defaultRenderBlocks,
     initFile: defaultInitFile,
+    themeMode: "light",
+    configChanges: {},
   });
 
   // Trick for HMR
@@ -62,6 +65,7 @@ const DemoQueryBuilder: React.FC = () => {
   const { renderInitFilesHeader, renderInitErrors } = useInitFiles(state, setState);
   const { renderSkinSelector } = useSkins(state, setState);
   const { renderBlocksSwitcher } = useBlocksSwitcher(state, setState);
+  const { renderThemeModeSelector } = useThemeing(state, setState);
 
 
   const renderBuilder = useCallback((bprops: BuilderProps) => {
@@ -108,9 +112,12 @@ const DemoQueryBuilder: React.FC = () => {
   return (
     <div>
       <div>
-        Settings: &nbsp;
+        Theme: &nbsp;
         {renderSkinSelector()}
-        &nbsp;
+        {renderThemeModeSelector()}
+      </div>
+      <div>
+        Settings: &nbsp;
         {renderConfigChangeHeader()}
       </div>
       <div>
