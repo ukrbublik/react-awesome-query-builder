@@ -13,6 +13,7 @@ export const useThemeing = (
 ) => {
   const changeThemeMode = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const themeMode = e.target.value as DemoQueryBuilderState["themeMode"];
+    document.body.setAttribute("data-theme", themeMode);
     let newConfig: Config = clone(state.config);
     state.configChanges = merge(state.configChanges, {
       settings: {
