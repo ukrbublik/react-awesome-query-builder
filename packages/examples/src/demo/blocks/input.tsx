@@ -7,8 +7,6 @@ import type { DemoQueryBuilderState } from "../types";
 import { validationTranslateOptions } from "../options";
 
 const stringify = JSON.stringify;
-const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
-const preWarningStyle = { backgroundColor: "lightyellow", margin: "10px", padding: "10px" };
 
 
 export const useInput = (
@@ -70,7 +68,7 @@ export const useInput = (
         <button onClick={importFromSpel}>import</button>
         <br />
         { state.spelErrors.length > 0 
-            && <pre style={preErrorStyle}>
+            && <pre className="qb-demo-error-pre">
               {stringify(state.spelErrors, undefined, 2)}
             </pre> 
         }
@@ -90,12 +88,12 @@ export const useInput = (
         <button onClick={importFromSql}>import</button>
         <br />
         { state.sqlErrors.length > 0 
-            && <pre style={preErrorStyle}>
+            && <pre className="qb-demo-error-pre">
               {stringify(state.sqlErrors, undefined, 2)}
             </pre> 
         }
         { state.sqlWarnings.length > 0 
-            && <pre style={preWarningStyle}>
+            && <pre className="qb-demo-warning-pre">
               {stringify(state.sqlWarnings, undefined, 2)}
             </pre> 
         }

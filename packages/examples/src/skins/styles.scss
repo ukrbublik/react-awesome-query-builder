@@ -1,3 +1,50 @@
+body {
+  background-color: white;
+  color: black;
+  .qb-demo-pre {
+    background-color: darkgrey;
+    margin: 10px;
+    padding: 10px;
+  }
+  .qb-demo-error-pre {
+    background-color: lightpink;
+    margin: 10px;
+    padding: 10px;
+  }
+  .qb-demo-warning-pre {
+    background-color: lightyellow;
+    margin: 10px;
+    padding: 10px;
+  }
+}
+
+$inputs: select, input, button;
+
+body[data-theme="dark"] {
+  background-color: oklch(0.253267 0.015896 252.418);
+  color: oklch(0.746477 0.0216 264.436);
+  @each $input in $inputs {
+    #{$input}:not(.query-builder #{$input}) {
+      border-color: oklch(0.253267 0.015896 252.418);
+      background-color: oklch(0.253267 0.015896 252.418);
+      color: oklch(0.746477 0.0216 264.436);
+      outline: none;
+    }
+  }
+  .qb-demo-pre {
+    background-color: oklch(0.313815 0.021108 254.139);
+    color: oklch(0.746477 0.0216 264.436);
+  }
+  .qb-demo-error-pre {
+    background-color: rgb(92, 54, 60);
+    color: oklch(0.746477 0.0216 264.436);
+  }
+  .qb-demo-warning-pre {
+    background-color: rgb(113, 86, 64);
+    color: oklch(0.746477 0.0216 264.436);
+  }
+}
+
 .query-builder {
   //--rule-border-left: 5px;
   // --rule-border-left-hover: 2px;
@@ -6,10 +53,10 @@
   // --rulegroupext-border-left-hover: 4px;
   
   // for mui
-  --rule-border-color: transparent;
-  --group-border-color: transparent;
-  --rulegroup-border-color: transparent;
-  --rulegroupext-border-color: transparent;
+  // --rule-border-color: transparent;
+  // --group-border-color: transparent;
+  // --rulegroup-border-color: transparent;
+  // --rulegroupext-border-color: transparent;
 
   // --rulegroup-border-left: 3px;
   // --rulegroupext-border-left: 3px;
