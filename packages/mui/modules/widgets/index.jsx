@@ -78,7 +78,7 @@ const MuiProvider = ({config, children}) => {
         "--rulegroupext-border-color": palette.mode === "dark" ? palette.secondary.main : palette.secondary.main,
         //"--group-in-rulegroupext-border-color": palette.secondary.main,
         "--treeline-color": palette.divider,
-        '--treeline-disabled-color': palette.action.disabledBackground,
+     //   "--treeline-disabled-color": palette.action.disabledBackground,
         "--main-text-color": palette.text.secondary,
         "--main-font-family": typography.fontFamily,
         "--main-font-size": typography.fontSize,
