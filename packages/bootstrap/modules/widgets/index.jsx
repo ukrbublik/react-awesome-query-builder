@@ -1,3 +1,5 @@
+import React from "react";
+
 // value widgets
 import BootstrapTextWidget from "./value/BootstrapText";
 import BootstrapTextAreaWidget from "./value/BootstrapTextArea";
@@ -23,7 +25,14 @@ import BootstrapValueSources from "./core/BootstrapValueSources";
 import BootstrapConfirm from "./core/BootstrapConfirm";
 
 // provider
-const BootstrapProvider = ({ config, children }) => children;
+const BootstrapProvider = ({config, children}) => {
+  //todo: same for vanilla, fluent
+  const themeMode = config.settings.themeMode ?? "light";
+  const compactMode = config.settings.compactMode;
+
+  const base = (<div className={`qb-bootstrap ${compactMode ? "qb-compact" : ""} qb-${themeMode}`}>{children}</div>);
+  return base;
+};
 
 export default {
   BootstrapTextWidget,
