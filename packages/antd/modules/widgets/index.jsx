@@ -32,13 +32,22 @@ import ValueSources from "./core/ValueSources";
 import confirm from "./core/confirm";
 
 import { ConfigProvider, theme } from "antd";
+
 const Provider = ({ config, children }) => {
-  const darkMode = config.settings.theme?.antd?.darkMode ?? false;
-  const algorithm = darkMode ? theme.darkAlgorithm : theme.compactAlgorithm;
-  const palette = algorithm(theme.defaultSeed);
+  const darkMode = config.settings.themeMode === "dark" ?? false;
+  const compactMode = config.settings.compactMode;
+  const ref = React.createRef();
+  const algorithms = [
+    darkMode && theme.darkAlgorithm,
+    compactMode && theme.compactAlgorithm,
+    !compactMode && !darkMode && theme.defaultAlgorithm,
+  ].filter(a => !!a);
+  const palette = algorithms.reduce((tkns, algo, i) => i === 0 ? algo(tkns) : algo({}, tkns), theme.defaultSeed);
   React.useEffect(() => {
     console.log('antd palette', palette);
     const r = document.querySelector(":root");
+    const w = ref.current?.closest(".qb-antd");
+    const cssVarsTarget = w ?? r;
     const cssVars = {
       "--rule-background": palette.colorBgElevated,
       "--group-background": darkMode ? palette.colorBgMask : palette.colorFillSecondary,
@@ -52,29 +61,35 @@ const Provider = ({ config, children }) => {
       '--treeline-disabled-color': palette.colorFillSecondary,
       "--main-text-color": palette.colorText,
       "--main-font-family": palette.fontFamily,
-      "--main-font-size": palette.fontSize,
+      "--main-font-size": palette.fontSize + 'px',
       //"--group-in-rulegroupext-border-color": palette.colorBorderSecondary,
     };
     console.log('antd cssVars', cssVars);
     for (const k in cssVars) {
       if (cssVars[k] != undefined) {
-        r.style.setProperty(k, cssVars[k]);
+        cssVarsTarget.style.setProperty(k, cssVars[k]);
       }
     }
     return () => {
       for (const k in cssVars) {
-        r.style.removeProperty(k);
+        cssVarsTarget.style.removeProperty(k);
       }
     };
-  }, [darkMode]);
-  return (
+  }, [darkMode, compactMode]);
+
+  const base = (<div className={`qb-antd ${compactMode ? "qb-compact" : ""}`}><div ref={ref} style={{display: "none"}} />{children}</div>);
+  const withProviders = (
     <ConfigProvider
       locale={config.settings.locale.antd}
       theme={{
-        algorithm
+        // https://ant.design/docs/react/customize-theme
+        // todo: allow overrides
+        algorithm: algorithms
       }}
-    >{children}</ConfigProvider>
+    >{base}</ConfigProvider>
   );
+
+  return withProviders;
 };
 
 export default {

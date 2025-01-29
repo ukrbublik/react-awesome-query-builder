@@ -319,7 +319,8 @@ export interface RuleProps {
 
 
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
-type AntdSize = "small" | "large" | "medium";
+type RenderSize = "small" | "large" | "medium";
+type ThemeMode = "light" | "dark";
 
 export interface ThemeSettings {
   theme?: {
@@ -327,7 +328,9 @@ export interface ThemeSettings {
     mui?: Object;
     antd?: Object;
   };
-  renderSize?: AntdSize;
+  renderSize?: RenderSize;
+  themeMode?: ThemeMode;
+  compactMode?: boolean;
   dropdownPlacement?: AntdPosition;
   groupActionsPosition?: AntdPosition;
   defaultSliderWidth?: string;

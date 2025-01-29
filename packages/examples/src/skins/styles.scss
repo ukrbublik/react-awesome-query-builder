@@ -21,12 +21,12 @@ body {
 $inputs: select, input, button;
 
 body[data-theme="dark"] {
-  background-color: oklch(0.253267 0.015896 252.418);
+  background-color: rgb(15, 18, 20);
   color: oklch(0.746477 0.0216 264.436);
   @each $input in $inputs {
     #{$input}:not(.query-builder #{$input}) {
-      border-color: oklch(0.253267 0.015896 252.418);
-      background-color: oklch(0.253267 0.015896 252.418);
+      border-color: rgb(15, 18, 20);
+      background-color: rgb(15, 18, 20);
       color: oklch(0.746477 0.0216 264.436);
       outline: none;
     }

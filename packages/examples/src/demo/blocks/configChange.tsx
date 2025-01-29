@@ -18,6 +18,7 @@ export const useConfigChange = (
         showLock: !(state.configChanges?.settings?.showLock ?? false),
       }
     });
+    window._configChanges = state.configChanges;
     newConfig = merge(newConfig, state.configChanges);
     setState({...state, config: newConfig});
   };
@@ -29,6 +30,7 @@ export const useConfigChange = (
         showErrorMessage: !(state.configChanges?.settings?.showErrorMessage ?? false),
       }
     });
+    window._configChanges = state.configChanges;
     newConfig = merge(newConfig, state.configChanges);
     setState({...state, config: newConfig});
   };

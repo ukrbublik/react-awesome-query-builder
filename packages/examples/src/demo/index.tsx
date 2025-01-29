@@ -5,6 +5,7 @@ import {
   BuilderProps, ImmutableTree, Config, ActionMeta, Actions
 } from "@react-awesome-query-builder/ui";
 import throttle from "lodash/throttle";
+import merge from "lodash/merge";
 import ImportSkinStyles from "../skins";
 import loadConfig from "./config";
 import {
@@ -23,7 +24,7 @@ import mainStyles from "../skins/styles.scss";
 (mainStyles as LazyStyleModule).use();
 
 // Load config and initial tree
-const loadedConfig = loadConfig(window._initialSkin || initialSkin);
+const loadedConfig = merge(loadConfig(window._initialSkin || initialSkin), window._configChanges ?? {});
 const {tree: initTree, errors: initErrors} = initTreeWithValidation(window._initFile || defaultInitFile, loadedConfig, validationTranslateOptions);
 
 // Trick for HMR: triggers callback put in useHmrUpdate on every update from HMR
@@ -48,6 +49,7 @@ const DemoQueryBuilder: React.FC = () => {
     renderBocks: defaultRenderBlocks,
     initFile: defaultInitFile,
     themeMode: "light",
+    compactMode: false,
     configChanges: {},
   });
 
@@ -65,7 +67,7 @@ const DemoQueryBuilder: React.FC = () => {
   const { renderInitFilesHeader, renderInitErrors } = useInitFiles(state, setState);
   const { renderSkinSelector } = useSkins(state, setState);
   const { renderBlocksSwitcher } = useBlocksSwitcher(state, setState);
-  const { renderThemeModeSelector } = useThemeing(state, setState);
+  const { renderThemeModeSelector, renderCompactModeSelector } = useThemeing(state, setState);
 
 
   const renderBuilder = useCallback((bprops: BuilderProps) => {
@@ -115,6 +117,7 @@ const DemoQueryBuilder: React.FC = () => {
         Theme: &nbsp;
         {renderSkinSelector()}
         {renderThemeModeSelector()}
+        {renderCompactModeSelector()}
       </div>
       <div>
         Settings: &nbsp;

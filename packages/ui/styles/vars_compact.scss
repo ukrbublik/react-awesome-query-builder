@@ -7,7 +7,7 @@ $compact-rule-parts-distance: 5px;
 $compact-drag-offset-right: 5px;
 $compact-rule-group-actions-offset-left: 5px;
 
-.query-builder.qb-compact {
+.qb-compact {
   --item-offset-left: #{$compact-item-offset-left};
   --item-offset: #{$compact-item-offset};
   --rulegroup-offset-left: #{$compact-rulegroup-offset-left};

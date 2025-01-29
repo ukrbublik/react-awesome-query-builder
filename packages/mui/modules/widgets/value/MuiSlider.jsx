@@ -105,10 +105,11 @@ export default (props) => {
     marginLeft: "5px",
   };
 
+  // todo: css
   const stylesSliderWrapper = {
     marginLeft: "5px", 
     paddingLeft: "12px", 
-    marginBottom: muiMarks && "-16px", 
+    marginBottom: muiMarks && "-24px", 
     width: width || defaultSliderWidth,
   };
 

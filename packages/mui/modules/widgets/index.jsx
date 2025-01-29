@@ -37,19 +37,18 @@ import MuiConfirm from "./core/MuiConfirm";
 
 // provider
 const MuiProvider = ({config, children}) => {
-  const settingsTheme = config.settings.theme || {};
-  const settingsLocale = config.settings.locale || {};
-  const momentLocale = settingsLocale.moment;
-  const themeConfig = settingsTheme.mui;
-  const locale = settingsLocale.mui;
-  const theme = createTheme(themeConfig, locale, { 
+  const themeMode = config.settings.themeMode ?? "light";
+  const compactMode = config.settings.compactMode;
+  const settingsTheme = config.settings.theme;
+  const settingsLocale = config.settings.locale;
+  const momentLocale = settingsLocale?.moment;
+  const themeConfig = settingsTheme?.mui;
+  const localeConfig = settingsLocale?.mui;
+  const theme = createTheme(themeConfig ?? {
     palette: {
-      // neutral: {
-      //   main: "#64748B",
-      //   contrastText: "#fff"
-      // },
+      mode: themeMode,
     }
-  });
+  }, localeConfig ?? {});
 
   const locProviderProps = xdpVersion >= 6 ? {
     locale: momentLocale,
@@ -65,7 +64,7 @@ const MuiProvider = ({config, children}) => {
       const { palette, typography, shadows } = theme;
       const setOpacity = (hex, alpha) => `${hex}${Math.floor(alpha * 255).toString(16).padStart(2, 0)}`;
       const r = document.querySelector(":root");
-      const w = ref.current?.closest(".mui");
+      const w = ref.current?.closest(".qb-mui");
       const cssVarsTarget = w ?? r;
       const cssVars = {
         "--rule-background": palette.mode === "dark" ? setOpacity(palette.grey[800], 0.3) : palette.background.paper,
@@ -100,7 +99,7 @@ const MuiProvider = ({config, children}) => {
     return <div ref={ref} style={{display: "none"}} />;
   };
 
-  const base = (<div className="mui"><UpdCssVars />{children}</div>);
+  const base = (<div className={`qb-mui ${compactMode ? "qb-compact" : ""}`}><UpdCssVars />{children}</div>);
   const withProviders = (
     <LocalizationProvider dateAdapter={AdapterMoment} {...locProviderProps} >
       <ConfirmProvider>
