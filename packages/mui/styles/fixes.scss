@@ -4,6 +4,9 @@ $custom-select-option-color: lightcoral !default;
   .MuiIconButton-sizeSmall {
     padding: 3px; // smaller button
   }
+  .MuiSlider-markLabel {
+    margin-top: -12px;
+  }
 }
 
 /* should be outside of .query-builder */
