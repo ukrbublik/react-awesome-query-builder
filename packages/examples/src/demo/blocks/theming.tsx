@@ -24,13 +24,27 @@ export const useThemeing = (
             }
           },
           antd: {
-            darkMode: themeMode === "dark"
           }
-        }
+        },
+        themeMode: themeMode,
       }
     });
+    window._configChanges = state.configChanges;
     newConfig = merge(newConfig, state.configChanges);
     setState({...state, config: newConfig, themeMode});
+  };
+
+  const changeCompactMode = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const compactMode = e.target.value === "compact";
+    let newConfig: Config = clone(state.config);
+    state.configChanges = merge(state.configChanges, {
+      settings: {
+        compactMode,
+      }
+    });
+    window._configChanges = state.configChanges;
+    newConfig = merge(newConfig, state.configChanges);
+    setState({...state, config: newConfig, compactMode});
   };
 
   const renderThemeModeSelector = () => {
@@ -42,7 +56,17 @@ export const useThemeing = (
     );
   };
 
+  const renderCompactModeSelector = () => {
+    return (
+      <select value={state.compactMode ? "compact" : "normal"} onChange={changeCompactMode}>
+        <option key="normal">normal</option>
+        <option key="compact">compact</option>
+      </select>
+    );
+  };
+
   return {
     renderThemeModeSelector,
+    renderCompactModeSelector,
   };
 };

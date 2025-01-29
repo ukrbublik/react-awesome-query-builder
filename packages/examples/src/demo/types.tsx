@@ -16,6 +16,7 @@ export interface DemoQueryBuilderState {
   sqlWarnings: Array<string>;
   initFile: string;
   themeMode: "light" | "dark";
+  compactMode: boolean;
   configChanges: PartialPartial<Config>;
 }
 
@@ -29,6 +30,7 @@ declare global {
   interface Window {
     _initialSkin: string;
     _initFile: string;
+    _configChanges: Object;
   }
 
   interface Console {
