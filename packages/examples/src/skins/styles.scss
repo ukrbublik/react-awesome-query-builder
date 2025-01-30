@@ -24,7 +24,7 @@ body[data-theme="dark"] {
   background-color: rgb(15, 18, 20);
   color: oklch(0.746477 0.0216 264.436);
   @each $input in $inputs {
-    #{$input}:not(.query-builder #{$input}) {
+    #root #{$input}:not(.query-builder #{$input}) {
       border-color: rgb(15, 18, 20);
       background-color: rgb(15, 18, 20);
       color: oklch(0.746477 0.0216 264.436);
