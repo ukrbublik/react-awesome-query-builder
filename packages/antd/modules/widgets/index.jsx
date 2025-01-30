@@ -34,7 +34,7 @@ import confirm from "./core/confirm";
 import { ConfigProvider, theme } from "antd";
 
 const Provider = ({ config, children }) => {
-  const darkMode = config.settings.themeMode === "dark" ?? false;
+  const darkMode = config.settings.themeMode === "dark";
   const compactMode = config.settings.compactMode;
   const ref = React.createRef();
   const algorithms = [
