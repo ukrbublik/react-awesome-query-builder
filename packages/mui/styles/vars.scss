@@ -2,7 +2,3 @@ $inactive_conjs: (".MuiButton-root:not(.MuiButton-colorPrimary, .MuiButton-color
 $active_conjs: (".MuiButton-colorPrimary, .MuiButton-colorError");
 $seps-offset-bottom: 8px;
 
-.group--conjunctions > .MuiFormControl-root {
-  border-radius: 8px; // todo: var
-  overflow: hidden;
-}

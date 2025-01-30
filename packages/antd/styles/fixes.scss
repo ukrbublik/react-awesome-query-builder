@@ -12,6 +12,13 @@ body.qb-dragging {
   }
 }
 
+.query-builder {
+  .group--conjunctions > .ant-btn-group {
+    border-radius: 4px; // todo: var
+    overflow: hidden;
+  }
+}
+
 /* slider */
 .query-builder {
   /* v4 fix */

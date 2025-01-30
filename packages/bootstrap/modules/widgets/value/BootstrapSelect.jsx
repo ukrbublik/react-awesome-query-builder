@@ -15,7 +15,9 @@ export default ({
   allowCustomValues,
   readonly,
   placeholder,
+  config,
 }) => {
+  const darkMode = config.settings.themeMode === "dark";
   const onChange = e => {
     if (e.target.value === undefined)
       return;
@@ -64,22 +66,25 @@ export default ({
 
   return (
     <Dropdown
-      isOpen={isOpen}
+      isOpen={!readonly && isOpen}
       onClick={() => (!isOpen ? setIsOpen(true) : setIsOpen(false))}
       disabled={readonly}
       toggle={() => setIsOpen(!isOpen)}
     >
       <DropdownToggle
-        tag={"button"}
+        tag={!darkMode ? "button" : undefined}
+        caret={darkMode}
         className={"form-select"}
         style={stylesDropdownWrapper}
-        color={"transparent"}
+        color={darkMode ? "dark" : "transparent"}
+        disabled={readonly}
       >
         {hasValue ? renderValue(selectedValue) : <span>&nbsp;</span>}
       </DropdownToggle>
       <DropdownMenu
         container="body"
         style={stylesDropdownMenuWrapper}
+        dark={darkMode}
       >
         {!hasValue && <DropdownItem disabled value={""}></DropdownItem>}
         {renderOptions()}
