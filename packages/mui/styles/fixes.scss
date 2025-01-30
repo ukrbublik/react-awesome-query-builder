@@ -11,3 +11,10 @@
 .customSelectOption {
   color: $custom-select-option-color;
 }
+
+.query-builder {
+  .group--conjunctions > .MuiFormControl-root {
+    border-radius: 8px; // todo: var
+    overflow: hidden;
+  }
+}

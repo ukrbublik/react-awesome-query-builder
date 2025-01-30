@@ -684,10 +684,14 @@ $root_group: ".query-builder > .group-container > .group";
 
   // multiline distance
   .rule--func, .widget--widget {
-    margin-bottom: 2px;
+    margin-bottom: $multiline-distance;
   }
   .rule--body--wrapper {
-    margin-bottom: -2px;
+    margin-bottom: calc(-1 * $multiline-distance);
+  }
+  .rule_group_ext > .group--header .group--conjunctions {
+    // fix bottom radius issue for antd
+    margin-bottom: $multiline-distance;
   }
 
 
@@ -735,7 +739,7 @@ $root_group: ".query-builder > .group-container > .group";
 @mixin display_conjs_only_for_hovered_group($inactive, $active) {
   @if $inactive {
     #{$inactive} {
-      transition: 0.2s;
+      transition: 0.3s;
     }
     .group-or-rule:not(.qb-draggable, .qb-placeholder) > .group--header:hover .group--header,
     .group-or-rule:not(.qb-draggable, .qb-placeholder) > .group--header:not(:hover),
@@ -745,8 +749,10 @@ $root_group: ".query-builder > .group-container > .group";
           width: 0;
           min-width: 0;
           padding: 0;
+          margin: 0;
           overflow: hidden;
           opacity: 0;
+          border-width: 0;
         }
       }
     }

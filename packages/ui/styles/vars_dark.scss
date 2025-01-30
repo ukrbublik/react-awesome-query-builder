@@ -1,6 +1,14 @@
-$dark-rule-background: black;
+$dark-rule-background: #53535359 !default;
+$dark-rulegroup-border-color: #8f8f8fa3 !default;
+$dark-rulegroupext-border-color: #8f8f8fa3 !default;
+$dark-group-background: #3e3e3e78 !default;
+$dark-group-border-color: #8f8f8fa3 !default;
 
 .qb-dark {
   --rule-background: #{$dark-rule-background};
+  --rulegroup-border-color: #{$dark-rulegroup-border-color};
+  --rulegroupext-border-color: #{$dark-rulegroupext-border-color};
+  --group-background: #{$dark-group-background};
+  --group-border-color: #{$dark-group-border-color};
   // todo: complete
 }
