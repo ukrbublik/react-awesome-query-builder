@@ -46,7 +46,7 @@ const Provider = ({ config, children }) => {
   React.useEffect(() => {
     console.log('antd palette', palette);
     const r = document.querySelector(":root");
-    const w = ref.current?.closest(".qb-antd");
+    const w = ref.current;
     const cssVarsTarget = w ?? r;
     const cssVars = {
       "--rule-background": palette.colorBgElevated,
@@ -77,7 +77,7 @@ const Provider = ({ config, children }) => {
     };
   }, [darkMode, compactMode]);
 
-  const base = (<div className={`qb-antd ${compactMode ? "qb-compact" : ""}`}><div ref={ref} style={{display: "none"}} />{children}</div>);
+  const base = (<div ref={ref} className={`qb-antd ${compactMode ? "qb-compact" : ""}`}>{children}</div>);
   const withProviders = (
     <ConfigProvider
       locale={config.settings.locale.antd}
