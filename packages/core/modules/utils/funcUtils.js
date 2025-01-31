@@ -96,6 +96,13 @@ export const setArgValueSrc = (value, argKey, argValSrc, _argConfig, _config) =>
   return value;
 };
 
+export const setArgValueAsyncListValues = (value, argKey, asyncListValues, _argConfig, _config) => {
+  if (value && value.get("func")) {
+    value = value.setIn(["args", argKey, "asyncListValues"], asyncListValues);
+  }
+  return value;
+};
+
 // see getFuncSignature in configUtils
 export const getCompatibleArgsOnFuncChange = (s1, s2, argVals, config, canFixArgs = false) => {
   if (s1?.returnType != s2?.returnType)
