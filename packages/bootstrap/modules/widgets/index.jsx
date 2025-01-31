@@ -25,7 +25,6 @@ import BootstrapConfirm from "./core/BootstrapConfirm";
 
 // provider
 const BootstrapProvider = ({config, children}) => {
-  //todo: same for vanilla, fluent
   const themeMode = config.settings.themeMode ?? "light";
   const compactMode = config.settings.compactMode;
 
