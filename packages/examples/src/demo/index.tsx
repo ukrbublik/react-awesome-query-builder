@@ -18,7 +18,7 @@ import "./i18n";
 
 // Load config and initial tree
 const loadedConfig = loadConfig(window._initialSkin || initialSkin);
-const initTree = initTreeWithValidation(window._initFile || defaultInitFile, loadedConfig, validationTranslateOptions);
+const {tree: initTree, errors: initErrors} = initTreeWithValidation(window._initFile || defaultInitFile, loadedConfig, validationTranslateOptions);
 
 // Trick for HMR: triggers callback put in useHmrUpdate on every update from HMR
 dispatchHmrUpdate(loadedConfig, initTree);
@@ -30,11 +30,15 @@ const DemoQueryBuilder: React.FC = () => {
   const memo: React.MutableRefObject<DemoQueryBuilderMemo> = useRef({});
 
   const [state, setState] = useState<DemoQueryBuilderState>({
-    tree: initTree, 
+    tree: initTree,
+    initErrors: initErrors,
     config: loadedConfig,
     skin: initialSkin,
     spelStr: "",
+    sqlStr: "",
     spelErrors: [] as Array<string>,
+    sqlErrors: [] as Array<string>,
+    sqlWarnings: [] as Array<string>,
     renderBocks: defaultRenderBlocks,
     initFile: defaultInitFile,
   });
@@ -48,9 +52,9 @@ const DemoQueryBuilder: React.FC = () => {
   const { renderValidationHeader, renderValidationBlock } = useValidation(state, setState);
   const { renderBenchmarkHeader } = useBenchmark(state, setState, memo);
   const { renderOutput } = useOutput(state);
-  const { renderSpelInputBlock } = useInput(state, setState);
+  const { renderInputs } = useInput(state, setState);
   const { renderConfigChangeHeader } = useConfigChange(state, setState);
-  const { renderInitFilesHeader } = useInitFiles(state, setState);
+  const { renderInitFilesHeader, renderInitErrors } = useInitFiles(state, setState);
   const { renderSkinSelector } = useSkins(state, setState);
   const { renderBlocksSwitcher } = useBlocksSwitcher(state, setState);
 
@@ -88,6 +92,7 @@ const DemoQueryBuilder: React.FC = () => {
     setState({
       ...state,
       tree: Utils.loadTree(emptyTree), 
+      initErrors: [],
     });
   };
 
@@ -107,6 +112,7 @@ const DemoQueryBuilder: React.FC = () => {
         Data: &nbsp;
         {renderInitFilesHeader()}
         <button onClick={clearValue}>Clear</button>
+        {renderInitErrors()}
         {renderRunActions()}
       </div>
       <div>
@@ -118,8 +124,7 @@ const DemoQueryBuilder: React.FC = () => {
         {renderBenchmarkHeader()}
       </div>
 
-      <br />
-      {renderSpelInputBlock()}
+      {renderInputs()}
 
       <ImportSkinStyles skin={state.skin} />
 

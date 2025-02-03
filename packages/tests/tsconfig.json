@@ -4,9 +4,12 @@
     "module": "esnext",
     "jsx": "preserve",
     "lib": [
-      "es2015",
+      "es2016",
       "dom",
       "dom.iterable"
+    ],
+    "types": [
+      "mocha"
     ],
     "allowJs": true,
     "outDir": "ts_out",
@@ -20,6 +23,7 @@
     "baseUrl": ".",
     "paths": {
       "@react-awesome-query-builder/core": ["../core/modules"],
+      "@react-awesome-query-builder/sql": ["../sql/modules"],
       "@react-awesome-query-builder/ui": ["../ui/modules"],
       "@react-awesome-query-builder/antd": ["../antd/modules"],
       "@react-awesome-query-builder/mui": ["../mui/modules"],

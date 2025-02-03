@@ -3,19 +3,42 @@ import SqlStringOrig from "sqlstring";
 export const SqlString = SqlStringOrig;
 
 SqlString.trim = (val) => {
-  if (val.charAt(0) == "'")
+  if (val?.charAt(0) == "'")
     return val.substring(1, val.length-1);
   else
     return val;
 };
 
-SqlString.escapeLike = (val, any_start = true, any_end = true) => {
+SqlString.unescapeLike = (val, sqlDialect = undefined) => {
+  if (typeof val !== "string") {
+    return val;
+  }
+  let res = val;
+  // unescape % and _
+  if (sqlDialect === "BigQuery") {
+    // https://cloud.google.com/bigquery/docs/reference/standard-sql/operators#like_operator
+    res = res.replace(/\\\\([%_])/g, "$1");
+  } else {
+    res = res.replace(/\\([%_])/g, "$1");
+  }
+  return res;
+};
+
+SqlString.escapeLike = (val, any_start = true, any_end = true, sqlDialect = undefined) => {
+  if (typeof val !== "string") {
+    return val;
+  }
   // normal escape
   let res = SqlString.escape(val);
   // unwrap ''
   res = SqlString.trim(res);
   // escape % and _
-  res = res.replace(/[%_]/g, "\\$&");
+  if (sqlDialect === "BigQuery") {
+    // https://cloud.google.com/bigquery/docs/reference/standard-sql/operators#like_operator
+    res = res.replace(/[%_\\]/g, "\\\\$&");
+  } else {
+    res = res.replace(/[%_]/g, "\\$&");
+  }
   // wrap with % for LIKE
   res = (any_start ? "%" : "") + res + (any_end ? "%" : "");
   // wrap ''

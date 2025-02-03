@@ -1,23 +1,23 @@
 import Immutable, { fromJS } from "immutable";
 import {
-  expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree, 
+  expandTreePath, expandTreeSubpath, getItemByPath, getAncestorRuleGroups, fixPathsInTree,
   getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren, removeIsLockedInTree
 } from "../utils/treeUtils";
 import {
   defaultRuleProperties, defaultGroupProperties, getDefaultOperator, 
-  defaultOperatorOptions, defaultItemProperties
-} from "../utils/defaultUtils";
+  defaultOperatorOptions, defaultItemProperties,
+} from "../utils/defaultRuleUtils";
 import * as constants from "./constants";
 import uuid from "../utils/uuid";
 import {
-  getFuncConfig, getFieldConfig, getOperatorConfig
+  getFuncConfig, getFieldConfig, getOperatorConfig, selectTypes, getOperatorsForType, getOperatorsForField, getFirstOperator,
 } from "../utils/configUtils";
 import {
-  getOperatorsForField, getOperatorsForType, getFirstOperator,
-  isEmptyItem, selectTypes, calculateValueType
+  isEmptyItem, calculateValueType
 } from "../utils/ruleUtils";
 import {deepEqual, getOpCardinality, applyToJS} from "../utils/stuff";
-import {validateValue, validateRange, getNewValueForFieldOp} from "../utils/validation";
+import {validateValue, validateRange} from "../utils/validation";
+import {getNewValueForFieldOp} from "../utils/getNewValueForFieldOp";
 import {translateValidation} from "../i18n";
 import omit from "lodash/omit";
 import mapValues from "lodash/mapValues";
@@ -50,7 +50,7 @@ const addNewGroup = (state, path, type, generatedId, properties, config, childre
 
       // Add one empty rule into new group
       if (canAddNewRule) {
-        state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+        state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config, meta?.parentRuleGroupField), config);
       }
     }
 
@@ -226,13 +226,30 @@ const addItem = (state, path, type, generatedId, properties, config, children = 
     currentNumber = targetChildrenSize;
     maxNumber = maxNumberOfCases;
   } else if (type === "group") {
-    currentNumber = path.size;
-    maxNumber = maxNesting;
-  } else if (targetItem?.get("type") === "rule_group") {
-    // don't restrict
-  } else {
-    currentNumber = isTernary ? getTotalRulesCountInTree(caseGroup) : getTotalRulesCountInTree(state);
-    maxNumber = maxNumberOfRules;
+    const ruleGroups = getAncestorRuleGroups(state, path);
+    if (ruleGroups.length) {
+      // closest rule-group
+      const { path: ruleGroupPath, field: ruleGroupField } = ruleGroups[0];
+      const ruleGroupFieldConfig = getFieldConfig(config, ruleGroupField);
+      currentNumber = path.size - ruleGroupPath.length;
+      maxNumber = ruleGroupFieldConfig?.maxNesting;
+    } else {
+      currentNumber = path.size;
+      maxNumber = maxNesting;
+    }
+  } else { // rule or rule_group
+    const ruleGroups = getAncestorRuleGroups(state, path);
+    if (ruleGroups.length) {
+      // closest rule-group
+      const { path: ruleGroupPath, field: ruleGroupField } = ruleGroups[0];
+      const ruleGroupFieldConfig = getFieldConfig(config, ruleGroupField);
+      const ruleGroupItem = getItemByPath(state, ruleGroupPath);
+      maxNumber = ruleGroupFieldConfig?.maxNumberOfRules;
+      currentNumber = getTotalRulesCountInTree(ruleGroupItem);
+    } else {
+      currentNumber = isTernary ? getTotalRulesCountInTree(caseGroup) : getTotalRulesCountInTree(state);
+      maxNumber = maxNumberOfRules;
+    }
   }
   const canAdd = maxNumber && currentNumber ? (currentNumber < maxNumber) : true;
   
@@ -571,9 +588,10 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
   if (isRuleGroup) {
     state = state.setIn(expandTreePath(path, "type"), "rule_group");
     const {canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality} = getNewValueForFieldOp(
+      { validateValue, validateRange },
       config, config, currentProperties, newField, newOperator, "field", canFix, isEndValue, canDropArgs
     );
-    let groupProperties = defaultGroupProperties(config, newFieldConfig).merge({
+    let groupProperties = defaultGroupProperties(config, newFieldConfig, newField).merge({
       field: newField,
       fieldSrc: "field",
       mode: newFieldConfig.mode,
@@ -599,6 +617,7 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
       const {
         canReuseValue, newValue, newValueSrc, newValueType, newValueError, newFieldError, fixedField
       } = getNewValueForFieldOp(
+        { validateValue, validateRange },
         config, config, current, newField, newOperator, "field", canFix, isEndValue, canDropArgs
       );
       // const newValueErrorStr = newValueError?.join?.("|");
@@ -667,6 +686,7 @@ const setOperator = (state, path, newOperator, config) => {
     const _currentOperator = current.get("operator");
 
     const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
+      { validateValue, validateRange },
       config, config, current, currentField, newOperator, "operator", canFix
     );
     if (showErrorMessage) {
@@ -840,6 +860,7 @@ const setValueSrc = (state, path, delta, srcKey, config, _meta = {}) => {
     // this call should return canReuseValue = false and provide default value
     const canFix = true;
     const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
+      { validateValue, validateRange },
       config, config, properties, field, operator, "valueSrc", canFix
     );
     if (!canReuseValue && newValueSrc.get(delta) == srcKey) {

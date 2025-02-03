@@ -13,6 +13,7 @@ import Widget from "../rule/Widget";
 import classNames from "classnames";
 const {getFieldConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
 const {isEmptyRuleGroupExtPropertiesAndChildren} = Utils.RuleUtils;
+const {getTotalReordableNodesCountInTree} = Utils.TreeUtils;
 
 
 class RuleGroupExt extends BasicGroup {
@@ -28,6 +29,7 @@ class RuleGroupExt extends BasicGroup {
     setOperator: PropTypes.func,
     setValue: PropTypes.func,
     valueError: PropTypes.any,
+    lev: PropTypes.number, // from GroupContainer
   };
 
   constructor(props) {
@@ -41,8 +43,22 @@ class RuleGroupExt extends BasicGroup {
   childrenClassName = () => "rule_group_ext--children";
   
   renderFooterWrapper = () => null;
-  canAddGroup = () => false;
-  canAddRule = () => true;
+
+  canAddGroup() {
+    return this.props.allowFurtherNesting;
+  }
+
+  canAddRule() {
+    const {config, selectedField} = this.props;
+    const selectedFieldConfig = getFieldConfig(config, selectedField);
+    const maxNumberOfRules = selectedFieldConfig.maxNumberOfRules;
+    const totalRulesCnt = this.props.totalRulesCnt;
+    if (maxNumberOfRules) {
+      return totalRulesCnt < maxNumberOfRules;
+    }
+    return true;
+  }
+
   canDeleteGroup = () => true;
 
   renderHeaderWrapper() {
@@ -53,7 +69,7 @@ class RuleGroupExt extends BasicGroup {
         this.isOneChild() ? "hide--line" : "",
         this.isNoChildren() ? "no--children" : "",
         this.showDragIcon() ? "with--drag" : "hide--drag",
-        this.showConjs() && (!this.isOneChild() || this.showNot()) ? "with--conjs" : "hide--conjs"
+        this.showConjs() ? "with--conjs" : "hide--conjs"
       )}>
         {this.renderHeader()}
         {this.renderGroupField()}
@@ -93,26 +109,14 @@ class RuleGroupExt extends BasicGroup {
   }
 
   showNot() {
-    const {config, selectedField, selectedOperator} = this.props;
-    const selectedFieldConfig = getFieldConfig(config, selectedField) || {};
-    return selectedFieldConfig.showNot != undefined ? selectedFieldConfig.showNot : config.settings.showNot;
+    const {config, selectedField} = this.props;
+    const selectedFieldConfig = getFieldConfig(config, selectedField);
+    return selectedFieldConfig?.showNot ?? config.settings.showNot;
   }
 
   conjunctionOptions() {
-    const {config, selectedField, selectedOperator} = this.props;
-    const selectedFieldConfig = getFieldConfig(config, selectedField) || {};
-    let conjunctionOptions = super.conjunctionOptions();
-    if (selectedFieldConfig.conjunctions) {
-      let filtered = {};
-      for (let k of selectedFieldConfig.conjunctions) {
-        const options = conjunctionOptions[k];
-        if (options) {
-          filtered[k] = options;
-        }
-      }
-      conjunctionOptions = filtered;
-    }
-    return conjunctionOptions;
+    const { selectedField } = this.props;
+    return this.conjunctionOptionsForGroupField(selectedField);
   }
 
   renderField() {
@@ -222,12 +226,14 @@ class RuleGroupExt extends BasicGroup {
   }
 
   renderActions() {
-    const {config, addRule, isLocked, isTrueLocked, id} = this.props;
+    const {config, addRule, addGroup, isLocked, isTrueLocked, id} = this.props;
 
     return <RuleGroupExtActions
       config={config}
       addRule={addRule}
+      addGroup={addGroup}
       canAddRule={this.canAddRule()}
+      canAddGroup={this.canAddGroup()}
       canDeleteGroup={this.canDeleteGroup()}
       removeSelf={this.removeSelf}
       setLock={this.setLock}
@@ -237,16 +243,23 @@ class RuleGroupExt extends BasicGroup {
     />;
   }
 
+
   reordableNodesCntForItem(_item) {
     if (this.props.isLocked)
       return 0;
-    const {children1} = this.props;
-    return children1?.size || 0;
+    const {children1, id} = this.props;
+    return getTotalReordableNodesCountInTree({
+      id, type: "rule_group", children1
+    });
   }
 
   extraPropsForItem(_item) {
+    const { selectedField, lev, config } = this.props;
+    const selectedFieldConfig = getFieldConfig(config, selectedField);
     return {
-      parentField: this.props.selectedField
+      parentField: selectedField,
+      parentFieldPathSize: lev + 1,
+      parentFieldCanReorder: selectedFieldConfig?.canReorder ?? config.settings.canReorder,
     };
   }
 }

@@ -7,7 +7,7 @@ import * as constants from "../../stores/constants";
 import PropTypes from "prop-types";
 import * as actions from "../../actions";
 import {pureShouldComponentUpdate, useOnPropsChanged, isUsingLegacyReactDomRender} from "../../utils/reactUtils";
-const {clone} = Utils;
+const {clone} = Utils.OtherUtils;
 const {getFlatTree} = Utils.TreeUtils;
 
 let _isReorderingTree = false;
@@ -29,7 +29,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
     }
 
     onPropsChanged(nextProps) {
-      this.tree = getFlatTree(nextProps.tree);
+      this.tree = getFlatTree(nextProps.tree, nextProps.config);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -148,6 +148,10 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
 
     onDragStart = (id, dom, e) => {
       let treeEl = dom.closest(".query-builder");
+      if (!treeEl) {
+        console.error("Please change renderBuilder implementation of <Query>: wrap <Builder> with div.query-builder for drag-n-drop support");
+        return;
+      }
       if (this._isUsingLegacyReactDomRender === undefined) {
         this._isUsingLegacyReactDomRender = isUsingLegacyReactDomRender(treeEl);
       }
@@ -565,31 +569,53 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
         return false;
       if (fromII.id === toII.id)
         return false;
-
+      
       const { canRegroup, canRegroupCases, maxNesting, maxNumberOfRules, canLeaveEmptyCase } = this.props.config.settings;
-      const newLev = toParentII ? toParentII.lev + 1 : toII.lev;
-      const newDepthLev = newLev + (fromII.depth || 0);
+      const newAtomicLev = toParentII ? toParentII.nextAtomicLev : toII.atomicLev;
+      // tip: if group is empty, we still should use 1 (not 0) as depth because we could potentially add a rule inside it
+      // tip: don't use fepth inside rule-group
+      const newDepthLev = newAtomicLev + (fromII.closestRuleGroupId ? 0 : (fromII.depth || (fromII.type == "group" ? 1 : 0)));
       const isBeforeAfter = placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER;
       const isPend = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND;
       const isLev1 = isBeforeAfter && toII.lev == 1 || isPend && toII.lev == 0;
       const isParentChange = fromII.parent != toII.parent;
       const isStructChange = isPend || isParentChange;
-      // can't move `case_group` anywhere but before/after anoter `case_group`
-      const isForbiddenStructChange = fromII.type == "case_group" && !isLev1
-        // can't restruct `rule_group`
-        || fromII.parentType == "rule_group" || toII.type == "rule_group" || toII.parentType == "rule_group" 
+      // can't restruct `rule_group`
+      const isRuleGroupAffected = (fromII.type == "rule_group" || !!fromII.closestRuleGroupId || toII.type == "rule_group" || !!toII.closestRuleGroupId);
+      const targetRuleGroupId = isPend && toII.type == "rule_group" ? toII.id : toII.closestRuleGroupId;
+      const targetRuleGroupMaxNesting = isPend && toII.type == "rule_group" ? toII.maxNesting : toII.closestRuleGroupMaxNesting;
+      const targetRuleGroupCanRegroup = (isPend && toII.type == "rule_group" ? toII.canRegroup : toII.closestRuleGroupCanRegroup) != false;
+      const closestRuleGroupLev = isPend && toII.type == "rule_group" ? toII.lev : toII.closestRuleGroupLev;
+      const newDepthLevInRuleGroup = (toParentII ? toParentII.lev + 1 : toII.lev)
+        + (fromII.depth || (fromII.type == "group" ? 1 : 0))
+        - (closestRuleGroupLev || 0);
+      const isForbiddenRuleGroupChange = isRuleGroupAffected && fromII.closestRuleGroupId != targetRuleGroupId;
+      const isForbiddenCaseChange = 
+        // can't move `case_group` anywhere but before/after anoter `case_group`
+        fromII.type == "case_group" && !isLev1
         // only `case_group` can be placed under `switch_group`
         || fromII.type != "case_group" && toII.type == "case_group" && isBeforeAfter
         || fromII.type != "case_group" && toII.type == "switch_group"
         // can't move rule/group to another case
         || !canRegroupCases && fromII.caseId != toII.caseId;
+      const isForbiddenStructChange = isForbiddenCaseChange || isForbiddenRuleGroupChange;
       const isLockedChange = toII.isLocked || fromII.isLocked || toParentII && toParentII.isLocked;
       
-      if (maxNesting && newDepthLev > maxNesting)
+      if (maxNesting && newDepthLev > maxNesting) {
         return false;
+      }
       
-      if (isStructChange && (!canRegroup || isForbiddenStructChange || isLockedChange))
+      if (targetRuleGroupMaxNesting && newDepthLevInRuleGroup > targetRuleGroupMaxNesting) {
         return false;
+      }
+      
+      if (isStructChange && (!canRegroup || isForbiddenStructChange || isLockedChange)) {
+        return false;
+      }
+
+      if (isRuleGroupAffected && isStructChange && !targetRuleGroupCanRegroup) {
+        return false;
+      }
       
       if (fromII.type != "case_group" && fromII.caseId != toII.caseId) {
         const isLastFromCase = fromCaseII ? fromCaseII._height == 2 : false;

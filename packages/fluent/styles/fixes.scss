@@ -25,6 +25,16 @@
     padding: 8px 0;
   }
 
+  .group--actions {
+    align-self: stretch;
+  }
+  .rule_group .group--actions {
+    align-self: center;
+  }
+  .rule_group_ext > .group--header .group--actions {
+    align-self: stretch;
+  }
+
   .widget--valuesrc span .ms-Icon {
     transform: rotate(90deg);
   }

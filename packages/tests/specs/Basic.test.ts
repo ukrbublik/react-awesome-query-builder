@@ -1,11 +1,12 @@
-import { Query, Builder, BasicConfig } from "@react-awesome-query-builder/ui";
+import { Query, Builder, BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 import { AntdConfig } from "@react-awesome-query-builder/antd";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb, empty_value, export_checks } from "../support/utils";
 import { expect } from "chai";
 // warning: don't put `export_checks` inside `it`
-
+import deepEqualInAnyOrder from "deep-equal-in-any-order";
+chai.use(deepEqualInAnyOrder);
 
 describe("library", () => {
   it("should be imported correctly", () => {
@@ -15,7 +16,6 @@ describe("library", () => {
     expect(AntdConfig).to.exist;
   });
 });
-
 
 describe("basic query", () => {
 
@@ -227,6 +227,46 @@ describe("basic query", () => {
         // validation:
         "Root  >>  Empty query"
       ]);
+    });
+
+    describe("should import @epoch timestamp ms from JL", () => {
+      export_checks([configs.with_date_and_time], inits.with_date_epoch_ms, "JsonLogic", {
+        logic: {
+          "and": [
+            {
+              "==": [
+                {
+                  "var": "datetime"
+                },
+                "2025-01-13T15:39:28.000Z"
+              ]
+            }
+          ]
+        }
+      });
+    });
+
+    describe("should import @epoch timestamp sec from JL if configured", () => {
+      export_checks([configs.with_date_and_time, configs.with_datetime_import_epoch_sec_jl], inits.with_date_epoch, "JsonLogic", {
+        logic: {
+          "and": [
+            {
+              "==": [
+                {
+                  "var": "datetime"
+                },
+                "2025-01-13T15:39:28.000Z"
+              ]
+            }
+          ]
+        }
+      });
+    });
+
+    describe("should export @epoch timestamp ms to JL if configured", () => {
+      export_checks([configs.with_date_and_time, configs.with_datetime_export_epoch_ms_jl], inits.with_date_epoch_ms, "JsonLogic", {
+        logic: inits.with_date_epoch_ms
+      });
     });
 
   });

@@ -126,7 +126,7 @@ export const useOutput = (
             </pre> 
           }
           <pre style={preStyle}>
-            {stringify(spel, undefined, 2)}
+            {spel}
           </pre>
         </div>
         <hr/>
@@ -147,14 +147,14 @@ export const useOutput = (
         <div>
           stringFormat: 
           <pre style={preStyle}>
-            {stringify(queryStr, undefined, 2)}
+            {queryStr}
           </pre>
         </div>
         <hr/>
         <div>
           humanStringFormat: 
           <pre style={preStyle}>
-            {stringify(humanQueryStr, undefined, 2)}
+            {humanQueryStr}
           </pre>
         </div>
         <hr/>
@@ -179,7 +179,7 @@ export const useOutput = (
             </pre> 
           }
           <pre style={preStyle}>
-            {stringify(sql, undefined, 2)}
+            {sql}
           </pre>
         </div>
         <hr/>

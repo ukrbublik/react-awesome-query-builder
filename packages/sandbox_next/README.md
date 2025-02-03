@@ -56,7 +56,7 @@ Feel free to play with code in `components/demo`, `lib`, `pages`.
 #### Session data
 Session data contains:
 - `jsonTree` - query value in JSON format, got from [`Utils.getTree()`](/README.md#gettree-immutablevalue-light--true-children1asarray--true---object)
-- `zipConfig` - compressed query config in JSON format, got from [`Utils.compressConfig()`](/README.md#compressconfigconfig-baseconfig---zipconfig)
+- `zipConfig` - compressed query config in JSON format, got from [`Utils.ConfigUtils.compressConfig()`](/README.md#compressconfigconfig-baseconfig---zipconfig)
 
 Session data is saved to Redis (for deploying to Vercel with Upstash integration) or tmp json file (for local run), see [lib/withSession.ts](lib/withSession.ts) if you're interested in session implementation.
 
@@ -71,7 +71,7 @@ Initial `zipConfig` (if missing in session data) is generated on server-side as 
 - based on `CoreConfig` (imported from `@react-awesome-query-builder/core`)
 - added fields, funcs and some overrides in [`lib/config_base`](lib/config_base.ts)
 - added UI mixins (`asyncFetch`, custom React components, `factory` overrides) in [`lib/config`](lib/config.tsx)
-- compressed with [`Utils.compressConfig()`](/README.md#compressconfigconfig-baseconfig---zipconfig)
+- compressed with [`Utils.ConfigUtils.compressConfig()`](/README.md#compressconfigconfig-baseconfig---zipconfig)
 
 See [getInitialZipConfig()](pages/api/config.ts).  
 
@@ -82,7 +82,7 @@ With `POST /api/config` compressed config can be saved to session data.
 
 #### DemoQueryBuilder
 `DemoQueryBuilder` component can use server-side props:
-- It uses [`Utils.decompressConfig(zipConfig, MuiConfig, ctx)`](/README.md#decompressconfigzipconfig-baseconfig-ctx---config) to create initial config to be passed to `<Query>`. [`ctx`](/README.md#ctx) is imported from [`config_ctx`](components/demo/config_ctx.tsx)
+- It uses [`Utils.ConfigUtils.decompressConfig(zipConfig, MuiConfig, ctx)`](/README.md#decompressconfigzipconfig-baseconfig-ctx---config) to create initial config to be passed to `<Query>`. [`ctx`](/README.md#ctx) is imported from [`config_ctx`](components/demo/config_ctx.tsx)
 - Initial tree (to be passed as `value` prop for `<Query>`) is a result of [`Utils.loadTree(jsonTree)`](/README.md#loadtree-jsvalue---immutable)
 
 On `onChange` callback it calls `POST /api/tree` to update tree on backend and also export tree to various formats on server-side.  

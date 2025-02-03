@@ -1,5 +1,4 @@
-
-const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
+import { isObject } from "./stuff";
 
 export const toListValue = (v, title) => {
   if (v == null || v == "") {

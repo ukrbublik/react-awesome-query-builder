@@ -6,12 +6,16 @@ Enzyme.configure({adapter: new Adapter()});
 
 // FILTER YOUR TESTS HERE
 const testsFilter = [
+  // "QueryWithOperators",
+  // "OtherUtils",
 ];
 const specFilter = [
+  // "@sql",
+  // "OtherUtils"
 ];
 
 const origDescribe = describe;
-// eslint-disable-next-line no-global-assign
+// eslint-disable-next-line no-global-assign, no-import-assign
 describe = function (suiteName, fn) {
   setCurrentTestName(suiteName);
   return origDescribe.call(this, suiteName, fn);

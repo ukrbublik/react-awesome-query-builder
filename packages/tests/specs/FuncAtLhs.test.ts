@@ -17,7 +17,16 @@ const {
 // warning: don't put `export_checks` inside `it`
 
 describe("LHS func", () => {
-  describe("load forom SpEL", () => {
+  describe("@sql load from SQL", () => {
+    describe("LOWER(..) LIKE ..", () => {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.sql_with_lhs_toLowerCase, "SQL", {
+        "query": "LOWER(str) Starts with \"aaa\"",
+        "sql": "LOWER(str) LIKE 'aaa%'",
+      });
+    });
+  });
+
+  describe("load from SpEL", () => {
     describe(".toLowerCase().startsWith()", () => {
       export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_lhs_toLowerCase, "SpEL", {
         "query": "LOWER(str) Starts with \"aaa\"",

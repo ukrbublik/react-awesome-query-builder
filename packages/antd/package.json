@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/antd",
-  "version": "6.6.3",
+  "version": "6.6.12",
   "description": "User-friendly query builder for React. AntDesign widgets",
   "keywords": [
     "query-builder",
@@ -53,7 +53,7 @@
     "rc-picker": "^4.5.0"
   },
   "devDependencies": {
-    "@ant-design/icons": "^5.3.7",
+    "@ant-design/icons": "^5.5.2",
     "@babel/cli": "^7.24.7",
     "@babel/core": "^7.24.5",
     "@babel/plugin-transform-class-properties": "^7.24.1",
@@ -67,7 +67,7 @@
     "@babel/runtime": "^7.24.5",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
-    "antd": "^5.18.3",
+    "antd": "^5.23.1",
     "less": "^4.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

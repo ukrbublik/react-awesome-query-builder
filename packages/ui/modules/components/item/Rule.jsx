@@ -50,6 +50,7 @@ class Rule extends Component {
     reordableNodesCnt: PropTypes.number,
     totalRulesCnt: PropTypes.number,
     parentReordableNodesCnt: PropTypes.number,
+    parentFieldCanReorder: PropTypes.bool,
   };
 
   constructor(props) {
@@ -65,7 +66,7 @@ class Rule extends Component {
   onPropsChanged(nextProps) {
     const prevProps = this.props;
     const configChanged = !this.Icon || prevProps?.config !== nextProps?.config;
-    const keysForMeta = ["selectedField", "selectedFieldSrc", "selectedFieldType", "selectedOperator", "config", "reordableNodesCnt", "isLocked"];
+    const keysForMeta = ["selectedField", "selectedFieldSrc", "selectedFieldType", "selectedOperator", "config", "reordableNodesCnt", "isLocked", "parentField", "parentFieldCanReorder"];
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
@@ -89,7 +90,7 @@ class Rule extends Component {
     };
   }
 
-  getMeta({selectedField, selectedFieldType, selectedOperator, config, reordableNodesCnt, isLocked}) {
+  getMeta({selectedField, selectedFieldType, selectedOperator, config, reordableNodesCnt, isLocked, parentField, parentFieldCanReorder}) {
     const {keepInputOnChangeFieldSrc} = config.settings;
     const selectedFieldId = getFieldId(selectedField, config);
     const selectedFieldConfig = getFieldConfig(config, selectedField);
@@ -102,7 +103,10 @@ class Rule extends Component {
     const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator, null, null) || {};
     const hideOperator = selectedFieldWidgetConfig.hideOperator;
 
-    const showDragIcon = config.settings.canReorder && reordableNodesCnt > 1 && !isLocked;
+    let showDragIcon = config.settings.canReorder && reordableNodesCnt > 1 && !isLocked;
+    if (parentField) {
+      showDragIcon = showDragIcon && parentFieldCanReorder;
+    }
     const showOperator = isFieldSelected && !hideOperator;
     const showOperatorLabel = isFieldSelected && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
     const showWidget = isFieldAndOpSelected && !isSelectedGroup;

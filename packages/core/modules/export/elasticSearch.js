@@ -1,6 +1,6 @@
-import {getWidgetForFieldOp} from "../utils/ruleUtils";
+import {getWidgetForFieldOp} from "../utils/configUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
-import { extendConfig } from "../utils/configUtils";
+import { extendConfig } from "../utils/configExtend";
 
 
 /**

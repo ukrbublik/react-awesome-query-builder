@@ -3,7 +3,7 @@ import {isJsonLogic, isValidFieldObject, isValidForFieldMarker, shallowEqual, is
 import {getFieldConfig, extendConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
-import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
+import {defaultGroupConjunction} from "../utils/defaultUtils";
 
 import moment from "moment";
 
@@ -42,6 +42,8 @@ export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
   const conv = buildConv(extendedConfig);
   const jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, ["rule", "group", "switch"], meta) : undefined;
   const immTree = jsTree ? loadTree(jsTree) : undefined;
+
+  meta.errors = Array.from(new Set(meta.errors));
 
   if (returnErrors) {
     return [immTree, meta.errors];
@@ -339,32 +341,51 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
     return undefined;
   }
 
-  // number of seconds -> time string
-  if (fieldType === "time" && typeof val === "number") {
-    const [h, m, s] = [Math.floor(val / 60 / 60) % 24, Math.floor(val / 60) % 60, val % 60];
-    const valueFormat = widgetConfig.valueFormat;
-    if (valueFormat) {
-      const dateVal = new Date(val);
-      dateVal.setMilliseconds(0);
-      dateVal.setHours(h);
-      dateVal.setMinutes(m);
-      dateVal.setSeconds(s);
-      val = moment(dateVal).format(valueFormat);
-    } else {
-      val = `${h}:${m}:${s}`;
-    }
-  }
 
-  // "2020-01-08T22:00:00.000Z" -> Date object
-  if (["date", "datetime"].includes(fieldType) && val && !(val instanceof Date)) {
+  if (widgetConfig?.jsonLogicImport) {
     try {
-      const dateVal = new Date(val);
-      if (dateVal instanceof Date && dateVal.toISOString() === val) {
-        val = dateVal;
-      }
+      val = widgetConfig.jsonLogicImport.call(
+        config.ctx, val,
+        {...widgetConfig, ...(fieldConfig?.fieldSettings ?? {})}
+      );
     } catch(e) {
-      meta.errors.push(`Can't convert value ${val} as Date`);
+      meta.errors.push(`Can't import value ${val} using import func of widget ${widget}: ${e?.message ?? e}`);
       val = undefined;
+    }
+  } else {
+    // number of seconds -> time string
+    if (fieldType === "time" && typeof val === "number") {
+      const [h, m, s] = [Math.floor(val / 60 / 60) % 24, Math.floor(val / 60) % 60, val % 60];
+      const valueFormat = widgetConfig.valueFormat;
+      if (valueFormat) {
+        const dateVal = new Date(val);
+        dateVal.setMilliseconds(0);
+        dateVal.setHours(h);
+        dateVal.setMinutes(m);
+        dateVal.setSeconds(s);
+        val = moment(dateVal).format(valueFormat);
+      } else {
+        val = `${h}:${m}:${s}`;
+      }
+    }
+
+    // "2020-01-08T22:00:00.000Z" -> Date object
+    if (["date", "datetime"].includes(fieldType) && val && !(val instanceof Date)) {
+      try {
+        const isEpoch = typeof val === "number" || typeof val === "string" && !isNaN(val);
+        // Note: can import only from ms timestamp, not seconds timestamp
+        const epoch = isEpoch && typeof val === "string" ? parseInt(val) : val;
+        const dateVal = new Date(isEpoch ? epoch : val);
+        if (dateVal instanceof Date) {
+          val = dateVal;
+        }
+        if (isNaN(dateVal)) {
+          throw new Error("Invalid date");
+        }
+      } catch(e) {
+        meta.errors.push(`Can't convert value ${val} as Date`);
+        val = undefined;
+      }
     }
   }
 
@@ -380,15 +401,6 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
   if (val && fieldConfig?.fieldSettings?.asyncFetch) {
     const vals = Array.isArray(val) ? val : [val];
     asyncListValues = vals;
-  }
-
-  if (widgetConfig?.jsonLogicImport) {
-    try {
-      val = widgetConfig.jsonLogicImport.call(config.ctx, val);
-    } catch(e) {
-      meta.errors.push(`Can't import value ${val} using import func of widget ${widget}: ${e?.message ?? e}`);
-      val = undefined;
-    }
   }
 
   return {
@@ -535,7 +547,7 @@ const convertFuncRhs = (op, vals, conv, config, not, fieldConfig = null, meta, p
       if (fc.jsonLogicImport && (returnType ? fc.returnType == returnType : true)) {
         let parsed;
         try {
-          parsed = fc.jsonLogicImport(v);
+          parsed = fc.jsonLogicImport.call(config.ctx, v);
         } catch(_e) {
           // given expression `v` can't be parsed into function
         }
@@ -722,16 +734,16 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
 //   return arr;
 // };
 
-const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj = undefined, not = false) => {
+const wrapInDefaultConjRuleGroup = (rule, groupField, groupFieldConfig, config, conj = undefined, not = false) => {
   if (!rule) return undefined;
   return {
     type: "rule_group",
     id: uuid(),
     children1: { [rule.id]: rule },
     properties: {
-      conjunction: conj || defaultGroupConjunction(config, parentFieldConfig),
+      conjunction: conj || defaultGroupConjunction(config, groupFieldConfig),
       not: not,
-      field: parentField,
+      field: groupField,
     }
   };
 };
@@ -742,7 +754,7 @@ const wrapInDefaultConj = (rule, config, not = false) => {
     id: uuid(),
     children1: { [rule.id]: rule },
     properties: {
-      conjunction: defaultConjunction(config),
+      conjunction: defaultGroupConjunction(config),
       not: not
     }
   };
@@ -752,7 +764,7 @@ const parseRule = (op, vals, parentField, conv, config, meta) => {
   const submeta = createMeta(meta);
   let res = _parseRule(op, vals, parentField, conv, config, submeta);
   if (!res) {
-    meta.errors.push(submeta.errors.join("; ") || `Unknown op ${op}`);
+    meta.errors.push(Array.from(new Set(submeta.errors)).join("; ") || `Unknown op ${op}`);
     return undefined;
   }
   
@@ -766,24 +778,40 @@ const _parseRule = (op, vals, parentField, conv, config, meta) => {
   let jlField = vals[0];
   let jlArgs = vals.slice(1);
 
-  if (!isJsonLogic(jlField)) {
-    meta.errors.push(`Incorrect operands for ${op}: ${JSON.stringify(vals)}`);
-    return;
+    const lhs = convertLhs(isGroup0, jlField, jlArgs, conv, config, null, null, meta, parentField);
+    if (!lhs) {
+      continue; // try another operator
+    }
+    const {
+      field, fieldSrc, having, isGroup, args
+    } = lhs;
+    const fieldConfig = getFieldConfig(config, field);
+    if (!fieldConfig && !meta.settings?.allowUnknownFields) {
+      meta.errors.push(`No config for LHS ${field}`);
+      return;
+    }
+    const isValidOp = fieldConfig?.operators && fieldConfig.operators.includes(opKey);
+
+    returnVariants.push({
+      field, fieldSrc, fieldConfig, opKey, args, having,
+      isValidOp,
+    });
   }
 
-  const lhs = convertLhs(isGroup0, jlField, jlArgs, conv, config, null, null, meta, parentField);
-  if (!lhs) return;
-  const {
-    field, fieldSrc, having, isGroup, args
-  } = lhs;
-  const fieldConfig = getFieldConfig(config, field);
-  if (!fieldConfig && !meta.settings?.allowUnknownFields) {
-    meta.errors.push(`No config for LHS ${field}`);
-    return;
+  let opKey = opKeys[0];
+  if (opKeys.length > 1 && fieldConfig && fieldConfig.operators) {
+    // eg. for "equal" and "select_equals"
+    opKeys = opKeys
+      .filter(k => fieldConfig.operators.includes(k));
+    if (opKeys.length == 0) {
+      meta.errors.push(`No corresponding ops for LHS ${field}`);
+      return;
+    }
+    opKey = opKeys[0];
   }
-
+  
   return {
-    field, fieldSrc, fieldConfig, args, having
+    field, fieldSrc, fieldConfig, opKey, args, having
   };
 };
 

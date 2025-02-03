@@ -2,8 +2,10 @@ import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { export_checks } from "../support/utils";
 import { Utils } from "@react-awesome-query-builder/core";
+import { SqlUtils } from "@react-awesome-query-builder/sql";
 import { BasicConfig } from "@react-awesome-query-builder/ui";
 import { expect } from "chai";
+
 
 describe("query with ops", () => {
   describe("reverseOperatorsForNot == true", () => {
@@ -479,6 +481,38 @@ describe("query with ops", () => {
       expect(output.logic).to.deep.equal(input);
     });
   });
+
+  describe("@sql operators", () => {
+    export_checks([configs.with_all_types], inits.with_ops_sql, "SQL", {
+      "sql": inits.with_ops_sql,
+    });
+  });
+
+  describe("@sql LIKE escape", () => {
+    export_checks([configs.with_all_types], "str LIKE '%h\\%\\_h%'", "SQL", {
+      "sql": "str LIKE '%h\\%\\_h%'",
+      "spel": "str.contains('h%_h')"
+    });
+  });
+
+  describe("@sql LIKE escape for BigQuery", () => {
+    export_checks([configs.with_all_types, configs.with_sql_dialect("BigQuery")], "str LIKE '%h\\\\%\\\\_h%'", "SQL", {
+      "sql": "str LIKE '%h\\\\%\\\\_h%'",
+      "spel": "str.contains('h%_h')"
+    });
+  });
+
+  describe("@spel multiselect_contains import works", () => {
+    export_checks([configs.with_all_types], "T(CollectionUtils).containsAny(multicolor, {'yellow'})", "SpEL", {
+      spel: "T(CollectionUtils).containsAny(multicolor, {'yellow'})",
+    });
+  });
+
+  describe("@spel multiselect_contains import is backward compatible", () => {
+    export_checks([configs.with_all_types], "CollectionUtils.containsAny(multicolor, {'yellow'})", "SpEL", {
+      spel: "T(CollectionUtils).containsAny(multicolor, {'yellow'})",
+    });
+  });
 });
 
 describe("query with exclamation operators", () => {
@@ -532,6 +566,23 @@ describe("query with exclamation operators in array group", () => {
     export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_and_neg_in_some, "JsonLogic", {
       "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
       "logic": inits.with_not_and_neg_in_some_reversed
+    });
+  });
+});
+
+
+describe("dual meaning ops", () => {
+  describe("(JL) in", () => {
+    export_checks([configs.with_all_types, configs.with_allow_any_src_for_all_ops], inits.with_in_ops, "JsonLogic", {
+      "logic": inits.with_in_ops,
+      "spel": inits.with_in_ops_spel
+    });
+  });
+
+  describe("(SpEL) contains", () => {
+    export_checks([configs.with_all_types, configs.with_allow_any_src_for_all_ops], inits.with_in_ops_spel, "SpEL", {
+      "logic": inits.with_in_ops,
+      "spel": inits.with_in_ops_spel
     });
   });
 });

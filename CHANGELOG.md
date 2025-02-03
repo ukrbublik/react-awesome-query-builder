@@ -1,4 +1,33 @@
 # Changelog
+- 6.6.12
+  - Fix issue with getting field config for func arg signature object (PR #1193) (issue #1192)
+- 6.6.11
+  - Fix issue with updating both config & tree value (PR #1190) (issue #1187)
+- 6.6.10
+  - Fix escape/unescape for LIKE operator (PR #1177) (issue #982)
+  - Fix tags tokenization (antd) (PR #1182) (issue #1115)
+  - Added `fieldSettings.fetchSelectedValuesOnInit` (see description in [`CONFIG.adoc`](/CONFIG.adoc)) (PR #1184)
+- 6.6.9
+  - Force autocomplete widget when `fieldSettings.allowCustomValues` is true (MIU/antd) (PR #1176) (issue #1150)
+  - Fix disabling !struct (PR #1178) (issue #1121)
+- 6.6.8
+  - Support safe navigation operator in SpEL operators/functions (PR #1172) (issue #1010)
+  - SpEL: backward compatibility for import of `CollectionUtils.containsAny` (PR #1174) (issue #1007)
+  - Support MUI 6 (PR #1175) (issue #1113)
+- 6.6.7
+  - Fix import of ambiguous operators (like, select_any_in) (PR #1168) (issue #1159)
+  - Allow import of epoch for date/datetime widgets from JsonLogic (PR #1171) (issue #1154)
+- 6.6.6
+  - Fix issue with process global (PR #1166) (issue #1165)
+- 6.6.5
+  - Support import fom SQL (`SqlUtils.loadFromSql`) (PR #1103) (issue #911, #593)
+  - Fixed type issue with SerializedFunction (PR #1103) (issue #1024)
+- 6.6.4
+  - Support groups inside rule-group (PR #1111) (issue #1108)
+  - Fixed cardinality issue (PR #1136) (issue #1118)
+  - Fixed types (PR #1131, #1132, #1130, #1129, #1127, #1128, #1126)
+- 6.6.4-alpha.0
+  - Support groups inside rule-group (PR #1111) (issue #1108)
 - 6.6.3
   - Fixed `Utils.isValidTree` for prod build.
     Removed `checkTree`, `isValidTree` from `Utils.Import` and `getTreeBadFields` from `Utils.TreeUtils`. (PR #1091) (issue #1075)

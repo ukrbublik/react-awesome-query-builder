@@ -8,8 +8,8 @@ import pick from "lodash/pick";
 import WidgetFactory from "./WidgetFactory";
 import classNames from "classnames";
 import {Col, getWidgetId, getRenderFromConfig} from "../utils";
-const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
-const {getValueSourcesForFieldOp, getWidgetForFieldOp, getValueLabel} = Utils.RuleUtils;
+const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getWidgetForFieldOp, getValueSourcesForFieldOp} = Utils.ConfigUtils;
+const {getValueLabel} = Utils.RuleUtils;
 const { createListWithOneElement } = Utils.DefaultUtils;
 const {shallowEqual} = Utils.OtherUtils;
 const { isImmutable } = Utils.TreeUtils;
@@ -160,6 +160,11 @@ export default class Widget extends Component {
 
     let valueSources = this.meta?.valueSources;
     let valueSourcesOptions = this.meta?.valueSourcesOptions;
+    const defaultValueSourcesLabels = {
+      value: "Value",
+      field: "Field",
+      func: "Function"
+    };
     if (!valueSources || ["field", "operator", "config", "fieldDefinition", "isForRuleGroup"].filter(k => changedKeys.includes(k)).length) {
       valueSources = getValueSourcesForFieldOp(config, field, operator, fieldDefinition);
       if (isForRuleGroup) {
@@ -170,7 +175,7 @@ export default class Widget extends Component {
         valueSources = Object.keys(valueSourcesInfo);
       }
       valueSourcesOptions = valueSources.map(srcKey => [srcKey, {
-        label: valueSourcesInfo[srcKey].label
+        label: valueSourcesInfo[srcKey]?.label ?? defaultValueSourcesLabels[srcKey] ?? srcKey,
       }]);
     }
     const widgets = range(0, cardinality).map(delta => {

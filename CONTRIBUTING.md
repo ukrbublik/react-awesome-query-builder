@@ -36,6 +36,7 @@ Or with VSCode:
   - [`stores`](/packages/core/modules/stores) - Tree store reducer
   - [`actions`](/packages/core/modules/actions) - Actions to dispatch on store
   - [`index.d.ts`](/packages/core/modules/index.d.ts) - TS definitions
+- [`packages/sql/modules`](/packages/sql/modules) - SQL support
 - [`packages/ui/modules`](/packages/ui/modules) - Core React components
   - [`stores`](/packages/ui/modules/stores) - Tree store reducer for Redux (reused from `core`)
   - [`actions`](/packages/ui/modules/actions) - Actions to dispatch on store (reused from `core`, added `drag`)

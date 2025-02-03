@@ -1,4 +1,5 @@
 import React from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
@@ -6,6 +7,7 @@ import {BasicGroup} from "./Group";
 import {RuleGroupActions} from "./RuleGroupActions";
 import FieldWrapper from "../rule/FieldWrapper";
 import {WithConfirmFn} from "../utils";
+const {getFieldConfig} = Utils.ConfigUtils;
 
 
 class RuleGroup extends BasicGroup {
@@ -16,6 +18,7 @@ class RuleGroup extends BasicGroup {
     parentField: PropTypes.string,
     setField: PropTypes.func,
     setFieldSrc: PropTypes.func,
+    lev: PropTypes.number, // from GroupContainer
   };
 
   constructor(props) {
@@ -95,8 +98,12 @@ class RuleGroup extends BasicGroup {
   }
 
   extraPropsForItem(_item) {
+    const { selectedField, lev, config } = this.props;
+    const selectedFieldConfig = getFieldConfig(config, selectedField);
     return {
-      parentField: this.props.selectedField
+      parentField: selectedField,
+      parentFieldPathSize: lev + 1,
+      parentFieldCanReorder: selectedFieldConfig?.canReorder ?? config.settings.canReorder,
     };
   }
 }

@@ -1,8 +1,9 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, getWidgetForFieldOp,
 } from "../utils/configUtils";
+import {extendConfig} from "../utils/configExtend";
 import {
-  getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue
+  getFieldPathLabels, formatFieldName, completeValue
 } from "../utils/ruleUtils";
 import pick from "lodash/pick";
 import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
@@ -274,6 +275,8 @@ const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, f
     ret = formatField(config, meta, value, parentField);
   } else if (valueSrc == "func") {
     ret = formatFunc(config, meta, value, parentField);
+  } else if (value == undefined) {
+    ret = undefined;
   } else {
     if (typeof fieldWidgetDef?.formatValue === "function") {
       const fn = fieldWidgetDef.formatValue;
@@ -295,7 +298,12 @@ const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, f
         const valFieldDefinition = getFieldConfig(config, value) || {}; 
         args.push(valFieldDefinition);
       }
-      ret = fn.call(config.ctx, ...args);
+      const doEscape = fieldDef?.escapeForFormat ?? true;
+      if (!doEscape) {
+        ret = value;
+      } else {
+        ret = fn.call(config.ctx, ...args);
+      }
     } else {
       ret = value;
     }
@@ -352,6 +360,7 @@ const formatFunc = (config, meta, funcValue, parentField = null) => {
     const fieldDef = getFieldConfig(config, argConfig);
     const {defaultValue, isOptional} = argConfig || {};
     const defaultValueSrc = defaultValue?.func ? "func" : "value";
+    const fieldWidgetDef = getFieldWidgetConfig(config, argConfig, undefined, undefined, defaultValueSrc, { forExport: true });
     const argName = isForDisplay && argConfig?.label || argKey;
     const argVal = args ? args.get(argKey) : undefined;
     let argValue = argVal ? argVal.get("value") : undefined;
@@ -362,7 +371,7 @@ const formatFunc = (config, meta, funcValue, parentField = null) => {
     }
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
     const formattedArgVal = formatValue(
-      config, meta, argValue, argValueSrc, argConfig?.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
+      config, meta, argValue, argValueSrc, argConfig?.type, fieldWidgetDef, argConfig, null, null, parentField, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
       if (argValueSrc != "func") // don't triger error if args value is another incomplete function
@@ -372,7 +381,7 @@ const formatFunc = (config, meta, funcValue, parentField = null) => {
     let formattedDefaultVal;
     if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
       formattedDefaultVal = formatValue(
-        config, meta, defaultValue, defaultValueSrc, argConfig?.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
+        config, meta, defaultValue, defaultValueSrc, argConfig?.type, fieldWidgetDef, argConfig, null, null, parentField, argAsyncListValues
       );
       if (formattedDefaultVal === undefined) {
         if (defaultValueSrc != "func") // don't triger error if args value is another incomplete function

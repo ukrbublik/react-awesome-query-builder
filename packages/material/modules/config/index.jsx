@@ -44,7 +44,7 @@ const widgets = {
   multiselect: {
     ...BasicConfig.widgets.multiselect,
     factory: (props, {RCE, W: {MaterialAutocompleteWidget, MaterialMultiSelectWidget}}) => {
-      return (props.asyncFetch || props.showSearch) 
+      return (props.asyncFetch || props.showSearch || props.allowCustomValues) 
         ? RCE(MaterialAutocompleteWidget, {...props, multiple: true}) 
         : RCE(MaterialMultiSelectWidget, props);
     },
@@ -52,7 +52,7 @@ const widgets = {
   select: {
     ...BasicConfig.widgets.select,
     factory: (props, {RCE, W: {MaterialAutocompleteWidget, MaterialSelectWidget}}) => {
-      return (props.asyncFetch || props.showSearch) 
+      return (props.asyncFetch || props.showSearch || props.allowCustomValues) 
         ? RCE(MaterialAutocompleteWidget, props) 
         : RCE(MaterialSelectWidget, props);
     },

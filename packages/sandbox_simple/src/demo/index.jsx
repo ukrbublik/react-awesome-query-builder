@@ -90,21 +90,21 @@ export default class DemoQueryBuilder extends Component {
         <div>
           stringFormat: 
           <pre style={preStyle}>
-            {stringify(queryString(immutableTree, config), undefined, 2)}
+            {queryString(immutableTree, config)}
           </pre>
         </div>
         <hr/>
         <div>
           humanStringFormat: 
           <pre style={preStyle}>
-            {stringify(queryString(immutableTree, config, true), undefined, 2)}
+            {queryString(immutableTree, config, true)}
           </pre>
         </div>
         <hr/>
         <div>
           sqlFormat: 
           <pre style={preStyle}>
-            {stringify(sqlFormat(immutableTree, config), undefined, 2)}
+            {sqlFormat(immutableTree, config)}
           </pre>
         </div>
         <hr/>

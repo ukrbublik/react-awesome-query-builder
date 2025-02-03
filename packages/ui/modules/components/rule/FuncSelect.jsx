@@ -6,8 +6,8 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
 const { clone } = Utils;
-const {getFieldConfig, getFuncConfig, getFieldParts, getFieldPathParts} = Utils.ConfigUtils;
-const {getFuncPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
+const {getFieldConfig, getFuncConfig, getFieldParts, getFieldPathParts, getWidgetForFieldOp} = Utils.ConfigUtils;
+const {getFuncPathLabels} = Utils.RuleUtils;
 const {shallowEqual} = Utils.OtherUtils;
 
 //tip: this.props.value - right value, this.props.field - left value

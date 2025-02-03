@@ -9,7 +9,7 @@ import { withSessionRoute, getSessionData, saveSessionData } from "../../lib/wit
 import serverConfig from "../../lib/config";
 
 // API to get/save `zipConfig` to session
-// Initial config is created in `lib/config` and compressed with `Utils.compressConfig()`
+// Initial config is created in `lib/config` and compressed with `Utils.ConfigUtils.compressConfig()`
 
 export type GetConfigQuery = {
   initial?: string;
@@ -25,7 +25,7 @@ export interface GetConfigResult {
 
 export async function decompressSavedConfig(req: NextApiRequest): Promise<Config> {
   const zipConfig = await getSavedZipConfig(req);
-  const config = Utils.decompressConfig(zipConfig, serverConfig);
+  const config = Utils.ConfigUtils.decompressConfig(zipConfig, serverConfig as Config);
   return config;
 }
 
@@ -34,7 +34,7 @@ export async function getSavedZipConfig(req: NextApiRequest): Promise<ZipConfig>
 }
 
 export function getInitialZipConfig() {
-  return Utils.compressConfig(serverConfig, CoreConfig);
+  return Utils.ConfigUtils.compressConfig(serverConfig as Config, CoreConfig);
 }
 
 async function saveZipConfig(req: NextApiRequest, zipConfig: ZipConfig) {

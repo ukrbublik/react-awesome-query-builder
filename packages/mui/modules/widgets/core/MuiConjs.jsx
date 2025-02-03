@@ -44,6 +44,9 @@ const Conjs = React.memo(({
         conjKey, id, name, label, checked,
         setConjunction, readonly, disabled,
       };
+      if (disabled && !checked) {
+        return null;
+      }
       return (
         <Conj key={id} {...conjProps} />
       );

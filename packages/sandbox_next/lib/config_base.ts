@@ -3,7 +3,7 @@ import merge from "lodash/merge";
 import {
   BasicFuncs, CoreConfig,
   // types:
-  Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs, OperatorProximity, Func,
+  Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs, OperatorProximity, Func, SerializedFunction,
 } from "@react-awesome-query-builder/core";
 
 // Create a config for demo app based on CoreConfig - add fields, funcs, some overrides.
@@ -31,7 +31,8 @@ function createConfig(InitialConfig: CoreConfig): Config {
             valuePlaceholder: "Enter name",
           },
           fieldSettings: {
-            validateValue: "validateFirstName",
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            validateValue: "validateFirstName" as SerializedFunction as any,
             // -or-
             // validateValue: {
             //   "<": [ {strlen: {var: "val"}}, 10 ]
@@ -46,6 +47,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
           type: "text",
           excludeOperators: ["proximity"],
           fieldSettings: {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             validateValue: {
               and: [
                 { "<": [ {strlen: {var: "val"}}, 10 ] },
@@ -54,7 +56,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
                   { regexTest: [ {var: "val"}, "^[A-Za-z0-9_-]+$" ] }
                 ]}
               ]
-            }
+            } as SerializedFunction as any
             // -incorrect-
             // (val: string) => {
             //   return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
@@ -322,6 +324,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
     addSubRuleLabel: "Add sub rule",
+    addSubGroupLabel: "Add sub group",
     delGroupLabel: null,
     notLabel: "Not",
     fieldSourcesPopupTitle: "Select source",

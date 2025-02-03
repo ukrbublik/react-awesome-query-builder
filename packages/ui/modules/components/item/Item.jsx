@@ -41,7 +41,9 @@ const typeMap = {
       onDragStart={props.onDragStart}
       isDraggingTempo={props.isDraggingTempo}
       parentField={props.parentField}
+      parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
+      parentFieldCanReorder={props.parentFieldCanReorder}
     />
   ),
   group: (props) => (
@@ -57,8 +59,10 @@ const typeMap = {
       onDragStart={props.onDragStart}
       isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
-      parentField={null}
+      parentField={props.parentField}
+      parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
+      parentFieldCanReorder={props.parentFieldCanReorder}
     />
   ),
   rule_group: (props) => (
@@ -75,7 +79,9 @@ const typeMap = {
       isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
       parentField={props.parentField}
+      parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
+      parentFieldCanReorder={props.parentFieldCanReorder}
     />
   ),
   rule_group_ext: (props) => (
@@ -92,7 +98,9 @@ const typeMap = {
       isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
       parentField={props.parentField}
+      parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
+      parentFieldCanReorder={props.parentFieldCanReorder}
     />
   ),
   switch_group: (props) => (
