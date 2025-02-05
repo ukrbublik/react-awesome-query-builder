@@ -476,7 +476,7 @@ export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition, o
   let isOtherType = false;
   if (operator) {
     const opConfig = config.operators[operator];
-    if (opConfig.valueTypes) {
+    if (opConfig?.valueTypes) {
       // Important: for "select" field and "select_any_in" op valueTypes are ["multiselect"]
       fieldType = opConfig.valueTypes[0];
       isOtherType = true;

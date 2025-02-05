@@ -1,5 +1,5 @@
 import uuid from "../utils/uuid";
-import {getOpCardinality, isJsonLogic, shallowEqual} from "../utils/stuff";
+import {isJsonLogic, isValidFieldObject, isValidForFieldMarker, shallowEqual, isVarEmptyObject} from "../utils/stuff";
 import {getFieldConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts, getWidgetForFieldOp} from "../utils/configUtils";
 import {extendConfig} from "../utils/configExtend";
 import {loadTree} from "./tree";
@@ -13,15 +13,12 @@ import moment from "moment";
 const arrayUniq = (arr) => Array.from(new Set(arr));
 
 // constants
-const jlFieldMarker = "jlField";
-const jlArgsMarker = "jlArgs";
-const jlEqOps = ["==", "!="];
-const jlRangeOps = ["<", "<=", ">", ">="];
-const jlDualMeaningOps = ["in", "!in"]; // can be mapped to "select_any_in" or "like"
-const multiselectOps = [
-  "multiselect_equals", "multiselect_not_equals",
-  "multiselect_contains", "multiselect_not_contains"
-];
+const jlTemplateInput = {
+  field: "jlField",
+  val: "jlArgs",  // For functions that use `val`
+  vals: "jlArrayArg", // For functions that use `vals`
+  twoVals: ["jlArgs", "jlArgs"]
+};
 
 const createMeta = (parentMeta) => {
   return {
@@ -60,31 +57,11 @@ export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
 
 const buildConv = (config) => {
   let operators = {};
-  let combinationOperators = {};
   for (let opKey in config.operators) {
     const opConfig = config.operators[opKey];
-    if (typeof opConfig.jsonLogic == "string") {
-      // example: "</2", "#in/1"
-      const opk = opConfig.jsonLogic + "/" + getOpCardinality(opConfig);
-      if (!operators[opk])
-        operators[opk] = [];
-      operators[opk].push(opKey);
-    } else if(typeof opConfig.jsonLogic2 == "string") {
-      // example: all-in/1"
-      const isRevArgs = opConfig.jsonLogic2.startsWith("#");
-      const jsonLogic = (""+opConfig.jsonLogic2).replace(/^#/, "");
-      const opk = jsonLogic + "/" + getOpCardinality(opConfig);
-      if (!operators[opk])
-        operators[opk] = [];
-      operators[opk].push(opKey);
-
-      if (!combinationOperators[opKey])
-        combinationOperators[opKey] = {};
-      combinationOperators[opKey] = {
-        "template": opConfig.jsonLogic(jlFieldMarker, opKey, jlArgsMarker), 
-        "jsonLogic2": jsonLogic,
-        "_jsonLogicIsExclamationOp": !!opConfig._jsonLogicIsExclamationOp,
-        "isRevArgs": isRevArgs
+    if (typeof opConfig.jsonLogic === "function") {
+      operators[opKey] = {
+        "template": opConfig.jsonLogic(jlTemplateInput),
       };
     }
   }
@@ -118,127 +95,191 @@ const buildConv = (config) => {
     conjunctions,
     funcs,
     varKeys: ["var", groupVarKey, altVarKey],
-    combinationOperators,
   };
 };
 
 /**
- * This function checks a given jsonlogic object against a set of templates defined in 'conv'. 
- * It determines if the jsonlogic object matches any of the specified templates.
- * 
- * @param {*} jsonlogic The jsonlogic object to be matched against the templates.
- * @param {*} conv The object containing all potential templates and their associated logic for matching. 
- * It is expected to have a 'combinationOperators' property that houses the templates.
- * @param {*} meta An object where any errors or metadata during the processing are stored. It's modified by reference.
- * @param {*} operatorsToCheck An optional array of operator keys that limits which operators in 'conv' are checked. 
- * If null, all operators in 'conv' are considered.
- * @returns {Object|null} The response object containing the match result, and any relevant matched fields and 
- * arguments if a match is found. Returns null if no match is found.
+ * Matches a given jsonlogic object against a set of operator templates defined in 'conv.operators'.
+ * The function determines if the jsonlogic matches any of these templates and selects the appropriate operator.
+ *
+ * @param {*} jsonlogic The jsonlogic object to be evaluated against the templates.
+ * @param {*} conv An object containing potential templates in its 'operators' property.
+ * @param {*} meta An object to store metadata such as errors during the matching process. Modified by reference.
+ * @param {*} config The configuration object used to normalize fields and fetch field-specific configurations.
+ * @param {*} parentField A parent field to help normalize fields when matching templates.
+ * @returns {Object|null} The response object with the matching result and matched operator or undefined if no match is found.
  */
-const matchAgainstTemplates = (jsonlogic, conv, meta, operatorsToCheck = null) => {
+const matchAgainstTemplates = (jsonlogic, conv, meta, config, parentField) => {
   let response;
-  if (conv?.combinationOperators) {
-    for (const [key, value] of Object.entries(conv.combinationOperators)) {
-      if ((operatorsToCheck == null || operatorsToCheck.includes(key))) {
-        const tempResponse = isTemplateMatch(value.template, jsonlogic);
-        // Found a match
-        if (tempResponse.match) {
-          if (!response) response = tempResponse;
-          // Templates should be spesific enough that only one match can be found. This should not happen
-          else {
-            meta.errors.push(`Operator matched against 2 templates: ${response.newOp} and ${key}`);
+
+  // Check if 'conv' contains 'operators' to iterate through templates
+  if (conv?.operators) {
+    // Iterate over all operator templates in 'conv.operators'
+    for (const [key, value] of Object.entries(conv.operators)) {
+      // Check if the current template matches the jsonlogic object
+      const tempResponse = isTemplateMatch(value.template, jsonlogic, conv);
+
+      // If a match is found, process the match further
+      if (tempResponse.match) {
+        tempResponse["op"] = key; // Assign the operator key to the response
+
+        // If a previous match exists, resolve potential conflicts
+        if (response && isValidForFieldMarker(tempResponse.jlField, conv)) {
+          const fieldKey = Object.keys(tempResponse.jlField)[0]; // Extract the key from the matched field object
+
+          // Check if the field key is valid (included in varkeys) and its value is string
+          if (conv.varKeys.includes(fieldKey) && typeof tempResponse.jlField[fieldKey] == "string") {
+            // Normalize the field name. ie combine it with parentfield names
+            const field = normalizeField(config, tempResponse.jlField[fieldKey], parentField);
+
+            // Retrieve the configuration for the normalized field
+            const fieldConfig = field ? getFieldConfig(config, field) : undefined;
+
+            // If a valid field configuration is found with operator mappings, handle conflict
+            if (fieldConfig?.operators) {
+              let opChoices = [response["op"], key]; // Combine current and previous operator keys in list
+
+              // Filter out operators not supported by the field configuration
+              opChoices = opChoices.filter(k => fieldConfig.operators.includes(k));
+
+              // If multiple valid operator choices remain, log an error
+              if (opChoices.length > 1) {
+                meta.errors.push(`Operator matched against 2 templates: ${response.op} and ${key}`);
+              } else if (opChoices[0] === key) {
+                // If the new match is more appropriate, update the response
+                response = tempResponse;
+              }
+            }
           }
-          // New op that is used to represent operator that is combosed of multiple operators
-          response["newOp"] = value.jsonLogic2;
+        } else {
+          // If no prior match exists, set the current match as the response
+          response = tempResponse;
         }
       }
     }
   }
-  // Returns undefined if no matches found
+  // Return the final response object or undefined if no match was found
   return response;
 };
 
 /**
- * This function recursively compares a jsonlogic object against a template to determine if they match structurally and content-wise.
- * It is used to support complex template matching where the template can include special markers indicating variable fields and arguments.
+ * Recursively compares a jsonlogic object against a template to determine if they match structurally and content-wise.
+ * Supports complex template matching where the template can include special markers for variable fields and arguments.
  *
- * @param {*} template The template object to match against, which can include special markers to denote fields and arguments.
+ * @param {*} template The template object to match against, which includes markers for fields and arguments.
  * @param {*} jsonlogic The jsonlogic object to test against the template.
- * @param {*} response An object to accumulate results such as whether a match is found, and to collect any fields or arguments identified 
- * by the template markers. Default is initialized to a match state with empty fields and arguments.
- * @returns {Object} The updated response object after checking the current template level. It includes whether the current level 
- * matches (match: true/false), any identified fields (jlField), and any arguments (jlArgs).
+ * @param {*} conv The object containing configuration data.
+ * @param {Object} response An object to accumulate results. Contains the following properties:
+ *   - match: {boolean} Whether the jsonlogic matches the template.
+ *   - jlField: {Object|null} Identified field object from jsonlogic.
+ *   - jlArgs: {Array} Identified arguments from jsonlogic.
+ *   Default value initializes with match: true, jlField: null, and an empty jlArgs array.
+ * @returns {Object} The updated response object. Includes:
+ *   - match: {boolean} True if the jsonlogic matches the template.
+ *   - jlField: {Object|null} The field matched in jsonlogic (if any).
+ *   - jlArgs: {Array} Collected arguments from jsonlogic.
  */
-const isTemplateMatch = (template, jsonlogic, response = {"match": true, "jlField": null, "jlArgs": []}) => {
-  if (template == undefined || jsonlogic == undefined) {
+const isTemplateMatch = (template, jsonlogic, conv, response = { match: true, jlField: null, jlArgs: [] }) => {
+  // Handle undefined cases early
+  if (template === undefined || jsonlogic === undefined) {
     response.match = false;
-    return response;    
+    return response;
   }
-  // This lets us compare order easily
+
+  // Get keys of the template and jsonlogic objects for comparison
   const tKeys = Object.keys(template);
   const jKeys = Object.keys(jsonlogic);
+
+  // Ensure both objects have the same number of keys
   if (tKeys.length !== jKeys.length) {
-    // Both have same length
     response.match = false;
-    return response;      
+    return response;
   }
-  response.vals = [];
+
+  // Iterate through each key in the template
   for (let index = 0; index < tKeys.length; index++) {
-    const key = tKeys[index];
-    const value = template[key];
-    response.vals.push(jsonlogic[key]);
-    if (key !== jKeys[index]) { 
-      // Checks that both have exact same key at exact same place. Kind of pointless for arrays but whatever
+    const templateKey = tKeys[index];
+    const templateValue = template[templateKey];
+    const realValue = jsonlogic[templateKey];
+
+    if (templateKey !== jKeys[index]) {
+      // Ensure keys are identical
       response.match = false;
       return response;
-    } else if (value === jlFieldMarker && isJsonLogic(jsonlogic[key])) {
-      // If jlFieldMarker is found in template AND it's field or func we take the value from corresponding place in jsonlogic
-      response.jlField = jsonlogic[key];
-    } else if (value === jlArgsMarker) {
-      // If jlArgsMarker is found in template we take the value from corresponding place in jsonlogic
-      response.jlArgs.push(jsonlogic[key]);
-    } else if (typeof value === "object" && value !== null || Array.isArray(value)) {
-      // Here we recurse thru objects and arrays of template until we have gone thru it completely
-      response = isTemplateMatch(value, jsonlogic[key], response);
-    } else if (value !== jsonlogic[key]) {
-      // This is for cases of {var: ""}, which should be only case in default config that leads here
-      response.match = false;
-      return response;
+    } else if (templateValue === jlTemplateInput.field) {
+      // Handle field marker: validate and extract field from jsonlogic
+      if (isValidForFieldMarker(realValue, conv)) {
+        response.jlField = realValue;
+      } else {
+        response.match = false;
+        return response;
+      }
+    } else if (templateValue === null) {
+      // Handle template null: ensure realValue is also null
+      if (realValue === null) {
+        response.jlArgs.push([]);
+      } else {
+        response.match = false;
+        return response;
+      }
+    } else if (isVarEmptyObject(templateValue)) {
+      // Handle template empty var object(ie. {"var": ""}): validate that realValue matches
+      if (!isVarEmptyObject(realValue)) {
+        response.match = false;
+        return response;
+      }
+    } else if (templateValue === jlTemplateInput.val) {
+      // Handle value marker: extract and validate non-null value from jsonlogic
+      if (realValue !== null) {
+        response.jlArgs.push(realValue);
+      } else {
+        response.match = false;
+        return response;
+      }
+    } else if (templateValue === jlTemplateInput.vals) {
+      // Handle array value marker: validate as field object(in case source is field) or array
+      if (isValidFieldObject(realValue, conv) || Array.isArray(realValue)) {
+        response.jlArgs.push(realValue);
+      } else {
+        response.match = false;
+        return response;
+      }
+    } else if (typeof templateValue === "object" && templateValue !== null || Array.isArray(templateValue)) {
+      // Recurse into nested objects or arrays
+      response = isTemplateMatch(templateValue, realValue, conv, response);
     }
   }
+
   return response;
 };
 
+// High level function that recognizes jsonLogic and determines what is done with it. Returns converted value.
 // expectedTypes - "val", "rule", "group", "switch", "case_val"
 const convertFromLogic = (logic, conv, config, expectedTypes, meta, not = false, fieldConfig, widget, parentField = null, _isLockedLogic = false) => {
-  let op, vals;
+  let op, vals, match;
   if (isJsonLogic(logic)) {
-    op = Object.keys(logic)[0];
-    vals = logic[op];
-    if (!Array.isArray(vals))
-      vals = [ vals ];
+    // If matchAgainstTemplates returns match then op is replaced with special jsonlogic2 value
+    const match = matchAgainstTemplates(logic, conv, meta, config, parentField);
+    if (match) {
+      // We reset vals if match found
+      vals = [];
+      vals[0] = match.jlField;
+      match.jlArgs.forEach(arg => vals.push(arg));
+      // We reset op to new op that represents multiple jsonlogic operators
+      op = match.op;
+    } else {
+      op = Object.keys(logic)[0];
+      vals = logic[op];
+      if (!Array.isArray(vals))
+        vals = [ vals ];
+    }
   }
   
   let ret;
   const beforeErrorsCnt = meta.errors.length;
 
+  const isNot = op == "!" && !match;
   const {lockedOp} = config.settings.jsonLogic;
-  const isEmptyOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && conv.varKeys.includes(Object.keys(vals[0])[0]));
-  // If matchAgainstTemplates returns match then op is replaced with special jsonlogic2 value
-  const match = matchAgainstTemplates(logic, conv, meta);
-  if (match) {
-    // We reset vals if match found
-    vals = [];
-    vals[0] = match.jlField;
-    match.jlArgs.forEach(arg => vals.push(arg));
-    // We reset op to new op that represents multiple jsonlogic operators
-    op = match.newOp;
-    if (jlDualMeaningOps.includes(op)) {
-      // use original order of args
-      vals = match.vals;
-    }
-  }
-  const isNot = op == "!" && !isEmptyOp;
   const isLocked = lockedOp && op == lockedOp;
   const isSwitch = expectedTypes.includes("switch");
   const isRoot = isSwitch;
@@ -719,93 +760,56 @@ const wrapInDefaultConj = (rule, config, not = false) => {
   };
 };
 
-const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
+const parseRule = (op, vals, parentField, conv, config, meta) => {
   const submeta = createMeta(meta);
-  let res = _parseRule(op, arity, vals, parentField, conv, config, submeta);
+  let res = _parseRule(op, vals, parentField, conv, config, submeta);
   if (!res) {
-    meta.errors.push(Array.from(new Set(submeta.errors)).join("; ") || `Unknown op ${op}/${arity}`);
+    meta.errors.push(Array.from(new Set(submeta.errors)).join("; ") || `Unknown op ${op}`);
     return undefined;
   }
   
   return res;
 };
 
-const _parseRule = (op, arity, vals, parentField, conv, config, meta) => {
+const _parseRule = (op, vals, parentField, conv, config, meta) => {
   // config.settings.groupOperators are used for group count (cardinality = 0 is exception)
-  // but don't confuse with "all-in" or "some-in" for multiselect
-  const isAllOrSomeInForMultiselect = multiselectOps
-    .map((opName) => config.operators[opName]?.jsonLogic2)
-    .includes(op);
-  const isGroup0 = config.settings.groupOperators.includes(op) && !isAllOrSomeInForMultiselect;
-  let cardinality = isGroup0 ? 0 : arity - 1;
-  if (isGroup0)
-    cardinality = 0;
-  else if (jlEqOps.includes(op) && cardinality == 1 && vals[1] === null) {
-    arity = 1;
-    cardinality = 0;
-    vals = [vals[0]];
-  }
+  const isGroup0 = config.settings.groupOperators.includes(op);
 
-  const opk = op + "/" + cardinality;
-  let opKeys = conv.operators[opk];
-  if (!opKeys)
+  let jlField = vals[0];
+  let jlArgs = vals.slice(1);
+
+  if (!isJsonLogic(jlField)) {
+    meta.errors.push(`Incorrect operands for ${op}: ${JSON.stringify(vals)}`);
     return;
-
-  const returnVariants = [];
-  for (const opKey of opKeys) {
-    let jlField, jlArgs = [];
-    if (jlRangeOps.includes(op) && arity == 3) {
-      jlField = vals[1];
-      jlArgs = [ vals[0], vals[2] ];
-    } else {
-      [jlField, ...jlArgs] = vals;
-    }
-    if (conv.combinationOperators[opKey]?.isRevArgs) {
-      jlField = vals[vals.length-1];
-      jlArgs = vals.slice(0, vals.length-1);
-    }
-  
-    if (!isJsonLogic(jlField)) {
-      continue; // try another operator
-    }
-
-    const lhs = convertLhs(isGroup0, jlField, jlArgs, conv, config, null, null, meta, parentField);
-    if (!lhs) {
-      continue; // try another operator
-    }
-    const {
-      field, fieldSrc, having, isGroup, args
-    } = lhs;
-    const fieldConfig = getFieldConfig(config, field);
-    if (!fieldConfig && !meta.settings?.allowUnknownFields) {
-      meta.errors.push(`No config for LHS ${field}`);
-      return;
-    }
-    const isValidOp = fieldConfig?.operators && fieldConfig.operators.includes(opKey);
-
-    returnVariants.push({
-      field, fieldSrc, fieldConfig, opKey, args, having,
-      isValidOp,
-    });
   }
 
-  returnVariants.sort(({isValidOp}) => isValidOp ? -1 : +1);
+  const lhs = convertLhs(isGroup0, jlField, jlArgs, conv, config, null, null, meta, parentField);
+  if (!lhs) return;
+  const {
+    field, fieldSrc, having, isGroup, args
+  } = lhs;
+  const fieldConfig = getFieldConfig(config, field);
+  if (!fieldConfig && !meta.settings?.allowUnknownFields) {
+    meta.errors.push(`No config for LHS ${field}`);
+    return;
+  }
 
-  return returnVariants[0];
+  return {
+    field, fieldSrc, fieldConfig, args, having
+  };
 };
 
 const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOneRuleInRuleGroup = false) => {
   if (!op) return undefined;
-  
-  const jlConjs = Object.values(config.conjunctions).map(({jsonLogicConj}) => jsonLogicConj);
-  const arity = vals.length;
 
-  const parseRes = parseRule(op, arity, vals, parentField, conv, config, meta);
+  const jlConjs = Object.values(config.conjunctions).map(({jsonLogicConj}) => jsonLogicConj);
+
+  const parseRes = parseRule(op, vals, parentField, conv, config, meta);
   if (!parseRes) return undefined;
-  let {field, fieldSrc, fieldConfig, opKey, args, having} = parseRes;
+  let {field, fieldSrc, fieldConfig, args, having} = parseRes;
   const parentFieldConfig = getFieldConfig(config, parentField);
 
-  let opConfig = config.operators[opKey];
+  let opConfig = config.operators[op];
   const reversedOpConfig = config.operators[opConfig?.reversedOp];
   const opNeedsReverse = false;
   const opCanReverse = !!reversedOpConfig;
@@ -840,7 +844,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
     // Eg. use `not_equal` instead of `not` `equal`
     // We look for template matches here to make sure we dont reverse when "!" is
     // part of operator
-    let match = matchAgainstTemplates(having, conv, meta);
+    let match = isJsonLogic(having) ? matchAgainstTemplates(having, conv, meta, config, field) : null;
     while (conj == "!" && !match) {
       const isEmptyOp = conj == "!" && (
         havingVals.length == 1 && havingVals[0] && isJsonLogic(havingVals[0])
@@ -860,8 +864,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
         havingVals = having[conj];
       }
       // Another template matching
-      const matchTemp = matchAgainstTemplates(having, conv, meta);
-      match = matchTemp ? matchTemp : match;
+      const matchTemp = isJsonLogic(having) ? matchAgainstTemplates(having, conv, meta, config, field) : null;
+      match = matchTemp || match;
     }
     if (!Array.isArray(havingVals)) {
       havingVals = [ havingVals ];
@@ -873,18 +877,18 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
       havingVals[0] = match.jlField;
       match.jlArgs.forEach(arg => havingVals.push(arg));
       // We reset op to new op that represents multiple jsonlogic operators
-      conj = match.newOp;
+      conj = match.op;
     }
   }
 
   // Use reversed op
   if (needRev) {
     not = !not;
-    opKey = opConfig.reversedOp;
-    opConfig = config.operators[opKey];
+    op = opConfig.reversedOp;
+    opConfig = config.operators[op];
   }
 
-  const widget = getWidgetForFieldOp(config, field, opKey, null);
+  const widget = getWidgetForFieldOp(config, field, op, null);
 
   const convertedArgs = args
     .map(v => convertFromLogic(v, conv, config, ["val"], meta, false, fieldConfig, widget, parentField));
@@ -923,7 +927,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
     Object.assign(res.properties, {
       field: field,
       mode: fieldConfig.mode,
-      operator: opKey,
+      operator: op,
     });
     if (fieldConfig.mode == "array") {
       Object.assign(res.properties, {
@@ -948,7 +952,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
         not: false,
         mode: fieldConfig.mode,
         field: field,
-        operator: opKey,
+        operator: op,
       }
     };
     if (fieldConfig.mode === "array") {
@@ -970,7 +974,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
       properties: {
         field: field,
         fieldSrc: fieldSrc,
-        operator: opKey,
+        operator: op,
         value: convertedArgs.map(v => v.value),
         valueSrc: convertedArgs.map(v => v.valueSrc),
         valueType: convertedArgs.map(v => v.valueType),
