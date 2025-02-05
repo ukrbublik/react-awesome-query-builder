@@ -1,7 +1,7 @@
 import uuid from "../utils/uuid";
 import {isJsonLogic, isValidFieldObject, isValidForFieldMarker, shallowEqual, isVarEmptyObject} from "../utils/stuff";
-import {getFieldConfig, extendConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts} from "../utils/configUtils";
-import {getWidgetForFieldOp} from "../utils/ruleUtils";
+import {getFieldConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts, getWidgetForFieldOp} from "../utils/configUtils";
+import {extendConfig} from "../utils/configExtend";
 import {loadTree} from "./tree";
 import {defaultGroupConjunction} from "../utils/defaultUtils";
 
@@ -778,40 +778,24 @@ const _parseRule = (op, vals, parentField, conv, config, meta) => {
   let jlField = vals[0];
   let jlArgs = vals.slice(1);
 
-    const lhs = convertLhs(isGroup0, jlField, jlArgs, conv, config, null, null, meta, parentField);
-    if (!lhs) {
-      continue; // try another operator
-    }
-    const {
-      field, fieldSrc, having, isGroup, args
-    } = lhs;
-    const fieldConfig = getFieldConfig(config, field);
-    if (!fieldConfig && !meta.settings?.allowUnknownFields) {
-      meta.errors.push(`No config for LHS ${field}`);
-      return;
-    }
-    const isValidOp = fieldConfig?.operators && fieldConfig.operators.includes(opKey);
-
-    returnVariants.push({
-      field, fieldSrc, fieldConfig, opKey, args, having,
-      isValidOp,
-    });
+  if (!isJsonLogic(jlField)) {
+    meta.errors.push(`Incorrect operands for ${op}: ${JSON.stringify(vals)}`);
+    return;
   }
 
-  let opKey = opKeys[0];
-  if (opKeys.length > 1 && fieldConfig && fieldConfig.operators) {
-    // eg. for "equal" and "select_equals"
-    opKeys = opKeys
-      .filter(k => fieldConfig.operators.includes(k));
-    if (opKeys.length == 0) {
-      meta.errors.push(`No corresponding ops for LHS ${field}`);
-      return;
-    }
-    opKey = opKeys[0];
+  const lhs = convertLhs(isGroup0, jlField, jlArgs, conv, config, null, null, meta, parentField);
+  if (!lhs) return;
+  const {
+    field, fieldSrc, having, isGroup, args
+  } = lhs;
+  const fieldConfig = getFieldConfig(config, field);
+  if (!fieldConfig && !meta.settings?.allowUnknownFields) {
+    meta.errors.push(`No config for LHS ${field}`);
+    return;
   }
-  
+
   return {
-    field, fieldSrc, fieldConfig, opKey, args, having
+    field, fieldSrc, fieldConfig, args, having
   };
 };
 
