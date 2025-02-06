@@ -63,18 +63,11 @@ class RuleGroupExt extends BasicGroup {
 
   renderHeaderWrapper() {
     return (
-      <div key="group-header" className={classNames(
-        "group--header", 
-        this.isOneChild() ? "one--child" : "",
-        this.isOneChild() ? "hide--line" : "",
-        this.isNoChildren() ? "no--children" : "",
-        this.showDragIcon() ? "with--drag" : "hide--drag",
-        this.showConjs() ? "with--conjs" : "hide--conjs"
-      )}>
-        {this.renderHeader()}
+      <>
         {this.renderGroupField()}
-        {this.renderActions()}
-      </div>
+        {this.renderError()}
+        {this.renderGroupHeader()}
+      </>
     );
   }
 
@@ -82,18 +75,37 @@ class RuleGroupExt extends BasicGroup {
     return (
       <div className={"group--conjunctions"}>
         {this.renderConjs()}
-        {this.renderDrag()}
       </div>
     );
   }
 
   renderGroupField() {
     return (
-      <div className={"group--field--count--rule"}>
+      <div className={classNames(
+        "group--field--count--rule",
+        this.showDragIcon() ? "with--drag" : "hide--drag",
+      )}>
+        {this.renderDrag()}
         {this.renderField()}
         {this.renderOperator()}
         {this.renderWidget()}
-        {this.renderError()}
+        {!this.isNoChildren() ? " where:" : ""}
+        {this.renderSelfActions()}
+      </div>
+    );
+  }
+
+  renderGroupHeader() {
+    return (
+      <div className={classNames(
+        "group--header", 
+        this.isOneChild() ? "one--child" : "",
+        this.isOneChild() ? "hide--line" : "",
+        this.isNoChildren() ? "no--children" : "",
+        this.showConjs() ? "with--conjs" : "hide--conjs"
+      )}>
+        {this.renderHeader()}
+        {this.renderChildrenActions()}
       </div>
     );
   }
@@ -225,21 +237,40 @@ class RuleGroupExt extends BasicGroup {
     );
   }
 
-  renderActions() {
+  showChildrenActionsAsSelf() {
+    return this.isNoChildren();
+  }
+
+  renderChildrenActions() {
     const {config, addRule, addGroup, isLocked, isTrueLocked, id} = this.props;
 
     return <RuleGroupExtActions
       config={config}
       addRule={addRule}
       addGroup={addGroup}
-      canAddRule={this.canAddRule()}
-      canAddGroup={this.canAddGroup()}
-      canDeleteGroup={this.canDeleteGroup()}
+      canAddRule={!this.showChildrenActionsAsSelf() && this.canAddRule()}
+      canAddGroup={!this.showChildrenActionsAsSelf() && this.canAddGroup()}
+      isLocked={isLocked}
+      isTrueLocked={isTrueLocked}
+      id={id+"_children"}
+    />;
+  }
+
+  renderSelfActions() {
+    const {config, addRule, addGroup, isLocked, isTrueLocked, id} = this.props;
+
+    return <RuleGroupExtActions
+      config={config}
+      addRule={addRule}
+      addGroup={addGroup}
+      canAddRule={this.showChildrenActionsAsSelf() && this.canAddRule()}
+      canAddGroup={this.showChildrenActionsAsSelf() && this.canAddGroup()}
       removeSelf={this.removeSelf}
       setLock={this.setLock}
       isLocked={isLocked}
       isTrueLocked={isTrueLocked}
-      id={id}
+      canDeleteGroup={this.canDeleteGroup()}
+      id={id+"_self"}
     />;
   }
 
