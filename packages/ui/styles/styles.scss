@@ -61,7 +61,6 @@ $root_group: ".query-builder > .group-container > .group";
     background-color: $rule-background;
     border: $rule-border solid $rule-border-color;
     border-left-width: $rule-border-left;
-    box-shadow: $rule-shadow;
     padding: $rule-padding;
     
     &:hover {
@@ -224,7 +223,7 @@ $root_group: ".query-builder > .group-container > .group";
     border-left-width: $rulegroup-border-left;
 
     &:hover {
-      //box-shadow: $rulegroup-shadow-hover;
+      //box-shadow: $rulegroup-shadow-hover; //todo
       border-left-width: $rulegroup-border-left-hover;
       @include fix_padding_for_hovered($rule-padding, $rulegroup-border-left, $rulegroup-border-left-hover);
     }
@@ -291,7 +290,7 @@ $root_group: ".query-builder > .group-container > .group";
     border-left-width: $rulegroupext-border-left;
 
     &:hover {
-      //box-shadow: $rulegroupext-shadow-hover;
+      //box-shadow: $rulegroupext-shadow-hover; //todo
       border-left-width: $rulegroupext-border-left-hover;
       @include fix_paddings_for_hovered_group($item-offset-left, $treeline-thick, $rulegroupext-border-left, $rulegroupext-border-left-hover);
     }
@@ -300,15 +299,19 @@ $root_group: ".query-builder > .group-container > .group";
       display: flex;
       flex-wrap: wrap;
       flex: 1;
+  
+      padding: {
+        left: calc($item-offset-left / 2 - $treeline-thick);
+        right: $item-offset;
+      }
+      margin: {
+        top: $item-offset;
+        bottom: $item-offset;
+      }
     }
 
     & > .group--header .group--actions {
       flex: none;
-    }
-    & > .group--header.hide--drag.with--conjs {
-      & > .group--field--count--rule {
-        margin-left: 20px;
-      }
     }
   }
 
@@ -728,7 +731,8 @@ $root_group: ".query-builder > .group-container > .group";
     }
     .group--header:hover .group--header,
     .group--header:not(:hover),
-    .rule_group:not(:hover) {
+    .rule_group:not(:hover),
+    .group--field--count--rule:not(:hover) {
       #{$what} {
         opacity: 0;
       }
@@ -748,7 +752,8 @@ $root_group: ".query-builder > .group-container > .group";
         #{$inactive} {
           width: 0;
           min-width: 0;
-          padding: 0;
+          padding-left: 0;
+          padding-right: 0;
           margin: 0;
           overflow: hidden;
           opacity: 0;

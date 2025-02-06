@@ -33,6 +33,7 @@ const FluentUIProvider = ({config, children}) => {
   const themeMode = config.settings.themeMode ?? "light";
   const darkMode = config.settings.themeMode === "dark";
   const compactMode = config.settings.compactMode;
+  // todo: theme obj can be set in settings
 
   // https://developer.microsoft.com/en-us/fluentui#/controls/web/themeprovider
   const darkTheme = {

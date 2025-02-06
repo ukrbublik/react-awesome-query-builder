@@ -37,6 +37,7 @@ import MuiConfirm from "./core/MuiConfirm";
 
 // provider
 const MuiProvider = ({config, children}) => {
+  const ref = React.createRef();
   const themeMode = config.settings.themeMode ?? "light";
   const compactMode = config.settings.compactMode;
   const settingsTheme = config.settings.theme;
@@ -44,11 +45,16 @@ const MuiProvider = ({config, children}) => {
   const momentLocale = settingsLocale?.moment;
   const themeConfig = settingsTheme?.mui;
   const localeConfig = settingsLocale?.mui;
-  const theme = createTheme(themeConfig ?? {
-    palette: {
-      mode: themeMode,
-    }
-  }, localeConfig ?? {});
+  const isFullTheme = (t) => !!t?.shadows;
+  const canCreateTheme = !!themeConfig || config.settings.themeMode || localeConfig;
+  const theme = !canCreateTheme ? null : (
+    isFullTheme(themeConfig) ? themeConfig :
+      createTheme(themeConfig ?? {
+        palette: {
+          mode: themeMode,
+        }
+      }, localeConfig ?? {})
+  );
 
   const locProviderProps = xdpVersion >= 6 ? {
     locale: momentLocale,
@@ -58,14 +64,11 @@ const MuiProvider = ({config, children}) => {
 
   const UpdCssVars = () => {
     const theme = useTheme();
-    const ref = React.createRef();
     React.useEffect(() => {
       console.log('MUI theme', theme);
       const { palette, typography, shadows } = theme;
       const setOpacity = (hex, alpha) => `${hex}${Math.floor(alpha * 255).toString(16).padStart(2, 0)}`;
-      const r = document.querySelector(":root");
-      const w = ref.current?.closest(".qb-mui");
-      const cssVarsTarget = w ?? r;
+      const cssVarsTarget = ref.current ?? document.querySelector(":root");
       const cssVars = {
         "--rule-background": palette.mode === "dark" ? setOpacity(palette.grey[800], 0.3) : palette.background.paper,
         "--group-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.8) : setOpacity(palette.grey[600], 0.1),
@@ -96,10 +99,10 @@ const MuiProvider = ({config, children}) => {
         }
       };
     }, [theme]);
-    return <div ref={ref} style={{display: "none"}} />;
+    return <div style={{display: "none"}} />;
   };
 
-  const base = (<div className={`qb-mui ${compactMode ? "qb-compact" : ""}`}><UpdCssVars />{children}</div>);
+  const base = (<div ref={ref} className={`qb-mui qb-${themeMode} ${compactMode ? "qb-compact" : ""}`}><UpdCssVars />{children}</div>);
   const withProviders = (
     <LocalizationProvider dateAdapter={AdapterMoment} {...locProviderProps} >
       <ConfirmProvider>

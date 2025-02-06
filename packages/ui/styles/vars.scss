@@ -20,9 +20,7 @@ $rulegroupext-border-left: var(--rulegroupext-border-left, $rulegroupext-border)
 $rulegroupext-border-left-hover: var(--rulegroupext-border-left-hover, $rulegroupext-border);
 $item-radius: var(--item-radius, $default-item-radius);
 // shadows
-$rule-shadow: var(--rule-shadow, $default-rule-shadow);
 $rule-shadow-hover: var(--rule-shadow-hover, $default-rule-shadow-hover);
-$group-shadow: var(--group-shadow, $default-group-shadow);
 $group-shadow-hover: var(--group-shadow-hover, $default-group-shadow-hover);
 // treeline
 $treeline-radius: var(--treeline-radius, $default-treeline-radius);

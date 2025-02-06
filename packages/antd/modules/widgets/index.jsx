@@ -45,9 +45,7 @@ const Provider = ({ config, children }) => {
   const palette = algorithms.reduce((tkns, algo, i) => i === 0 ? algo(tkns) : algo({}, tkns), theme.defaultSeed);
   React.useEffect(() => {
     console.log('antd palette', palette);
-    const r = document.querySelector(":root");
-    const w = ref.current;
-    const cssVarsTarget = w ?? r;
+    const cssVarsTarget = ref.current;
     const cssVars = {
       "--rule-background": palette.colorBgElevated,
       "--group-background": darkMode ? palette.colorBgMask : palette.colorFillSecondary,
