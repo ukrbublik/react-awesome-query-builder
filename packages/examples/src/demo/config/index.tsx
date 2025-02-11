@@ -378,7 +378,7 @@ export default (skin: string) => {
       }
     },
     results: {
-      label: "Results",
+      label: "Results (group)",
       type: "!group",
       subfields: {
         product: {
@@ -395,15 +395,43 @@ export default (skin: string) => {
             max: 100,
           },
           valueSources: ["value"],
-        }
+        },
+        interviewer: {
+          type: "!group",
+          mode: "struct",
+          subfields: {
+            level: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["jun", "mid", "sen"],
+              } as SelectFieldSettings,
+              valueSources: ["value"],
+            },
+          }
+        },
+        questions: {
+          type: "!group",
+          mode: "array",
+          conjunctions: ["AND", "OR"],
+          showNot: false,
+          initialEmptyWhere: true,
+          defaultOperator: "equal",
+
+          subfields: {
+            answered: {
+              type: "boolean",
+              valueSources: ["value"],
+            },
+          }
+        },
       }
     },
     cars: {
-      label: "Cars",
+      label: "Cars (group)",
       type: "!group",
       mode: "array",
       conjunctions: ["AND", "OR"],
-      showNot: true,
+      showNot: false,
       operators: [
         // w/ operand - count
         "equal",
