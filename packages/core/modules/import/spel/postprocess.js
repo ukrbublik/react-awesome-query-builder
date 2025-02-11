@@ -10,7 +10,10 @@ export const postprocessCompiled = (expr, meta, parentExpr = null) => {
   // flatize OR/AND
   if (type == "op-or" || type == "op-and") {
     children = children.reduce((acc, child) => {
-      const canFlatize = child.type == type && !child.not;
+      const isBetweenNormal = (child.type == "op-and" && child.children.length == 2 && child.children[0].type == "op-ge" && child.children[1].type == "op-le");
+      const isBetweenRev = (child.type == "op-or" && child.children.length == 2 && child.children[0].type == "op-lt" && child.children[1].type == "op-gt");
+      const isBetween = isBetweenNormal || isBetweenRev;
+      const canFlatize = child.type == type && !child.not && !isBetween;
       const flat = canFlatize ? child.children : [child];
       return [...acc, ...flat];
     }, []);
