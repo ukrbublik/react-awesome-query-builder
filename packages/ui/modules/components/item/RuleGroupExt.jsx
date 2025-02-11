@@ -89,7 +89,7 @@ class RuleGroupExt extends BasicGroup {
         {this.renderField()}
         {this.renderOperator()}
         {this.renderWidget()}
-        {!this.isNoChildren() ? " where:" : ""}
+        {/* {!this.isNoChildren() ? " where:" : ""} */}
         {this.renderSelfActions()}
       </div>
     );
