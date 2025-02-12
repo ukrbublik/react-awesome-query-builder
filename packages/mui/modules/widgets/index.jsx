@@ -15,6 +15,7 @@ import MuiDateTimeWidget from "./value/MuiDateTime";
 import MuiTimeWidget from "./value/MuiTime";
 import MuiSelectWidget from "./value/MuiSelect";
 import MuiNumberWidget from "./value/MuiNumber";
+import MuiPriceWidget from "./value/MuiPrice";
 import MuiSliderWidget from "./value/MuiSlider";
 import MuiRangeWidget from "./value/MuiRange";
 import MuiBooleanWidget from "./value/MuiBoolean";
@@ -82,6 +83,7 @@ export default {
   MuiTimeWidget,
   MuiSelectWidget,
   MuiNumberWidget,
+  MuiPriceWidget,
   MuiSliderWidget,
   MuiRangeWidget,
   MuiBooleanWidget,

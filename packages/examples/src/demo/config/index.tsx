@@ -13,6 +13,7 @@ import {
   TreeSelectWidget,
   Config,
   ValidateValue,
+  PriceFieldSettings,
 } from "@react-awesome-query-builder/ui";
 import moment from "moment";
 import ru_RU from "antd/es/locale/ru_RU";
@@ -108,7 +109,10 @@ export default (skin: string) => {
       maxRows: 3
     },
     slider: {
-      ...InitialConfig.widgets.slider
+      ...InitialConfig.widgets.slider,
+    },
+    price: {
+      ...InitialConfig.widgets.price,
     },
     rangeslider: {
       ...InitialConfig.widgets.rangeslider
@@ -163,6 +167,9 @@ export default (skin: string) => {
     text: {
       ...InitialConfig.types.text,
       excludeOperators: ["proximity"],
+    },
+    price: {
+      ...InitialConfig.types.price,
     },
     boolean: merge({}, InitialConfig.types.boolean, {
       widgets: {
@@ -330,6 +337,17 @@ export default (skin: string) => {
   //////////////////////////////////////////////////////////////////////
 
   const fields: Fields = {
+    price: {
+      label: "Price",
+      type: "price",
+      preferWidgets: ["price"],
+      fieldSettings: {
+        valuePlaceholder: "Enter your Price",
+        thousandSeparator:",",
+        prefix:'﷼',
+        suffix:'$',
+      }as PriceFieldSettings,
+    },
     user: {
       label: "User",
       tooltip: "Group of fields",
