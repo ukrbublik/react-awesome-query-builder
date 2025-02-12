@@ -113,6 +113,9 @@
     "lerna": "^8.1.9",
     "typescript": "~5.4.5"
   },
+  "dependencies": {
+    "react-number-format": "^5.0.0"
+  },
   "engines": {
     "node": ">=18",
     "pnpm": ">=8"

@@ -6,6 +6,7 @@ import BootstrapDateTimeWidget from "./value/BootstrapDateTime";
 import BootstrapTimeWidget from "./value/BootstrapTime";
 import BootstrapSelectWidget from "./value/BootstrapSelect";
 import BootstrapNumberWidget from "./value/BootstrapNumber";
+import BootstrapPriceWidget from "./value/BootstrapPrice";
 import BootstrapSliderWidget from "./value/BootstrapSlider";
 import BootstrapBooleanWidget from "./value/BootstrapBoolean";
 import BootstrapMultiSelectWidget from "./value/BootstrapMultiSelect";
@@ -22,7 +23,7 @@ import BootstrapValueSources from "./core/BootstrapValueSources";
 import BootstrapConfirm from "./core/BootstrapConfirm";
 
 // provider
-const BootstrapProvider = ({config, children}) => children;
+const BootstrapProvider = ({ config, children }) => children;
 
 export default {
   BootstrapTextWidget,
@@ -32,6 +33,7 @@ export default {
   BootstrapTimeWidget,
   BootstrapSelectWidget,
   BootstrapNumberWidget,
+  BootstrapPriceWidget,
   BootstrapSliderWidget,
   BootstrapBooleanWidget,
   BootstrapMultiSelectWidget,

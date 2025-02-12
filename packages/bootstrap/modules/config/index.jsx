@@ -34,6 +34,10 @@ const widgets = {
     ...BasicConfig.widgets.number,
     factory: (props, {RCE, W: {BootstrapNumberWidget}}) => RCE(BootstrapNumberWidget, props),
   },
+  price: {
+    ...BasicConfig.widgets.price,
+    factory: (props, {RCE, W: {BootstrapPriceWidget}}) => RCE(BootstrapPriceWidget, props),
+  },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
     factory: (props, {RCE, W: {BootstrapMultiSelectWidget}}) => RCE(BootstrapMultiSelectWidget, props),

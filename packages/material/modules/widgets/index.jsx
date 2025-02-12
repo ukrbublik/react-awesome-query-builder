@@ -13,6 +13,7 @@ import MaterialDateTimeWidget from "./value/MaterialDateTime";
 import MaterialTimeWidget from "./value/MaterialTime";
 import MaterialSelectWidget from "./value/MaterialSelect";
 import MaterialNumberWidget from "./value/MaterialNumber";
+import MaterialPriceWidget from "./value/MaterialPrice";
 import MaterialSliderWidget from "./value/MaterialSlider";
 import MaterialRangeWidget from "./value/MaterialRange";
 import MaterialBooleanWidget from "./value/MaterialBoolean";
@@ -67,6 +68,7 @@ export default {
   MaterialTimeWidget,
   MaterialSelectWidget,
   MaterialNumberWidget,
+  MaterialPriceWidget,
   MaterialSliderWidget,
   MaterialRangeWidget,
   MaterialBooleanWidget,
