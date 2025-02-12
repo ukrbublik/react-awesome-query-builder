@@ -554,7 +554,7 @@ export const with_group_inside_struct = (BasicConfig) => ({
           mode: "some",
           subfields: {
             price: {
-              type: "number",
+              type: "price",
               valueSources: ["value"],
             },
             type: {

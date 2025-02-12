@@ -24,6 +24,7 @@ export interface BootstrapWidgets {
   BootstrapMultiSelectWidget: ElementType<SelectWidgetProps>,
   BootstrapSelectWidget: ElementType<SelectWidgetProps>,
   BootstrapNumberWidget: ElementType<NumberWidgetProps>,
+  BootstrapPriceWidget: ElementType<NumberWidgetProps>,
   BootstrapSliderWidget: ElementType<NumberWidgetProps>,
 }
 

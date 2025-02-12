@@ -9,6 +9,7 @@ import FluentUIDateTimeWidget from "./value/FluentUIDateTime";
 import FluentUITimeWidget from "./value/FluentUITime";
 import FluentUISelectWidget from "./value/FluentUISelect";
 import FluentUINumberWidget from "./value/FluentUINumber";
+import FluentUIPriceWidget from "./value/FluentUIPrice";
 import FluentUISliderWidget from "./value/FluentUISlider";
 import FluentUIBooleanWidget from "./value/FluentUIBoolean";
 import FluentUIMultiSelectWidget from "./value/FluentUIMultiSelect";
@@ -36,6 +37,7 @@ export default {
   FluentUITimeWidget,
   FluentUISelectWidget,
   FluentUINumberWidget,
+  FluentUIPriceWidget,
   FluentUISliderWidget,
   FluentUIBooleanWidget,
   FluentUIMultiSelectWidget,

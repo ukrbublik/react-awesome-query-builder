@@ -27,6 +27,7 @@ export interface MaterialWidgets {
   MaterialMultiSelectWidget: ElementType<SelectWidgetProps>,
   MaterialSelectWidget: ElementType<SelectWidgetProps>,
   MaterialNumberWidget: ElementType<NumberWidgetProps>,
+  MaterialPriceWidget: ElementType<NumberWidgetProps>;
   MaterialSliderWidget: ElementType<NumberWidgetProps>,
   MaterialRangeWidget: ElementType<RangeSliderWidgetProps>,
   MaterialAutocompleteWidget: ElementType<SelectWidgetProps>,

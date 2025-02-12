@@ -27,6 +27,7 @@ export interface MuiWidgets {
   MuiMultiSelectWidget: ElementType<SelectWidgetProps>,
   MuiSelectWidget: ElementType<SelectWidgetProps>,
   MuiNumberWidget: ElementType<NumberWidgetProps>,
+  MuiPriceWidget: ElementType<NumberWidgetProps>;
   MuiSliderWidget: ElementType<NumberWidgetProps>,
   MuiRangeWidget: ElementType<RangeSliderWidgetProps>,
   MuiAutocompleteWidget: ElementType<SelectWidgetProps>,

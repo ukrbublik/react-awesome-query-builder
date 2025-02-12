@@ -34,6 +34,11 @@ const widgets = {
     ...BasicConfig.widgets.number,
     factory: (props, {RCE, W: {FluentUINumberWidget}}) => RCE(FluentUINumberWidget, props),
   },
+  price: {
+    ...BasicConfig.widgets.price,
+    factory: (props, { RCE, W: { FluentUIPriceWidget } }) =>
+      RCE(FluentUIPriceWidget, props),
+  },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
     factory: (props, {RCE, W: {FluentUIMultiSelectWidget}}) => RCE(FluentUIMultiSelectWidget, props),

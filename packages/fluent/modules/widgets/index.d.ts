@@ -24,6 +24,7 @@ export interface FluentUIWidgets {
   FluentUIMultiSelectWidget: ElementType<SelectWidgetProps>,
   FluentUISelectWidget: ElementType<SelectWidgetProps>,
   FluentUINumberWidget: ElementType<NumberWidgetProps>,
+  FluentUIPriceWidget: ElementType<NumberWidgetProps>;
   FluentUISliderWidget: ElementType<NumberWidgetProps>,
 }
 export declare const FluentUIWidgets: FluentUIWidgets;

@@ -8,6 +8,7 @@ import SelectWidget from "./value/Select";
 import TextWidget from "./value/Text";
 import TextAreaWidget from "./value/TextArea";
 import NumberWidget from "./value/Number";
+import PriceWidget from "./value/Price";
 import SliderWidget from "./value/Slider";
 import RangeWidget from "./value/Range";
 import BooleanWidget from "./value/Boolean";
@@ -41,6 +42,7 @@ export default {
   TextWidget,
   TextAreaWidget,
   NumberWidget,
+  PriceWidget,
   SliderWidget,
   RangeWidget,
   BooleanWidget,

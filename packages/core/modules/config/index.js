@@ -762,6 +762,28 @@ const widgets = {
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
+  price: {
+    type: "price",
+    jsType: "number",
+    valueSrc: "value",
+    valueLabel: "Price",
+    valueLabels: [
+      { label: "Price from", placeholder: "Enter price from" },
+      { label: "Price to", placeholder: "Enter price to" },
+    ],
+    formatValue: function (val, fieldDef, wgtDef, isForDisplay) {      
+      return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
+    },
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+      return this.utils.SqlString.escape(val);
+    },
+    spelFormatValue: function (val, fieldDef, wgtDef) {
+      const isFloat = wgtDef.step && !Number.isInteger(wgtDef.step);
+      return this.utils.spelEscape(val, isFloat);
+    },
+    toJS: (val, fieldSettings) => (val),
+    mongoFormatValue: (val, fieldDef, wgtDef) => (val),
+  },
   slider: {
     type: "number",
     jsType: "number",
@@ -1225,6 +1247,27 @@ const types = {
           // "is_not_empty",
           "is_null",
           "is_not_null"
+        ],
+      },
+    },
+  },
+  price: {
+    defaultOperator: "equal",
+    widgets: {
+      price: {
+        operators: [
+          "equal",
+          "not_equal",
+          "less",
+          "less_or_equal",
+          "greater",
+          "greater_or_equal",
+          "between",
+          "not_between",
+          // "is_empty",
+          // "is_not_empty",
+          "is_null",
+          "is_not_null",
         ],
       },
     },

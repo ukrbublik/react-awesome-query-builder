@@ -57,14 +57,8 @@ export default (): Config => {
     },
     price: {
       label: "Price",
-      type: "number",
+      type: "price",
       valueSources: ["value"],
-      fieldSettings: {
-        min: 10,
-        max: 100
-      },
-      preferWidgets: ["slider", "rangeslider"],
-      isSpelVariable: true
     },
     color: {
       label: "Color",
