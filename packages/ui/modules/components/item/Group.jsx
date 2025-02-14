@@ -41,6 +41,7 @@ export class BasicGroup extends Component {
     addRule: PropTypes.func.isRequired,
     addGroup: PropTypes.func.isRequired,
     removeSelf: PropTypes.func.isRequired,
+    removeGroupChildren: PropTypes.func.isRequired,
     setConjunction: PropTypes.func.isRequired,
     setNot: PropTypes.func.isRequired,
     setLock: PropTypes.func.isRequired,
@@ -54,6 +55,7 @@ export class BasicGroup extends Component {
     this.onPropsChanged(props);
 
     this.removeSelf = this.removeSelf.bind(this);
+    this.removeGroupChildren = this.removeGroupChildren.bind(this);
     this.setLock = this.setLock.bind(this);
     this.renderItem = this.renderItem.bind(this);
   }
@@ -82,6 +84,10 @@ export class BasicGroup extends Component {
 
   setLock(lock) {
     this.props.setLock(lock);
+  }
+
+  removeGroupChildren() {
+    this.props.removeGroupChildren();
   }
 
   removeSelf() {
