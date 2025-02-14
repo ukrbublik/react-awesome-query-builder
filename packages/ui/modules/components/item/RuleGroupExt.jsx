@@ -71,6 +71,10 @@ class RuleGroupExt extends BasicGroup {
     );
   }
 
+  canRenderHeader() {
+    return this.canRenderConjs();
+  }
+
   renderHeader() {
     return (
       <div className={"group--conjunctions"}>
@@ -95,7 +99,14 @@ class RuleGroupExt extends BasicGroup {
     );
   }
 
+  canRenderGroupHeader() {
+    return this.canRenderHeader() && this.canRenderChildrenActions();
+  }
+
   renderGroupHeader() {
+    if (!this.canRenderGroupHeader()) {
+      return null;
+    }
     return (
       <div className={classNames(
         "group--header", 
@@ -238,7 +249,13 @@ class RuleGroupExt extends BasicGroup {
   }
 
   showChildrenActionsAsSelf() {
-    return this.isNoChildren();
+    const { config } = this.props;
+    const { forceShowConj } = config.settings;
+    return this.isNoChildren() || this.isOneChild() && !forceShowConj && !this.showNot();
+  }
+
+  canRenderChildrenActions() {
+    return !this.showChildrenActionsAsSelf() && (this.canAddRule() || this.canAddGroup());
   }
 
   renderChildrenActions() {
