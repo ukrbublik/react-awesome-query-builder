@@ -18,7 +18,8 @@
 
 @mixin fix_paddings_for_hovered_group($item-offset-left, $treeline-thick, $border-left, $border-left-hover) {
   & > .group--header,
-  & > .group--footer {
+  & > .group--footer,
+  & > .group--field--count--rule {
     padding-left: calc($item-offset-left / 2 - $treeline-thick - $border-left-hover + $border-left);
   }
   & > .group--children {
@@ -119,7 +120,6 @@
   $item-offset-left, $item-offset,
   $treeline-thick, $treeline-radius, $treeline-color,
   $rule-border, $group-border, $rulegroup-border, $rulegroupext-border,
-  $rule-border-left, $group-border-left, $rulegroup-border-left, $rulegroupext-border-left,
   $rule-border-left-hover, $group-border-left-hover, $rulegroup-border-left-hover, $rulegroupext-border-left-hover
 ) {
   & > .group-or-rule-container:last-child {
@@ -136,16 +136,16 @@
       }
     }
     & > .rule {
-      @include line_position_for_item($rule-border-left, $rule-border-left-hover, $rule-border, $item-offset-left, $item-offset, $treeline-thick);
+      @include line_position_for_item($rule-border, $rule-border-left-hover, $rule-border, $item-offset-left, $item-offset, $treeline-thick);
     }
     & > .simple_group {
-      @include line_position_for_item($group-border-left, $group-border-left-hover, $group-border, $item-offset-left, $item-offset, $treeline-thick);
+      @include line_position_for_item($group-border, $group-border-left-hover, $group-border, $item-offset-left, $item-offset, $treeline-thick);
     }
     & > .rule_group {
-      @include line_position_for_item($rulegroup-border-left, $rulegroup-border-left-hover, $rulegroup-border, $item-offset-left, $item-offset, $treeline-thick);
+      @include line_position_for_item($rulegroup-border, $rulegroup-border-left-hover, $rulegroup-border, $item-offset-left, $item-offset, $treeline-thick);
     }
     & > .rule_group_ext {
-      @include line_position_for_item($rulegroupext-border-left, $rulegroupext-border-left-hover, $rulegroupext-border, $item-offset-left, $item-offset, $treeline-thick);
+      @include line_position_for_item($rulegroupext-border, $rulegroupext-border-left-hover, $rulegroupext-border, $item-offset-left, $item-offset, $treeline-thick);
     }
   }
 }
