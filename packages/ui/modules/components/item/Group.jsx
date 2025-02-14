@@ -349,17 +349,24 @@ export class BasicGroup extends Component {
     return conjunctionOptions;
   }
 
+  canRenderConjs() {
+    const { children1 } = this.props;
+    if (!this.showConjs())
+      return false;
+    if (!children1 || !children1.size)
+      return false;
+    return true;
+  }
+
   renderConjs() {
     const {
-      config, children1, id,
+      config, id,
       selectedConjunction, setConjunction, not, setNot, isLocked
     } = this.props;
 
     const {immutableGroupsMode, notLabel} = config.settings;
     const conjunctionOptions = this.conjunctionOptions();
-    if (!this.showConjs())
-      return null;
-    if (!children1 || !children1.size)
+    if (!this.canRenderConjs())
       return null;
 
     const renderProps = {

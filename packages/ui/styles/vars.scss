@@ -4,19 +4,14 @@
 
 // borders
 $rule-border: var(--rule-border, $default-rule-border);
-$rule-border-left: var(--rule-border-left, $rule-border);
 $rule-border-left-hover: var(--rule-border-left-hover, $rule-border);
 $group-border: var(--group-border, $default-group-border);
-$group-border-left: var(--group-border-left, $group-border);
 $group-border-left-hover: var(--group-border-left-hover, $group-border);
 $case-border: var(--case-border, $default-case-border);
-$case-border-left: var(--case-border-left, $case-border);
 $case-border-left-hover: var(--case-border-left-hover, $case-border);
 $rulegroup-border: var(--rulegroup-border, $default-rulegroup-border);
-$rulegroup-border-left: var(--rulegroup-border-left, $rulegroup-border);
 $rulegroup-border-left-hover: var(--rulegroup-border-left-hover, $rulegroup-border);
 $rulegroupext-border: var(--rulegroupext-border, $default-rulegroupext-border);
-$rulegroupext-border-left: var(--rulegroupext-border-left, $rulegroupext-border);
 $rulegroupext-border-left-hover: var(--rulegroupext-border-left-hover, $rulegroupext-border);
 $item-radius: var(--item-radius, $default-item-radius);
 // shadows
@@ -56,7 +51,7 @@ $rule-in-rulegroup-border-color: var(--rule-in-rulegroup-border-color, $rule-bor
 $rulegroup-in-rulegroup-border-color: var(--rulegroup-in-rulegroup-border-color, $rulegroup-border-color);
 $rulegroupext-in-rulegroup-border-color: var(--rulegroupext-in-rulegroup-border-color, $rulegroupext-border-color);
 $rule-in-rulegroupext-background: var(--rule-in-rulegroupext-background, $rule-background);
-$group-in-rulegroupext-background: var(--group-in-rulegroupext-background, $group-background);
+$group-in-rulegroupext-background: var(--group-in-rulegroupext-background, $rulegroupext-background);
 $rulegroupext-in-rulegroupext-background: var(--rulegroupext-in-rulegroupext-background, $rulegroupext-background);
 $rulegroup-in-rulegroupext-background: var(--rulegroup-in-rulegroupext-background, $rulegroup-background);
 $rule-in-rulegroupext-border-color: var(--rule-in-rulegroupext-border-color, $rule-border-color);
