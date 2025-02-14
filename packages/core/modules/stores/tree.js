@@ -96,6 +96,25 @@ const removeGroup = (state, path, config) => {
   return state;
 };
 
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
+ * @param {Immutable.Map} properties
+ */
+const removeGroupChildren = (state, path, config) => {
+  const targetItem = state.getIn(expandTreePath(path));
+  if (!targetItem) {
+    // incorrect path
+    return state;
+  }
+
+  state = removeChildren(state, path);
+
+  state = fixPathsInTree(state);
+  return state;
+};
+
 /**
  * @param {object} config
  * @param {Immutable.List} path
@@ -286,6 +305,16 @@ const addItem = (state, path, type, generatedId, properties, config, children = 
  */
 const removeItem = (state, path) => {
   state = state.deleteIn(expandTreePath(path));
+  state = fixPathsInTree(state);
+  return state;
+};
+
+/**
+ * @param {Immutable.Map} state
+ * @param {Immutable.List} path
+ */
+const removeChildren = (state, path) => {
+  state = state.deleteIn(expandTreePath(path, "children1"));
   state = fixPathsInTree(state);
   return state;
 };
@@ -1022,6 +1051,11 @@ export default (initialConfig, tree, getMemoizedTree, setLastTree, getLastConfig
 
     case constants.REMOVE_GROUP: {
       set.tree = removeGroup(state.tree, action.path, config);
+      break;
+    }
+
+    case constants.REMOVE_GROUP_CHILDREN: {
+      set.tree = removeGroupChildren(state.tree, action.path, config);
       break;
     }
 
