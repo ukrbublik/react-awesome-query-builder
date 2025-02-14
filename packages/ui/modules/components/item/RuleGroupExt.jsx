@@ -258,6 +258,12 @@ class RuleGroupExt extends BasicGroup {
     return !this.showChildrenActionsAsSelf() && (this.canAddRule() || this.canAddGroup());
   }
 
+  childrenAreRequired() {
+    const {config, selectedOperator} = this.props;
+    const cardinality = config.operators[selectedOperator]?.cardinality ?? 1;
+    return cardinality == 0; // tip: for group operators some/none/all
+  }
+
   renderChildrenActions() {
     const {config, addRule, addGroup, isLocked, isTrueLocked, id} = this.props;
 
@@ -267,6 +273,8 @@ class RuleGroupExt extends BasicGroup {
       addGroup={addGroup}
       canAddRule={!this.showChildrenActionsAsSelf() && this.canAddRule()}
       canAddGroup={!this.showChildrenActionsAsSelf() && this.canAddGroup()}
+      removeSelf={this.removeGroupChildren}
+      canDeleteGroup={!this.childrenAreRequired()}
       isLocked={isLocked}
       isTrueLocked={isTrueLocked}
       id={id+"_children"}

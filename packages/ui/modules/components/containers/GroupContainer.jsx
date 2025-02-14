@@ -116,6 +116,10 @@ const createGroupContainer = (Group, itemType) =>
       this.props.actions.removeGroup(this.props.path);
     };
 
+    removeGroupChildren = () => {
+      this.props.actions.removeGroupChildren(this.props.path);
+    };
+
     addGroup = () => {
       const parentRuleGroupField = itemType == "rule_group" ? this.props.field : this.props.parentField;
       this.props.actions.addGroup(this.props.path, undefined, undefined, parentRuleGroupField);
@@ -213,6 +217,7 @@ const createGroupContainer = (Group, itemType) =>
               setNot={this.dummyFn}
               setLock={this.dummyFn}
               removeSelf={this.dummyFn}
+              removeGroupChildren={this.dummyFn}
               addGroup={this.dummyFn}
               addCaseGroup={this.dummyFn}
               addDefaultCaseGroup={this.dummyFn}
@@ -260,6 +265,7 @@ const createGroupContainer = (Group, itemType) =>
               setNot={isInDraggingTempo ? this.dummyFn : this.setNot}
               setLock={isInDraggingTempo ? this.dummyFn : this.setLock}
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
+              removeGroupChildren={isInDraggingTempo ? this.dummyFn : this.removeGroupChildren}
               addGroup={isInDraggingTempo ? this.dummyFn : this.addGroup}
               addCaseGroup={isInDraggingTempo ? this.dummyFn : this.addCaseGroup}
               addDefaultCaseGroup={isInDraggingTempo ? this.dummyFn : this.addDefaultCaseGroup}

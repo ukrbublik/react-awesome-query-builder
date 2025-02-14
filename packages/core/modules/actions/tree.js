@@ -103,6 +103,16 @@ export const removeGroup = (config, path) => ({
 
 /**
  * @param {object} config
+ * @param {Immutable.List} path
+ */
+export const removeGroupChildren = (config, path) => ({
+  type: constants.REMOVE_GROUP_CHILDREN,
+  path: toImmutableList(path),
+  config: config
+});
+
+/**
+ * @param {object} config
  * @param {Array} fromPath
  * @param {Array} toPath
  * @param {String} placement, see constants PLACEMENT_*
