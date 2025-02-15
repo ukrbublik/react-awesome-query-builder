@@ -5,6 +5,7 @@ import {
   Utils, BasicConfig, BasicFuncs,
   // types:
   Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
+  PriceFieldSettings,
 } from "@react-awesome-query-builder/mui";
 const { simulateAsyncFetch } = Utils.Autocomplete;
 
@@ -62,6 +63,17 @@ export function createConfig(InitialConfig: BasicConfig): Config {
           },
         }
       }
+    },
+    price: {
+        label: "Price",
+        type: "price",
+        preferWidgets: ["price"],
+        fieldSettings: {
+          valuePlaceholder: "Enter your Price",
+          thousandSeparator:",",
+          prefix:'﷼',
+          suffix:'$',
+      }as PriceFieldSettings,
     },
     prox1: {
       label: "prox",
