@@ -4,6 +4,7 @@ import {
   BasicFuncs, CoreConfig,
   // types:
   Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs, OperatorProximity, Func,
+  PriceFieldSettings,
 } from "@react-awesome-query-builder/core";
 
 // Create a config for demo app based on CoreConfig - add fields, funcs, some overrides.
@@ -66,6 +67,17 @@ function createConfig(InitialConfig: CoreConfig): Config {
           },
         }
       }
+    },
+    price: {
+      label: "Price",
+      type: "price",
+      preferWidgets: ["price"],
+      fieldSettings: {
+        valuePlaceholder: "Enter your Price",
+        thousandSeparator:",",
+        prefix:'﷼',
+        suffix:'$',
+      }as PriceFieldSettings,
     },
     prox1: {
       label: "prox",
