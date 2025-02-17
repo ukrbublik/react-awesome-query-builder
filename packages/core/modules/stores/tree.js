@@ -741,7 +741,7 @@ const setOperator = (state, path, newOperator, config) => {
   }));
 
   if (isRuleGroup) {
-    if (operatorCardinality == 0 && children.size == 0) {
+    if (operatorCardinality == 0 && children?.size == 0) {
       state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, currentField), config);
     }
   }
