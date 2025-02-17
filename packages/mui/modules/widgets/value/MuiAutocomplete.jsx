@@ -131,18 +131,7 @@ export default (props) => {
     );
   };
 
-  const GroupHeader = ({groupMaybeJson}) => {
-    if (!groupMaybeJson) return null;
-    let group = {
-      label: groupMaybeJson,
-    };
-    if (typeof groupMaybeJson === "string" && groupMaybeJson[0] === "{") {
-      try {
-        group = JSON.parse(groupMaybeJson);
-      } catch (_) {
-        // ignore
-      }
-    }
+  const GroupHeader = ({group}) => {
     let groupLabel = group.label;
     if (groupLabel && group.tooltip) {
       groupLabel = (
@@ -168,9 +157,23 @@ export default (props) => {
   };
 
   const renderGroup = (params) => {
+    const groupMaybeJson = params.group;
+    let group;
+    if (typeof groupMaybeJson === "string" && groupMaybeJson[0] === "{") {
+      try {
+        group = JSON.parse(groupMaybeJson);
+      } catch (_) {
+        // ignore
+      }
+    } else if (groupMaybeJson) {
+      group = {
+        label: groupMaybeJson,
+      };
+    }
+    const groups = group ? (group.parentGroups ?? [group]) : [];
     let res = (
       <div key={params.key}>
-        <GroupHeader groupMaybeJson={params.group} />
+        {groups.map((gr) => (<GroupHeader group={gr} />))}
         <GroupItems>{params.children}</GroupItems>
       </div>
     );
