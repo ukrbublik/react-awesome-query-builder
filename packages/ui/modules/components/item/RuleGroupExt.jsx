@@ -274,7 +274,7 @@ class RuleGroupExt extends BasicGroup {
       canAddRule={!this.showChildrenActionsAsSelf() && this.canAddRule()}
       canAddGroup={!this.showChildrenActionsAsSelf() && this.canAddGroup()}
       removeSelf={this.removeGroupChildren}
-      canDeleteGroup={!this.childrenAreRequired()}
+      canDeleteGroup={true}
       isLocked={isLocked}
       isTrueLocked={isTrueLocked}
       id={id+"_children"}
