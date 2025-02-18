@@ -74,10 +74,8 @@ function createConfig(InitialConfig: CoreConfig): Config {
       preferWidgets: ["price"],
       fieldSettings: {
         valuePlaceholder: "Enter your Price",
-        thousandSeparator:",",
-        prefix:'﷼',
-        suffix:'$',
-      }as PriceFieldSettings,
+        thousandSeparator: ",",
+      } as PriceFieldSettings,
     },
     prox1: {
       label: "prox",
