@@ -4,6 +4,7 @@ import { with_qb, with_qb_ant, export_checks, export_checks_in_it } from "../sup
 const {
   with_all_types,
   with_funcs,
+  with_spel_safe_nav
 } = configs;
 import { expect } from "chai";
 
@@ -44,6 +45,12 @@ describe("query with func", () => {
       sql: "LOWER('AAA') LIKE '%aa%'",
       spel: "'AAA'.toLowerCase().contains('aa')",
       logic: inits.with_func_tolower_and_contains_op
+    });
+  });
+
+  describe("support safe navigation operator in @spel import functions", () => {
+    export_checks([with_all_types, with_funcs, with_spel_safe_nav], "'AAA'?.toLowerCase()?.contains('aa')", "SpEL", {
+      spel: "'AAA'?.toLowerCase()?.contains('aa')",
     });
   });
 
@@ -188,7 +195,7 @@ describe("query with func", () => {
   describe("loads tree with func SUM_OF_MULTISELECT", () => {
     export_checks([with_all_types, with_funcs], inits.with_func_sum_of_multiselect, "JsonLogic", {
       "query": "num == SUM_OF_MULTISELECT(3,5)",
-      "queryHuman": "Number = Sum of multiselect(Value: 3,5)",
+      "queryHuman": "Number = Sum of multiselect(Value: C,E)",
       "sql": "num = SUM_OF_MULTISELECT(3,5)",
       "spel": "num == {3, 5}.sumOfMultiselect()",
       "logic": {
@@ -211,7 +218,7 @@ describe("query with func", () => {
   describe("loads tree with func SUM_OF_MULTISELECT from SpEL", () => {
     export_checks([with_all_types, with_funcs], inits.with_func_sum_of_multiselect_spel, "SpEL", {
       "query": "num == SUM_OF_MULTISELECT(5)",
-      "queryHuman": "Number = Sum of multiselect(Value: 5)",
+      "queryHuman": "Number = Sum of multiselect(Value: E)",
       "sql": "num = SUM_OF_MULTISELECT(5)",
       "spel": "num == {5}.sumOfMultiselect()",
       "logic": {

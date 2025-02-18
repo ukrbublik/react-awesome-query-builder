@@ -3,6 +3,7 @@ import {
   Utils,
   ImmutableTree, Config, JsonTree, JsonLogicTree, SanitizeOptions, Actions
 } from "@react-awesome-query-builder/ui";
+import { SqlUtils } from "@react-awesome-query-builder/sql";
 import { initFiles } from "./init_data";
 
 
@@ -39,34 +40,47 @@ export const useHmrUpdate = (callback: (detail: CustomEventDetail) => void) => {
 
 export const importFromInitFile = (fileKey: string, config?: Config) => {
   const fileType = fileKey.split("/")[0];
-  let importedTree: ImmutableTree | undefined;
+  let tree: ImmutableTree | undefined;
+  let errors: string[] = [];
   if (fileType === "logic") {
     const initLogic = initFiles[fileKey] as JsonLogicTree;
-    importedTree = Utils.loadFromJsonLogic(initLogic, config);
+    tree = Utils.loadFromJsonLogic(initLogic, config);
+  } else if (fileType === "sql") {
+    const initValue = initFiles[fileKey] as string;
+    ({tree, errors} = SqlUtils.loadFromSql(initValue, config));
+  } else if (fileType === "spel") {
+    const initValue = initFiles[fileKey] as string;
+    [tree, errors] = Utils.loadFromSpel(initValue, config);
   } else if (fileType === "tree") {
     const initValue = initFiles[fileKey] as JsonTree;
-    importedTree = Utils.loadTree(initValue);
+    tree = Utils.loadTree(initValue);
   } else {
     throw new Error(`Unknown file type ${fileType}`);
   }
-  return importedTree;
+  if (errors.length) {
+    console.warn(`Errors while importing from ${fileKey} as ${fileType}:`, errors);
+  }
+  return {tree, errors};
 };
 
 
 export const initTreeWithValidation = (initFileKey: string, config: Config, validationOptions?: Partial<SanitizeOptions>) => {
-  let initTree: ImmutableTree = importFromInitFile(initFileKey, config);
-  const {fixedTree, fixedErrors, nonFixedErrors} = Utils.sanitizeTree(initTree, config, {
+  let tree: ImmutableTree;
+  let errors: string[];
+  // eslint-disable-next-line prefer-const
+  ({tree, errors} = importFromInitFile(initFileKey, config));
+  const {fixedTree, fixedErrors, nonFixedErrors} = Utils.sanitizeTree(tree, config, {
     ...(validationOptions ?? {}),
     removeEmptyGroups: false,
     removeEmptyRules: false,
     removeIncompleteRules: false,
   });
-  initTree = fixedTree;
+  tree = fixedTree;
   if (fixedErrors.length) {
     console.warn("Fixed tree errors on load: ", fixedErrors);
   }
   if (nonFixedErrors.length) {
     console.warn("Validation errors on load:", nonFixedErrors);
   }
-  return initTree;
+  return {tree, errors};
 };

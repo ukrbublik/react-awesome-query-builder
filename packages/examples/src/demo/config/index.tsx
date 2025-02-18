@@ -32,7 +32,8 @@ const { simulateAsyncFetch } = Utils.Autocomplete;
 
 
 export default (skin: string) => {
-  const InitialConfig = skinToConfig[skin] as BasicConfig;
+  const originalConfig = skinToConfig[skin] as BasicConfig;
+  const InitialConfig = originalConfig as BasicConfig;
 
   const demoListValues = [
     { title: "A", value: "a" },
@@ -229,6 +230,11 @@ export default (skin: string) => {
       okType: "danger",
       cancelText: "Cancel"
     },
+    loadMoreLabel: "Load more...",
+    loadingMoreLabel: "Loading more...",
+    typeToSearchLabel: "Type to search",
+    loadingLabel: "Loading...",
+    notFoundLabel: "Not found",
   };
 
   const settings: Settings = {
@@ -596,6 +602,11 @@ export default (skin: string) => {
           orange: "Orange"
         },
         allowCustomValues: true,
+      },
+      mainWidgetProps: {
+        customProps: {
+          tokenSeparators: [","]
+        }
       }
     },
     selecttree: {
@@ -667,6 +678,7 @@ export default (skin: string) => {
       fieldSettings: {
         asyncFetch: simulatedAsyncFetch,
         useAsyncSearch: true,
+        fetchSelectedValuesOnInit: true,
         useLoadMore: true,
         forceAsyncSearch: false,
         allowCustomValues: false
@@ -679,6 +691,7 @@ export default (skin: string) => {
       fieldSettings: {
         asyncFetch: simulatedAsyncFetch,
         useAsyncSearch: true,
+        fetchSelectedValuesOnInit: true,
         useLoadMore: true,
         forceAsyncSearch: false,
         allowCustomValues: false

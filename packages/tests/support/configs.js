@@ -111,6 +111,7 @@ export const without_less_format = (BasicConfig) => ({
     less: {
       ...BasicConfig.operators.less,
       sqlOp: null,
+      sqlOps: null,
       spelOp: null,
       spelOps: null,
       formatOp: null,
@@ -171,6 +172,32 @@ export const with_date_and_time = (BasicConfig) => ({
   },
 });
 
+export const with_datetime_import_epoch_sec_jl = (BasicConfig) => ({
+  ...BasicConfig,
+  widgets: {
+    ...BasicConfig.widgets,
+    datetime: {
+      ...BasicConfig.widgets.datetime,
+      jsonLogicImport: function(timestamp, wgtDef) {
+        const momentVal = this.utils.moment(timestamp, "X");
+        return momentVal.isValid() ? momentVal.toDate() : undefined;
+      },
+    }
+  }
+});
+
+export const with_datetime_export_epoch_ms_jl = (BasicConfig) => ({
+  ...BasicConfig,
+  widgets: {
+    ...BasicConfig.widgets,
+    datetime: {
+      ...BasicConfig.widgets.datetime,
+      jsonLogic: function (val, fieldDef, wgtDef) {
+        return this.utils.moment(val, wgtDef.valueFormat).format("x");
+      },
+    }
+  }
+});
 
 export const with_theme_material = (BasicConfig) => ({
   ...BasicConfig,
@@ -601,6 +628,50 @@ export const with_group_and_struct_deep = (BasicConfig) => ({
   }
 });
 
+export const with_allow_any_src_for_all_ops = (BasicConfig) => ({
+  ...BasicConfig,
+  operators: {
+    ...BasicConfig.operators,
+    like: {
+      ...BasicConfig.operators.like,
+      valueSources: ["value", "field", "func"],
+    },
+    not_like: {
+      ...BasicConfig.operators.not_like,
+      valueSources: ["value", "field", "func"],
+    },
+    starts_with: {
+      ...BasicConfig.operators.starts_with,
+      valueSources: ["value", "field", "func"],
+    },
+    ends_with: {
+      ...BasicConfig.operators.ends_with,
+      valueSources: ["value", "field", "func"],
+    },
+  },
+  types: {
+    ...BasicConfig.types,
+    text: {
+      ...BasicConfig.types.text,
+      widgets: {
+        ...BasicConfig.types.text.widgets,
+        field: {
+          ...BasicConfig.types.text.widgets.field,
+          operators: [
+            "equal",
+            "not_equal",
+            "like",
+            "not_like",
+            "starts_with",
+            "ends_with",
+            "proximity",
+          ],
+        }
+      }
+    }
+  }
+});
+
 export const with_all_types = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -670,6 +741,7 @@ export const with_all_types = (BasicConfig) => ({
     color: {
       label: "Color",
       type: "select",
+      valueSources: ["value", "field"],
       fieldSettings: {
         listValues: [
           { value: "yellow", title: "Yellow" },
@@ -681,6 +753,7 @@ export const with_all_types = (BasicConfig) => ({
     multicolor: {
       label: "Colors",
       type: "multiselect",
+      valueSources: ["value", "field"],
       fieldSettings: {
         listValues: {
           yellow: "Yellow",
@@ -785,6 +858,14 @@ export const simple_with_number_max_nesting_1 = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     maxNesting: 1,
+  }
+});
+
+export const with_sql_dialect = (sqlDialect) => (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    sqlDialect,
   }
 });
 
@@ -1086,6 +1167,7 @@ export const with_funcs = (BasicConfig) => ({
         LOWER2: merge({}, BasicFuncs.LOWER, {
           label: "Lowercase2",
           mongoFunc: "$toLower2",
+          sqlFunc: "LOWER2",
           jsonLogic: "toLowerCase2",
           spelFunc: "${str}.toLowerCase2(${def}, ${opt})",
           allowSelfNesting: true,
@@ -1134,6 +1216,33 @@ export const with_funcs = (BasicConfig) => ({
       },
     },
   },
+});
+
+
+export const with_spel_safe_nav = (BasicConfig) => ({
+  ...BasicConfig,
+  operators: {
+    ...BasicConfig.operators,
+    like: {
+      ...BasicConfig.operators.like,
+      spelOp: "${0}?.contains(${1})",
+    },
+    starts_with: {
+      ...BasicConfig.operators.starts_with,
+      spelOp: "${0}?.startsWith(${1})",
+    },
+    ends_with: {
+      ...BasicConfig.operators.ends_with,
+      spelOp: "${0}?.endsWith(${1})",
+    },
+  },
+  funcs: {
+    ...BasicConfig.funcs,
+    LOWER: {
+      ...BasicConfig.funcs.LOWER,
+      spelFunc: "${str}?.toLowerCase()",
+    }
+  }
 });
 
 export const with_struct = (BasicConfig) => ({
@@ -1435,7 +1544,8 @@ export const with_autocomplete = (BasicConfig) => ({
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
-        allowCustomValues: false
+        allowCustomValues: false,
+        fetchSelectedValuesOnInit: false,
       },
     },
     autocompleteMultipleStrict: {
@@ -1447,7 +1557,8 @@ export const with_autocomplete = (BasicConfig) => ({
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
-        allowCustomValues: false
+        allowCustomValues: false,
+        fetchSelectedValuesOnInit: false
       },
     },
     autocomplete: {
@@ -1459,7 +1570,8 @@ export const with_autocomplete = (BasicConfig) => ({
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
-        allowCustomValues: true
+        allowCustomValues: true,
+        fetchSelectedValuesOnInit: false
       },
     },
     autocompleteMultiple: {
@@ -1471,10 +1583,45 @@ export const with_autocomplete = (BasicConfig) => ({
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
-        allowCustomValues: true
+        allowCustomValues: true,
+        fetchSelectedValuesOnInit: false
       },
     },
   },
+});
+
+export const with_autocomplete_fetchSelectedValuesOnInit = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    autocompleteStrict: {
+      ...BasicConfig.fields.autocompleteStrict,
+      fieldSettings: {
+        ...BasicConfig.fields.autocompleteStrict.fieldSettings,
+        fetchSelectedValuesOnInit: true,
+      }
+    },
+    autocompleteMultipleStrict: {
+      ...BasicConfig.fields.autocompleteMultipleStrict,
+      fieldSettings: {
+        ...BasicConfig.fields.autocompleteMultipleStrict.fieldSettings,
+        fetchSelectedValuesOnInit: true,
+      }
+    },
+    autocomplete: {
+      ...BasicConfig.fields.autocomplete,
+      fieldSettings: {
+        ...BasicConfig.fields.autocomplete.fieldSettings,
+        fetchSelectedValuesOnInit: true,
+      }
+    },
+    autocompleteMultiple: {
+      ...BasicConfig.fields.autocompleteMultiple,
+      fieldSettings: {
+        ...BasicConfig.fields.autocompleteMultiple.fieldSettings,
+        fetchSelectedValuesOnInit: true,
+      }
+    },
+  }
 });
 
 export const with_different_groups = (BasicConfig) => ({
@@ -1623,6 +1770,19 @@ export const with_fieldSources = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     fieldSources: ["field", "func"],
+    valueSourcesInfo: {
+      value: {
+        label: "Value"
+      },
+      field: {
+        label: "Field",
+        widget: "field",
+      },
+      func: {
+        label: "Function",
+        widget: "func",
+      }
+    },
   }
 });
 

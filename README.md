@@ -85,7 +85,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   Functions nesting is supported (function argument can be a function)
 * [Ternary mode](#ternary-mode) (if-then-else)
 * Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
-* Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)
+* Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), SQL
 * Reordering (drag-n-drop) support for rules and groups of rules
 * Query value and config can be saved/loaded from server
 * Themes: [Ant Design](https://ant.design/), [Material-UI](https://mui.com/), [Bootstrap](https://reactstrap.github.io/), [Fluent UI](https://developer.microsoft.com/en-us/fluentui), vanilla
@@ -105,7 +105,8 @@ From v6 library is divided into packages:
 
 ```mermaid
 graph LR;
-  core((core))-->ui(ui);
+  core-->ui;
+  core-->sql((sql));
   ui-->antd;
   ui-->mui;
   ui-->material;
@@ -416,9 +417,9 @@ Render this component only inside `Query.renderBuilder()` like in example above:
   )
 ```
 
-Wrapping `<Builder />` in `div.query-builder` is necessary.  
+Wrapping `<Builder />` in `div.query-builder` is **necessary** for drag-n-drop support.  
 Optionally you can add class `.qb-lite` to it for showing action buttons (like delete rule/group, add, etc.) only on hover, which will look cleaner.  
-Wrapping in `div.query-builder-container` is necessary if you put query builder inside scrollable block.  
+Wrapping in `div.query-builder-container` is necessary for correct drag-n-drop support if you put query builder inside scrollable block.  
 
 ## `Utils`
 
@@ -527,6 +528,12 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   #### `loadFromSpel`
   `Utils.Import.loadFromSpel (string, config) -> [Immutable, errors]`  
   Convert query value from [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html) format to internal Immutable format. 
+
+  #### `loadFromSql`
+  `SqlUtils.loadFromSql (string, config) -> {tree: Immutable, errors: string[]}`  
+  Convert query value from SQL format to internal Immutable format.  
+  Requires import of `@react-awesome-query-builder/sql`:  
+  `import { SqlUtils } from "@react-awesome-query-builder/sql"`
 
 ### Save/load config from server
 
@@ -673,15 +680,15 @@ See [example](/packages/examples/src/demo_switch/index.tsx)
 
 ## SSR
 You can save and load config from server with help of utils:
-- [Utils.compressConfig()](#compressconfig)
-- [Utils.decompressConfig()](#decompressconfig)
+- [Utils.ConfigUtils.compressConfig()](#compressconfig)
+- [Utils.ConfigUtils.decompressConfig()](#decompressconfig)
 
 You need these utils because you can't just send config *as-is* to server, as it contains functions that can't be serialized to JSON.  
 Note that you need to set `config.settings.useConfigCompress = true` to enable this feature.  
 
 To put it simple:
 - `ZipConfig` type is a JSON that contains only changes against basic config (differences). At minimum it contains your `fields`. It does not contain [`ctx`](#ctx).
-- `Utils.decompressConfig()` will merge `ZipConfig` to basic config (and add `ctx` if passed). 
+- `Utils.ConfigUtils.decompressConfig()` will merge `ZipConfig` to basic config (and add `ctx` if passed). 
 
 See [sandbox_next demo app](/packages/sandbox_next) that demonstrates server-side features. 
 
@@ -757,6 +764,25 @@ const config = {
 };
 export default config;
 ```
+
+
+**Note:** If you override `render*` function(s) in config setttings and call original `render*` function from imported config, be aware that you should pass `ctx` as 2nd param.
+Example:
+```js
+config = {
+  ...MuiConfig,
+  settings: {
+    ...MuiConfig.settings,
+    renderField: (props) => (
+      <WithTheme theme={theme}>
+        { MuiConfig.settings.renderField?.(props, MuiConfig.ctx) }  // please pass `ctx`
+      </WithTheme>
+    ),
+  }
+};
+```
+See issue [#996](https://github.com/ukrbublik/react-awesome-query-builder/issues/996)
+
 
 ### Migration to 6.2.0
 

@@ -12,6 +12,22 @@ const findLastIndex = (arr, fn) => {
 };
 
 export const simulateAsyncFetch = (all, cPageSize = 0, delay = 1000) => async (search, offset, meta) => {
+  if (delay) {
+    // console.debug("simulateAsyncFetch", {
+    //   search, offset, values, hasMore, filtered
+    // });
+    await sleep(delay);
+  }
+  
+  const isFetchSelectedValues = !!meta?.fetchSelectedValues && Array.isArray(search);
+  if (isFetchSelectedValues) {
+    const values = listValuesToArray(all)
+      .filter(({value}) => search.includes(value));
+    return {
+      values
+    };
+  }
+
   const pageSize = meta?.pageSize != undefined ? meta.pageSize : cPageSize;
   const filtered = listValuesToArray(all)
     .filter(({title, value}) => search == null ? true : (
@@ -24,12 +40,6 @@ export const simulateAsyncFetch = (all, cPageSize = 0, delay = 1000) => async (s
   const values = pageSize ? filtered.slice(currentOffset, currentOffset + pageSize) : filtered;
   const newOffset = pageSize ? currentOffset + values.length : null;
   const hasMore = pageSize ? (newOffset < filtered.length) : false;
-  if (delay) {
-    // console.debug("simulateAsyncFetch", {
-    //   search, offset, values, hasMore, filtered
-    // });
-    await sleep(delay);
-  }
   return {
     values,
     hasMore

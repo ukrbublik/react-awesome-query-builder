@@ -18,8 +18,16 @@ describe("interactions on MUI", () => {
       testsSingleStrict();
     });
 
+    describe("single-strict with fetchSelectedValuesOnInit=true", () => {
+      testsSingleStrict(true);
+    });
+
     describe("multiple-strict", () => {
       testsMultipleStrict();
+    });
+
+    describe("multiple-strict with fetchSelectedValuesOnInit=true", () => {
+      testsMultipleStrict(true);
     });
   });
 

@@ -72,7 +72,7 @@ export const extendConfig = (config, configId, canCompile = true) => {
   deepFreeze(config);
 
   // Save to memo (cache)
-  const memo = getCommonMemo();
+  const memo = getCommonMemo(extendConfig);
   memo.storeConfigPair(origConfig, config);
 
   return config;
@@ -223,8 +223,10 @@ function extendFieldConfig(fieldConfig, config, path = [], isFuncArg = false, is
   }
 
   if (!typeConfig) {
-    // console.warn(`No type config for ${type}`);
-    fieldConfig.disabled = true;
+    if (fieldConfig.type !== "!struct") {
+      // console.warn(`No type config for ${type}`);
+      fieldConfig.disabled = true;
+    }
     return;
   }
 

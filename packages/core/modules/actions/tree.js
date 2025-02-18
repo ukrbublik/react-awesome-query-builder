@@ -1,7 +1,7 @@
 import Immutable, {fromJS} from "immutable";
 import {toImmutableList} from "../utils/stuff";
 import * as constants from "../stores/constants";
-import { defaultRuleProperties, defaultGroupProperties } from "../utils/defaultUtils";
+import { defaultRuleProperties, defaultGroupProperties } from "../utils/defaultRuleUtils";
 import uuid from "../utils/uuid";
 
 

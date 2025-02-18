@@ -7,7 +7,7 @@ import * as constants from "../../stores/constants";
 import PropTypes from "prop-types";
 import * as actions from "../../actions";
 import {pureShouldComponentUpdate, useOnPropsChanged, isUsingLegacyReactDomRender} from "../../utils/reactUtils";
-const {clone} = Utils;
+const {clone} = Utils.OtherUtils;
 const {getFlatTree} = Utils.TreeUtils;
 
 let _isReorderingTree = false;
@@ -148,6 +148,10 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
 
     onDragStart = (id, dom, e) => {
       let treeEl = dom.closest(".query-builder");
+      if (!treeEl) {
+        console.error("Please change renderBuilder implementation of <Query>: wrap <Builder> with div.query-builder for drag-n-drop support");
+        return;
+      }
       if (this._isUsingLegacyReactDomRender === undefined) {
         this._isUsingLegacyReactDomRender = isUsingLegacyReactDomRender(treeEl);
       }

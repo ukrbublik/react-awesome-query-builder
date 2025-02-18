@@ -3,6 +3,7 @@ const path = require('path');
 const os = require('os');
 
 const CORE_MODULES = path.resolve(__dirname, "../core/modules");
+const SQL_MODULES = path.resolve(__dirname, "../sql/modules");
 const UI_MODULES = path.resolve(__dirname, "../ui/modules");
 const ANTD_MODULES = path.resolve(__dirname, "../antd/modules");
 const MUI_MODULES = path.resolve(__dirname, "../mui/modules");
@@ -42,6 +43,7 @@ console.log('karma-webpack output: ' + outputPath);
 
 const processEnv = {
   NODE_ENV: JSON.stringify('development'),
+  NODE_ENV_TEST: JSON.stringify('true'),
   CI: JSON.stringify(process.env.CI),
   FILTER_ARGS: JSON.stringify(filterArgs),
   // default is 2*1000
@@ -62,6 +64,10 @@ module.exports = {
     }),
   ],
   module: {
+    // Suppress warning from mocha: "Critical dependency: the request of a dependency is an expression"
+    // @see https://webpack.js.org/configuration/module/#module-contexts
+    exprContextCritical: false,
+
     rules: [
       {
         test: /\.[tj]sx?$/,
@@ -84,6 +90,7 @@ module.exports = {
         test: /\.[tj]sx?$/,
         include: [
           CORE_MODULES,
+          SQL_MODULES,
           UI_MODULES,
           ANTD_MODULES,
           MUI_MODULES,
@@ -153,6 +160,7 @@ module.exports = {
       '@react-awesome-query-builder/fluent/css': FLUENT_CSS,
 
       '@react-awesome-query-builder/core': CORE_MODULES,
+      '@react-awesome-query-builder/sql': SQL_MODULES,
       '@react-awesome-query-builder/ui': UI_MODULES,
       '@react-awesome-query-builder/antd': ANTD_MODULES,
       '@react-awesome-query-builder/mui': MUI_MODULES,

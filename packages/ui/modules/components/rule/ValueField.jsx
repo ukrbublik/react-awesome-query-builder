@@ -5,9 +5,9 @@ import {truncateString} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
-const {clone} = Utils;
-const {getFieldConfig, getFieldParts, getFieldPathParts} = Utils.ConfigUtils;
-const {getFieldPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
+const {clone} = Utils.OtherUtils;
+const {getFieldConfig, getFieldParts, getFieldPathParts, getWidgetForFieldOp} = Utils.ConfigUtils;
+const {getFieldPathLabels} = Utils.RuleUtils;
 
 //tip: this.props.value - right value, this.props.field - left value
 
@@ -98,9 +98,12 @@ export default class ValueField extends Component {
     const _relyOnWidgetType = false; //TODO: remove this, see issue #758
     const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
     const widgetConfig = config.widgets[widget];
+    const opConfig = config.operators[operator];
     let expectedType;
     if (isFuncArg) {
       expectedType = fieldDefinition?.type;
+    } else if (opConfig?.valueTypes) {
+      expectedType = opConfig?.valueTypes[0];
     } else if (_relyOnWidgetType && widgetConfig) {
       expectedType = widgetConfig.type;
     } else if (leftFieldConfig) {

@@ -47,7 +47,7 @@ const widgets = {
   multiselect: {
     ...BasicConfig.widgets.multiselect,
     factory: (props, {RCE, W: {MuiAutocompleteWidget, MuiMultiSelectWidget}}) => {
-      return (props.asyncFetch || props.showSearch) 
+      return (props.asyncFetch || props.showSearch || props.allowCustomValues) 
         ? RCE(MuiAutocompleteWidget, {...props, multiple: true}) 
         : RCE(MuiMultiSelectWidget, props);
     },
@@ -55,7 +55,7 @@ const widgets = {
   select: {
     ...BasicConfig.widgets.select,
     factory: (props, {RCE, W: {MuiAutocompleteWidget, MuiSelectWidget}}) => {
-      return (props.asyncFetch || props.showSearch) 
+      return (props.asyncFetch || props.showSearch || props.allowCustomValues) 
         ? RCE(MuiAutocompleteWidget, props) 
         : RCE(MuiSelectWidget, props);
     },

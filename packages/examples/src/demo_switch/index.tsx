@@ -138,7 +138,7 @@ const Demo: React.FC = () => {
           </pre>
           Values:
           <pre>
-            {JSON.stringify(QbUtils.getSwitchValues(state.tree), undefined, 2)}
+            {JSON.stringify(QbUtils.TreeUtils.getSwitchValues(state.tree), undefined, 2)}
           </pre>
         </div>
         <hr/>

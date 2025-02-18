@@ -3,6 +3,7 @@ import { Select, Divider, Tooltip } from "antd";
 import { calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../utils/domUtils";
 import { Hooks , Utils } from "@react-awesome-query-builder/ui";
 const { fixListValuesGroupOrder } = Utils.Autocomplete;
+const { makeCustomListValue } = Utils.ListUtils;
 const { useListValuesAutocomplete } = Hooks;
 
 // see type ListItem
@@ -40,6 +41,15 @@ export default (props) => {
 
   const filteredOptions = extendOptions(options);
 
+  // To colorize custom options
+  if (multiple && allowCustomValues && value?.length) {
+    for (const v of value) {
+      if (getOptionIsCustom(v) && !options.find(({value}) => value === v)) {
+        filteredOptions.push(makeCustomListValue(v));
+      }
+    }
+  }
+
   const optionsMaxWidth = useMemo(() => {
     return filteredOptions.reduce((max, option) => {
       return Math.max(max, calcTextWidth(option.title, null));
@@ -63,7 +73,9 @@ export default (props) => {
     width: dropdownWidth,
   };
 
-  const mode = !multiple ? undefined : (allowCustomValues ? "multiple" : "multiple");
+  const mode = !multiple ? undefined : (
+    customProps?.mode || (allowCustomValues && customProps?.tokenSeparators ? "tags" : "multiple")
+  );
   const dynamicPlaceholder = !readonly ? aPlaceholder : "";
 
   const nestByGroup = (opts, fix = false) => {
@@ -140,6 +152,11 @@ export default (props) => {
   const aOnSelect = async (newValue, option) => {
     // For both multiple/single `newValue` is string, `option` is {value, children}
     // ! Custom option is always `{}`
+    const isAutoTokenization = multiple && !!option.props && !(option.value !== undefined || option.label !== undefined);
+    if (isAutoTokenization) {
+      // Ignore, already processed in `aOnChange`
+      return;
+    }
     if (isSpecialValue(option)) {
       await onChange(null, newValue, option);
     } else {
@@ -167,6 +184,7 @@ export default (props) => {
     // - tag removal
     // - option selection (`aOnSelect` is also called after)
     // - trying to add new tag from search input (for mode "tags" - unwanted!)
+    // - automatic tokenization (like pasting "1,2,3") - issue #1115
     // 
     // For single called on:
     // - click (x) at right (clear all)
@@ -228,7 +246,7 @@ export default (props) => {
       filterOption={useAsyncSearch ? false : filterOption}
       dropdownRender={dropdownRender}
       allowClear={true}
-      notFoundContent={isLoading ? "Loading..." : "Not found"}
+      notFoundContent={isLoading ? (config.settings.loadingLabel ?? "Loading...") : (config.settings.notFoundLabel ?? "Not found")}
       disabled={readonly}
       mode={mode}
       style={customProps?.style || style}
