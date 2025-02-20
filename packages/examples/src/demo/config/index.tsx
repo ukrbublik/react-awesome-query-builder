@@ -478,6 +478,38 @@ export default (skin: string) => {
           type: "text",
           valueSources: ["value"],
         },
+        class: {
+          type: "!group",
+          mode: "struct",
+          subfields: {
+            type: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["sedan", "hatchback", "minivan"],
+              } as SelectFieldSettings,
+              valueSources: ["value"],
+            },
+          }
+        },
+        items: {
+          type: "!group",
+          mode: "array",
+          conjunctions: ["AND", "OR"],
+          showNot: false,
+          defaultOperator: "greater_or_equal",
+          initialEmptyWhere: true,
+          subfields: {
+            color: {
+              type: "select",
+              listValues: [
+                { value: "yellow", title: "Yellow" },
+                { value: "green", title: "Green" },
+                { value: "orange", title: "Orange" }
+              ],
+              valueSources: ["value"],
+            },
+          }
+        },
       }
     },
     prox1: {
