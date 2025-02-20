@@ -145,7 +145,7 @@ export default class FuncWidget extends Component {
     const argVal = arg ? arg.get("value") : undefined;
     const defaultValueSource = argDefinition.valueSources.length == 1 ? argDefinition.valueSources[0] : undefined;
     const argValSrc = arg ? (arg.get("valueSrc") || defaultValueSource || "value") : defaultValueSource;
-    const asyncListValues = arg.get("asyncListValues");
+    const asyncListValues = arg?.get("asyncListValues");
 
     const widgetProps = {
       config, 
