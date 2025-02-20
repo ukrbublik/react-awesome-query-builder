@@ -251,7 +251,9 @@ class RuleGroupExt extends BasicGroup {
   showChildrenActionsAsSelf() {
     const { config } = this.props;
     const { forceShowConj } = config.settings;
-    return this.isNoChildren() || this.isOneChild() && !forceShowConj && !this.showNot();
+    return this.isNoChildren()
+      || this.isOneChild() && !forceShowConj && !this.showNot()
+      || !this.showNot() && !this.showConjs();
   }
 
   canRenderChildrenActions() {
