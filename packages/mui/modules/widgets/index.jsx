@@ -68,23 +68,23 @@ const MuiProvider = ({config, children}) => {
       console.log('MUI theme', theme);
       const { palette, typography, shadows } = theme;
       const setOpacity = (hex, alpha) => `${hex}${Math.floor(alpha * 255).toString(16).padStart(2, 0)}`;
-      const cssVarsTarget = ref.current ?? document.querySelector(":root");
+      const cssVarsTarget = ref.current;
       const cssVars = {
         "--rule-background": palette.mode === "dark" ? setOpacity(palette.grey[800], 0.3) : palette.background.paper,
         "--group-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.8) : setOpacity(palette.grey[600], 0.1),
         "--rulegroup-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.3) : setOpacity(palette.grey[400], 0.1),
         "--rulegroupext-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.3) : setOpacity(palette.grey[400], 0.1),
-        "--rule-border-color": palette.mode === "dark" ? palette.primary.main : palette.action.active,
-        "--group-border-color": palette.mode === "dark" ? palette.secondary.main : palette.secondary.main,
-        "--rulegroup-border-color": palette.mode === "dark" ? palette.secondary.main : palette.secondary.main,
-        "--rulegroupext-border-color": palette.mode === "dark" ? palette.secondary.main : palette.secondary.main,
-        //"--group-in-rulegroupext-border-color": palette.secondary.main,
-        "--treeline-color": palette.divider,
+        
+         "--rule-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
+         "--group-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
+         "--rulegroup-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
+         "--rulegroupext-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
+
+        "--treeline-color": palette.primary.main, //palette.divider,
      //   "--treeline-disabled-color": palette.action.disabledBackground,
         "--main-text-color": palette.text.secondary,
         "--main-font-family": typography.fontFamily,
-        "--main-font-size": typography.fontSize,
-        "--rule-shadow": shadows[0],
+        "--main-font-size": typography.fontSize+"px",
         "--rule-shadow-hover": shadows[1]
       };
       console.log('MUI cssVars', cssVars);
