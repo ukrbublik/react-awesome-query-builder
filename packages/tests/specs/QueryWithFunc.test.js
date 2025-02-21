@@ -242,7 +242,7 @@ describe("query with func", () => {
     export_checks([with_all_types, with_funcs], inits.with_func_sum_of_multiselect_in_lhs, "JsonLogic", {
       "query": "SUM_OF_MULTISELECT(3,4) >= SUM_OF_MULTISELECT(1,2) && SUM_OF_MULTISELECT(3,4) <= SUM_OF_MULTISELECT(5,6)",
       "sql": "SUM_OF_MULTISELECT(3,4) BETWEEN SUM_OF_MULTISELECT(1,2) AND SUM_OF_MULTISELECT(5,6)",
-      "spel": "{3, 4}.sumOfMultiselect() >= {1, 2}.sumOfMultiselect() && {3, 4}.sumOfMultiselect() <= {5, 6}.sumOfMultiselect()",
+      "spel": "({3, 4}.sumOfMultiselect() >= {1, 2}.sumOfMultiselect() && {3, 4}.sumOfMultiselect() <= {5, 6}.sumOfMultiselect())",
       "logic": {
         "and": [
           {

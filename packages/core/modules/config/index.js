@@ -245,7 +245,7 @@ const operators = {
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       const valFrom = values[0];
       const valTo = values[1];
-      return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
+      return `(${field} >= ${valFrom} && ${field} <= ${valTo})`;
     },
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp2(["$gte", "$lte"], false, ...args); },
     valueLabels: [

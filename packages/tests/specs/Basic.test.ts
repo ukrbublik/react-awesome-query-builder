@@ -106,7 +106,7 @@ describe("basic query", () => {
             }
           ]
         },
-        spel: "num >= 1 && num <= 2",
+        spel: "(num >= 1 && num <= 2)",
         mongo: {
           num: { $gte: 1, $lte: 2 }
         },
