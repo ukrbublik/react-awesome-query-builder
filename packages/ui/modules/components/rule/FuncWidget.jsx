@@ -25,6 +25,7 @@ export default class FuncWidget extends Component {
     setFuncValue: PropTypes.func,
     readonly: PropTypes.bool,
     parentFuncs: PropTypes.array,
+    parentDelta: PropTypes.number,
     fieldDefinition: PropTypes.object,
     isFuncArg: PropTypes.bool,
     isLHS: PropTypes.bool,
@@ -60,35 +61,35 @@ export default class FuncWidget extends Component {
   }
 
   setFunc = (funcKey, _meta = {}) => {
-    const { isLHS, delta, parentFuncs, id } = this.props;
+    const { isLHS, parentDelta, parentFuncs, id } = this.props;
     if (!_meta.widgetId) {
-      const widgetId = getWidgetId({ id, isLHS, delta, parentFuncs });
+      const widgetId = getWidgetId({ id, isLHS, delta: parentDelta, parentFuncs });
       _meta.widgetId = widgetId;
     }
 
     this.props.setFuncValue(
-      isLHS ? -1 : (delta || 0), parentFuncs, null, funcKey, "!func", undefined, _meta
+      isLHS ? -1 : (parentDelta || 0), parentFuncs, null, funcKey, "!func", undefined, _meta
     );
   };
 
   setArgValue = (argKey, argVal, widgetType, asyncListValues, _meta) => {
-    const {config, delta, isLHS, parentFuncs} = this.props;
+    const {config, parentDelta, isLHS, parentFuncs} = this.props;
 
     this.props.setFuncValue(
-      isLHS ? -1 : (delta || 0), parentFuncs, argKey, argVal, widgetType, asyncListValues, _meta
+      isLHS ? -1 : (parentDelta || 0), parentFuncs, argKey, argVal, widgetType, asyncListValues, _meta
     );
   };
 
   setArgValueSrc = (argKey, argValSrc, _meta) => {
-    const {config, delta, isLHS, parentFuncs} = this.props;
+    const {config, parentDelta, isLHS, parentFuncs} = this.props;
 
     this.props.setFuncValue(
-      isLHS ? -1 : (delta || 0), parentFuncs, argKey, argValSrc, "!valueSrc", undefined, _meta
+      isLHS ? -1 : (parentDelta || 0), parentFuncs, argKey, argValSrc, "!valueSrc", undefined, _meta
     );
   };
 
   renderFuncSelect = () => {
-    const {config, field, fieldType, fieldSrc, isLHS, operator, customProps, value, readonly, parentFuncs, id, groupId, isFuncArg, fieldDefinition} = this.props;
+    const {config, field, fieldType, fieldSrc, isLHS, operator, customProps, value, readonly, parentFuncs, id, groupId, isFuncArg, fieldDefinition, parentDelta} = this.props;
     const funcKey = value?.get?.("func") ?? null;
     const selectProps = {
       value: funcKey,
@@ -139,7 +140,7 @@ export default class FuncWidget extends Component {
   renderArgVal = (funcKey, argKey, argDefinition) => {
     const {
       config, field, fieldType, fieldSrc, isLHS, operator, value, readonly, parentFuncs, id, groupId,
-      fieldError, valueError, setFuncValue,
+      fieldError, valueError, setFuncValue, parentDelta,
     } = this.props;
     const arg = value ? value.getIn(["args", argKey]) : null;
     const argVal = arg ? arg.get("value") : undefined;
@@ -171,6 +172,7 @@ export default class FuncWidget extends Component {
       parentFuncs,
       id,
       groupId,
+      parentDelta,
     };
     //tip: value & valueSrc will be converted to Immutable.List at <Widget>
 
@@ -299,6 +301,7 @@ class ArgWidget extends Component {
     return (
       <Widget
         {...this.props}
+        parentDelta={this.props.parentDelta}
         setValue={this.setValue}
         setValueSrc={this.setValueSrc}
         isFuncArg={true}

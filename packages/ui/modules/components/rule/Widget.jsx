@@ -47,6 +47,7 @@ export default class Widget extends Component {
     // for func in func
     parentFuncs: PropTypes.array,
     isLHS: PropTypes.bool,
+    parentDelta: PropTypes.number,
     // for case_value
     isCaseValue: PropTypes.bool,
   };
@@ -64,7 +65,7 @@ export default class Widget extends Component {
     const keysForMeta = [
       "config", "id", "parentFuncs",
       "field", "fieldId", "fieldSrc", "fieldType", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "asyncListValues",
-      "isLHS", "isFuncArg", "isForRuleGroup", "isCaseValue", "value",
+      "isLHS", "isFuncArg", "isForRuleGroup", "isCaseValue", "value", "parentDelta",
     ];
     const changedKeys = keysForMeta
       .filter(k => {
@@ -124,7 +125,7 @@ export default class Widget extends Component {
 
   getMeta({
     config, field: simpleField, fieldSrc, fieldType, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values,
-    isForRuleGroup, isCaseValue, isFuncArg, leftField, asyncListValues, parentFuncs, isLHS, id,
+    isForRuleGroup, isCaseValue, isFuncArg, leftField, asyncListValues, parentFuncs, isLHS, id, parentDelta,
   }, changedKeys = []) {
     const {valueSourcesInfo} = config.settings;
     const field = isFuncArg ? {func: fieldFunc, arg: fieldArg} : simpleField;
@@ -178,7 +179,7 @@ export default class Widget extends Component {
         label: valueSourcesInfo[srcKey]?.label ?? defaultValueSourcesLabels[srcKey] ?? srcKey,
       }]);
     }
-    const widgets = range(0, cardinality).map(delta => {
+    const widgets = (isFuncArg ? [0] : range(0, cardinality)).map(delta => {
       const oldWidgetMeta = this.meta?.widgets?.[delta];
       const valueSrc = iValueSrcs?.get(delta) || null;
       let widget = getWidgetForFieldOp(config, field, operator, valueSrc);
@@ -210,7 +211,7 @@ export default class Widget extends Component {
         textSeparators = operatorDefinition?.textSeparators;
       }
 
-      const widgetId = getWidgetId({ id, isLHS, delta, parentFuncs });
+      const widgetId = getWidgetId({ id, isLHS, delta: parentDelta ?? delta, parentFuncs });
       const vsId = widgetId + ":" + "VS";
 
       let setValueSrc = oldWidgetMeta?.setValueSrc;
@@ -260,7 +261,7 @@ export default class Widget extends Component {
   renderWidget = (delta, meta, props) => {
     const {
       config, isFuncArg, leftField, operator, value: values, valueError, fieldError,
-      readonly, parentField, parentFuncs, id, groupId, fieldSrc, fieldType, isLHS, setFuncValue,
+      readonly, parentField, parentFuncs, id, groupId, fieldSrc, fieldType, isLHS, setFuncValue, parentDelta,
     } = props;
     const {settings} = config;
     const { widgets, iValues, aField, valueSources } = meta;
@@ -301,6 +302,7 @@ export default class Widget extends Component {
           fieldType={fieldType}
           parentField={parentField}
           parentFuncs={parentFuncs}
+          parentDelta={parentDelta ?? delta}
           operator={operator}
           readonly={readonly}
         />
@@ -373,6 +375,7 @@ export default class Widget extends Component {
   render() {
     if (!this.meta) return null;
     const { defaultWidget, cardinality } = this.meta;
+    const { isFuncArg } = this.meta;
     if (!defaultWidget) return null;
     const name = defaultWidget;
 
@@ -381,7 +384,7 @@ export default class Widget extends Component {
         className={`rule--widget rule--widget--${name.toUpperCase()}`}
         key={"widget-col-"+name}
       >
-        {range(0, cardinality).map(this.renderWidgetDelta)}
+        {(isFuncArg ? [0] : range(0, cardinality)).map(this.renderWidgetDelta)}
       </Col>
     );
   }

@@ -4,6 +4,7 @@ import {
 } from "./configUtils";
 import { getOpCardinality, getFirstDefined } from "./stuff";
 import { translateValidation } from "../i18n";
+import { jsToImmutable } from "./treeUtils";
 
 /**
  * @param {Immutable.Map} current
@@ -239,7 +240,7 @@ export const getNewValueForFieldOp = function (
           firstWidgetConfig?.defaultValue
         ]);
         valueFixes[i] = dv;
-        if (dv?.func) {
+        if (dv?.func || dv?.get?.("func")) {
           valueSrcFixes[i] = "func";
           //tip: defaultValue of src "field" is not supported, todo
         }
@@ -251,6 +252,7 @@ export const getNewValueForFieldOp = function (
   for (let i = 0 ; i < operatorCardinality ; i++) {
     let vs = canReuseValue && currentValueSrc.get(i) || null;
     let vt = canReuseValue && currentValueType.get(i) || null;
+    const v = valueFixes[i] !== undefined ? valueFixes[i] : (canReuseValue ? currentValue.get(i) : undefined);
     if (canReuseValue && canExtendValueToRange && i === 1) {
       vs = valueSrcFixes[i] ?? currentValueSrc.get(0);
       vt = valueTypeFixes[i] ?? currentValueType.get(0);
@@ -263,6 +265,11 @@ export const getNewValueForFieldOp = function (
     }
     if (!vt) {
       valueTypeFixes[i] = defaultValueType;
+    }
+    // Fix if func in LHS has `defaultValue: { func: ..., args: {...} }`
+    if (v?.func) {
+      valueFixes[i] = jsToImmutable(v);
+      valueSrcFixes[i] = "func";
     }
   }
 
