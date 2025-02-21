@@ -148,7 +148,7 @@
       @include line_position_for_item($rulegroupext-border, $rulegroupext-border-left-hover, $rulegroupext-border, $item-offset-left, $item-offset, $treeline-thick);
     }
     & > .case_group {
-      @include line_position_for_item($case-border, $case-border-left-hover, $case-border, $item-offset-left, $item-offset, $treeline-switch-thick);
+      @include line_position_for_item($case-border, $case-border, $case-border, $item-offset-left, $item-offset, $treeline-switch-thick);
     }
   }
 }
