@@ -36,7 +36,7 @@ const WidgetFactoryMemo = memo(({
 WidgetFactoryMemo.displayName = "WidgetFactoryMemo";
 
 const WidgetFactory = ({
-  delta, isFuncArg, valueSrc,
+  delta, parentDelta, isFuncArg, valueSrc,
   value: immValue, valueError: immValueError, fieldError, asyncListValues,
   isSpecialRange, fieldDefinition,
   widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValue, setFuncValue,
@@ -85,6 +85,7 @@ const WidgetFactory = ({
     fieldDefinition,
     operator,
     delta,
+    parentDelta,
     isSpecialRange,
     isFuncArg,
     value,

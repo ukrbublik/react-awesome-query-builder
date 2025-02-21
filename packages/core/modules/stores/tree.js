@@ -450,7 +450,7 @@ const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue,
     if (funcK !== targetFV.get("func")) {
       const funcPath = funcsPath.map(([f, a]) => `${f}(${a})`).join("/") || "root";
       throw new Error(
-        `In ${isLHS ? "LHS" : "RHS"} for path ${funcPath} expected func key ${funcK} but got ${parent.get("func")}`
+        `In ${isLHS ? "LHS" : "RHS"} for path ${funcPath} expected func key ${funcK} but got ${targetFV.get("func")}`
       );
     }
     targetFV = targetFV.getIn(["args", argK, "value"]);
