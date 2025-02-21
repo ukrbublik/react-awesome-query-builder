@@ -9,7 +9,6 @@ $switch-border: var(--switch-border, $default-switch-border);
 $group-border: var(--group-border, $default-group-border);
 $group-border-left-hover: var(--group-border-left-hover, $group-border);
 $case-border: var(--case-border, $default-case-border);
-$case-border-left-hover: var(--case-border-left-hover, $case-border);
 $rulegroup-border: var(--rulegroup-border, $default-rulegroup-border);
 $rulegroup-border-left-hover: var(--rulegroup-border-left-hover, $rulegroup-border);
 $rulegroupext-border: var(--rulegroupext-border, $default-rulegroupext-border);
@@ -18,6 +17,8 @@ $item-radius: var(--item-radius, $default-item-radius);
 // shadows
 $rule-shadow-hover: var(--rule-shadow-hover, $default-rule-shadow-hover);
 $group-shadow-hover: var(--group-shadow-hover, $default-group-shadow-hover);
+$rulegroup-shadow-hover: var(--rulegroup-shadow-hover, $default-rulegroup-shadow-hover);
+$rulegroupext-shadow-hover: var(--rulegroupext-shadow-hover, $default-rulegroupext-shadow-hover);
 // treeline
 $treeline-radius: var(--treeline-radius, $default-treeline-radius);
 $treeline-thick: var(--treeline-thick, $default-treeline-thick);
