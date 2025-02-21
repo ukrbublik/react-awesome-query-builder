@@ -220,7 +220,7 @@ $root_group: ".query-builder > .group-container > .group";
     border: $rulegroup-border solid $rulegroup-border-color;
 
     &:hover {
-      //box-shadow: $rulegroup-shadow-hover; //todo
+      box-shadow: $rulegroup-shadow-hover;
       border-left-width: $rulegroup-border-left-hover;
       @include fix_padding_for_hovered($rule-padding, $rulegroup-border, $rulegroup-border-left-hover);
     }
@@ -286,7 +286,7 @@ $root_group: ".query-builder > .group-container > .group";
     border: $rulegroupext-border solid $rulegroupext-border-color;
 
     &:hover {
-      //box-shadow: $rulegroupext-shadow-hover; //todo
+      box-shadow: $rulegroupext-shadow-hover;
       border-left-width: $rulegroupext-border-left-hover;
       @include fix_paddings_for_hovered_group($item-offset-left, $treeline-thick, $rulegroupext-border, $rulegroupext-border-left-hover);
     }
@@ -517,7 +517,7 @@ $root_group: ".query-builder > .group-container > .group";
       $item-offset-left, $item-offset,
       $treeline-switch-thick, $treeline-radius, $treeline-switch-color,
       $rule-border, $case-border, $rulegroup-border, $rulegroupext-border,
-      $rule-border-left-hover, $case-border-left-hover, $rulegroup-border-left-hover, $rulegroupext-border-left-hover
+      $rule-border-left-hover, $case-border, $rulegroup-border-left-hover, $rulegroupext-border-left-hover
     );
   }
 

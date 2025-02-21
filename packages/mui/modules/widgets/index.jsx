@@ -85,7 +85,11 @@ const MuiProvider = ({config, children}) => {
         "--main-text-color": palette.text.secondary,
         "--main-font-family": typography.fontFamily,
         "--main-font-size": typography.fontSize+"px",
-        "--rule-shadow-hover": shadows[1]
+        
+        // "--rule-shadow-hover": shadows[1],
+        // "--group-shadow-hover": shadows[1],
+        // "--rulegroup-shadow-hover": shadows[1],
+        // "--rulegroupext-shadow-hover": shadows[1],
       };
       console.log('MUI cssVars', cssVars);
       for (const k in cssVars) {
