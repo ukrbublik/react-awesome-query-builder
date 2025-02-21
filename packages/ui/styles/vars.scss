@@ -5,6 +5,7 @@
 // borders
 $rule-border: var(--rule-border, $default-rule-border);
 $rule-border-left-hover: var(--rule-border-left-hover, $rule-border);
+$switch-border: var(--switch-border, $default-switch-border);
 $group-border: var(--group-border, $default-group-border);
 $group-border-left-hover: var(--group-border-left-hover, $group-border);
 $case-border: var(--case-border, $default-case-border);
@@ -29,6 +30,10 @@ $treeline-rulegroup-color: var(--treeline-rulegroup-color, $treeline-color);
 $treeline-rulegroupext-color: var(--treeline-rulegroupext-color, $treeline-color);
 $treeline-switch-color: var(--treeline-switch-color, $treeline-color);
 $treeline-disabled-color: var(--treeline-disabled-color, $default-treeline-disabled-color);
+$switch-background: var(--switch-background, $default-switch-background);
+$switch-border-color: var(--switch-border-color, $default-switch-border-color);
+$case-background: var(--case-background, $default-case-background);
+$case-border-color: var(--case-border-color, $default-case-border-color);
 $group-background: var(--group-background, $default-group-background);
 $group-border-color: var(--group-border-color, $default-group-border-color);
 $group-with-error-border-color: var(--group-with-error-border-color, $default-group-with-error-border-color);

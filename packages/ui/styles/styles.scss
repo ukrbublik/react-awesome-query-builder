@@ -336,8 +336,14 @@ $root_group: ".query-builder > .group-container > .group";
   /** CASE_GROUP ****************************************************************/
   /******************************************************************************/
 
+  .switch_group {
+    background: $switch-background;
+    border: $switch-border solid $switch-border-color;
+  }
+
   .case_group {
-    border-width: $case-border;
+    background: $case-background;
+    border: $case-border solid $case-border-color;
 
     .case_group--body {
       display: flex;
