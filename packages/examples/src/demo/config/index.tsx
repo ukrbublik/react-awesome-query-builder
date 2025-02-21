@@ -421,7 +421,7 @@ export default (skin: string) => {
       }
     },
     cars: {
-      label: "Cars (group)",
+      label: "Cars (list)",
       type: "!group",
       mode: "array",
       conjunctions: ["AND", "OR"],

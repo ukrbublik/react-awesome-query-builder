@@ -1,7 +1,8 @@
 // borders
 $default-rule-border: 1px !default;
 $default-group-border: 1px !default;
-$default-case-border: 3px !default;
+$default-switch-border: 3px !default;
+$default-case-border: 2px !default;
 $default-rulegroup-border: 1px !default;
 $default-rulegroupext-border: 1px !default;
 $default-item-radius: 5px !default;
@@ -17,6 +18,10 @@ $default-treeline-rulegroupext-thick: 1px !default;
 // colors
 $default-treeline-color: #ccc !default;
 $default-treeline-disabled-color: rgba(128, 128, 128, 0.1) !default;
+$default-switch-background: rgba(250, 240, 210, 0.5) !default;
+$default-switch-border-color: #DCC896 !default;
+$default-case-background: rgba(250, 240, 210, 0.5) !default;
+$default-case-border-color: #DCC896 !default;
 $default-group-background: rgba(250, 240, 210, 0.5) !default;
 $default-group-border-color: #DCC896 !default;
 $default-group-with-error-border-color: #e0a1a1 !default;
