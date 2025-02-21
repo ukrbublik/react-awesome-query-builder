@@ -1,4 +1,7 @@
 # Changelog
+- 6.7.0
+  - Theming improved (PR #1188) (issues #892 #970)
+  - Dropped `compact_styles.scss`, use class `.qb-compact` for RAQB container instead
 - 6.6.13
   - Fix selecting func/args at RHS at delta 1 (PR #1211) (issue #1207)
   - Fix fetchSelectedValuesOnInit for func arguments (PR #1210) (issue #1198)

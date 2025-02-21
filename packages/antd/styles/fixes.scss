@@ -10,6 +10,13 @@ body.qb-dragging {
   }
 }
 
+.query-builder {
+  .group--conjunctions > .ant-btn-group {
+    border-radius: 4px; // todo: var
+    overflow: hidden;
+  }
+}
+
 /* slider */
 .query-builder {
   /* v4 fix */
@@ -22,7 +29,7 @@ body.qb-dragging {
       margin-bottom: 4px !important;
       margin-top: 4px;
     }
-    .ant-slider.ant-slider-with-marks {
+    .ant-slider.ant-slider-horizontal.ant-slider-with-marks {
       margin-bottom: 10px !important;
       margin-left: 10px;
       margin-top: 4px;
@@ -31,6 +38,10 @@ body.qb-dragging {
       visibility: visible !important;
     }
   }
+}
+
+.qb-compact {
+  /* todo */
 }
 
 /* tree v4 ? */

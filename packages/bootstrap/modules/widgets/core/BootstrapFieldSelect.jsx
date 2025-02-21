@@ -6,7 +6,8 @@ import {
   DropdownItem,
 } from "reactstrap";
 
-export default ({ items, setField, selectedKey, readonly, placeholder, errorText }) => {
+export default ({ items, setField, selectedKey, readonly, placeholder, errorText, config }) => {
+  const darkMode = config.settings.themeMode === "dark";
   const [isOpen, setIsOpen] = useState(false);
 
   const stylesDropdownWrapper = {
@@ -95,22 +96,25 @@ export default ({ items, setField, selectedKey, readonly, placeholder, errorText
 
   return (
     <Dropdown
-      isOpen={isOpen}
+      isOpen={!readonly && isOpen}
       onClick={() => (!isOpen ? setIsOpen(true) : setIsOpen(false))}
       disabled={readonly}
       toggle={() => setIsOpen(!isOpen)}
     >
       <DropdownToggle
-        tag={"button"}
+        tag={!darkMode ? "button" : undefined}
+        caret={darkMode}
         className={"form-select"}
         style={stylesDropdownWrapper}
-        color={"transparent"}
+        color={darkMode ? "dark" : "transparent"}
+        disabled={readonly}
       >
         {hasValue ? renderSelected(items, selectedKey) : renderNotSelected()}
       </DropdownToggle>
       <DropdownMenu 
-        container="body" 
+        container={"body"}
         style={stylesDropdownMenuWrapper}
+        dark={darkMode}
       >
         {!hasValue && <DropdownItem key={"body"} disabled value={""}></DropdownItem>}
         {renderOptions(items)}

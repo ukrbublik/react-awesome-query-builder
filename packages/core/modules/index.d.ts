@@ -764,7 +764,7 @@ export interface ConfigMixin<C extends Config = Config> {
 /////////////////
 
 type Placement = "after" | "before" | "append" | "prepend";
-type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "ADD_CASE_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_LOCK" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_FIELD_SRC" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
+type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "ADD_CASE_GROUP" | "REMOVE_GROUP" | "REMOVE_GROUP_CHILDREN" | "SET_NOT" | "SET_LOCK" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_FIELD_SRC" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
 interface BaseAction {
   type: ActionType;
 
@@ -1409,8 +1409,6 @@ type SpelFieldMeta = {
   isSpelVariable?: boolean;
 };
 type ValueSourcesInfo = {[vs in ValueSource]?: {label: string, widget?: string}};
-type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
-type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
 type FormatReverse = (this: ConfigContext, q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: boolean) => string;
 type SqlFormatReverse = (this: ConfigContext, q: string) => string;
@@ -1420,17 +1418,7 @@ type FormatSpelField = (this: ConfigContext, field: FieldPath, parentField: Fiel
 type CanCompareFieldWithField = (this: ConfigContext, leftField: FieldPath, leftFieldConfig: Field, rightField: FieldPath, rightFieldConfig: Field, op: string) => boolean;
 type FormatAggr = (this: ConfigContext, whereStr: string, aggrField: FieldPath, operator: string, value: string | ImmutableList<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: OperatorOptionsI, isForDisplay: boolean, aggrFieldDef: Field) => string;
 
-export interface LocaleSettings {
-  locale?: {
-    moment?: string;
-    antd?: Object;
-    material?: Object;
-    mui?: Object;
-  };
-  theme?: {
-    material?: Object;
-    mui?: Object;
-  };
+export interface LocaleTranslations {
   valueLabel?: string;
   valuePlaceholder?: string;
   fieldLabel?: string;
@@ -1470,6 +1458,15 @@ export interface LocaleSettings {
   typeToSearchLabel?: string;
   loadingLabel?: string;
   notFoundLabel?: string;
+}
+
+export interface LocaleSettings extends LocaleTranslations {
+  locale?: {
+    moment?: string;
+    antd?: Object;
+    material?: Object;
+    mui?: Object;
+  };
 }
 
 

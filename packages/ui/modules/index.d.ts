@@ -316,8 +316,27 @@ export interface RuleProps {
 
 
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
-type AntdSize = "small" | "large" | "medium";
+type RenderSize = "small" | "large" | "medium";
+type ThemeMode = "light" | "dark";
 
+export interface ThemeSettings {
+  theme?: {
+    material?: Object;
+    mui?: Object;
+    antd?: Object;
+  };
+  renderSize?: RenderSize;
+  themeMode?: ThemeMode;
+  compactMode?: boolean;
+  dropdownPlacement?: AntdPosition;
+  groupActionsPosition?: AntdPosition;
+  defaultSliderWidth?: string;
+  defaultSelectWidth?: string;
+  defaultSearchWidth?: string;
+  defaultMaxRows?: number;
+  showLabels?: boolean;
+  maxLabelsLength?: number;
+}
 
 export interface RenderSettings {
   renderField?: SerializableType<FactoryWithContext<FieldProps>>;
@@ -333,14 +352,7 @@ export interface RenderSettings {
   renderFieldSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
   renderConfirm?: SerializableType<ConfirmFunc>;
   useConfirm?: SerializableType<(() => Function)>;
-  renderSize?: AntdSize;
   renderItem?: SerializableType<FactoryWithContext<ItemBuilderProps>>;
-  dropdownPlacement?: AntdPosition;
-  groupActionsPosition?: AntdPosition;
-  showLabels?: boolean;
-  maxLabelsLength?: number;
-  customFieldSelectProps?: AnyObject;
-  customOperatorSelectProps?: AnyObject;
   renderBeforeWidget?: SerializableType<FactoryWithContext<RuleProps>>;
   renderAfterWidget?: SerializableType<FactoryWithContext<RuleProps>>;
   renderBeforeActions?: SerializableType<FactoryWithContext<RuleProps>>;
@@ -349,13 +361,12 @@ export interface RenderSettings {
   renderAfterCaseValue?: SerializableType<FactoryWithContext<RuleProps>>;
   renderRuleError?: SerializableType<FactoryWithContext<RuleErrorProps>>;
   renderSwitchPrefix?: SerializableType<RenderedReactElement>;
-  defaultSliderWidth?: string;
-  defaultSelectWidth?: string;
-  defaultSearchWidth?: string;
-  defaultMaxRows?: number;
+
+  customFieldSelectProps?: AnyObject;
+  customOperatorSelectProps?: AnyObject;
 }
 
-export interface Settings extends CoreSettings, RenderSettings {
+export interface Settings extends CoreSettings, RenderSettings, ThemeSettings {
 }
 
 /////////////////

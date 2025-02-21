@@ -1,5 +1,5 @@
 import {
-  ImmutableTree, Config, Actions
+  ImmutableTree, Config, Actions, PartialPartial
 } from "@react-awesome-query-builder/ui";
 
 
@@ -15,6 +15,9 @@ export interface DemoQueryBuilderState {
   sqlErrors: Array<string>;
   sqlWarnings: Array<string>;
   initFile: string;
+  themeMode: "light" | "dark";
+  compactMode: boolean;
+  configChanges: PartialPartial<Config>;
 }
 
 export interface DemoQueryBuilderMemo {
@@ -27,6 +30,7 @@ declare global {
   interface Window {
     _initialSkin: string;
     _initFile: string;
+    _configChanges: Object;
   }
 
   interface Console {

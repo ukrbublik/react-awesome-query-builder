@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 
 export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) => {
-
+  const darkMode = config.settings.themeMode === "dark";
   const [isOpen, setIsOpen] = useState(false);
 
   const stylesDropdownWrapper = {
@@ -59,7 +59,8 @@ export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) 
         tag={"span"}
         className={"btn"}
         style={stylesDropdownWrapper}
-        color={"transparent"}
+        color={darkMode ? "dark" : "transparent"}
+        disabled={readonly}
       >
         {/*valueSrc ? getValueSrcLabel(valueSrc) : <span>&nbsp;</span>*/}
         <FontAwesomeIcon icon={faEllipsisV} />
@@ -67,6 +68,7 @@ export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) 
       <DropdownMenu
         container="body"
         style={stylesDropdownMenuWrapper}
+        dark={darkMode}
       >
         {renderOptions(valueSources)}
       </DropdownMenu>
