@@ -1,4 +1,8 @@
 # Changelog
+- 6.6.13
+  - Fix selecting func/args at RHS at delta 1 (PR #1211) (issue #1207)
+  - Fix fetchSelectedValuesOnInit for func arguments (PR #1210) (issue #1198)
+  - Fix SpEL import/export for between op (PR #1212) (issue #1203)
 - 6.6.12
   - Fix issue with getting field config for func arg signature object (PR #1193) (issue #1192)
 - 6.6.11
