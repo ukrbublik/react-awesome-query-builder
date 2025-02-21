@@ -21,7 +21,7 @@ import {getNewValueForFieldOp} from "../utils/getNewValueForFieldOp";
 import {translateValidation} from "../i18n";
 import omit from "lodash/omit";
 import mapValues from "lodash/mapValues";
-import {setFunc, setArgValue, setArgValueSrc} from "../utils/funcUtils";
+import {setFunc, setArgValue, setArgValueSrc, setArgValueAsyncListValues} from "../utils/funcUtils";
 
 
 /**
@@ -474,6 +474,9 @@ const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue,
       targetFV = setArgValueSrc(targetFV, argKey, argValue, argDefinition, config);
     } else {
       targetFV = setArgValue(targetFV, argKey, argValue, argDefinition, config);
+      if (asyncListValues) {
+        targetFV = setArgValueAsyncListValues(targetFV, argKey, asyncListValues, argDefinition, config);
+      }
     }
   }
 
@@ -488,9 +491,9 @@ const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue,
   }
 
   if (isLHS) {
-    return setField(state, path, newV, config, asyncListValues, _meta);
+    return setField(state, path, newV, config, undefined, _meta);
   } else {
-    return setValue(state, path, delta, newV, undefined, config, asyncListValues, _meta);
+    return setValue(state, path, delta, newV, undefined, config, undefined, _meta);
   }
 };
 

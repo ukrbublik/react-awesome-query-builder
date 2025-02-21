@@ -27,6 +27,11 @@ const useListValuesAutocomplete = ({
   const loadingMoreTitle = config.settings.loadingMoreLabel ?? "Loading more...";
   const aPlaceholder = forceAsyncSearch ? (config.settings.typeToSearchLabel ?? "Type to search") : placeholder;
 
+  // Import from JsonLogic fills `asyncListValues`, but import from SQL/SpEL does not. It's workaround
+  if (asyncFetch && fetchSelectedValuesOnInit && !selectedAsyncListValues && selectedValue != undefined) {
+    selectedAsyncListValues = Array.isArray(selectedValue) ? selectedValue : [selectedValue];
+  }
+
   // state
   const [open, setOpen] = React.useState(false);
   const [asyncFetchMeta, setAsyncFetchMeta] = React.useState(undefined);

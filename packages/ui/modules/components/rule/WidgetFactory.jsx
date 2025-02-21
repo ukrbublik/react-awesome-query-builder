@@ -63,7 +63,7 @@ const WidgetFactory = ({
     if (isSpecialRange) {
       return [ immValueError.get(0), immValueError.get(1), immValueError.get(2) ];
     }
-    return immValueError?.get(delta);
+    return immValueError?.get?.(delta);
   }, [ isSpecialRange, immValue ]);
   const errorMessage = isLHS ? fieldError : valueError;
   const { fieldSettings } = fieldDefinition || {};
