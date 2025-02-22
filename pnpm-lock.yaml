@@ -28,10 +28,6 @@ overrides:
 importers:
 
   .:
-    dependencies:
-      react-number-format:
-        specifier: ^5.0.0
-        version: 5.4.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@babel/cli':
         specifier: ^7.24.7
@@ -114,6 +110,9 @@ importers:
       rc-picker:
         specifier: ^4.5.0
         version: 4.5.0(dayjs@1.11.11)(moment@2.30.1)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+      react-number-format:
+        specifier: ^5.0.0
+        version: 5.4.3(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
     devDependencies:
       '@ant-design/icons':
         specifier: ^5.5.2
@@ -178,6 +177,9 @@ importers:
       '@react-awesome-query-builder/ui':
         specifier: workspace:^
         version: link:../ui
+      react-number-format:
+        specifier: ^5.0.0
+        version: 5.4.3(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
     devDependencies:
       '@babel/cli':
         specifier: ^7.24.7
@@ -553,6 +555,9 @@ importers:
       '@react-awesome-query-builder/ui':
         specifier: workspace:^
         version: link:../ui
+      react-number-format:
+        specifier: ^5.0.0
+        version: 5.4.3(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
     devDependencies:
       '@babel/cli':
         specifier: ^7.24.7
@@ -629,6 +634,9 @@ importers:
       material-ui-confirm:
         specifier: ^2.1.3
         version: 2.1.4(@material-ui/core@4.12.4(@types/react@17.0.80)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+      react-number-format:
+        specifier: ^5.0.0
+        version: 5.4.3(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
     devDependencies:
       '@babel/cli':
         specifier: ^7.24.7
@@ -708,6 +716,9 @@ importers:
       material-ui-confirm:
         specifier: ^3.0.5
         version: 3.0.7(@mui/material@6.3.1(@emotion/react@11.11.4(@types/react@17.0.80)(react@17.0.2))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@17.0.80)(react@17.0.2))(@types/react@17.0.80)(react@17.0.2))(@types/react@17.0.80)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+      react-number-format:
+        specifier: ^5.0.0
+        version: 5.4.3(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
     devDependencies:
       '@babel/cli':
         specifier: ^7.24.7
@@ -16552,10 +16563,10 @@ snapshots:
 
   react-is@19.0.0: {}
 
-  react-number-format@5.4.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-number-format@5.4.3(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
     dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
+      react: 17.0.2
+      react-dom: 17.0.2(react@17.0.2)
 
   react-popper@2.3.0(@popperjs/core@2.11.8)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
     dependencies:
