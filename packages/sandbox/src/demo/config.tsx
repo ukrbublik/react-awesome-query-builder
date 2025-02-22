@@ -71,9 +71,7 @@ export function createConfig(InitialConfig: BasicConfig): Config {
         fieldSettings: {
           valuePlaceholder: "Enter your Price",
           thousandSeparator:",",
-          prefix:'﷼',
-          suffix:'$',
-      }as PriceFieldSettings,
+      } as PriceFieldSettings,
     },
     prox1: {
       label: "prox",
