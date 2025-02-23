@@ -1,9 +1,22 @@
 /*eslint @typescript-eslint/no-unused-vars: ["off", {"varsIgnorePattern": "^_"}]*/
 import merge from "lodash/merge";
 import {
-  BasicFuncs, CoreConfig,
+  BasicFuncs,
+  CoreConfig,
   // types:
-  Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs, OperatorProximity, Func, SerializedFunction,
+  Settings,
+  Operators,
+  Widgets,
+  Fields,
+  Config,
+  Types,
+  Conjunctions,
+  LocaleSettings,
+  Funcs,
+  OperatorProximity,
+  Func,
+  SerializedFunction,
+  PriceFieldSettings,
 } from "@react-awesome-query-builder/core";
 
 // Create a config for demo app based on CoreConfig - add fields, funcs, some overrides.
@@ -15,7 +28,6 @@ import {
 //   Or use JsonLogic functions, see `validateValue` for `login` field (advanced usage, but doesn't change `ctx`).
 
 function createConfig(InitialConfig: CoreConfig): Config {
-
   const fields: Fields = {
     user: {
       label: "User",
@@ -50,13 +62,15 @@ function createConfig(InitialConfig: CoreConfig): Config {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             validateValue: {
               and: [
-                { "<": [ {strlen: {var: "val"}}, 10 ] },
-                { or: [
-                  { "===": [ {var: "val"}, "" ] },
-                  { regexTest: [ {var: "val"}, "^[A-Za-z0-9_-]+$" ] }
-                ]}
-              ]
-            } as SerializedFunction as any
+                { "<": [{ strlen: { var: "val" } }, 10] },
+                {
+                  or: [
+                    { "===": [{ var: "val" }, ""] },
+                    { regexTest: [{ var: "val" }, "^[A-Za-z0-9_-]+$"] },
+                  ],
+                },
+              ],
+            } as SerializedFunction as any,
             // -incorrect-
             // (val: string) => {
             //   return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
@@ -66,8 +80,17 @@ function createConfig(InitialConfig: CoreConfig): Config {
             valueLabel: "Login",
             valuePlaceholder: "Enter login",
           },
-        }
-      }
+        },
+      },
+    },
+    price: {
+      label: "Price",
+      type: "price",
+      preferWidgets: ["price"],
+      fieldSettings: {
+        valuePlaceholder: "Enter your Price",
+        thousandSeparator: ",",
+      } as PriceFieldSettings,
     },
     prox1: {
       label: "prox",
@@ -81,7 +104,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
       preferWidgets: ["number"],
       fieldSettings: {
         min: -1,
-        max: 5
+        max: 5,
       },
       funcs: ["LINEAR_REGRESSION"],
     },
@@ -100,8 +123,8 @@ function createConfig(InitialConfig: CoreConfig): Config {
         slider: {
           widgetProps: {
             valuePlaceholder: "..Slider",
-          }
-        }
+          },
+        },
       },
     },
     date: {
@@ -119,12 +142,12 @@ function createConfig(InitialConfig: CoreConfig): Config {
     datetime: {
       label: "DateTime",
       type: "datetime",
-      valueSources: ["value"]
+      valueSources: ["value"],
     },
     datetime2: {
       label: "DateTime2",
       type: "datetime",
-      valueSources: ["field"]
+      valueSources: ["field"],
     },
     color: {
       label: "Color",
@@ -134,9 +157,9 @@ function createConfig(InitialConfig: CoreConfig): Config {
         listValues: [
           { value: "yellow", title: "Yellow" },
           { value: "green", title: "Green" },
-          { value: "orange", title: "Orange" }
+          { value: "orange", title: "Orange" },
         ],
-      }
+      },
     },
     color2: {
       label: "Color2",
@@ -146,9 +169,9 @@ function createConfig(InitialConfig: CoreConfig): Config {
           yellow: "Yellow",
           green: "Green",
           orange: "Orange",
-          purple: "Purple"
+          purple: "Purple",
         },
-      }
+      },
     },
     multicolor: {
       label: "Colors",
@@ -157,9 +180,9 @@ function createConfig(InitialConfig: CoreConfig): Config {
         listValues: {
           yellow: "Yellow",
           green: "Green",
-          orange: "Orange"
+          orange: "Orange",
         },
-        allowCustomValues: true
+        allowCustomValues: true,
       },
     },
     stock: {
@@ -168,8 +191,8 @@ function createConfig(InitialConfig: CoreConfig): Config {
       defaultValue: true,
       mainWidgetProps: {
         labelYes: "+",
-        labelNo: "-"
-      }
+        labelNo: "-",
+      },
     },
     autocomplete: {
       label: "Autocomplete",
@@ -179,7 +202,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
-        allowCustomValues: false
+        allowCustomValues: false,
       },
     },
     autocompleteMultiple: {
@@ -190,11 +213,10 @@ function createConfig(InitialConfig: CoreConfig): Config {
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
-        allowCustomValues: false
+        allowCustomValues: false,
       },
     },
   };
-
 
   //////////////////////////////////////////////////////////////////////
 
@@ -202,7 +224,6 @@ function createConfig(InitialConfig: CoreConfig): Config {
     AND: InitialConfig.conjunctions.AND,
     OR: InitialConfig.conjunctions.OR,
   };
-
 
   const proximity: OperatorProximity = {
     ...InitialConfig.operators.proximity,
@@ -222,10 +243,10 @@ function createConfig(InitialConfig: CoreConfig): Config {
       minProximity: 2,
       maxProximity: 10,
       defaults: {
-        proximity: 2
+        proximity: 2,
       },
-      customProps: {}
-    }
+      customProps: {},
+    },
   };
 
   const operators: Operators = {
@@ -233,14 +254,8 @@ function createConfig(InitialConfig: CoreConfig): Config {
     // examples of  overriding
     between: {
       ...InitialConfig.operators.between,
-      valueLabels: [
-        "Value from",
-        "Value to"
-      ],
-      textSeparators: [
-        "from",
-        "to"
-      ],
+      valueLabels: ["Value from", "Value to"],
+      textSeparators: ["from", "to"],
     },
     proximity,
   };
@@ -254,14 +269,14 @@ function createConfig(InitialConfig: CoreConfig): Config {
     slider: {
       ...InitialConfig.widgets.slider,
       customProps: {
-        width: "300px"
-      }
+        width: "300px",
+      },
     },
     rangeslider: {
       ...InitialConfig.widgets.rangeslider,
       customProps: {
-        width: "300px"
-      }
+        width: "300px",
+      },
     },
     date: {
       ...InitialConfig.widgets.date,
@@ -282,17 +297,16 @@ function createConfig(InitialConfig: CoreConfig): Config {
     func: {
       ...InitialConfig.widgets.func,
       customProps: {
-        showSearch: true
-      }
+        showSearch: true,
+      },
     },
     treeselect: {
       ...InitialConfig.widgets.treeselect,
       customProps: {
-        showSearch: true
-      }
+        showSearch: true,
+      },
     },
   };
-
 
   const types: Types = {
     ...InitialConfig.types,
@@ -303,12 +317,11 @@ function createConfig(InitialConfig: CoreConfig): Config {
           widgetProps: {
             hideOperator: true,
             operatorInlineLabel: "is",
-          }
+          },
         },
       },
     }),
   };
-
 
   const localeSettings: LocaleSettings = {
     locale: {
@@ -348,7 +361,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
     useConfigCompress: true,
     valueSourcesInfo: {
       value: {
-        label: "Value"
+        label: "Value",
       },
       field: {
         label: "Field",
@@ -357,7 +370,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
       func: {
         label: "Function",
         widget: "func",
-      }
+      },
     },
     fieldSources: ["field", "func"],
     // canReorder: false,
@@ -367,7 +380,6 @@ function createConfig(InitialConfig: CoreConfig): Config {
     maxNesting: 3,
     canLeaveEmptyGroup: true, //after deletion
   };
-
 
   const funcs: Funcs = {
     LINEAR_REGRESSION: BasicFuncs.LINEAR_REGRESSION,
@@ -382,7 +394,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
   const ctx = {
     ...InitialConfig.ctx,
     validateFirstName: (val: string) => {
-      return (val.length < 10);
+      return val.length < 10;
     },
   };
 
@@ -394,7 +406,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
     settings,
     fields,
     funcs,
-    ctx
+    ctx,
   };
 
   return config;

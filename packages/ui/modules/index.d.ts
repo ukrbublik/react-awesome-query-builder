@@ -385,6 +385,7 @@ interface VanillaWidgets {
   VanillaMultiSelectWidget: ElementType<SelectWidgetProps>;
   VanillaSelectWidget: ElementType<SelectWidgetProps>;
   VanillaNumberWidget: ElementType<NumberWidgetProps>;
+  VanillaPriceWidget: ElementType<NumberWidgetProps>;
   VanillaSliderWidget: ElementType<NumberWidgetProps>;
   
   // common

@@ -41,6 +41,11 @@ const widgets = {
     ...BasicConfig.widgets.number,
     factory: (props, {RCE, W: {MaterialNumberWidget}}) => RCE(MaterialNumberWidget, props),
   },
+  price: {
+    ...BasicConfig.widgets.price,
+    factory: (props, { RCE, W: { MaterialPriceWidget } }) =>
+      RCE(MaterialPriceWidget, props),
+  },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
     factory: (props, {RCE, W: {MaterialAutocompleteWidget, MaterialMultiSelectWidget}}) => {
