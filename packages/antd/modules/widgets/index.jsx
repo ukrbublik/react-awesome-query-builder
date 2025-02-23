@@ -44,25 +44,8 @@ const Provider = ({ config, children }) => {
   ].filter(a => !!a);
   const palette = algorithms.reduce((tkns, algo, i) => i === 0 ? algo(tkns) : algo({}, tkns), theme.defaultSeed);
   React.useEffect(() => {
-    console.log('antd palette', palette);
     const cssVarsTarget = ref.current;
-    const cssVars = {
-      "--rule-background": palette.colorBgElevated,
-      "--group-background": darkMode ? palette.colorBgMask : palette.colorFillSecondary,
-      "--rulegroup-background": darkMode ? palette.colorBgSpotlight : palette.colorSecondaryBg,
-      "--rulegroupext-background": darkMode ? palette.colorBgSpotlight : palette.colorSecondaryBg,
-      "--rule-border-color": palette.colorBorder,
-      "--group-border-color": palette.colorBorderSecondary,
-      "--rulegroup-border-color": palette.colorBorderSecondary,
-      "--rulegroupext-border-color": palette.colorBorderSecondary,
-      "--treeline-color": darkMode ? palette.colorInfo : palette.colorInfoBorder,
-      '--treeline-disabled-color': palette.colorFillSecondary,
-      "--main-text-color": palette.colorText,
-      "--main-font-family": palette.fontFamily,
-      "--main-font-size": palette.fontSize + 'px',
-      //"--group-in-rulegroupext-border-color": palette.colorBorderSecondary,
-    };
-    console.log('antd cssVars', cssVars);
+    const cssVars = themeToCssVars(palette, darkMode);
     for (const k in cssVars) {
       if (cssVars[k] != undefined) {
         cssVarsTarget.style.setProperty(k, cssVars[k]);
@@ -88,6 +71,34 @@ const Provider = ({ config, children }) => {
   );
 
   return withProviders;
+};
+
+const themeToCssVars = (palette, darkMode) => {
+  // console.log('antd palette', palette);
+  return {
+    "--rule-background": palette.colorBgElevated,
+    "--group-background": darkMode ? palette.colorBgMask : palette.colorFillSecondary,
+    "--rulegroup-background": darkMode ? palette.colorBgSpotlight : palette.colorSecondaryBg,
+    "--rulegroupext-background": darkMode ? palette.colorBgSpotlight : palette.colorSecondaryBg,
+    "--switch-background": darkMode ? palette.colorBgMask : palette.colorFillQuaternary,
+    "--case-background": darkMode ? palette.colorBgMask : palette.colorFillQuaternary,
+
+    "--rule-border-color": palette.colorBorder,
+    "--group-border-color": palette.colorBorderSecondary,
+    "--rulegroup-border-color": palette.colorBorderSecondary,
+    "--rulegroupext-border-color": palette.colorBorderSecondary,
+    "--switch-border-color": palette.colorBorderSecondary,
+    "--case-border-color": palette.colorBorder,
+
+    "--treeline-color": darkMode ? palette.colorPrimaryHover : palette.colorPrimaryHover,
+    "--treeline-switch-color": darkMode ? palette.colorInfo : palette.colorInfo,
+    '--treeline-disabled-color': palette.colorFillSecondary,
+
+    "--main-text-color": palette.colorText,
+    "--main-font-family": palette.fontFamily,
+    "--main-font-size": palette.fontSize + "px",
+    "--item-radius": palette.borderRadiusOuter + "px",
+  };
 };
 
 export default {
@@ -120,4 +131,5 @@ export default {
   confirm,
 
   Provider,
+  themeToCssVars,
 };

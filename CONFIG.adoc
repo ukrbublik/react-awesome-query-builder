@@ -416,9 +416,11 @@ Theme settings:
 [cols="1m,1,3a",options="header",]
 |===
 |key |default |meaning
+|themeMode |`light` |`light` or `dark`
+|compactMode |false |
 |theme.material |{} |Options for https://v4.mui.com/customization/theming/[createTheme]
 |theme.mui |{} |Options for https://mui.com/material-ui/customization/theming/[createTheme]
-|renderSize |`small` |Size of AntDesign components - `small` or `large`
+|renderSize |`small` |Size of components - `small`, `middle` or `large`
 |dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
 |groupActionsPosition |`topRight` |You can change the position of the group actions to the following: +
  `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight`

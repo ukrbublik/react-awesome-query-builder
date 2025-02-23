@@ -99,7 +99,6 @@ $root_group: ".query-builder > .group-container > .group";
 
   .rule--error {
     color: $rule-error-color;
-    margin-bottom: -5px;
     margin-top: 5px;
   }
 
@@ -257,7 +256,7 @@ $root_group: ".query-builder > .group-container > .group";
 
   .rule_group--error {
     color: $rule-error-color;
-    margin-bottom: -5px;
+    margin-left: 5px;
     margin-top: 5px;
     width: 100%;
   }

@@ -1,7 +1,7 @@
 import React from "react";
 
 import { initializeIcons } from "@fluentui/font-icons-mdl2";
-import { ThemeProvider } from "@fluentui/react";
+import { ThemeProvider, useTheme } from "@fluentui/react";
 initializeIcons();
 
 // value widgets
@@ -30,6 +30,7 @@ import FluentUIConfirm from "./core/FluentUIConfirm";
 
 // provider
 const FluentUIProvider = ({config, children}) => {
+  const ref = React.createRef();
   const themeMode = config.settings.themeMode ?? "light";
   const darkMode = config.settings.themeMode === "dark";
   const compactMode = config.settings.compactMode;
@@ -66,7 +67,26 @@ const FluentUIProvider = ({config, children}) => {
   };
   const appTheme = darkMode ? darkTheme : undefined;
 
-  const base = (<div className={`qb-fluent ${compactMode ? "qb-compact" : ""} qb-${themeMode}`}>{children}</div>);
+  const UpdCssVars = () => {
+    const theme = useTheme();
+    React.useEffect(() => {
+      const cssVarsTarget = ref.current;
+      const cssVars = themeToCssVars(theme, darkMode);
+      for (const k in cssVars) {
+        if (cssVars[k] != undefined) {
+          cssVarsTarget.style.setProperty(k, cssVars[k]);
+        }
+      }
+      return () => {
+        for (const k in cssVars) {
+          cssVarsTarget.style.removeProperty(k);
+        }
+      };
+    }, [theme]);
+    return <div style={{display: "none"}} />;
+  };
+
+  const base = (<div ref={ref} className={`qb-fluent ${compactMode ? "qb-compact" : ""} qb-${themeMode}`}><UpdCssVars />{children}</div>);
   const withProviders = (
     <ThemeProvider
       theme={appTheme}
@@ -74,6 +94,40 @@ const FluentUIProvider = ({config, children}) => {
   );
 
   return withProviders;
+};
+
+const themeToCssVars = (theme, darkMode) => {
+  // console.log("fluent theme", theme);
+  const { fonts, effects, semanticColors } = theme;
+  return {
+    "--rule-background": semanticColors.cardStandoutBackground,
+    "--group-background": semanticColors.menuItemBackgroundHovered,
+    "--rulegroup-background": semanticColors.defaultStateBackground,
+    "--rulegroupext-background": semanticColors.defaultStateBackground,
+    "--switch-background": semanticColors.defaultStateBackground,
+    "--case-background": semanticColors.defaultStateBackground,
+
+    "--rule-border-color": semanticColors.variantBorder,
+    "--group-border-color": semanticColors.inputBorder,
+    "--rulegroup-border-color": semanticColors.disabledBorder,
+    "--rulegroupext-border-color": semanticColors.disabledBorder,
+    "--switch-border-color": semanticColors.disabledBorder,
+    "--case-border-color": semanticColors.inputFocusBorderAlt
+    ,
+
+    "--treeline-color": semanticColors.accentButtonBackground,
+    "--treeline-switch-color": semanticColors.accentButtonBackground,
+
+    "--main-text-color": semanticColors.bodyText,
+    "--main-font-family": fonts.medium.fontFamily,
+    "--main-font-size": fonts.medium.fontSize,
+    "--item-radius": effects.roundedCorner2,
+    
+    "--rule-shadow-hover": effects.elevation4,
+    "--group-shadow-hover": effects.elevation4,
+    "--rulegroup-shadow-hover": effects.elevation4,
+    "--rulegroupext-shadow-hover": effects.elevation4,
+  };
 };
 
 export default {

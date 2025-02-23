@@ -16,7 +16,7 @@ $custom-select-option-color: lightcoral !default;
 
 .query-builder {
   .group--conjunctions > .MuiFormControl-root {
-    border-radius: 8px; // todo: var
+    border-radius: $conjunctions-radius;
     overflow: hidden;
   }
 }

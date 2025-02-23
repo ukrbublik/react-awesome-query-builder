@@ -65,33 +65,8 @@ const MuiProvider = ({config, children}) => {
   const UpdCssVars = () => {
     const theme = useTheme();
     React.useEffect(() => {
-      console.log('MUI theme', theme);
-      const { palette, typography, shadows } = theme;
-      const setOpacity = (hex, alpha) => `${hex}${Math.floor(alpha * 255).toString(16).padStart(2, 0)}`;
       const cssVarsTarget = ref.current;
-      const cssVars = {
-        "--rule-background": palette.mode === "dark" ? setOpacity(palette.grey[800], 0.3) : palette.background.paper,
-        "--group-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.8) : setOpacity(palette.grey[600], 0.1),
-        "--rulegroup-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.3) : setOpacity(palette.grey[400], 0.1),
-        "--rulegroupext-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.3) : setOpacity(palette.grey[400], 0.1),
-        
-         "--rule-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
-         "--group-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
-         "--rulegroup-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
-         "--rulegroupext-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
-
-        "--treeline-color": palette.primary.main, //palette.divider,
-     //   "--treeline-disabled-color": palette.action.disabledBackground,
-        "--main-text-color": palette.text.secondary,
-        "--main-font-family": typography.fontFamily,
-        "--main-font-size": typography.fontSize+"px",
-        
-        // "--rule-shadow-hover": shadows[1],
-        // "--group-shadow-hover": shadows[1],
-        // "--rulegroup-shadow-hover": shadows[1],
-        // "--rulegroupext-shadow-hover": shadows[1],
-      };
-      console.log('MUI cssVars', cssVars);
+      const cssVars = themeToCssVars(theme);
       for (const k in cssVars) {
         if (cssVars[k] != undefined) {
           cssVarsTarget.style.setProperty(k, cssVars[k]);
@@ -123,6 +98,39 @@ const MuiProvider = ({config, children}) => {
   return withTheme;
 };
 
+const themeToCssVars = (theme) => {
+  // console.log('MUI theme', theme);
+  const { palette, typography, shadows, shape } = theme;
+  const setOpacity = (hex, alpha) => `${hex}${Math.floor(alpha * 255).toString(16).padStart(2, 0)}`;
+  return {
+    "--rule-background": palette.mode === "dark" ? setOpacity(palette.grey[800], 0.3) : palette.background.paper,
+    "--group-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.8) : setOpacity(palette.grey[500], 0.1),
+    "--rulegroup-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.3) : setOpacity(palette.grey[400], 0.1),
+    "--rulegroupext-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.3) : setOpacity(palette.grey[400], 0.1),
+    "--switch-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.8) : setOpacity(palette.grey[400], 0.1),
+    "--case-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.8) : setOpacity(palette.grey[500], 0.1),
+
+    "--rule-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
+    "--group-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
+    "--rulegroup-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
+    "--rulegroupext-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
+    "--switch-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
+    "--case-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
+
+    "--treeline-color": palette.primary.main,
+    "--treeline-switch-color": palette.secondary.main,
+
+    "--main-text-color": palette.text.secondary,
+    "--main-font-family": typography.fontFamily,
+    "--main-font-size": typography.fontSize + "px",
+    "--item-radius": shape.borderRadius + "px",
+
+    // "--rule-shadow-hover": shadows[1],
+    // "--group-shadow-hover": shadows[1],
+    // "--rulegroup-shadow-hover": shadows[1],
+    // "--rulegroupext-shadow-hover": shadows[1],
+  };
+};
 
 export default {
   MuiTextWidget,
@@ -152,4 +160,5 @@ export default {
   MuiUseConfirm: useConfirm,
 
   MuiProvider,
+  themeToCssVars,
 };
