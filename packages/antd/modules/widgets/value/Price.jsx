@@ -1,5 +1,6 @@
 import React from "react";
 import { NumericFormat } from "react-number-format";
+import { Input } from "antd";
 
 export default (props) => {
   const {
@@ -7,6 +8,7 @@ export default (props) => {
     setValue,
     readonly,
     placeholder,
+    config,
     ...numericFormatProps
   } = props;
 
@@ -14,10 +16,13 @@ export default (props) => {
     let val = values.floatValue;
     setValue(val === undefined ? null : val);
   };
+  const { renderSize } = config.settings;
 
   return (
     <NumericFormat
+      customInput={Input}
       type="text"
+      size={renderSize}
       value={value}
       placeholder={placeholder}
       disabled={readonly}

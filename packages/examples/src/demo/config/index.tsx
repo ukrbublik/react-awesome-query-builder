@@ -340,13 +340,10 @@ export default (skin: string) => {
     price: {
       label: "Price",
       type: "price",
-      preferWidgets: ["price"],
       fieldSettings: {
         valuePlaceholder: "Enter your Price",
-        thousandSeparator:",",
-        prefix:'﷼',
-        suffix:'$',
-      }as PriceFieldSettings,
+        thousandSeparator: ",",
+      } as PriceFieldSettings,
     },
     user: {
       label: "User",

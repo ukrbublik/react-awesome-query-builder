@@ -11,6 +11,7 @@ export default (props) => {
     min,
     max,
     step,
+    label,
     placeholder,
     customProps,
     ...numericFormatProps
@@ -49,9 +50,9 @@ export default (props) => {
         inputProps={inputProps}
         disabled={readonly}
         onValueChange={handleChange}
+        variant="standard"
         {...customProps}
         {...numericFormatProps}
-
       />
     </FormControl>
   );
