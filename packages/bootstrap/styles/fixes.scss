@@ -21,7 +21,7 @@
 
 .query-builder {
   .group--conjunctions > .btn-group {
-    border-radius: 4px; // todo: var
+    border-radius: $conjunctions-radius;
     overflow: hidden;
   }
 }
