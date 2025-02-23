@@ -14,6 +14,7 @@ $rulegroup-border-left-hover: var(--rulegroup-border-left-hover, $rulegroup-bord
 $rulegroupext-border: var(--rulegroupext-border, $default-rulegroupext-border);
 $rulegroupext-border-left-hover: var(--rulegroupext-border-left-hover, $rulegroupext-border);
 $item-radius: var(--item-radius, $default-item-radius);
+$conjunctions-radius: var(--conjunctions-radius, $item-radius);
 // shadows
 $rule-shadow-hover: var(--rule-shadow-hover, $default-rule-shadow-hover);
 $group-shadow-hover: var(--group-shadow-hover, $default-group-shadow-hover);
