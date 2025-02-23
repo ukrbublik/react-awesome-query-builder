@@ -8,6 +8,7 @@ const FluentUIPrice = (props) => {
     setValue,
     readonly,
     placeholder,
+    label,
     ...numericFormatProps
   } = props;
 
