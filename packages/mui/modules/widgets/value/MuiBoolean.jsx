@@ -5,14 +5,15 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 
 export default (props) => {
-  const { customProps, value, setValue, labelYes, labelNo, readonly } = props;
+  const { customProps, value, setValue, labelYes, labelNo, readonly, config } = props;
+  const {renderSize} = config.settings;
 
   const onChange = () => {
     setValue(!value);
   };
 
   return (
-    <FormControl size={"small"}>
+    <FormControl size={renderSize}>
       <Typography component="div">
         <Grid component="label" container alignItems="center" spacing={0}>
           <Grid item component="span">{labelNo}</Grid>
@@ -21,7 +22,7 @@ export default (props) => {
               checked={!!value}
               onChange={onChange}
               disabled={readonly}
-              size={"small"}
+              size={renderSize}
               {...customProps}
             />
           </Grid>
