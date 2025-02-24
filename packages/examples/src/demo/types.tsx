@@ -1,5 +1,5 @@
 import {
-  ImmutableTree, Config, Actions, PartialPartial
+  ImmutableTree, Config, Actions, PartialPartial, ThemeMode, RenderSize,
 } from "@react-awesome-query-builder/ui";
 
 
@@ -15,7 +15,8 @@ export interface DemoQueryBuilderState {
   sqlErrors: Array<string>;
   sqlWarnings: Array<string>;
   initFile: string;
-  themeMode: "light" | "dark";
+  themeMode: ThemeMode;
+  renderSize: RenderSize;
   compactMode: boolean;
   configChanges: PartialPartial<Config>;
 }
