@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction } from "react";
 import {
-  Config,
+  Config, RenderSize,
 } from "@react-awesome-query-builder/ui";
 import type { DemoQueryBuilderState } from "../types";
 import clone from "clone";
@@ -47,6 +47,19 @@ export const useThemeing = (
     setState({...state, config: newConfig, compactMode});
   };
 
+  const changeRenderSize = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const renderSize = e.target.value as RenderSize;
+    let newConfig: Config = clone(state.config);
+    state.configChanges = merge(state.configChanges, {
+      settings: {
+        renderSize,
+      }
+    });
+    window._configChanges = state.configChanges;
+    newConfig = merge(newConfig, state.configChanges);
+    setState({...state, config: newConfig, renderSize});
+  };
+
   const renderThemeModeSelector = () => {
     return (
       <select value={state.themeMode} onChange={changeThemeMode}>
@@ -65,8 +78,19 @@ export const useThemeing = (
     );
   };
 
+  const renderSizeSelector = () => {
+    return (
+      <select value={state.renderSize} onChange={changeRenderSize}>
+        <option key="small">small</option>
+        <option key="medium">medium</option>
+        <option key="large">large</option>
+      </select>
+    );
+  };
+
   return {
     renderThemeModeSelector,
     renderCompactModeSelector,
+    renderSizeSelector,
   };
 };

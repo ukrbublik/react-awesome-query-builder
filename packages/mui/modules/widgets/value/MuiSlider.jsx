@@ -5,7 +5,7 @@ import FormControl from "@mui/material/FormControl";
 
 export default (props) => {
   const {config, placeholder, customProps, value, setValue, min, max, step, marks, readonly} = props;
-  const {defaultSliderWidth} = config.settings;
+  const {defaultSliderWidth, renderSize} = config.settings;
 
   const handleSliderChange = useCallback((_e, newValue) => {
     setValue(newValue);
@@ -75,7 +75,7 @@ export default (props) => {
       disabled={readonly}
       onChange={handleInputChange}
       onBlur={handleInputBlur}
-      size="small"
+      size={renderSize}
       {...customInputProps}
     />
   );
@@ -90,7 +90,7 @@ export default (props) => {
       step={step}
       marks={muiMarks}
       valueLabelDisplay="auto"
-      size="small"
+      size={renderSize}
       {...customSliderProps}
     />
   );

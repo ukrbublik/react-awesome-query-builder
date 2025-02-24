@@ -70,6 +70,7 @@ body.qb-dragging {
 
 .query-builder {
   .widget--valuesrc, .rule--fieldsrc {
+    vertical-align: middle;
     .anticon {
       height: 100%;
       svg {
@@ -92,5 +93,12 @@ body.qb-dragging {
     margin-left: 3px;
     margin-right: 3px;
     margin-bottom: 4px;
+  }
+  .rule--widget--BOOLEAN {
+    height: 100%;
+    display: flex;
+    .widget--widget {
+      align-self: center;
+    }
   }
 }

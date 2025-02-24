@@ -77,16 +77,16 @@ const themeToCssVars = (palette, darkMode) => {
   // console.log('antd palette', palette);
   return {
     "--rule-background": palette.colorBgElevated,
-    "--group-background": darkMode ? palette.colorBgMask : palette.colorFillSecondary,
+    "--group-background": darkMode ? palette.colorBgMask : palette.colorFillQuaternary,
     "--rulegroup-background": darkMode ? palette.colorBgSpotlight : palette.colorSecondaryBg,
     "--rulegroupext-background": darkMode ? palette.colorBgSpotlight : palette.colorSecondaryBg,
     "--switch-background": darkMode ? palette.colorBgMask : palette.colorFillQuaternary,
     "--case-background": darkMode ? palette.colorBgMask : palette.colorFillQuaternary,
 
-    "--rule-border-color": palette.colorBorder,
-    "--group-border-color": palette.colorBorderSecondary,
-    "--rulegroup-border-color": palette.colorBorderSecondary,
-    "--rulegroupext-border-color": palette.colorBorderSecondary,
+    "--rule-border-color": palette.colorBorderSecondary,
+    "--group-border-color": palette.colorBorder,
+    "--rulegroup-border-color": palette.colorBorder,
+    "--rulegroupext-border-color": palette.colorBorder,
     "--switch-border-color": palette.colorBorderSecondary,
     "--case-border-color": palette.colorBorder,
 
@@ -97,7 +97,12 @@ const themeToCssVars = (palette, darkMode) => {
     "--main-text-color": palette.colorText,
     "--main-font-family": palette.fontFamily,
     "--main-font-size": palette.fontSize + "px",
-    "--item-radius": palette.borderRadiusOuter + "px",
+    "--item-radius": palette.borderRadius + "px",
+
+    "--rule-border-left-hover": "2px",
+    "--group-border-left-hover": "2px",
+    "--rulegroup-border-left-hover": "2px",
+    "--rulegroupext-border-left-hover": "2px",
   };
 };
 

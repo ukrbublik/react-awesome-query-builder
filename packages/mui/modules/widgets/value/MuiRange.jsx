@@ -5,7 +5,7 @@ import FormControl from "@mui/material/FormControl";
 
 export default (props) => {
   const {config, placeholders, customProps, value, setValue, min, max, step, marks, readonly, textSeparators} = props;
-  const {defaultSliderWidth} = config.settings;
+  const {defaultSliderWidth, renderSize} = config.settings;
 
   useEffect(() => {
     const [valueFrom, valueTo] = props.value || [undefined, undefined];
@@ -99,7 +99,7 @@ export default (props) => {
       disabled={readonly}
       onChange={handleInputChangeFrom}
       onBlur={handleInputBlur}
-      size="small"
+      size={renderSize}
       {...customInputProps}
     />
   );
@@ -121,7 +121,7 @@ export default (props) => {
       disabled={readonly}
       onChange={handleInputChangeTo}
       onBlur={handleInputBlur}
-      size="small"
+      size={renderSize}
       {...customInputProps}
     />
   );
@@ -136,7 +136,7 @@ export default (props) => {
       step={step}
       marks={muiMarks}
       valueLabelDisplay="auto"
-      size="small"
+      size={renderSize}
       {...customSliderProps}
     />
   );

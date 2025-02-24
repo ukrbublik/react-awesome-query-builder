@@ -20,10 +20,12 @@ const typeToColor = {
 };
 
 export default memo((props) => {
-  const {type, label, onClick, readonly, renderIcon} = props;
+  const {type, label, onClick, readonly, renderIcon, config} = props;
+  const {renderSize} = config.settings;
   const iconProps = {
     type,
     readonly,
+    renderSize,
   };
   const icon = renderIcon?.(iconProps);
 
@@ -31,7 +33,7 @@ export default memo((props) => {
     // For icons, use the label as aria-label for accessibility
     return (
       <IconButton
-        size="small" 
+        size={renderSize}
         disabled={readonly} 
         onClick={onClick} 
         color={typeToColor[type]}
@@ -41,7 +43,7 @@ export default memo((props) => {
   } else {
     return (
       <Button 
-        size="small" 
+        size={renderSize} 
         disabled={readonly} 
         onClick={onClick} 
         color={typeToColor[type]} 

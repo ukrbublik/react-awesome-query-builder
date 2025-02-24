@@ -4,6 +4,7 @@ import FormControl from "@mui/material/FormControl";
 
 export default (props) => {
   const {value, setValue, config, readonly, placeholder, customProps, maxLength, errorMessage} = props;
+  const {renderSize} = config.settings;
 
   const onChange = useCallback((e) => {
     let val = e.target.value;
@@ -28,7 +29,7 @@ export default (props) => {
         }}
         disabled={readonly}
         onChange={onChange}
-        size="small"
+        size={renderSize}
         {...customProps}
       />
     </FormControl>

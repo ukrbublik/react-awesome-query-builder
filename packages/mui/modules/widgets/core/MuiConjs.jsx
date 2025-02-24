@@ -34,7 +34,7 @@ const Conjs = React.memo(({
   //TIP: disabled=true if only 1 rule; readonly=true if immutable mode
   const conjsCount = Object.keys(conjunctionOptions).length;
   const lessThenTwo = disabled;
-  const {forceShowConj} = config.settings;
+  const {forceShowConj, renderSize} = config.settings;
   const showConj = forceShowConj || conjsCount > 1 && !lessThenTwo;
 
   const renderOptions = () => 
@@ -61,6 +61,7 @@ const Conjs = React.memo(({
       return null;
     return (
       <Button 
+        size={renderSize}
         key={id}
         id={id + "__not"}
         color={not ? "error" : "inherit"} 
@@ -77,7 +78,7 @@ const Conjs = React.memo(({
       <ButtonGroup 
         disableElevation 
         variant="contained" 
-        size="small"
+        size={renderSize}
         disabled={readonly}
       >
         {showNot && renderNot()}

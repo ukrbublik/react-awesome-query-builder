@@ -8,7 +8,8 @@ const { moment } = Utils;
 const xdpVersion = parseInt(xdpPackage?.version?.split(".")?.[0] ?? "0");
 
 export default (props) => {
-  const {value, setValue, readonly, customProps, dateFormat, valueFormat, placeholder} = props;
+  const {value, setValue, readonly, customProps, dateFormat, valueFormat, placeholder, config} = props;
+  const {renderSize} = config.settings;
 
   const formatSingleValue = (value) => {
     return value && value.isValid() ? value.format(valueFormat) : undefined;
@@ -20,7 +21,7 @@ export default (props) => {
   
   const renderInput = (params) => 
     <TextField 
-      size="small" 
+      size={renderSize}
       variant="standard"
       {...params}
     />;
@@ -31,7 +32,7 @@ export default (props) => {
     format: dateFormat,
     slotProps: {
       textField: {
-        size: "small",
+        size: renderSize,
         variant: "standard"
       },
       toolbar: {
@@ -54,6 +55,7 @@ export default (props) => {
         disabled={readonly}
         value={aValue}
         onChange={handleChange}
+        size={renderSize}
         {...pickerProps}
         {...customProps}
       />

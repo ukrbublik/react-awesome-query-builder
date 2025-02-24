@@ -318,9 +318,9 @@ export interface RuleProps {
 /////////////////
 
 
-type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
-type RenderSize = "small" | "large" | "medium";
-type ThemeMode = "light" | "dark";
+export type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
+export type RenderSize = "small" | "large" | "medium";
+export type ThemeMode = "light" | "dark";
 
 export interface ThemeSettings {
   theme?: {
