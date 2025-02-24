@@ -20,7 +20,7 @@ export const jsonLogicFormat = (item, config) => {
 
   const extendedConfig = extendConfig(config, undefined, false);
   const logic = formatItem(item, extendedConfig, meta, false, true);
-
+  
   // build empty data
   const {errors, usedFields} = meta;
   const {fieldSeparator} = extendedConfig.settings;
@@ -568,16 +568,17 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
   let fn = typeof operatorDefinition.jsonLogic == "function"
     ? operatorDefinition.jsonLogic
     : buildFnToFormatOp(operator, operatorDefinition, formattedField, formattedValue);
-  const args = [
+  /*  const args = [
     formattedField,
     operator,
     formattedValue,
     omit(operatorDefinition, opDefKeysToOmit),
     operatorOptions,
     fieldDefinition,
-  ];
-  let ruleQuery = fn.call(config.ctx, ...args);
-
+  ];*/
+  const functionInput = {field: formattedField, val: formattedValue, vals: formattedValue, twoVals: formattedValue};
+  //let ruleQuery = fn.call(functionInput);
+  let ruleQuery = fn(functionInput);
   if (isRev) {
     ruleQuery = { "!": ruleQuery };
   }

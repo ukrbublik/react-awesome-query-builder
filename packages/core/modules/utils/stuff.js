@@ -421,6 +421,69 @@ export const isJsonLogic = (logic) => {
   return isJL;
 };
 
+/**
+ * Checks if the input object is a valid field object in the form { "var": "field" }.
+ * A valid field object:
+ *  - Is a non-null object
+ *  - Has exactly one key that matches any key in `conv.varKeys`
+ *  - The value of that key is a non-empty string
+ * 
+ * @param {*} obj - The object to validate
+ * @param {*} conv - The configuration containing `varKeys` for valid keys
+ * @returns {boolean} True if the object is a valid field object, otherwise false
+ */
+export const isValidFieldObject = (obj, conv) => {
+  // Check if the input is an object and not null
+  if (typeof obj !== "object" || obj === null) return false;
+
+  // Get the keys of the object
+  const keys = Object.keys(obj);
+
+  // Check if it has exactly one key and that key is "var"
+  if (keys.length !== 1 || !conv.varKeys.includes(keys[0])) return false;
+
+  // Check if the value of the "var" key is a non-empty string
+  const varValue = obj[keys[0]];
+  return typeof varValue === "string" && varValue.trim() !== "";
+};
+
+/**
+ * Checks if the input object is a "var empty" object in the form { "var": "" }.
+ * A "var empty" object:
+ *  - Is a non-null object
+ *  - Has exactly one key, "var"
+ *  - The value of the "var" key is an empty string
+ * 
+ * @param {*} obj - The object to validate
+ * @returns {boolean} True if the object is a "var empty" object, otherwise false
+ */
+export const isVarEmptyObject = (obj) => {
+  // Check if the input is an object and not null
+  if (typeof obj !== "object" || obj === null) return false;
+
+  // Ensure the object has exactly one key, and it is "var" with an empty string value
+  return Object.keys(obj).length === 1 && obj.var === "";
+};
+
+/**
+ * Validates if the input object can appear in a JsonLogic field position.
+ * Valid forms for field markers include:
+ *  - A normal field object (e.g., { "var": "field" })
+ *  - A reduce operation (object containing "reduce" as a key)
+ *  - A function call where the object contains a single key matching `conv.funcs`
+ * 
+ * @param {*} obj - The object to validate
+ * @param {*} conv - The configuration containing valid functions under `funcs`
+ * @returns {boolean} True if the object is valid for a field marker, otherwise false
+ */
+export const isValidForFieldMarker = (obj, conv) => {
+  return (
+    isValidFieldObject(obj, conv) ||
+    (typeof obj === "object" && obj !== null && "reduce" in obj) ||
+    (typeof obj === "object" && obj !== null && Object.keys(obj).some(key => key in conv.funcs))
+  );
+};
+
 export function sleep(delay) {
   return new Promise((resolve) => {
     setTimeout(resolve, delay);
