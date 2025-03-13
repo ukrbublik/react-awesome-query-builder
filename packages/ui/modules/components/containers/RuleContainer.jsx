@@ -109,6 +109,7 @@ const createRuleContainer = (Rule) =>
     }
 
     render() {
+      const lev = this.props.path.size - 1;
       const isDraggingMe = this.props.dragging.id == this.props.id;
       const fieldConfig = getFieldConfig(this.props.config, this.props.field);
       const fieldType = this.props.fieldType || fieldConfig?.type || null;
@@ -130,7 +131,7 @@ const createRuleContainer = (Rule) =>
               key={"dragging"}
               id={this.props.id}
               groupId={this.props.groupId}
-              lev={this.props.path.size - 1}
+              lev={lev}
               isDraggingMe={true}
               isDraggingTempo={true}
               dragging={this.props.dragging}
@@ -169,7 +170,7 @@ const createRuleContainer = (Rule) =>
               key={this.props.id}
               id={this.props.id}
               groupId={this.props.groupId}
-              lev={this.props.path.size - 1}
+              lev={lev}
               isDraggingMe={isDraggingMe}
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
