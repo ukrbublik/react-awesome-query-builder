@@ -165,6 +165,7 @@ const createGroupContainer = (Group, itemType) =>
     render() {
       const {showErrorMessage} = this.props.config.settings;
       const isDraggingMe = this.props.dragging.id == this.props.id;
+      const lev = this.props.path.size - 1;
       let currentNesting = this.props.path.size;
       let maxNesting = this.props.config.settings.maxNesting;
       let isRoot = currentNesting == 1;
@@ -207,7 +208,7 @@ const createGroupContainer = (Group, itemType) =>
               isDraggingTempo={true}
               dragging={this.props.dragging}
               isRoot={isRoot}
-              lev={this.props.path.size - 1}
+              lev={lev}
               allowFurtherNesting={allowFurtherNesting}
               isMaxNestingExceeded={isMaxNestingExceeded}
               conjunctionOptions={this.conjunctionOptions}
@@ -255,7 +256,7 @@ const createGroupContainer = (Group, itemType) =>
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
               isRoot={isRoot}
-              lev={this.props.path.size - 1}
+              lev={lev}
               allowFurtherNesting={allowFurtherNesting}
               isMaxNestingExceeded={isMaxNestingExceeded}
               conjunctionOptions={this.conjunctionOptions}
