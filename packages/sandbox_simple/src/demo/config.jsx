@@ -46,8 +46,8 @@ const fields = {
     fieldSettings: {
       valuePlaceholder: "Enter your Price",
       thousandSeparator:",",
-      prefix:'﷼',
-      suffix:'$',
+      prefix:"﷼",
+      suffix:"$",
     },
   },
   num: {
