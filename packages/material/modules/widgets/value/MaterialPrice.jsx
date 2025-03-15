@@ -1,4 +1,3 @@
-import _extends from "@babel/runtime/helpers/extends";
 import React from "react";
 import TextField from "@material-ui/core/TextField";
 import { NumericFormat } from "react-number-format";
