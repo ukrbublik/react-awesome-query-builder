@@ -65,12 +65,12 @@ export function createConfig(InitialConfig: BasicConfig): Config {
       }
     },
     price: {
-        label: "Price",
-        type: "price",
-        preferWidgets: ["price"],
-        fieldSettings: {
-          valuePlaceholder: "Enter your Price",
-          thousandSeparator:",",
+      label: "Price",
+      type: "price",
+      preferWidgets: ["price"],
+      fieldSettings: {
+        valuePlaceholder: "Enter your Price",
+        thousandSeparator:",",
       } as PriceFieldSettings,
     },
     prox1: {
