@@ -1,4 +1,4 @@
-$custom-select-option-color: lightcoral !default;
+@import '@react-awesome-query-builder/ui/css/vars.scss';
 
 /* don't trigger tooltips during drag-n-drop */
 body.qb-dragging {

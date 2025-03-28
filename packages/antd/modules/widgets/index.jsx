@@ -93,7 +93,7 @@ const themeToCssVars = (palette, darkMode) => {
 
     "--treeline-color": darkMode ? palette.colorPrimaryHover : palette.colorPrimaryHover,
     "--treeline-switch-color": darkMode ? palette.colorInfo : palette.colorInfo,
-    '--treeline-disabled-color': palette.colorFillSecondary,
+    "--treeline-disabled-color": palette.colorFillSecondary,
 
     "--main-text-color": palette.colorText,
     "--main-font-family": palette.fontFamily,

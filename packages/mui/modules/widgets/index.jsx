@@ -50,8 +50,9 @@ const MuiProvider = ({config, children}) => {
   const isFullTheme = (t) => !!t?.shadows;
   const canCreateTheme = !!themeConfig || config.settings.themeMode || localeConfig;
   const theme = !canCreateTheme ? null : (
-    isFullTheme(themeConfig) ? themeConfig :
-      createTheme(themeConfig ?? {
+    isFullTheme(themeConfig)
+      ? themeConfig
+      : createTheme(themeConfig ?? {
         palette: {
           mode: themeMode,
         }
@@ -101,7 +102,7 @@ const MuiProvider = ({config, children}) => {
 };
 
 const themeToCssVars = (theme) => {
-  console.log('MUI theme', theme);
+  console.log("MUI theme", theme);
   const { palette, typography, shadows, shape } = theme;
   const isDark = palette.mode === "dark";
   return {

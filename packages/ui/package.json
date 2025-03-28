@@ -43,6 +43,10 @@
     "./css/styles.scss": {
       "sass": "./css/styles.scss",
       "default": "./css/styles.scss"
+    },
+    "./css/vars.scss": {
+      "sass": "./css/vars.scss",
+      "default": "./css/vars.scss"
     }
   },
   "main": "./cjs/index.js",

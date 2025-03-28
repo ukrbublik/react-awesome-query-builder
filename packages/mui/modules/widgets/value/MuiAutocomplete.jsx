@@ -174,7 +174,7 @@ export default (props) => {
     const groups = group ? (group.parentGroups ?? [group]) : [];
     let res = (
       <div key={params.key}>
-        {groups.map((gr) => (<GroupHeader group={gr} />))}
+        {groups.map((gr) => (<GroupHeader key={gr?.path} group={gr} />))}
         <GroupItems>{params.children}</GroupItems>
       </div>
     );
