@@ -4,8 +4,7 @@ import { ConfirmProvider, useConfirm } from "material-ui-confirm";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"; // TODO: set moment to dayjs
 import xdpPackage from "@mui/x-date-pickers/package.json"; // to determine version
-
-const xdpVersion = parseInt(xdpPackage?.version?.split(".")?.[0] ?? "0");
+import { Utils } from "@react-awesome-query-builder/ui";
 
 // value widgets
 import MuiTextWidget from "./value/MuiText";
@@ -34,6 +33,9 @@ import MuiConjs from "./core/MuiConjs";
 import MuiSwitch from "./core/MuiSwitch";
 import MuiValueSources from "./core/MuiValueSources";
 import MuiConfirm from "./core/MuiConfirm";
+
+const xdpVersion = parseInt(xdpPackage?.version?.split(".")?.[0] ?? "0");
+const { setOpacityForHex, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
 
 // provider
 const MuiProvider = ({config, children}) => {
@@ -99,23 +101,30 @@ const MuiProvider = ({config, children}) => {
 };
 
 const themeToCssVars = (theme) => {
-  // console.log('MUI theme', theme);
+  console.log('MUI theme', theme);
   const { palette, typography, shadows, shape } = theme;
-  const setOpacity = (hex, alpha) => `${hex}${Math.floor(alpha * 255).toString(16).padStart(2, 0)}`;
+  const isDark = palette.mode === "dark";
   return {
-    "--rule-background": palette.mode === "dark" ? setOpacity(palette.grey[800], 0.3) : palette.background.paper,
-    "--group-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.8) : setOpacity(palette.grey[500], 0.1),
-    "--rulegroup-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.3) : setOpacity(palette.grey[400], 0.1),
-    "--rulegroupext-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.3) : setOpacity(palette.grey[400], 0.1),
-    "--switch-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.8) : setOpacity(palette.grey[400], 0.1),
-    "--case-background": palette.mode === "dark" ? setOpacity(palette.grey[900], 0.8) : setOpacity(palette.grey[500], 0.1),
+    "--main-background": palette.background.paper,
+    "--rule-background": isDark ? palette.background.paper : palette.background.paper,
+    "--group-background": isDark ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
+    "--rulegroup-background": isDark ? setOpacityForHex(palette.grey[900], 0.3) : setOpacityForHex(palette.grey[400], 0.1),
+    "--rulegroupext-background": isDark ? setOpacityForHex(palette.grey[900], 0.3) : setOpacityForHex(palette.grey[400], 0.1),
+    "--switch-background": isDark ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[400], 0.1),
+    "--case-background": isDark ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
 
-    "--rule-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
-    "--group-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
-    "--rulegroup-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
-    "--rulegroupext-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
-    "--switch-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
-    "--case-border-color": palette.mode === "dark" ? palette.action.selected : palette.action.selected,
+    ...generateCssVarsForLevels(isDark, "--group-background", palette.background.paper, undefined, 0.1, 0.01),
+    ...generateCssVarsForLevels(isDark, "--rulegroup-background", chroma(palette.background.paper), undefined, 0.1, 0.01),
+    ...generateCssVarsForLevels(isDark, "--rulegroupext-background", palette.background.paper, undefined, 0.1, 0.01),
+    ...generateCssVarsForLevels(isDark, "--switch-background", palette.background.paper, undefined, 0.1, 0.01),
+    ...generateCssVarsForLevels(isDark, "--case-background", palette.background.paper, undefined, 0.1, 0.01),
+
+    "--rule-border-color": isDark ? palette.action.selected : palette.action.selected,
+    "--group-border-color": isDark ? palette.action.selected : palette.action.selected,
+    "--rulegroup-border-color": isDark ? palette.action.selected : palette.action.selected,
+    "--rulegroupext-border-color": isDark ? palette.action.selected : palette.action.selected,
+    "--switch-border-color": isDark ? palette.action.selected : palette.action.selected,
+    "--case-border-color": isDark ? palette.action.selected : palette.action.selected,
 
     "--treeline-color": palette.primary.main,
     "--treeline-switch-color": palette.secondary.main,

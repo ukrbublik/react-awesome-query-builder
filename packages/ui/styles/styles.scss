@@ -21,7 +21,8 @@ $root_group: ".query-builder > .group-container > .group";
   color: $main-text-color;
   line-height: 1.25;
   margin: $main-margin;
-
+  background: $main-background;
+  border-radius: $item-radius;
 
   .group-or-rule {
     border-radius: $item-radius;
@@ -114,6 +115,12 @@ $root_group: ".query-builder > .group-container > .group";
   .simple_group {
     background: $group-background;
     border: $group-border solid $group-border-color;
+    
+    @for $lev from $minLevel through $maxLevel {
+      &.level-#{$lev} {
+        background: var(--group-background-#{$lev}, $group-background);
+      }
+    }
 
     &:hover {
       box-shadow: $group-shadow-hover;
@@ -218,6 +225,12 @@ $root_group: ".query-builder > .group-container > .group";
     background: $rulegroup-background;
     border: $rulegroup-border solid $rulegroup-border-color;
 
+    @for $lev from $minLevel through $maxLevel {
+      &.level-#{$lev} {
+        background: var(--rulegroup-background-#{$lev}, $rulegroup-background);
+      }
+    }
+
     &:hover {
       box-shadow: $rulegroup-shadow-hover;
       border-left-width: $rulegroup-border-left-hover;
@@ -284,6 +297,12 @@ $root_group: ".query-builder > .group-container > .group";
     background: $rulegroupext-background;
     border: $rulegroupext-border solid $rulegroupext-border-color;
 
+    @for $lev from $minLevel through $maxLevel {
+      &.level-#{$lev} {
+        background: var(--rulegroupext-background-#{$lev}, $rulegroupext-background);
+      }
+    }
+
     &:hover {
       box-shadow: $rulegroupext-shadow-hover;
       border-left-width: $rulegroupext-border-left-hover;
@@ -338,11 +357,23 @@ $root_group: ".query-builder > .group-container > .group";
   .switch_group {
     background: $switch-background;
     border: $switch-border solid $switch-border-color;
+
+    @for $lev from $minLevel through $maxLevel {
+      &.level-#{$lev} {
+        background: var(--switch-background-#{$lev}, $switch-background);
+      }
+    }
   }
 
   .case_group {
     background: $case-background;
     border: $case-border solid $case-border-color;
+
+    @for $lev from $minLevel through $maxLevel {
+      &.level-#{$lev} {
+        background: var(--case-background-#{$lev}, $case-background);
+      }
+    }
 
     .case_group--body {
       display: flex;

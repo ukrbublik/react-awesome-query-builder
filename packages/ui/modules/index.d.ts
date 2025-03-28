@@ -70,6 +70,8 @@ import {
 // re-export
 export * from "@react-awesome-query-builder/core";
 
+import chroma from "chroma-js";
+
 /////////////////
 // override <C> in types
 /////////////////
@@ -411,13 +413,20 @@ interface VanillaWidgets {
 // extend Utils
 /////////////////
 
+export interface ColorUtils {
+  chroma: typeof chroma;
+  setOpacityForHex(hex: string, alpha: number): string;
+  generateCssVarsForLevels(isDark: boolean, cssVar: string, baseColor: string, baseDarkColor?: string, lightRatio?: number, darkRatio?: number, maxLevel?: number, minLevel?: number): Record<string, string>;
+}
+export interface NumberFormat {
+  getNumberFormatProps: (props: Record<string, any>, excludePropsNames?: string[]) => Record<string, any>;
+  NumericFormat: typeof NumericFormat;
+  numericFormatter: (val: number, numericFormatProps: NumericFormatProps) => string;
+  numericParser: (str: string, numericFormatProps: NumericFormatProps, lastStrValue?: string, lastNumValue?: number) => number | undefined;
+}
 export interface Utils extends CoreUtils {
-  NumberFormat: {
-    getNumberFormatProps: (props: Record<string, any>, excludePropsNames?: string[]) => Record<string, any>;
-    NumericFormat: typeof NumericFormat;
-    numericFormatter: (val: number, numericFormatProps: NumericFormatProps) => string;
-    numericParser: (str: string, numericFormatProps: NumericFormatProps, lastStrValue?: string, lastNumValue?: number) => number | undefined;
-  }
+  NumberFormat: NumberFormat;
+  ColorUtils: ColorUtils;
   // ReactUtils: {
   //   useOnPropsChanged(obj: ReactElement): void;
   // }

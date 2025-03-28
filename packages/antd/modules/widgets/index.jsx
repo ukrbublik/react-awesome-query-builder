@@ -76,6 +76,7 @@ const Provider = ({ config, children }) => {
 const themeToCssVars = (palette, darkMode) => {
   // console.log('antd palette', palette);
   return {
+    "--main-background": palette.colorBgBase,
     "--rule-background": palette.colorBgElevated,
     "--group-background": darkMode ? palette.colorBgMask : palette.colorFillQuaternary,
     "--rulegroup-background": darkMode ? palette.colorBgSpotlight : palette.colorSecondaryBg,

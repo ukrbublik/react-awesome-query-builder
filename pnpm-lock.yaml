@@ -1284,6 +1284,9 @@ importers:
       '@react-awesome-query-builder/core':
         specifier: workspace:^
         version: link:../core
+      chroma-js:
+        specifier: ^3.1.2
+        version: 3.1.2
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -1331,8 +1334,14 @@ importers:
         specifier: ^7.26.3
         version: 7.26.3(@babel/core@7.26.10)
       '@babel/preset-typescript':
-        specifier: ^7.27.0
-        version: 7.27.0(@babel/core@7.26.10)
+        specifier: ^7.24.1
+        version: 7.24.1(@babel/core@7.24.5)
+      '@babel/runtime':
+        specifier: ^7.24.5
+        version: 7.24.5
+      '@types/chroma-js':
+        specifier: ^3.1.1
+        version: 3.1.1
       '@types/prop-types':
         specifier: ^15.7.3
         version: 15.7.12
@@ -5970,6 +5979,10 @@ packages:
       '@types/node': 18.15.11
     dev: true
 
+  /@types/chroma-js@3.1.1:
+    resolution: {integrity: sha512-SFCr4edNkZ1bGaLzGz7rgR1bRzVX4MmMxwsIa3/Bh6ose8v+hRpneoizHv0KChdjxaXyjRtaMq7sCuZSzPomQA==}
+    dev: true
+
   /@types/clone@2.1.1:
     resolution: {integrity: sha512-BZIU34bSYye0j/BFcPraiDZ5ka6MJADjcDVELGf7glr9K+iE8NYVjFslJFVWzskSxkLLyCrSPScE82/UUoBSvg==}
     dev: true
@@ -7708,6 +7721,10 @@ packages:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
     engines: {node: '>=10'}
     dev: true
+
+  /chroma-js@3.1.2:
+    resolution: {integrity: sha512-IJnETTalXbsLx1eKEgx19d5L6SRM7cH4vINw/99p/M11HCuXGRWL+6YmCm7FWFGIo6dtWuQoQi1dc5yQ7ESIHg==}
+    dev: false
 
   /chrome-trace-event@1.0.3:
     resolution: {integrity: sha512-p3KULyQg4S7NIHixdwbGX+nFHkoBiA4YQmyWtjb8XngSKV124nJmRysgAeujbUVb15vh+RvFUfCPqU7rXk+hZg==}
