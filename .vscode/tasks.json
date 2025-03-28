@@ -336,5 +336,26 @@
                 }
             }
 		},
+		{
+			"label": "audit",
+			"type": "npm",
+			"script": "audit",
+			"group": "none",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "running": {
+                        "backgroundColor": "statusBarItem.errorBackground"
+                    }
+                }
+            }
+		},
 	]
 }

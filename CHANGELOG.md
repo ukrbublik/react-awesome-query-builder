@@ -1,4 +1,7 @@
 # Changelog
+- 6.6.14
+  - Fixed import from JsonLogic when like op is used inside group with some group op (PR #1225) (issue #1221)
+  - Support React 19 (PR #1229) (issue #1205)
 - 6.6.13
   - Fix selecting func/args at RHS at delta 1 (PR #1211) (issue #1207)
   - Fix fetchSelectedValuesOnInit for func arguments (PR #1210) (issue #1198)

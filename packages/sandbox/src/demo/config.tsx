@@ -89,8 +89,8 @@ export function createConfig(InitialConfig: BasicConfig): Config {
         max: 100,
         step: 1,
         marks: {
-          0: <strong>0%</strong>,
-          100: <strong>100%</strong>
+          0: "0%", //<strong>0%</strong>,
+          100: "100%" //<strong>100%</strong>
         },
       },
       //overrides
