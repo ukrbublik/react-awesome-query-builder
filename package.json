@@ -111,7 +111,7 @@
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-react": "^7.34.1",
-    "lerna": "^8.1.9",
+    "lerna": "^8.2.1",
     "madge": "^8.0.0",
     "typescript": "~5.4.5"
   },
@@ -128,9 +128,10 @@
       "@material-ui/styles": "*"
     },
     "overrides": {
+      "axios@1.7.7": "^1.7.9",
       "csstype@3.1.1": "^3.1.3",
       "ejs@3.1.9": "^3.1.10",
-      "express@4.18.2": "^4.21.1",
+      "express@4.18.2": "^4.21.2",
       "follow-redirects@1.15.2": "^1.15.6",
       "ip@2.0.0": "^2.0.1",
       "postcss@8.4.14": "^8.4.31",
@@ -146,7 +147,8 @@
       "cheerio@1.0.0": "1.0.0-rc.12",
       "http-proxy-middleware@2.0.6": "^2.0.7",
       "nise@5.1.4": "^5.1.9",
-      "cross-spawn@7.0.3": "^7.0.6"
+      "cross-spawn@7.0.3": "^7.0.6",
+      "serialize-javascript@6.0.0": "^6.0.2"
     }
   }
 }

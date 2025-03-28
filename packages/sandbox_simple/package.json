@@ -40,9 +40,9 @@
     "react-dom": "^16.14.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.2.1",
+    "@vitejs/plugin-react": "^4.3.4",
     "sass": "^1.77.2",
-    "vite": "^5.2.14"
+    "vite": "^5.4.15"
   },
   "readme": "README.md"
 }
