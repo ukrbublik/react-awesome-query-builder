@@ -439,7 +439,11 @@ export default (skin: string) => {
             max: 2021,
           },
           valueSources: ["value"],
-        }
+        },
+        model: {
+          type: "text",
+          valueSources: ["value"],
+        },
       }
     },
     prox1: {

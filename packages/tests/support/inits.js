@@ -370,6 +370,15 @@ export const with_nested_and_select_any_in_in_some = {
   ]
 };
 
+export const with_nested_and_like_in_some = {
+  "and": [
+    { "some": [
+      { "var": "vehicles.cars" },
+      { "in": [ "coro", { "var": "model" } ] }
+    ] }
+  ]
+};
+
 export const with_select_not_any_in_in_some = {
   "and": [
     { "some": [

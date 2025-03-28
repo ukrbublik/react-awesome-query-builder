@@ -874,6 +874,10 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
       match.jlArgs.forEach(arg => havingVals.push(arg));
       // We reset op to new op that represents multiple jsonlogic operators
       conj = match.newOp;
+      if (jlDualMeaningOps.includes(match.newOp)) {
+        // use original order of args
+        havingVals = match.vals;
+      }
     }
   }
 
