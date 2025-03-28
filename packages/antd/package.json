@@ -50,7 +50,8 @@
     "@react-awesome-query-builder/ui": "workspace:^",
     "lodash": "^4.17.21",
     "prop-types": "^15.8.1",
-    "rc-picker": "^4.5.0"
+    "rc-picker": "^4.5.0",
+    "react-number-format": "^5.0.0"
   },
   "devDependencies": {
     "@ant-design/icons": "^5.5.2",

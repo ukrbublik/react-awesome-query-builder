@@ -46,7 +46,8 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
-    "@react-awesome-query-builder/ui": "workspace:^"
+    "@react-awesome-query-builder/ui": "workspace:^",
+    "react-number-format": "^5.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.7",
