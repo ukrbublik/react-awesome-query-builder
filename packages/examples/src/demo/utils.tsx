@@ -69,6 +69,7 @@ export const initTreeWithValidation = (initFileKey: string, config: Config, vali
   let errors: string[];
   // eslint-disable-next-line prefer-const
   ({tree, errors} = importFromInitFile(initFileKey, config));
+  console.log("Loaded tree: ", tree?.toJS?.());
   const {fixedTree, fixedErrors, nonFixedErrors} = Utils.sanitizeTree(tree, config, {
     ...(validationOptions ?? {}),
     removeEmptyGroups: false,

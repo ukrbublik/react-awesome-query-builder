@@ -116,10 +116,17 @@ describe("query with !struct and !group", () => {
     });
   });
 
-  describe("should handle some-in when it's not related to multiselect_contains op", () => {
+  describe("should handle some-in when it's not related to multiselect_contains op and means select_any_in", () => {
     export_checks(configs.with_group_inside_struct, inits.with_nested_and_select_any_in_in_some, "JsonLogic", {
       "query": "vehicles.cars.vendor IN (\"Ford\", \"Toyota\")",
       logic: inits.with_nested_and_select_any_in_in_some,
+    });
+  });
+
+  describe("should handle some-in when it's not related to multiselect_contains op and means like", () => {
+    export_checks(configs.with_group_inside_struct, inits.with_nested_and_like_in_some, "JsonLogic", {
+      "query": "vehicles.cars.model Contains \"coro\"",
+      logic: inits.with_nested_and_like_in_some,
     });
   });
 

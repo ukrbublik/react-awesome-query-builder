@@ -5,6 +5,8 @@ import initLogicWithNot from "./logic/with_not";
 import initLogicAutocomplete from "./logic/autocomplete";
 import initLogicWithNotInSome from "./logic/with_not_in_some";
 import initLogicWithFuncInLhs from "./logic/with_func_in_lhs";
+import initLogicGroupSomeInAny from "./logic/with_group_some_in_any";
+import initLogicGroupSomeInLike from "./logic/with_group_some_in_like";
 
 import {
   Utils, JsonTree,
@@ -26,6 +28,8 @@ export const initFiles: Record<string, any> = {
   "logic/with_not_in_some": initLogicWithNotInSome,
   "logic/with_func_in_lhs": initLogicWithFuncInLhs,
   "logic/autocomplete": initLogicAutocomplete,
+  "logic/with_group_some_in_any": initLogicGroupSomeInAny,
+  "logic/with_group_some_in_like": initLogicGroupSomeInLike,
 
   "tree/complex": initTreeComplex,
   "tree/empty": emptyTree,

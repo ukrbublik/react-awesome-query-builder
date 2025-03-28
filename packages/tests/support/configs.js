@@ -537,7 +537,11 @@ export const with_group_inside_struct = (BasicConfig) => ({
                 max: 2021,
               },
               valueSources: ["value"],
-            }
+            },
+            model: {
+              type: "text",
+              valueSources: ["value"],
+            },
           }
         },
         bikes: {
