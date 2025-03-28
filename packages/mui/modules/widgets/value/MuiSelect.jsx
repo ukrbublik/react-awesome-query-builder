@@ -6,7 +6,8 @@ import omit from "lodash/omit";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { mapListValues } = Utils.ListUtils;
 
-export default ({listValues, value, setValue, allowCustomValues, readonly, placeholder, customProps}) => {
+export default ({listValues, value, setValue, allowCustomValues, readonly, placeholder, customProps, config}) => {
+  const {renderSize} = config.settings;
   const renderOptions = () =>
     mapListValues(listValues, ({title, value}) => {
       return <MenuItem key={value} value={value}>{title}</MenuItem>;
@@ -45,7 +46,7 @@ export default ({listValues, value, setValue, allowCustomValues, readonly, place
         disabled={readonly}
         readOnly={readonly}
         renderValue={renderValue}
-        size="small"
+        size={renderSize}
         {...omit(customProps, ["showSearch", "input"])}
       >
         {renderOptions()}

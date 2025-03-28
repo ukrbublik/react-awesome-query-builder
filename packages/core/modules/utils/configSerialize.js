@@ -131,6 +131,8 @@ const compileMetaField = {
 const compileMetaSettings = {
   locale: {
     mui: { type: "f", args: [], invokeWith: [], ignore: "jl" },
+    material: { type: "f", args: [], invokeWith: [], ignore: "jl" },
+    antd: { type: "f", args: [], invokeWith: [], ignore: "jl" },
   },
 
   caseValueField: compileMetaField,

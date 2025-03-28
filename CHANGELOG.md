@@ -1,4 +1,7 @@
 # Changelog
+- 6.7.0
+  - Theming improved (PR #1188) (issues #892 #970)
+  - Dropped `compact_styles.scss`, use class `.qb-compact` for RAQB container instead
 - 6.6.14
   - Fixed import from JsonLogic when like op is used inside group with some group op (PR #1225) (issue #1221)
   - Support React 19 (PR #1229) (issue #1205)

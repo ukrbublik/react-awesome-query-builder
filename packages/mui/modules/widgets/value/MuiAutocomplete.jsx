@@ -63,7 +63,7 @@ export default (props) => {
   });
 
   // settings
-  const {defaultSelectWidth, defaultSearchWidth} = config.settings;
+  const {defaultSelectWidth, defaultSearchWidth, renderSize} = config.settings;
   const {width, ...rest} = customProps || {};
   let customInputProps = rest.input || {};
   const inputWidth = customInputProps.width || defaultSearchWidth; // todo: use as min-width for Autocomplete comp
@@ -121,6 +121,7 @@ export default (props) => {
             </React.Fragment>
           ),
         }}
+        size={renderSize}
         disabled={readonly}
         placeholder={placeholder}
         error={!!errorText}
@@ -130,18 +131,7 @@ export default (props) => {
     );
   };
 
-  const GroupHeader = ({groupMaybeJson}) => {
-    if (!groupMaybeJson) return null;
-    let group = {
-      label: groupMaybeJson,
-    };
-    if (typeof groupMaybeJson === "string" && groupMaybeJson[0] === "{") {
-      try {
-        group = JSON.parse(groupMaybeJson);
-      } catch (_) {
-        // ignore
-      }
-    }
+  const GroupHeader = ({group}) => {
     let groupLabel = group.label;
     if (groupLabel && group.tooltip) {
       groupLabel = (
@@ -167,9 +157,23 @@ export default (props) => {
   };
 
   const renderGroup = (params) => {
+    const groupMaybeJson = params.group;
+    let group;
+    if (typeof groupMaybeJson === "string" && groupMaybeJson[0] === "{") {
+      try {
+        group = JSON.parse(groupMaybeJson);
+      } catch (_) {
+        // ignore
+      }
+    } else if (groupMaybeJson) {
+      group = {
+        label: groupMaybeJson,
+      };
+    }
+    const groups = group ? (group.parentGroups ?? [group]) : [];
     let res = (
       <div key={params.key}>
-        <GroupHeader groupMaybeJson={params.group} />
+        {groups.map((gr) => (<GroupHeader key={gr?.path} group={gr} />))}
         <GroupItems>{params.children}</GroupItems>
       </div>
     );
@@ -258,7 +262,7 @@ export default (props) => {
       renderOption={renderOption}
       filterOptions={filterOptions}
       isOptionEqualToValue={isOptionEqualToValue}
-      size="small"
+      size={renderSize}
       {...customAutocompleteProps}
     />
   );

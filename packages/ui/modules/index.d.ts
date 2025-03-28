@@ -68,6 +68,8 @@ import {
 // re-export
 export * from "@react-awesome-query-builder/core";
 
+import chroma from "chroma-js";
+
 /////////////////
 // override <C> in types
 /////////////////
@@ -315,9 +317,28 @@ export interface RuleProps {
 /////////////////
 
 
-type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
-type AntdSize = "small" | "large" | "medium";
+export type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
+export type RenderSize = "small" | "large" | "medium";
+export type ThemeMode = "light" | "dark";
 
+export interface ThemeSettings {
+  theme?: {
+    material?: Object;
+    mui?: Object;
+    antd?: Object;
+  };
+  renderSize?: RenderSize;
+  themeMode?: ThemeMode;
+  compactMode?: boolean;
+  dropdownPlacement?: AntdPosition;
+  groupActionsPosition?: AntdPosition;
+  defaultSliderWidth?: string;
+  defaultSelectWidth?: string;
+  defaultSearchWidth?: string;
+  defaultMaxRows?: number;
+  showLabels?: boolean;
+  maxLabelsLength?: number;
+}
 
 export interface RenderSettings {
   renderField?: SerializableType<FactoryWithContext<FieldProps>>;
@@ -333,14 +354,7 @@ export interface RenderSettings {
   renderFieldSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
   renderConfirm?: SerializableType<ConfirmFunc>;
   useConfirm?: SerializableType<(() => Function)>;
-  renderSize?: AntdSize;
   renderItem?: SerializableType<FactoryWithContext<ItemBuilderProps>>;
-  dropdownPlacement?: AntdPosition;
-  groupActionsPosition?: AntdPosition;
-  showLabels?: boolean;
-  maxLabelsLength?: number;
-  customFieldSelectProps?: AnyObject;
-  customOperatorSelectProps?: AnyObject;
   renderBeforeWidget?: SerializableType<FactoryWithContext<RuleProps>>;
   renderAfterWidget?: SerializableType<FactoryWithContext<RuleProps>>;
   renderBeforeActions?: SerializableType<FactoryWithContext<RuleProps>>;
@@ -349,13 +363,12 @@ export interface RenderSettings {
   renderAfterCaseValue?: SerializableType<FactoryWithContext<RuleProps>>;
   renderRuleError?: SerializableType<FactoryWithContext<RuleErrorProps>>;
   renderSwitchPrefix?: SerializableType<RenderedReactElement>;
-  defaultSliderWidth?: string;
-  defaultSelectWidth?: string;
-  defaultSearchWidth?: string;
-  defaultMaxRows?: number;
+
+  customFieldSelectProps?: AnyObject;
+  customOperatorSelectProps?: AnyObject;
 }
 
-export interface Settings extends CoreSettings, RenderSettings {
+export interface Settings extends CoreSettings, RenderSettings, ThemeSettings {
 }
 
 /////////////////
@@ -396,7 +409,13 @@ interface VanillaWidgets {
 // extend Utils
 /////////////////
 
+export interface ColorUtils {
+  chroma: typeof chroma;
+  setOpacityForHex(hex: string, alpha: number): string;
+  generateCssVarsForLevels(isDark: boolean, cssVar: string, baseColor: string, baseDarkColor?: string, lightRatio?: number, darkRatio?: number, maxLevel?: number, minLevel?: number): Record<string, string>;
+}
 export interface Utils extends CoreUtils {
+  ColorUtils: ColorUtils;
   // ReactUtils: {
   //   useOnPropsChanged(obj: ReactElement): void;
   // }
