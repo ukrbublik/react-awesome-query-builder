@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
-import type { Conv, Meta, OutLogic } from "./types";
 import {
-  Config, SqlImportFunc, Utils, ConfigContext, DateTimeWidget,
-  BaseWidget, MomentInput, SqlDialect, Widget
+  BaseWidget,
+  Config,
+  ConfigContext, DateTimeWidget,
+  SqlDialect,
+  SqlImportFunc, Utils,
+  Widget
 } from "@react-awesome-query-builder/core";
-import { ValueExpr } from "node-sql-parser";
+import type { Conv, Meta, OutLogic } from "./types";
 
 const logger = Utils.OtherUtils.logger;
 
@@ -103,8 +106,7 @@ const sqlImportDate: SqlImportFunc = function (this: ConfigContext, sqlObj: OutL
     const [valArg, _patternArg] = sqlObj!.children!;
     if (valArg?.valueType?.endsWith("_quote_string")) {
       const dateWidgetDef = wgtDef as DateTimeWidget;
-      // tip: moment doesn't support SQL date format, so ignore patternArg
-      const dateVal = this.utils.moment(valArg.value as MomentInput);
+      const dateVal = this.utils.dayjs(valArg.value as string);
       if (dateVal.isValid()) {
         return {
           value: dateVal.format(dateWidgetDef?.valueFormat),
