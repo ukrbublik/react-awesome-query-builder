@@ -1,13 +1,13 @@
-import uuid from "./uuid";
-import mergeWith from "lodash/mergeWith";
-import {settings as defaultSettings} from "../config/default";
-import moment from "moment";
-import {mergeArraysSmart, logger, deepFreeze, mergeCustomizerNoArrays, shallowCopy, omit} from "./stuff";
 import clone from "clone";
+import dayjs from "dayjs";
+import mergeWith from "lodash/mergeWith";
+import { settings as defaultSettings } from "../config/default";
+import { deepFreeze, logger, mergeArraysSmart, mergeCustomizerNoArrays, shallowCopy } from "./stuff";
+import uuid from "./uuid";
 
+import { findExtendedConfigInAllMemos, getCommonMemo } from "./configMemo";
 import { compileConfig } from "./configSerialize";
 import { getFieldRawConfig } from "./configUtils";
-import { findExtendedConfigInAllMemos, getCommonMemo } from "./configMemo";
 
 export const extendConfig = (config, configId, canCompile = true) => {
   //operators, defaultOperator - merge
@@ -56,9 +56,9 @@ export const extendConfig = (config, configId, canCompile = true) => {
     extendFieldConfig(caseValueField, config, [], false, true);
   }
 
-  const momentLocale = config.settings.locale.moment;
-  if (momentLocale) {
-    moment.locale(momentLocale);
+  const dayjsLocale = config.settings.locale.dayjs;
+  if (dayjsLocale) {
+    dayjs.locale(dayjsLocale);
   }
 
   Object.defineProperty(config, "__configId", {

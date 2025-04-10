@@ -820,15 +820,15 @@ const widgets = {
       { label: "Date to", placeholder: "Enter date to" },
     ],
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       return isForDisplay ? dateVal.format(wgtDef.dateFormat) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.format("YYYY-MM-DD"));
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       const v = dateVal.format("YYYY-MM-DD");
       const fmt = "yyyy-MM-dd";
       //return `new java.text.SimpleDateFormat('${fmt}').parse('${v}')`;
@@ -860,7 +860,7 @@ const widgets = {
         return [undefined, "No widget def to get value format"];
       if (args?.fmt?.value?.includes?.(" ") || args.fmt?.value?.toLowerCase?.().includes("hh:mm"))
         return [undefined, `Invalid date format ${JSON.stringify(args.fmt)}`];
-      const dateVal = this.utils.moment(val.value, this.utils.moment.ISO_8601);
+      const dateVal = this.utils.dayjs(val.value);
       if (dateVal.isValid()) {
         return [dateVal.format(wgtDef?.valueFormat), []];
       } else {
@@ -868,14 +868,14 @@ const widgets = {
       }
     },
     jsonLogic: function (val, fieldDef, wgtDef) {
-      return this.utils.moment(val, wgtDef.valueFormat).toDate();
+      return this.utils.dayjs(val, wgtDef.valueFormat).toDate();
     },
     toJS: function (val, fieldSettings) {
-      const dateVal = this.utils.moment(val, fieldSettings.valueFormat);
+      const dateVal = this.utils.dayjs(val, fieldSettings.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;
     },
     mongoFormatValue: function (val, fieldDef, wgtDef) {
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;
     }
   },
@@ -893,15 +893,15 @@ const widgets = {
       { label: "Time to", placeholder: "Enter time to" },
     ],
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       return isForDisplay ? dateVal.format(wgtDef.timeFormat) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.format("HH:mm:ss"));
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       const fmt = "HH:mm:ss";
       const v = dateVal.format("HH:mm:ss");
       return `T(java.time.LocalTime).parse('${v}')`;
@@ -916,7 +916,7 @@ const widgets = {
         return [undefined, "No widget def to get value format"];
       if (args?.fmt && (!args.fmt?.value?.toLowerCase?.().includes("hh:mm") || args.fmt?.value?.includes(" ")))
         return [undefined, `Invalid time format ${JSON.stringify(args.fmt)}`];
-      const dateVal = this.utils.moment(val.value, "HH:mm:ss");
+      const dateVal = this.utils.dayjs(val.value, "HH:mm:ss");
       if (dateVal.isValid()) {
         return [dateVal.format(wgtDef?.valueFormat), []];
       } else {
@@ -925,17 +925,17 @@ const widgets = {
     },
     jsonLogic: function (val, fieldDef, wgtDef) {
       // return seconds of day
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       return dateVal.get("hour") * 60 * 60 + dateVal.get("minute") * 60 + dateVal.get("second");
     },
     toJS: function (val, fieldSettings) {
       // return seconds of day
-      const dateVal = this.utils.moment(val, fieldSettings.valueFormat);
+      const dateVal = this.utils.dayjs(val, fieldSettings.valueFormat);
       return dateVal.isValid() ? dateVal.get("hour") * 60 * 60 + dateVal.get("minute") * 60 + dateVal.get("second") : undefined;
     },
     mongoFormatValue: function (val, fieldDef, wgtDef) {
       // return seconds of day
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       return dateVal.get("hour") * 60 * 60 + dateVal.get("minute") * 60 + dateVal.get("second");
     },
     elasticSearchFormatValue: function elasticSearchFormatValue(queryType, value, operator, fieldName) {
@@ -967,15 +967,15 @@ const widgets = {
       { label: "Datetime to", placeholder: "Enter datetime to" },
     ],
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       return isForDisplay ? dateVal.format(wgtDef.dateFormat + " " + wgtDef.timeFormat) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.toDate());
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       const v = dateVal.format("YYYY-MM-DD HH:mm:ss");
       const fmt = "yyyy-MM-dd HH:mm:ss";
       //return `new java.text.SimpleDateFormat('${fmt}').parse('${v}')`;
@@ -1007,52 +1007,24 @@ const widgets = {
         return [undefined, "No widget def to get value format"];
       if (!args?.fmt?.value?.includes?.(" "))
         return [undefined, `Invalid datetime format ${JSON.stringify(args.fmt)}`];
-      const dateVal = this.utils.moment(val.value, this.utils.moment.ISO_8601);
+      const dateVal = this.utils.dayjs(val.value);
       if (dateVal.isValid()) {
         return [dateVal.format(wgtDef?.valueFormat), []];
       } else {
         return [undefined, "Invalid date"];
       }
     },
-    // Moved to `sqlImportDate` in `packages/sql/modules/import/conv`
-    // sqlImport: function (sqlObj, wgtDef, sqlDialect) {
-    //   if (["TO_DATE"].includes(sqlObj?.func) && sqlObj?.children?.length >= 1) {
-    //     const [valArg, patternArg] = sqlObj.children;
-    //     if (valArg?.valueType == "single_quote_string") {
-    //       // tip: moment doesn't support SQL date format, so ignore patternArg
-    //       const dateVal = this.utils.moment(valArg.value);
-    //       if (dateVal.isValid()) {
-    //         return {
-    //           value: dateVal.format(wgtDef?.valueFormat),
-    //         };
-    //       } else {
-    //         return {
-    //           value: null,
-    //           error: "Invalid date",
-    //         };
-    //       }
-    //     }
-    //   }
-    // },
     jsonLogic: function (val, fieldDef, wgtDef) {
-      return this.utils.moment(val, wgtDef.valueFormat).toDate();
+      return this.utils.dayjs(val, wgtDef.valueFormat).toDate();
     },
-    // Example of importing and exporting to epoch timestamp (in ms) for JsonLogic:
-    // jsonLogicImport: function(timestamp, wgtDef) {
-    //   const momentVal = this.utils.moment(timestamp, "x");
-    //   return momentVal.isValid() ? momentVal.toDate() : undefined;
-    // },
-    // jsonLogic: function (val, fieldDef, wgtDef) {
-    //   return this.utils.moment(val, wgtDef.valueFormat).format("x");
-    // },
     toJS: function (val, fieldSettings) {
-      const dateVal = this.utils.moment(val, fieldSettings.valueFormat);
+      const dateVal = this.utils.dayjs(val, fieldSettings.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;
     },
     // todo: $toDate (works onliny in $expr)
     // https://www.mongodb.com/docs/manual/reference/operator/aggregation/toDate/
     mongoFormatValue: function (val, fieldDef, wgtDef) {
-      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.dayjs(val, wgtDef.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;
     }
   },

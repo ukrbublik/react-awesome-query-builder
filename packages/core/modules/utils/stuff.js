@@ -1,9 +1,9 @@
 import Immutable, { Map } from "immutable";
 import {default as uuid} from "./uuid";
 import {default as clone} from "clone";
-import {default as moment} from "moment";
+import {default as dayjs} from "dayjs";
 
-export {uuid, clone, moment};
+export {uuid, clone, dayjs};
 
 export const widgetDefKeysToOmit = [
   "formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue", "spelImportFuncs", "spelImportValue"

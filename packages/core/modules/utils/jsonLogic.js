@@ -1,5 +1,5 @@
 import JL from "json-logic-js";
-import moment from "moment";
+import dayjs from "dayjs";
 
 export function applyJsonLogic(logic, data) {
   return JL.apply(logic, data);
@@ -17,7 +17,7 @@ export const customJsonLogicOperations = {
   strlen: (str) => (str?.length || 0),
   regexTest: (str, pattern, flags) => str?.match(new RegExp(pattern, flags)) != null,
   now: () => new Date(),
-  date_add: (date, val, dim) => { return moment(date).add(val, dim).toDate(); },
+  date_add: (date, val, dim) => { return dayjs(date).add(val, dim).toDate(); },
   toLowerCase: (str) => str.toLowerCase(),
   toUpperCase: (str) => str.toUpperCase(),
 };
