@@ -295,7 +295,7 @@ const convertFromLogic = (logic, conv, config, expectedTypes, meta, not = false,
       || convertFuncRhs(op, vals, conv, config, not, fieldConfig, meta, parentField) 
       || convertValRhs(logic, fieldConfig, widget, config, meta);
   } else {
-    const prevErrors = [...meta.errors];
+    const errorsBefore = [...meta.errors];
     if (expectedTypes.includes("switch")) {
       ret = convertSwitch(op, vals, conv, config, not, meta, parentField);
     }
@@ -305,10 +305,14 @@ const convertFromLogic = (logic, conv, config, expectedTypes, meta, not = false,
     if (ret == undefined && expectedTypes.includes("rule")) {
       ret = convertOp(op, vals, conv, config, not, meta, parentField);
     }
+    const errorsAfter = [...meta.errors];
     if (ret == undefined && expectedTypes.includes("case_val")) {
       // last resort
-      meta.errors = prevErrors;
+      meta.errors = errorsBefore;
       ret = convertCaseVal(op, vals, conv, config, not, meta, parentField);
+      if (ret == undefined) {
+        meta.errors = errorsAfter;
+      }
     }
     if (ret) {
       if (isRoot && !["group", "switch_group"].includes(ret.type)) {
@@ -1047,6 +1051,9 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
 const convertCaseVal = (op, vals, conv, config, not, meta, parentField = null) => {
   const val = {[op]: vals};
   const defaultCaseVal = buildCaseValProperties(config, meta, conv, val);
+  if (defaultCaseVal === undefined) {
+    return undefined;
+  }
   const defaultCase = wrapInCase(null, defaultCaseVal, config, meta);
   const children1 = [defaultCase];
 
