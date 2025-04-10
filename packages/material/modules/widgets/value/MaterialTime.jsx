@@ -1,6 +1,6 @@
 import React from "react";
 import { TimePicker, KeyboardTimePicker } from "@material-ui/pickers";
-import moment from "moment";
+import dayjs from "dayjs";
 import FormControl from "@material-ui/core/FormControl";
 
 export default (props) => {
@@ -19,7 +19,7 @@ export default (props) => {
     : props.useKeyboard;
   const Picker = useKeyboard ? KeyboardTimePicker : TimePicker;
   const hasSeconds = timeFormat.indexOf(":ss") != -1;
-  const timeValue = value ? moment(value, timeFormat) : null;
+  const timeValue = value ? dayjs(value, timeFormat) : null;
 
   return (
     <FormControl>

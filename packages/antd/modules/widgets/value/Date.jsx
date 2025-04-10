@@ -1,9 +1,9 @@
-import React, { PureComponent } from "react";
 import { Utils } from "@react-awesome-query-builder/ui";
 import PropTypes from "prop-types";
-import { DatePicker } from "../moment";
+import React, { PureComponent } from "react";
+import { DatePicker } from "antd";
 const { RangePicker } = DatePicker;
-const { moment } = Utils;
+const { dayjs } = Utils;
 
 
 export default class DateWidget extends PureComponent {
@@ -26,7 +26,7 @@ export default class DateWidget extends PureComponent {
 
     const {value, setValue} = props;
     if (!this.isValidValue(value)) {
-      setValue(this.formatValue(this.getMomentValue(value)));
+      setValue(this.formatValue(this.getDayjsValue(value)));
     }
   }
 
@@ -37,7 +37,7 @@ export default class DateWidget extends PureComponent {
 
   isValidSingleValue = (value) => {
     const {valueFormat} = this.props;
-    let v = value ? moment(value, valueFormat) : null;
+    let v = value ? dayjs(value, valueFormat) : null;
     return !v || v && v.isValid();
   };
 
@@ -49,20 +49,20 @@ export default class DateWidget extends PureComponent {
       return this.isValidSingleValue(value);
   };
 
-  getMomentSingleValue = (value) => {
+  getDayjsSingleValue = (value) => {
     const {valueFormat} = this.props;
-    let v = value ? moment(value, valueFormat) : null;
+    let v = value ? dayjs(value, valueFormat) : null;
     if (v && !v.isValid())
       v = null;
     return v;
   };
 
-  getMomentValue = (value) => {
+  getDayjsValue = (value) => {
     const {isSpecialRange} = this.props;
     if (isSpecialRange)
-      return value ? value.map(el => this.getMomentSingleValue(el)) : [null, null];
+      return value ? value.map(el => this.getDayjsSingleValue(el)) : [null, null];
     else
-      return this.getMomentSingleValue(value);
+      return this.getDayjsSingleValue(value);
   };
 
   formatSingleValue = (value) => {
@@ -88,7 +88,7 @@ export default class DateWidget extends PureComponent {
   render() {
     const {placeholder, placeholders, customProps, value, dateFormat, config, readonly, isSpecialRange} = this.props;
     const {renderSize} = config.settings;
-    const dateValue = this.getMomentValue(value);
+    const dateValue = this.getDayjsValue(value);
 
     if (isSpecialRange) {
       return (

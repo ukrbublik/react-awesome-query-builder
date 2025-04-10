@@ -1,10 +1,10 @@
+
 import React from "react";
-import { Button } from "antd";
-const ButtonGroup = Button.Group;
+import { Space } from "antd";
 
 export default ({children, config: {settings}}) => {
   const {renderSize} = settings;
-  return <ButtonGroup
+  return <Space.Compact
     size={renderSize}
-  >{children}</ButtonGroup>;
+  >{children}</Space.Compact>;
 };

@@ -1,4 +1,4 @@
-import moment from "moment";
+import dayjs from "dayjs";
 import {
   SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape, spelFixList,
   stringifyForDisplay, wrapWithBrackets,
@@ -51,7 +51,7 @@ export const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr, valueSrc
 const ctx = {
   utils: {
     SqlString,
-    moment,
+    dayjs,
     mongoFormatOp1,
     mongoFormatOp2,
     mongoEmptyValue,

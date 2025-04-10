@@ -1,9 +1,8 @@
-import React, { PureComponent } from "react";
-import PropTypes from "prop-types";
-import { TimePicker } from "../moment";
 import { Utils } from "@react-awesome-query-builder/ui";
-const { moment } = Utils;
-
+import PropTypes from "prop-types";
+import React, { PureComponent } from "react";
+import { TimePicker } from "../dayjs";
+const { dayjs } = Utils;
 
 export default class TimeWidget extends PureComponent {
   static propTypes = {
@@ -24,7 +23,7 @@ export default class TimeWidget extends PureComponent {
     super(props);
 
     const {valueFormat, value, setValue} = props;
-    let mValue = value ? moment(value, valueFormat) : null;
+    let mValue = value ? dayjs(value, valueFormat) : null;
     if (mValue && !mValue.isValid()) {
       setValue(null);
     }
@@ -50,7 +49,7 @@ export default class TimeWidget extends PureComponent {
   render() {
     const {placeholder, customProps, value, valueFormat, timeFormat, use12Hours, config, readonly} = this.props;
     const {renderSize} = config.settings;
-    const timeValue = value ? moment(value, valueFormat) : null;
+    const timeValue = value ? dayjs(value, valueFormat) : null;
 
     return (
       <TimePicker

@@ -4,7 +4,7 @@ import TextField from "@mui/material/TextField";
 import { Utils } from "@react-awesome-query-builder/ui";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import xdpPackage from "@mui/x-date-pickers/package.json"; // to determine version
-const { moment } = Utils;
+const { dayjs } = Utils;
 const xdpVersion = parseInt(xdpPackage?.version?.split(".")?.[0] ?? "0");
 
 export default (props) => {
@@ -19,7 +19,7 @@ export default (props) => {
   };
 
   const hasSeconds = timeFormat.indexOf(":ss") != -1;
-  const timeValue = value ? moment(value, timeFormat) : null;
+  const timeValue = value ? dayjs(value, timeFormat) : null;
 
   const renderInput = (params) => 
     <TextField 

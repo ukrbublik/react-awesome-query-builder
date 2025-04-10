@@ -11,7 +11,7 @@ export * as OtherUtils from "./stuff";
 export {default as i18n} from "../i18n";
 
 // expose
-export {default as moment} from "moment"; // in OtherUtils
+export {default as dayjs} from "dayjs"; // in OtherUtils
 export {default as clone} from "clone"; // in OtherUtils
 export {default as uuid} from "./uuid"; // in OtherUtils
 // expose validation api to top level for convenience

@@ -312,7 +312,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
 
   const localeSettings: LocaleSettings = {
     locale: {
-      moment: "ru",
+      dayjs: "ru",
     },
     valueLabel: "Value",
     valuePlaceholder: "Value",

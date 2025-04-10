@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { DatePicker, TimePicker } from "@fluentui/react";
 import { Utils } from "@react-awesome-query-builder/ui";
-const { moment } = Utils;
+const { dayjs } = Utils;
 
 export default (props) => {
   const {
@@ -16,8 +16,8 @@ export default (props) => {
     customProps,
   } = props;
 
-  const momentValue = value ? moment(value, valueFormat) : undefined;
-  const dateValue = momentValue ? momentValue.toDate() : undefined;
+  const dayjsValue = value ? dayjs(value, valueFormat) : undefined;
+  const dateValue = dayjsValue ? dayjsValue.toDate() : undefined;
   const [timeDate, setTimeDate] = useState(dateValue);
 
   const onDateChange = (date) => {
@@ -27,15 +27,15 @@ export default (props) => {
       date = undefined;
     if (date) {
       // build new date
-      let newMoment = moment(date);
+      let newDayjs = dayjs(date);
       if (timeDate) { // if there is current time
         // copy current time
-        const currTimeMoment = moment(timeDate);
-        newMoment.set("hour", currTimeMoment.get("hour"));
-        newMoment.set("minute", currTimeMoment.get("minute"));
-        newMoment.set("second", currTimeMoment.get("second"));
+        const currTimeDayjs = dayjs(timeDate);
+        newDayjs = newDayjs.set("hour", currTimeDayjs.get("hour"));
+        newDayjs = newDayjs.set("minute", currTimeDayjs.get("minute"));
+        newDayjs = newDayjs.set("second", currTimeDayjs.get("second"));
       }
-      newValue = newMoment.format(valueFormat);
+      newValue = newDayjs.format(valueFormat);
     }
     if (newValue) {
       setValue(newValue);
@@ -48,17 +48,17 @@ export default (props) => {
     if (date == "" || date instanceof Date && isNaN(date))
       date = undefined;
     setTimeDate(date); // set to state!
-    const newTimeMoment = date ? moment(date) : undefined;
-    if (momentValue) { // if there is current date
+    const newTimeDayjs = date ? dayjs(date) : undefined;
+    if (dayjsValue) { // if there is current date
       // copy current date
-      let newMoment = moment(momentValue);
+      let newDayjs = dayjs(dayjsValue);
       // set new time
-      if (newTimeMoment) {
-        newMoment.set("hour", newTimeMoment.get("hour"));
-        newMoment.set("minute", newTimeMoment.get("minute"));
-        newMoment.set("second", newTimeMoment.get("second"));
+      if (newTimeDayjs) {
+        newDayjs = newDayjs.set("hour", newTimeDayjs.get("hour"));
+        newDayjs = newDayjs.set("minute", newTimeDayjs.get("minute"));
+        newDayjs = newDayjs.set("second", newTimeDayjs.get("second"));
       }
-      newValue = newMoment.format(valueFormat);
+      newValue = newDayjs.format(valueFormat);
     }
     if (newValue) {
       setValue(newValue);
@@ -66,7 +66,7 @@ export default (props) => {
   };
 
   const hasSeconds = valueFormat.indexOf(":ss") != -1;
-  const formatDate = (date) => moment(date).format(dateFormat);
+  const formatDate = (date) => dayjs(date).format(dateFormat);
 
   const stylesTimePicker = {
     marginRight: "5px"

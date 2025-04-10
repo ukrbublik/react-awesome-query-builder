@@ -14,12 +14,13 @@ import {
   Config,
   ValidateValue,
 } from "@react-awesome-query-builder/ui";
-import moment from "moment";
 import ru_RU from "antd/es/locale/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
 import { ruRU as muiRuRU } from "@mui/material/locale";
 import { AntdWidgets } from "@react-awesome-query-builder/antd";
 import { skinToConfig } from "../../skins";
+
+const { dayjs } = Utils;
 
 const {
   FieldSelect,
@@ -187,7 +188,7 @@ export default (skin: string) => {
 
   const localeSettings: LocaleSettings = {
     locale: {
-      moment: "ru",
+      dayjs: "ru",
       antd: ru_RU,
       material: ruRU,
       mui: muiRuRU
@@ -509,7 +510,7 @@ export default (skin: string) => {
         dateFormat: "DD-MM-YYYY",
         validateValue: (val, fieldSettings: DateTimeFieldSettings) => {
           // example of date validation
-          const dateVal = moment(val, fieldSettings.valueFormat);
+          const dateVal = dayjs(val, fieldSettings.valueFormat);
           return dateVal.year() != (new Date().getFullYear()) ? "Please use current year" : null;
         },
       } as DateTimeFieldSettings,

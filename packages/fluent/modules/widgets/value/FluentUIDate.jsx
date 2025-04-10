@@ -1,7 +1,7 @@
 import React from "react";
 import { DatePicker } from "@fluentui/react";
 import { Utils } from "@react-awesome-query-builder/ui";
-const { moment } = Utils;
+const { dayjs } = Utils;
 
 export default (props) => {
   const {
@@ -15,18 +15,18 @@ export default (props) => {
     placeholder,
   } = props;
 
-  const momentValue = value ? moment(value, valueFormat) : undefined;
-  const dateValue = momentValue ? momentValue.toDate() : undefined;
+  const dayjsValue = value ? dayjs(value, valueFormat) : undefined;
+  const dateValue = dayjsValue ? dayjsValue.toDate() : undefined;
 
   const onChange = (date) => {
     // clear if invalid date
     if (date == "" || date instanceof Date && isNaN(date))
       date = undefined;
-    const newValue = date ? moment(date).format(valueFormat) : undefined;
+    const newValue = date ? dayjs(date).format(valueFormat) : undefined;
     setValue(newValue);
   };
 
-  const formatDate = (date) => moment(date).format(dateFormat);
+  const formatDate = (date) => dayjs(date).format(dateFormat);
 
   const stylesDatePicker = {
     // width: "auto", 

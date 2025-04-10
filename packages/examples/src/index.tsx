@@ -2,6 +2,7 @@
 import React from "react";
 //import { createRoot } from "react-dom/client";
 import ReactDOM from "react-dom";
+import 'dayjs/locale/ru';
 
 const Demo = React.lazy(() => import("./demo"));
 const DemoSwitch = React.lazy(() => import("./demo_switch"));

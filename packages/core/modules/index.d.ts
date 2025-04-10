@@ -3,11 +3,11 @@
 
 import {List as ImmList, Map as ImmMap, OrderedMap as ImmOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";
-import moment from "moment";
-import type { Moment, MomentInput } from "moment";
 import type { i18n } from "i18next";
+import dayjs from "dayjs";
 
-export type { Moment, MomentInput };
+import type { Dayjs } from "dayjs";
+export type { Dayjs };
 export type ImmutableList<T> = ImmList<T>;
 export type ImmutableMap<K, V> = ImmMap<K, V>;
 export type ImmutableOMap<K, V> = ImmOMap<K, V>;
@@ -101,7 +101,7 @@ export type ConfigContextUtils = {
   mongoEmptyValue: ExportUtils["mongoEmptyValue"];
   spelEscape: ExportUtils["spelEscape"];
 
-  moment: OtherUtils["moment"];
+  dayjs: OtherUtils["dayjs"];
   escapeRegExp: OtherUtils["escapeRegExp"];
 
   getTitleInListValues: ListUtils["getTitleInListValues"];
@@ -668,7 +668,7 @@ export type MixType<T> = _MixType<Opt<T>>;
 interface OtherUtils {
   logger: typeof console;
   clone(obj: any): any;
-  moment: typeof moment;
+  dayjs: typeof dayjs;
   uuid(): string;
   mergeArraysSmart(arr1: any[], arr2: any[]): any[];
   setIn<O, T = any>(
@@ -707,7 +707,7 @@ interface OtherUtils {
 }
 
 export interface Utils extends Import, Export,
-  Pick<OtherUtils, "uuid" | "clone" | "moment">,
+  Pick<OtherUtils, "uuid" | "clone" | "dayjs">,
   Pick<Validation, "sanitizeTree" | "validateTree" | "isValidTree">,
   PickDeprecated<Validation, "checkTree">,
   PickDeprecated<ConfigUtils, "compressConfig" | "decompressConfig">,
@@ -1422,7 +1422,7 @@ type FormatAggr = (this: ConfigContext, whereStr: string, aggrField: FieldPath, 
 
 export interface LocaleSettings {
   locale?: {
-    moment?: string;
+    dayjs?: string;
     antd?: Object;
     material?: Object;
     mui?: Object;

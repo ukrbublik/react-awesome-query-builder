@@ -4,7 +4,7 @@ import xdpPackage from "@mui/x-date-pickers/package.json"; // to determine versi
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import { Utils } from "@react-awesome-query-builder/ui";
-const { moment } = Utils;
+const { dayjs } = Utils;
 const xdpVersion = parseInt(xdpPackage?.version?.split(".")?.[0] ?? "0");
 
 export default (props) => {
@@ -44,7 +44,7 @@ export default (props) => {
     toolbarPlaceholder: !readonly ? placeholder : "",
   };
 
-  const aValue = value ? (xdpVersion >= 6 ? moment(value, valueFormat) : value) : null;
+  const aValue = value ? (xdpVersion >= 6 ? dayjs(value, valueFormat) : value) : null;
 
   return (
     <FormControl>

@@ -39,7 +39,7 @@ export const settings = {
 
   // localization
   locale: {
-    moment: "en",
+    dayjs: "en",
   },
   valueLabel: "Value",
   valuePlaceholder: "Value",
