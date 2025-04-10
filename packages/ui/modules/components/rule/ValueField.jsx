@@ -91,6 +91,7 @@ export default class ValueField extends Component {
     };
   }
 
+  // todo: move to core
   filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldType) {
     fields = clone(fields);
     const fieldSeparator = config.settings.fieldSeparator;
@@ -112,22 +113,25 @@ export default class ValueField extends Component {
       // no field at LHS, but can use type from "memory effect"
       expectedType = fieldType;
     }
+    // todo: (for select fields) use listValuesType
     
-    function _filter(list, path) {
+    function _filter(list, path, isInsideGroup) {
       for (let rightFieldKey in list) {
-        let subfields = list[rightFieldKey].subfields;
-        let subpath = (path ? path : []).concat(rightFieldKey);
-        let rightFieldFullkey = subpath.join(fieldSeparator);
-        let rightFieldConfig = getFieldConfig(config, rightFieldFullkey);
+        const subfields = list[rightFieldKey].subfields;
+        const subpath = (path ? path : []).concat(rightFieldKey);
+        const rightFieldFullkey = subpath.join(fieldSeparator);
+        const rightFieldConfig = getFieldConfig(config, rightFieldFullkey);
+        const isGroup = rightFieldConfig.type === "!group";
         if (!rightFieldConfig) {
           delete list[rightFieldKey];
-        } else if (rightFieldConfig.type == "!struct" || rightFieldConfig.type == "!group") {
-          if (_filter(subfields, subpath) == 0)
+        } else if (rightFieldConfig.type === "!struct" || rightFieldConfig.type === "!group") {
+          if (_filter(subfields, subpath, isInsideGroup || isGroup) == 0)
             delete list[rightFieldKey];
         } else {
           // tip: LHS field can be used as arg in RHS function
           let canUse = (!expectedType || rightFieldConfig.type == expectedType)
-            && (isFuncArg ? true : rightFieldFullkey != leftFieldFullkey);
+            && (isFuncArg ? true : rightFieldFullkey != leftFieldFullkey)
+            && !isInsideGroup;
           let fn = canCompareFieldWithField || config.settings.canCompareFieldWithField;
           if (fn)
             canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig, operator);
@@ -138,7 +142,7 @@ export default class ValueField extends Component {
       return keys(list).length;
     }
 
-    _filter(fields, parentFieldPath || []);
+    _filter(fields, parentFieldPath || [], false);
 
     return fields;
   }
