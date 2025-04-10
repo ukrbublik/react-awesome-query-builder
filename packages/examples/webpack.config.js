@@ -2,7 +2,6 @@ const webpack = require('webpack');
 const path = require('path');
 const fs = require('fs');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
@@ -96,10 +95,7 @@ plugins = [
 if (isProd) {
     plugins = [
         ...plugins,
-        new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
-        new MomentLocalesPlugin({
-            localesToKeep: ['es-us', 'ru'],
-        }),
+        new webpack.ContextReplacementPlugin(/dayjs[/\\]locale$/, /en|ru|es-us/),
     ];
 }
 if (isSeparateCss) {

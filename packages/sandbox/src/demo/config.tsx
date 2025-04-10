@@ -381,7 +381,7 @@ export function createConfig(InitialConfig: BasicConfig): Config {
   
   const localeSettings: LocaleSettings = {
     locale: {
-      moment: "ru",
+      dayjs: "ru",
     },
     valueLabel: "Value",
     valuePlaceholder: "Value",

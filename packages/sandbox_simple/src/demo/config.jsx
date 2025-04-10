@@ -213,7 +213,7 @@ const types = {
 
 const localeSettings = {
   locale: {
-    moment: "ru",
+    dayjs: "ru",
   },
   valueLabel: "Value",
   valuePlaceholder: "Value",
