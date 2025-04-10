@@ -1849,6 +1849,17 @@ export const with_concat_case_value = (BasicConfig) => ({
   },
 });
 
+export const with_case_value_field_text = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    caseValueField: {
+      type: "text",
+      valueSources: ["value", "field", "func"],
+    },
+  },
+});
+
 export const with_fieldSources = (BasicConfig) => ({
   ...BasicConfig,
   settings: {
