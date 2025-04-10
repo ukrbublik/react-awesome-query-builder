@@ -153,6 +153,7 @@ export const getFieldPath = (field, config = null) => {
   return getFieldParts(field, config).join(fieldSeparator);
 };
 
+// just split path to array using fieldSeparator
 export const getFieldParts = (field, config = null) => {
   if (!field)
     return [];
@@ -168,6 +169,7 @@ export const getFieldParts = (field, config = null) => {
   return field?.split?.(fieldSeparator) || [];
 };
 
+// eg. for path "vehicles.cars.vendor" returns ["vehicles", "vehicles.cars", "vehicles.cars.vendor"]
 export const getFieldPathParts = (field, config, onlyKeys = false) => {
   if (!field)
     return null;
@@ -489,9 +491,14 @@ export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition, o
     let canAdd = true;
     if (vs === "field") {
       if (config.__fieldsCntByType) {
-        // tip: LHS field can be used as arg in RHS function
-        const minCnt = fieldDefinition._isFuncArg || isOtherType ? 0 : 1;
-        canAdd = canAdd && config.__fieldsCntByType[fieldType] > minCnt;
+        // todo: (for select fields) use listValuesType and __fieldsCntByListValuesType
+        // tip: LHS field can be used:
+        //       - in RHS with value source "field" if LHS has field source "field" --> ONLY in this case we should prevent comparing same fields
+        //       - in RHS with value source "func" if LHS has field source "func"  (see `_isFunc`)
+        //       - as arg in RHS/LHS function
+        //       - in case value
+        const dontExcludeSelfField = fieldDefinition._isFunc || fieldDefinition._isFuncArg || fieldDefinition._isCaseValue || isOtherType;
+        canAdd = canAdd && config.__fieldsCntByType[fieldType] > (dontExcludeSelfField ? 0 : 1);
       }
     }
     if (vs === "func") {
@@ -557,10 +564,14 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
     }))
     .map(({part, key}) => {
       const cnf = getFieldRawConfig(config, part);
-      return {key, cnf};
+      return {key, path: part, cnf};
     })
-    .map(({key, cnf}, ind, arr) => {
+    .map(({key, path, cnf}, ind, arr) => {
       const parentCnf = ind > 0 ? arr[ind - 1].cnf : parentFieldDef;
-      return [key, cnf, parentCnf];
+      return {key, cnf, path, parentCnf};
     });
+};
+
+export const getClosestGroupField = (field, config) => {
+  return getFieldPartsConfigs(field, config)?.reverse().find(({path, cnf}) => cnf?.type === "!group")?.path;
 };
