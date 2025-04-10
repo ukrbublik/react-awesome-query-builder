@@ -179,8 +179,8 @@ export const with_datetime_import_epoch_sec_jl = (BasicConfig) => ({
     datetime: {
       ...BasicConfig.widgets.datetime,
       jsonLogicImport: function(timestamp, wgtDef) {
-        const momentVal = this.utils.moment(timestamp, "X");
-        return momentVal.isValid() ? momentVal.toDate() : undefined;
+        const dayjsVal = this.utils.dayjs(timestamp);
+        return dayjsVal.isValid() ? dayjsVal.toDate() : undefined;
       },
     }
   }
@@ -193,7 +193,7 @@ export const with_datetime_export_epoch_ms_jl = (BasicConfig) => ({
     datetime: {
       ...BasicConfig.widgets.datetime,
       jsonLogic: function (val, fieldDef, wgtDef) {
-        return this.utils.moment(val, wgtDef.valueFormat).format("x");
+        return this.utils.dayjs(val, wgtDef.valueFormat).valueOf();
       },
     }
   }

@@ -20,3 +20,4 @@ packages/*/cjs/
 packages/*/esm/
 packages/*/css/
 packages/*/types/
+.pnpm-store

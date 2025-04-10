@@ -1,4 +1,3 @@
-import moment from "moment";
 import { expect } from "chai";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";

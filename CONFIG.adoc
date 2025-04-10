@@ -306,7 +306,7 @@ const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
   },
   fieldSources: ["field", "func"],
   locale: {
-      moment: 'ru',
+      dayjs: 'ru',
       antd: ru_RU,
       material: ruRU,
       mui: muiRuRU,
@@ -435,7 +435,7 @@ Other settings:
 [cols="1m,1,3a",options="header",]
 |===
 |key |default |meaning
-|locale.moment |`en` |Locale (string or array of strings) used for https://momentjs.com/docs/#/i18n/[moment]
+|locale.dayjs |`en` |Locale (string or array of strings) used for https://day.js.org/docs/en/i18n/i18n[dayjs]
 |locale.antd |`en_US` |Locale object used for https://ant.design/docs/react/i18n[AntDesign] widgets
 |locale.material |`enUS` |Locale object used for https://v4.mui.com/getting-started/installation/[MaterialUI v4] widgets
 |locale.mui |`enUS` |Locale object used for https://mui.com/material-ui/guides/localization/[MUI] widgets
@@ -911,7 +911,7 @@ const ctx = {
     // ... other widgets provieded with the lib
   },
   utils: {
-    moment, // used in `formatValue`
+    dayjs, // used in `formatValue`
     SqlString, // used in `sqlFormatValue`
     // ... other utils
   },
@@ -1015,7 +1015,7 @@ To achieve this ability, JS functions in config (like `factory`, `formatValue`, 
 ----
 import { VanillaWidgets } from '@react-awesome-query-builder/ui';
 const { VanillaButton } = VanillaWidgets;
-import moment from "moment";
+import dayjs from "dayjs";
 
 const config = {
   settings: {
@@ -1023,7 +1023,7 @@ const config = {
   },
   widgets: {
     date: {
-      jsonLogic: (val, fieldDef, wgtDef) => moment(val, wgtDef.valueFormat).toDate(),
+      jsonLogic: (val, fieldDef, wgtDef) => dayjs(val, wgtDef.valueFormat).toDate(),
     },
   },
 };
@@ -1041,7 +1041,7 @@ const config = {
   widgets: {
     date: {
       jsonLogic: function (val, fieldDef, wgtDef) {
-        return this.utils.moment(val, wgtDef.valueFormat).toDate();
+        return this.utils.dayjs(val, wgtDef.valueFormat).toDate();
       },
     },
   },
@@ -1052,7 +1052,7 @@ const config = {
       VanillaButton,
     },
     utils: {
-      moment,
+      dayjs,
     },
   }
 };

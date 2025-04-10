@@ -1,4 +1,4 @@
-import moment from "moment";
+import dayjs from "dayjs";
 import { expect } from "chai";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
@@ -87,7 +87,7 @@ describe("material-ui widgets interactions", () => {
         .find("KeyboardDateInput")
         .props();
       // @ts-ignore
-      onChangeDate(moment("0001-01-01 10:30"));
+      onChangeDate(dayjs("0001-01-01 10:30"));
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "time" }, 60*60*10+60*30 ] }] }
       ]);

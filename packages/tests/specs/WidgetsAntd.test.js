@@ -1,4 +1,4 @@
-import moment from "moment";
+import dayjs from "dayjs";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_ant } from "../support/utils";
@@ -52,7 +52,7 @@ describe("antdesign widgets interactions", () => {
       qb
         .find("DateWidget")
         .instance()
-        .handleChange(moment("2020-05-05"));
+        .handleChange(dayjs("2020-05-05"));
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "date" }, "2020-05-05T00:00:00.000Z" ] }] }
       ]);
@@ -170,7 +170,7 @@ describe("antdesign widgets interactions", () => {
       qb
         .find("TimeWidget")
         .instance()
-        .handleChange(moment("0001-01-01 10:30"));
+        .handleChange(dayjs("0001-01-01 10:30"));
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "time" }, 60*60*10+60*30 ] }] }
       ]);
@@ -182,7 +182,7 @@ describe("antdesign widgets interactions", () => {
       qb
         .find("DateTimeWidget")
         .instance()
-        .handleChange(moment("2020-05-05 10:30"));
+        .handleChange(dayjs("2020-05-05 10:30"));
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "datetime" }, "2020-05-05T10:30:00.000Z" ] }] }
       ]);
