@@ -1,7 +1,6 @@
 import React, { PureComponent } from "react";
 import map from "lodash/map";
-import { Button, Radio } from "antd";
-const ButtonGroup = Button.Group;
+import { Button, Space } from "antd";
 
 
 class ConjsButton extends PureComponent {
@@ -39,7 +38,7 @@ export default class ConjsButtons extends PureComponent {
     const showConj = forceShowConj || conjsCount > 1 && !lessThenTwo;
 
     return (
-      <ButtonGroup
+      <Space.Compact
         key="group-conjs-buttons"
         size={renderSize}
         disabled={disabled || readonly}
@@ -60,7 +59,7 @@ export default class ConjsButtons extends PureComponent {
             setConjunction={setConjunction}
           />
         ))}
-      </ButtonGroup>
+      </Space.Compact>
     );
   }
 }

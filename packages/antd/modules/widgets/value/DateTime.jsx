@@ -1,8 +1,8 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import { DatePicker } from "../moment";
+import { DatePicker } from "antd";
 import { Utils } from "@react-awesome-query-builder/ui";
-const { moment } = Utils;
+const { dayjs } = Utils;
 
 
 export default class DateTimeWidget extends PureComponent {
@@ -25,7 +25,7 @@ export default class DateTimeWidget extends PureComponent {
     super(props);
 
     const {valueFormat, value, setValue} = props;
-    let mValue = value ? moment(value, valueFormat) : null;
+    let mValue = value ? dayjs(value, valueFormat) : null;
     if (mValue && !mValue.isValid()) {
       setValue(null);
     }
@@ -48,7 +48,7 @@ export default class DateTimeWidget extends PureComponent {
   render() {
     const {placeholder, customProps, value, valueFormat, dateFormat, timeFormat, use12Hours, config, readonly} = this.props;
     const {renderSize} = config.settings;
-    const dateValue = value ? moment(value, valueFormat) : null;
+    const dateValue = value ? dayjs(value, valueFormat) : null;
     const dateTimeFrmat = dateFormat + " " + timeFormat;
 
     return (
