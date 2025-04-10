@@ -1,7 +1,7 @@
 import React from "react";
 import { Input } from "reactstrap";
 import { Utils } from "@react-awesome-query-builder/ui";
-const { moment } = Utils;
+const { dayjs } = Utils;
 
 export default (props) => {
   const {value, setValue, config, valueFormat, use12Hours, readonly} = props;
@@ -11,7 +11,7 @@ export default (props) => {
     if (value == "")
       value = undefined;
     else
-      value = moment(new Date(value)).format(valueFormat);
+      value = dayjs(new Date(value)).format(valueFormat);
     setValue(value);
   };
 
@@ -19,7 +19,7 @@ export default (props) => {
   if (!value)
     dtValue = "";
   else
-    dtValue = moment(value).format("YYYY-MM-DDTHH:mm");
+    dtValue = dayjs(value).format("YYYY-MM-DDTHH:mm");
   
   return (
     <Input type="datetime-local" bsSize={"sm"} value={dtValue} disabled={readonly} onChange={onChange} />
