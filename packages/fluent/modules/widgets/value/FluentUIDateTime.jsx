@@ -31,9 +31,9 @@ export default (props) => {
       if (timeDate) { // if there is current time
         // copy current time
         const currTimeDayjs = dayjs(timeDate);
-        newDayjs.set("hour", currTimeDayjs.get("hour"));
-        newDayjs.set("minute", currTimeDayjs.get("minute"));
-        newDayjs.set("second", currTimeDayjs.get("second"));
+        newDayjs = newDayjs.set("hour", currTimeDayjs.get("hour"));
+        newDayjs = newDayjs.set("minute", currTimeDayjs.get("minute"));
+        newDayjs = newDayjs.set("second", currTimeDayjs.get("second"));
       }
       newValue = newDayjs.format(valueFormat);
     }
@@ -54,9 +54,9 @@ export default (props) => {
       let newDayjs = dayjs(dayjsValue);
       // set new time
       if (newTimeDayjs) {
-        newDayjs.set("hour", newTimeDayjs.get("hour"));
-        newDayjs.set("minute", newTimeDayjs.get("minute"));
-        newDayjs.set("second", newTimeDayjs.get("second"));
+        newDayjs = newDayjs.set("hour", newTimeDayjs.get("hour"));
+        newDayjs = newDayjs.set("minute", newTimeDayjs.get("minute"));
+        newDayjs = newDayjs.set("second", newTimeDayjs.get("second"));
       }
       newValue = newDayjs.format(valueFormat);
     }
