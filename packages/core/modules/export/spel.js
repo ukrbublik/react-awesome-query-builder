@@ -423,7 +423,7 @@ const formatField = (meta, config, field, parentField = null) => {
   const fieldPartsConfigs = getFieldPartsConfigs(field, config, parentField);
   const formatFieldFn = config.settings.formatSpelField;
   const fieldName = formatFieldName(field, config, meta, parentField);
-  const fieldPartsMeta = fieldPartsConfigs.map(([key, cnf, parentCnf]) => {
+  const fieldPartsMeta = fieldPartsConfigs.map(({key, cnf, parentCnf}) => {
     let parent;
     if (parentCnf) {
       if (parentCnf.type == "!struct" || parentCnf.type == "!group" && parentCnf.mode == "struct")

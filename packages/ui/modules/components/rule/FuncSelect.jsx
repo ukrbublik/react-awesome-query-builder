@@ -100,6 +100,7 @@ export default class FuncSelect extends Component {
     };
   }
 
+  // todo: move to core
   filterFuncs(config, funcs, leftFieldFullkey, fieldType, isLHS, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition) {
     funcs = clone(funcs);
     const fieldSeparator = config.settings.fieldSeparator;
@@ -128,7 +129,7 @@ export default class FuncSelect extends Component {
         let funcFullkey = subpath.join(fieldSeparator);
         let funcConfig = getFuncConfig(config, funcFullkey);
         if (funcConfig.type == "!struct") {
-          if(_filter(subfields, subpath) == 0)
+          if (_filter(subfields, subpath) == 0)
             delete list[funcKey];
         } else {
           let canUse = !expectedType || funcConfig.returnType == expectedType;
