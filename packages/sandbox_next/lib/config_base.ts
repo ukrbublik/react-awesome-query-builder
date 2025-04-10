@@ -50,9 +50,9 @@ function createConfig(InitialConfig: CoreConfig): Config {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             validateValue: {
               and: [
-                { "<": [ {strlen: {var: "val"}}, 10 ] },
+                { "<": [{ strlen: { var: "val" } }, 10] },
                 { or: [
-                  { "===": [ {var: "val"}, "" ] },
+                  { "===": [{ var: "val" }, ""] },
                   { regexTest: [ {var: "val"}, "^[A-Za-z0-9_-]+$" ] }
                 ]}
               ]
