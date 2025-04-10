@@ -1,5 +1,5 @@
-const listValues 
-= [
+const listValues = 
+[
   { title: "A", value: "a" },
   { title: "AA", value: "aa" },
   { title: "AAA1", value: "aaa1" },

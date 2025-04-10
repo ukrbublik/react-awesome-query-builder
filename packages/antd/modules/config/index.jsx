@@ -67,9 +67,9 @@ const widgets = {
   },
   select: {
     ...BasicConfig.widgets.select,
-    factory: (props, {RCE, W: {AutocompleteWidget, SelectWidget}}) => {
-      return (props.asyncFetch || props.showSearch || props.allowCustomValues) 
-        ? RCE(AutocompleteWidget, props) 
+    factory: (props, { RCE, W: { AutocompleteWidget, SelectWidget } }) => {
+      return (props.asyncFetch || props.showSearch || props.allowCustomValues)
+        ? RCE(AutocompleteWidget, props)
         : RCE(SelectWidget, props);
     },
   },
