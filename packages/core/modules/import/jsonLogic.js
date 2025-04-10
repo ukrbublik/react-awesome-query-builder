@@ -64,7 +64,7 @@ export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
   };
   const extendedConfig = extendConfig(config, undefined, false);
   const conv = buildConv(extendedConfig);
-  const jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, ["rule", "group", "switch"], meta) : undefined;
+  const jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, ["rule", "group", "switch", "case_val"], meta) : undefined;
   const immTree = jsTree ? loadTree(jsTree) : undefined;
 
   meta.errors = Array.from(new Set(meta.errors));
@@ -295,14 +295,20 @@ const convertFromLogic = (logic, conv, config, expectedTypes, meta, not = false,
       || convertFuncRhs(op, vals, conv, config, not, fieldConfig, meta, parentField) 
       || convertValRhs(logic, fieldConfig, widget, config, meta);
   } else {
+    const prevErrors = [...meta.errors];
     if (expectedTypes.includes("switch")) {
-      ret = convertIf(op, vals, conv, config, not, meta, parentField);
+      ret = convertSwitch(op, vals, conv, config, not, meta, parentField);
     }
     if (ret == undefined && expectedTypes.includes("group")) {
       ret = convertConj(op, vals, conv, config, not, meta, parentField, false);
     }
     if (ret == undefined && expectedTypes.includes("rule")) {
       ret = convertOp(op, vals, conv, config, not, meta, parentField);
+    }
+    if (ret == undefined && expectedTypes.includes("case_val")) {
+      // last resort
+      meta.errors = prevErrors;
+      ret = convertCaseVal(op, vals, conv, config, not, meta, parentField);
     }
     if (ret) {
       if (isRoot && !["group", "switch_group"].includes(ret.type)) {
@@ -1038,7 +1044,23 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null, _isOne
 };
 
 
-const convertIf = (op, vals, conv, config, not, meta, parentField = null) => {
+const convertCaseVal = (op, vals, conv, config, not, meta, parentField = null) => {
+  const val = {[op]: vals};
+  const defaultCaseVal = buildCaseValProperties(config, meta, conv, val);
+  const defaultCase = wrapInCase(null, defaultCaseVal, config, meta);
+  const children1 = [defaultCase];
+
+  const switchI = {
+    type: "switch_group",
+    id: uuid(),
+    children1,
+    properties: {}
+  };
+
+  return switchI;
+};
+
+const convertSwitch = (op, vals, conv, config, not, meta, parentField = null) => {
   if (op?.toLowerCase() !== "if") return undefined;
 
   const flat = flatizeTernary(vals);
