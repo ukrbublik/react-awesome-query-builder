@@ -43,8 +43,7 @@ const widgets = {
   },
   price: {
     ...BasicConfig.widgets.price,
-    factory: (props, { RCE, W: { MaterialPriceWidget } }) =>
-      RCE(MaterialPriceWidget, props),
+    factory: (props, { RCE, W: { MaterialPriceWidget } }) => RCE(MaterialPriceWidget, props),
   },
   multiselect: {
     ...BasicConfig.widgets.multiselect,

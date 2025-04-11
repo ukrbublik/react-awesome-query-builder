@@ -23,7 +23,7 @@ export default (props) => {
   const {
     allowCustomValues, multiple, disableClearable,
     value: selectedValue, customProps, readonly, config, filterOptionsConfig, errorText,
-    tooltipText, isFieldAutocomplete,
+    tooltipText, isFieldAutocomplete, dontFixOptionsOrder,
   } = props;
   const stringifyOption = useCallback((option) => {
     const keysForFilter = config.settings.listKeysForSearch;
@@ -60,6 +60,7 @@ export default (props) => {
     multiple,
     uif: "mui",
     isFieldAutocomplete,
+    dontFixOptionsOrder,
   });
 
   // settings
