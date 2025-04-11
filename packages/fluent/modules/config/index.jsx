@@ -36,8 +36,7 @@ const widgets = {
   },
   price: {
     ...BasicConfig.widgets.price,
-    factory: (props, { RCE, W: { FluentUIPriceWidget } }) =>
-      RCE(FluentUIPriceWidget, props),
+    factory: (props, { RCE, W: { FluentUIPriceWidget } }) => RCE(FluentUIPriceWidget, props),
   },
   multiselect: {
     ...BasicConfig.widgets.multiselect,

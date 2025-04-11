@@ -21,6 +21,7 @@ const useListValuesAutocomplete = ({
   multiple,
   uif,
   isFieldAutocomplete,
+  dontFixOptionsOrder,
 }) => {
   const knownSpecialValues = ["LOAD_MORE", "LOADING_MORE"];
   const loadMoreTitle = config.settings.loadMoreLabel ?? "Load more...";
@@ -429,7 +430,7 @@ const useListValuesAutocomplete = ({
     return option.title || option.label || option.value.toString(); // fallback to value
   };
 
-  const fixedOptions = uif === "mui" ? fixListValuesGroupOrder(options) : options;
+  const fixedOptions = uif === "mui" && !dontFixOptionsOrder ? fixListValuesGroupOrder(options) : options;
 
   return {
     options: fixedOptions,
