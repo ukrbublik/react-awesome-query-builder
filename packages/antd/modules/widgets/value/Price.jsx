@@ -1,6 +1,7 @@
-import React from "react";
-import { NumericFormat } from "react-number-format";
-import { Input } from "antd";
+import React, { useCallback } from "react";
+import { InputNumber } from "antd";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { getNumberFormatProps, numericFormatter, numericParser } = Utils.NumberFormat;
 
 export default (props) => {
   const {
@@ -9,25 +10,52 @@ export default (props) => {
     readonly,
     placeholder,
     config,
-    ...numericFormatProps
+    min,
+    max,
+    step,
+    customProps,
+
+    prefix,
+    suffix,
   } = props;
 
-  const handleChange = (values) => {
-    let val = values.floatValue;
-    setValue(val === undefined ? null : val);
-  };
+  const numericFormatProps = getNumberFormatProps(props, ["prefix", "suffix"]);
+  const numericFormatPropsJson = JSON.stringify(numericFormatProps);
+
   const { renderSize } = config.settings;
+  const aValue = value != undefined ? value : undefined;
+
+  const currencyFormatter = useCallback((val) => {
+    return numericFormatter(val, numericFormatProps);
+  }, [numericFormatPropsJson]);
+
+  const currencyParser = useCallback((str) => {
+    return numericParser(str, numericFormatProps);
+  }, [numericFormatPropsJson]);
+
+  const handleChange = useCallback((val) => {
+    if (val === "" || val === null)
+      val = undefined;
+    setValue(val);
+  }, [setValue]);
 
   return (
-    <NumericFormat
-      customInput={Input}
-      type="text"
+    <InputNumber
+      formatter={currencyFormatter}
+      // decimalSeparator={numericFormatProps.decimalSeparator}
+      // precision={numericFormatProps.decimalScale}
+      parser={currencyParser}
       size={renderSize}
-      value={value}
+      value={aValue}
       placeholder={placeholder}
       disabled={readonly}
-      onValueChange={handleChange}
-      {...numericFormatProps}
+      onChange={handleChange}
+      // min={min}
+      // max={max}
+      step={step}
+      prefix={prefix}
+      suffix={suffix}
+      {...customProps}
     />
   );
 };

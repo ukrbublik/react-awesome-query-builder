@@ -1273,7 +1273,8 @@ export interface PriceFieldSettings<V = number> extends BasicFieldSettings<V> {
   max?: number;
   thousandsGroupStyle?: string
   thousandSeparator?: string;
-  prefix?: string
+  decimalSeparator?: string;
+  prefix?: string;
   suffix?: string;
 }
 export interface DateTimeFieldSettings<V = string> extends BasicFieldSettings<V> {

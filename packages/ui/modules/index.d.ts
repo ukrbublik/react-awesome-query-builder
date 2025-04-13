@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 
 import {ElementType, ReactElement, Factory} from "react";
+import { NumericFormat, NumericFormatProps } from "react-number-format";
 import {
   Conjunctions, Types, Fields, Funcs, CoreConfig, RuleValue, RuleValueI, 
   SimpleValue, OperatorOptionsI, FieldValueI, FieldSource, AsyncListValues,
@@ -398,6 +399,12 @@ interface VanillaWidgets {
 /////////////////
 
 export interface Utils extends CoreUtils {
+  NumberFormat: {
+    getNumberFormatProps: (props: Record<string, any>, excludePropsNames?: string[]) => Record<string, any>;
+    NumericFormat: typeof NumericFormat;
+    numericFormatter: (val: number, numericFormatProps: NumericFormatProps) => string;
+    numericParser: (str: string, numericFormatProps: NumericFormatProps) => number | undefined;
+  }
   // ReactUtils: {
   //   useOnPropsChanged(obj: ReactElement): void;
   // }

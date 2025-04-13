@@ -168,9 +168,6 @@ export default (skin: string) => {
       ...InitialConfig.types.text,
       excludeOperators: ["proximity"],
     },
-    price: {
-      ...InitialConfig.types.price,
-    },
     boolean: merge({}, InitialConfig.types.boolean, {
       widgets: {
         boolean: {
