@@ -763,7 +763,7 @@ const widgets = {
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
   price: {
-    type: "price",
+    type: "number",
     jsType: "number",
     valueSrc: "value",
     valueLabel: "Price",
@@ -1235,25 +1235,6 @@ const types = {
           "is_not_null",
         ],
       },
-      slider: {
-        operators: [
-          "equal",
-          "not_equal",
-          "less",
-          "less_or_equal",
-          "greater",
-          "greater_or_equal",
-          // "is_empty",
-          // "is_not_empty",
-          "is_null",
-          "is_not_null"
-        ],
-      },
-    },
-  },
-  price: {
-    defaultOperator: "equal",
-    widgets: {
       price: {
         operators: [
           "equal",
@@ -1268,6 +1249,20 @@ const types = {
           // "is_not_empty",
           "is_null",
           "is_not_null",
+        ],
+      },
+      slider: {
+        operators: [
+          "equal",
+          "not_equal",
+          "less",
+          "less_or_equal",
+          "greater",
+          "greater_or_equal",
+          // "is_empty",
+          // "is_not_empty",
+          "is_null",
+          "is_not_null"
         ],
       },
     },
@@ -1474,9 +1469,10 @@ const settings = {
   ...defaultSettings,
 
   convertableWidgets: {
-    "number": ["slider", "rangeslider"],
-    "slider": ["number", "rangeslider"],
-    "rangeslider": ["number", "slider"],
+    "number": ["slider", "rangeslider", "price"],
+    "slider": ["number", "rangeslider", "price"],
+    "rangeslider": ["number", "slider", "price"],
+    "price": ["number", "slider", "rangeslider"],
     "text": ["textarea"],
     "textarea": ["text"]
   },

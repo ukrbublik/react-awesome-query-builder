@@ -71,7 +71,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
     },
     price: {
       label: "Price",
-      type: "price",
+      type: "number",
       preferWidgets: ["price"],
       fieldSettings: {
         valuePlaceholder: "Enter your Price",

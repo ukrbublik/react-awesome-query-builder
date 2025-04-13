@@ -57,7 +57,8 @@ export default (): Config => {
     },
     price: {
       label: "Price",
-      type: "price",
+      type: "number",
+      preferWidgets: ["price"],
       valueSources: ["value"],
     },
     color: {

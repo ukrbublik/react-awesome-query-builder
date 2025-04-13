@@ -1,7 +1,11 @@
 import React, { useMemo } from "react";
 import TextField from "@mui/material/TextField";
+import Input from "@mui/material/Input";
 import FormControl from "@mui/material/FormControl";
-import { NumericFormat } from "react-number-format";
+import InputAdornment from "@mui/material/InputAdornment";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { NumericFormat, getNumberFormatProps } = Utils.NumberFormat;
+
 
 export default (props) => {
   const {
@@ -14,8 +18,12 @@ export default (props) => {
     label,
     placeholder,
     customProps,
-    ...numericFormatProps
+
+    prefix,
+    suffix,
   } = props;
+
+  const numericFormatProps = getNumberFormatProps(props, ["prefix", "suffix"]);
 
   const handleChange = (values) => {
     const val = values.floatValue;
@@ -27,17 +35,20 @@ export default (props) => {
   const InputProps = useMemo(
     () => ({
       readOnly: readonly,
+      startAdornment: (prefix != undefined ? <InputAdornment position="start">{prefix}</InputAdornment> : undefined),
+      endAdornment: (suffix != undefined ? <InputAdornment position="end">{suffix}</InputAdornment> : undefined),
     }),
     [readonly]
   );
 
-  const inputProps = useMemo(
-    () => ({
-      min,
-      max,
-    }),
-    [min, max, step]
-  );
+  // will not work without prop type="number"
+  // const inputProps = useMemo(
+  //   () => ({
+  //     min,
+  //     max,
+  //   }),
+  //   [min, max, step]
+  // );
 
   return (
     <FormControl>
@@ -47,10 +58,11 @@ export default (props) => {
         value={numberValue}
         placeholder={!readonly ? placeholder : ""}
         InputProps={InputProps}
-        inputProps={inputProps}
+        //inputProps={inputProps}
         disabled={readonly}
         onValueChange={handleChange}
         variant="standard"
+        //type="number"
         {...customProps}
         {...numericFormatProps}
       />
