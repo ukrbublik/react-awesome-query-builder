@@ -1285,14 +1285,17 @@ export interface NumberFieldSettings<V = number> extends BasicFieldSettings<V> {
   step?: number;
   marks?: {[mark: number]: RenderedReactElement};
 }
-export interface PriceFieldSettings<V = number> extends BasicFieldSettings<V> {
-  min?: number;
-  max?: number;
-  thousandsGroupStyle?: string
+export interface PriceFieldSettings<V = number> extends NumberFieldSettings<V> {
+  thousandsGroupStyle?: string;
   thousandSeparator?: string;
   decimalSeparator?: string;
+  decimalScale?: number;
   prefix?: string;
   suffix?: string;
+  allowLeadingZeros?: boolean;
+  fixedDecimalScale?: boolean;
+  allowNegative?: boolean;
+  //todo: add to NumberFieldSettings instead
 }
 export interface DateTimeFieldSettings<V = string> extends BasicFieldSettings<V> {
   timeFormat?: string;

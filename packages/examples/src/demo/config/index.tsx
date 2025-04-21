@@ -336,14 +336,6 @@ export default (skin: string) => {
   //////////////////////////////////////////////////////////////////////
 
   const fields: Fields = {
-    price: {
-      label: "Price",
-      type: "price",
-      fieldSettings: {
-        valuePlaceholder: "Enter your Price",
-        thousandSeparator: ",",
-      } as PriceFieldSettings,
-    },
     user: {
       label: "User",
       tooltip: "Group of fields",
@@ -475,6 +467,23 @@ export default (skin: string) => {
         max: 5
       },
       funcs: ["number.LINEAR_REGRESSION"],
+    },
+    price: {
+      label: "Price",
+      type: "number",
+      preferWidgets: ["price"],
+      fieldSettings: {
+        valuePlaceholder: "Enter your Price",
+        thousandSeparator: ",",
+        decimalSeparator: ".",
+        prefix: "$",
+        decimalScale: 3,
+        // allowLeadingZeros: true,
+        // fixedDecimalScale: true,
+        // allowNegative: true,
+        // min: 20,
+        // max: 30000,
+      },
     },
     slider: {
       label: "Slider",
