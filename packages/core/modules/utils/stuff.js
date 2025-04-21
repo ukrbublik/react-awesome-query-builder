@@ -46,6 +46,14 @@ export const shallowCopy = (v) => {
   return v;
 };
 
+export const isSafeKeyForObject = (k) => {
+  return !["__proto__", "constructor", "prototype"].includes(k);
+};
+
+export const hasSafeOwnProperty = (obj, k) => {
+  return Object.prototype.hasOwnProperty.call(obj, k) && isSafeKeyForObject(k);
+};
+
 export const setIn = (obj, path, newValue, opts) => {
   const defaultOpts = {
     canCreate: false, canIgnore: false, canChangeType: false,
@@ -70,6 +78,9 @@ export const setIn = (obj, path, newValue, opts) => {
   const targetKey = pathToTarget.pop();
   const goodPath = [];
   for (const k of pathToTarget) {
+    if (!isSafeKeyForObject(k)) {
+      throw new Error(`path contains unsafe ${k}`);
+    }
     const nextKey = path[goodPath.length];
     const expectedType = typeof nextKey === "number" ? "array" : "object";
     if (!isTypeOf(target[k], expectedType)) {
@@ -136,6 +147,14 @@ export const mergeIn = (obj, mixin, opts) => {
   } = {}) => {
     let indexDelta = 0;
     for (const mk in targetMix) {
+      if (!isSafeKeyForObject(mk)) {
+        throw new Error(`mixin contains unsafe key ${mk}`);
+        // newObjChanged = false;
+        // break;
+      }
+      if (!hasSafeOwnProperty(targetMix, mk)) {
+        continue;
+      }
       const k = isMixingArray ? Number(mk) + indexDelta : mk;
       const useSymbols = specialSymbols && isObjectOrArray(targetMix[mk]);
       let canCreate = opts.canCreate, canChangeType = opts.canChangeType, arrayMergeMode = opts.arrayMergeMode;
