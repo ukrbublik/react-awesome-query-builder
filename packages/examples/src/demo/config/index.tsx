@@ -481,8 +481,8 @@ export default (skin: string) => {
         // allowLeadingZeros: true,
         // fixedDecimalScale: true,
         // allowNegative: true,
-        // min: 20,
-        // max: 30000,
+        min: 20,
+        max: 30000,
       },
     },
     slider: {
