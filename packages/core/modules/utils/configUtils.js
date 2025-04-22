@@ -416,10 +416,10 @@ export function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, va
       const widgetValueSrc = config.widgets[widget].valueSrc || "value";
       let canAdd = true;
       if (widget === "field") {
-        canAdd = canAdd && filterValueSourcesForField(config, ["field"], fieldConfig, operator).length > 0;
+        canAdd = canAdd && filterValueSourcesForField(config, ["field"], field, fieldConfig, operator).length > 0;
       }
       if (widget === "func") {
-        canAdd = canAdd && filterValueSourcesForField(config, ["func"], fieldConfig, operator).length > 0;
+        canAdd = canAdd && filterValueSourcesForField(config, ["func"], field, fieldConfig, operator).length > 0;
       }
       // If can't check operators, don't add
       // Func args don't have operators
@@ -467,7 +467,8 @@ export function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, va
 }
 
 
-export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition, operator = null) => {
+export const filterValueSourcesForField = (config, valueSrcs, field, fieldDefinition, operator = null) => {
+  // tip: this func can be called with field = null and fieldDefinition = argConfig
   if (!fieldDefinition)
     return valueSrcs;
   let fieldType = fieldDefinition.type ?? fieldDefinition.returnType;
@@ -491,14 +492,27 @@ export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition, o
     let canAdd = true;
     if (vs === "field") {
       if (config.__fieldsCntByType) {
+        let canAddByType = false;
+        const groupFields = getAncestorGroupFields(field, config) ?? [];
+        const isInGroup = groupFields.length > 0;
+        const closestGroupField = groupFields[0] ?? "";
         // todo: (for select fields) use listValuesType and __fieldsCntByListValuesType
         // tip: LHS field can be used:
         //       - in RHS with value source "field" if LHS has field source "field" --> ONLY in this case we should prevent comparing same fields
         //       - in RHS with value source "func" if LHS has field source "func"  (see `_isFunc`)
         //       - as arg in RHS/LHS function
         //       - in case value
-        const dontExcludeSelfField = fieldDefinition._isFunc || fieldDefinition._isFuncArg || fieldDefinition._isCaseValue || isOtherType;
-        canAdd = canAdd && config.__fieldsCntByType[fieldType] > (dontExcludeSelfField ? 0 : 1);
+        const dontExcludeSelfField = (fieldDefinition._isFunc || fieldDefinition._isFuncArg || fieldDefinition._isCaseValue || isOtherType);
+        const excludeSelfField = !dontExcludeSelfField;
+        // todo: If we're inside group we SHOULD be able to compare inner fields with outer fields
+        //       In this function we support this
+        //       BUT in filterFields in ValueField it should be fixed
+        for (const groupPathStr of [...groupFields, ""]) {
+          // tip: "" means not inside group (in root)
+          const k = groupPathStr === "" ? fieldType : `${groupPathStr}_${fieldType}`;
+          canAddByType = canAddByType || config.__fieldsCntByType[k] > (excludeSelfField && groupPathStr === closestGroupField ? 1 : 0);
+        }
+        canAdd = canAdd && canAddByType;
       }
     }
     if (vs === "func") {
@@ -523,7 +537,7 @@ export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) =>
 
 export const getValueSourcesForFieldOp = (config, field, operator, fieldDefinition = null) => {
   const {valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, null);
-  const filteredValueSrcs = filterValueSourcesForField(config, valueSrcs, fieldDefinition, operator);
+  const filteredValueSrcs = filterValueSourcesForField(config, valueSrcs, field, fieldDefinition, operator);
   return filteredValueSrcs;
 };
 
@@ -574,4 +588,9 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
 
 export const getClosestGroupField = (field, config) => {
   return getFieldPartsConfigs(field, config)?.reverse().find(({path, cnf}) => cnf?.type === "!group")?.path;
+};
+
+// order - from closest to farthest
+export const getAncestorGroupFields = (field, config) => {
+  return getFieldPartsConfigs(field, config)?.reverse()?.filter(({path, cnf}) => cnf?.type === "!group")?.map(({path, cnf}) => path);
 };
