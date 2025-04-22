@@ -53,6 +53,7 @@ import {
   DateTimeWidgetProps as _DateTimeWidgetProps,
   BooleanWidgetProps as _BooleanWidgetProps,
   NumberWidgetProps as _NumberWidgetProps,
+  PriceWidgetProps as _PriceWidgetProps,
   RangeSliderWidgetProps as _RangeSliderWidgetProps,
   SelectWidgetProps as _SelectWidgetProps,
   MultiSelectWidgetProps as _MultiSelectWidgetProps,
@@ -104,6 +105,7 @@ export type TextWidgetProps<C = Config> = _TextWidgetProps<C>;
 export type DateTimeWidgetProps<C = Config> = _DateTimeWidgetProps<C>;
 export type BooleanWidgetProps<C = Config> = _BooleanWidgetProps<C>;
 export type NumberWidgetProps<C = Config> = _NumberWidgetProps<C>;
+export type PriceWidgetProps<C = Config> = _PriceWidgetProps<C>;
 export type RangeSliderWidgetProps<C = Config> = _RangeSliderWidgetProps<C>;
 export type SelectWidgetProps<C = Config> = _SelectWidgetProps<C>;
 export type MultiSelectWidgetProps<C = Config> = _MultiSelectWidgetProps<C>;
@@ -386,7 +388,7 @@ interface VanillaWidgets {
   VanillaMultiSelectWidget: ElementType<SelectWidgetProps>;
   VanillaSelectWidget: ElementType<SelectWidgetProps>;
   VanillaNumberWidget: ElementType<NumberWidgetProps>;
-  VanillaPriceWidget: ElementType<NumberWidgetProps>;
+  VanillaPriceWidget: ElementType<PriceWidgetProps>;
   VanillaSliderWidget: ElementType<NumberWidgetProps>;
   
   // common

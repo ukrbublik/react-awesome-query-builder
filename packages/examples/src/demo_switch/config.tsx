@@ -60,6 +60,11 @@ export default (): Config => {
       type: "number",
       preferWidgets: ["price"],
       valueSources: ["value"],
+      isSpelVariable: true,
+      fieldSettings: {
+        min: 10,
+        max: 100
+      },
     },
     color: {
       label: "Color",

@@ -1,7 +1,7 @@
 import { ElementType } from "react";
 import {
   FieldProps, ConjsProps, SwitchProps, ButtonProps, ButtonGroupProps, ProviderProps, ValueSourcesProps, ConfirmFunc,
-  BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, RangeSliderWidgetProps, TreeSelectWidgetProps
+  BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, PriceWidgetProps, RangeSliderWidgetProps, TreeSelectWidgetProps
 } from "@react-awesome-query-builder/ui";
 
 export interface AntdWidgets {
@@ -22,7 +22,7 @@ export interface AntdWidgets {
   TextWidget: ElementType<TextWidgetProps>,
   TextAreaWidget: ElementType<TextWidgetProps>,
   NumberWidget: ElementType<NumberWidgetProps>,
-  PriceWidget: ElementType<NumberWidgetProps>,
+  PriceWidget: ElementType<PriceWidgetProps>,
   SliderWidget: ElementType<NumberWidgetProps>,
   RangeWidget: ElementType<RangeSliderWidgetProps>,
   SelectWidget: ElementType<SelectWidgetProps>,
