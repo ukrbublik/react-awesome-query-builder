@@ -18,6 +18,7 @@ const FluentUIText = (props) => {
     <TextField
       value={textValue}
       placeholder={placeholder}
+      readOnly={readonly}
       disabled={readonly}
       onChange={onChange}
       maxLength={maxLength}
