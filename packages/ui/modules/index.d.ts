@@ -405,7 +405,7 @@ export interface Utils extends CoreUtils {
     getNumberFormatProps: (props: Record<string, any>, excludePropsNames?: string[]) => Record<string, any>;
     NumericFormat: typeof NumericFormat;
     numericFormatter: (val: number, numericFormatProps: NumericFormatProps) => string;
-    numericParser: (str: string, numericFormatProps: NumericFormatProps) => number | undefined;
+    numericParser: (str: string, numericFormatProps: NumericFormatProps, lastStrValue?: string, lastNumValue?: number) => number | undefined;
   }
   // ReactUtils: {
   //   useOnPropsChanged(obj: ReactElement): void;
