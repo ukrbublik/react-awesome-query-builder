@@ -126,9 +126,11 @@ const fixDecimal = (origStr, numericFormatProps, lastStrValue = undefined) => {
   return str;
 };
 
-const numericParser = (origStr, numericFormatProps, lastStrValue = undefined) => {
+const numericParser = (origStr, numericFormatProps, lastStrValue = undefined, lastNumValue = undefined) => {
+  const decimalSeparator = numericFormatProps?.decimalSeparator ?? ".";
   const str = fixDecimal(origStr, numericFormatProps, lastStrValue);
   const changeMeta = getChangeMeta(str, lastStrValue);
+  const typedDecimalSep = (changeMeta.to.end - changeMeta.to.start) === 1 && [decimalSeparator, "."].includes(str[changeMeta.to.start]);
   const cleanStr = removeNumericFormat(str, changeMeta, numericFormatProps);
  
   let num = parseFloat(cleanStr);
@@ -138,9 +140,10 @@ const numericParser = (origStr, numericFormatProps, lastStrValue = undefined) =>
   }
 
   const { max, min, allowLeadingZeros } = numericFormatProps;
+  const changedValueWithSep = typedDecimalSep && num != lastNumValue;
   const isValid = num != undefined && (max == undefined || num <= max) && (min == undefined || num >= min);
   const extraLeadingZeros = allowLeadingZeros ? getExtraLeadingZeros(cleanStr, num) : undefined;
-  const trailingZeros = getTrailingZeros(cleanStr);
+  const trailingZeros = changedValueWithSep ? undefined : getTrailingZeros(cleanStr);
 
   const res = {
     str: origStr,
@@ -148,8 +151,6 @@ const numericParser = (origStr, numericFormatProps, lastStrValue = undefined) =>
     extraLeadingZeros,
     trailingZeros,
     isValid,
-    // extra
-    cleanStr,
   };
   return res;
 };

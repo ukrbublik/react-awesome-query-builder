@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import TextField from "@mui/material/TextField";
-import Input from "@mui/material/Input";
 import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
 import { Utils } from "@react-awesome-query-builder/ui";
@@ -15,7 +14,6 @@ export default (props) => {
     min,
     max,
     step,
-    label,
     placeholder,
     customProps,
 
@@ -30,7 +28,7 @@ export default (props) => {
     setValue(val === undefined ? null : val);
   };
 
-  const numberValue = value == undefined ? "" : value;
+  const formattedValue = value == undefined ? "" : value;
 
   const InputProps = useMemo(
     () => ({
@@ -55,7 +53,7 @@ export default (props) => {
       <NumericFormat
         size="small"
         customInput={TextField}
-        value={numberValue}
+        value={formattedValue}
         placeholder={!readonly ? placeholder : ""}
         InputProps={InputProps}
         //inputProps={inputProps}

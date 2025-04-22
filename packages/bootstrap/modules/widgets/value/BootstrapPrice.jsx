@@ -1,6 +1,7 @@
 import React from "react";
 import { Input } from "reactstrap";
-import { NumericFormat } from "react-number-format";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { NumericFormat, getNumberFormatProps } = Utils.NumberFormat;
 
 export default (props) => {
   const {
@@ -8,8 +9,15 @@ export default (props) => {
     setValue,
     readonly,
     placeholder,
-    ...numericFormatProps
+    min,
+    max,
+    customProps,
   } = props;
+
+  const numericFormatProps = getNumberFormatProps(props);
+
+  const formattedValue = value == undefined ? "" : value;
+  const isValid = value != undefined && (max == undefined || value <= max) && (min == undefined || value >= min);
 
   const handleChange = (values) => {
     let val = values.floatValue;
@@ -18,11 +26,14 @@ export default (props) => {
 
   return (
     <NumericFormat
+      bsSize={"sm"}
+      invalid={value != undefined && !isValid}
       customInput={Input}
-      value={value}
+      value={formattedValue}
       placeholder={placeholder}
       disabled={readonly}
       onValueChange={handleChange}
+      {...customProps}
       {...numericFormatProps}
     />
   );

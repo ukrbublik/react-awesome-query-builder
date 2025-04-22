@@ -61,7 +61,8 @@ export default (props) => {
   const extParser = useCallback((str) => {
     const prev = lastValueRef.current;
     const prevStr = prev?.str;
-    const res = numericParser(str, numericFormatProps, prevStr);
+    const prevNum = prev?.num;
+    const res = numericParser(str, numericFormatProps, prevStr, prevNum);
     if (str !== prevStr) {
       lastValueRef.current = res;
     }
