@@ -6,7 +6,7 @@ import {mergeArraysSmart, logger, deepFreeze, mergeCustomizerNoArrays, shallowCo
 import clone from "clone";
 
 import { compileConfig } from "./configSerialize";
-import { getFieldRawConfig } from "./configUtils";
+import { getFieldRawConfig, getClosestGroupField } from "./configUtils";
 import { findExtendedConfigInAllMemos, getCommonMemo } from "./configMemo";
 
 const widgetPropsForDeepMerge = ["customProps"];
@@ -240,6 +240,13 @@ function extendFieldConfig(fieldConfig, config, path = [], isInsideGroup = false
     config.__fieldsCntByType[type]++;
 
     // todo: fill __fieldsCntByListValuesType (for select fields)
+  }
+  if (isInsideGroup) {
+    const groupField = getClosestGroupField(path, config);
+    const k = `${groupField}_${type}`;
+    if (!config.__fieldsCntByType[k])
+      config.__fieldsCntByType[k] = 0;
+    config.__fieldsCntByType[k]++;
   }
 
   if (isFuncArg) {
