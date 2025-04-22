@@ -75,7 +75,8 @@ function createConfig(InitialConfig: CoreConfig): Config {
       preferWidgets: ["price"],
       fieldSettings: {
         valuePlaceholder: "Enter your Price",
-        thousandSeparator: ",",
+        prefix: "$",
+        allowNegative: false,
       } as PriceFieldSettings,
     },
     prox1: {
@@ -259,6 +260,14 @@ function createConfig(InitialConfig: CoreConfig): Config {
     // examples of  overriding
     text: {
       ...InitialConfig.widgets.text,
+    },
+    price: {
+      ...InitialConfig.widgets.price,
+      // prefix: "$",
+      // allowNegative: false,
+      thousandSeparator: ",",
+      decimalSeparator: ".",
+      decimalScale: 2,
     },
     slider: {
       ...InitialConfig.widgets.slider,

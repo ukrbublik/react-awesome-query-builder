@@ -1,5 +1,5 @@
 import React from "react";
-import { NumericFormat } from "react-number-format";
+import { NumericFormat, getNumberFormatProps } from "../../../../utils/numberFormat";
 
 export default (props) => {
   const {
@@ -7,9 +7,15 @@ export default (props) => {
     setValue,
     readonly,
     placeholder,
+    min,
+    max,
     customProps,
-    ...numericFormatProps
   } = props;
+
+  const numericFormatProps = getNumberFormatProps(props);
+
+  const formattedValue = value == undefined ? "" : value;
+  //const isValid = value != undefined && (max == undefined || value <= max) && (min == undefined || value >= min);
 
   const onValueChange = (values) => {
     let { floatValue } = values;
@@ -18,7 +24,7 @@ export default (props) => {
 
   return (
     <NumericFormat
-      value={value}
+      value={formattedValue}
       placeholder={placeholder}
       disabled={readonly}
       onValueChange={onValueChange}
