@@ -711,6 +711,18 @@ export const with_all_types = (BasicConfig) => ({
       type: "number",
       valueSources: ["field"],
     },
+    price: {
+      label: "Price",
+      type: "number",
+      preferWidgets: ["price"],
+      fieldSettings: {
+        prefix: "$",
+        allowNegative: false,
+        thousandSeparator: ",",
+        decimalSeparator: ".",
+        decimalScale: 3,
+      },
+    },
     str: {
       label: "String",
       type: "text",

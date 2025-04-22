@@ -15,6 +15,18 @@ describe("vanilla widgets interactions", () => {
     });
   });
 
+  it("@price change price value", async () => {
+    await with_qb_skins(configs.with_all_types, inits.with_price, "JsonLogic", async (qb, { expect_jlogic }) => {
+      const inputWrapper = qb.find(".rule .rule--value .widget--widget input");
+      const inputNode = inputWrapper.at(0).getDOMNode();
+      inputNode.value = "23.4298";
+      inputWrapper.simulate("change", { target: inputNode });
+      expect_jlogic([null,
+        { "and": [{ ">": [ { "var": "price" }, 23.429 ] }] }
+      ]);
+    });
+  });
+
   it("change text value", async () => {
     await with_qb_skins(configs.with_all_types, inits.with_text, "JsonLogic", (qb, {expect_jlogic}) => {
       qb

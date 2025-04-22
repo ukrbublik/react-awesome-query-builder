@@ -1,6 +1,7 @@
 import Enzyme from "enzyme";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 import {setCurrentTest, setCurrentTestName, setFilterSpec, getCurrentTestName} from "./support/utils";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "@react-awesome-query-builder/ui/css/styles.scss";
 Enzyme.configure({adapter: new Adapter()});
 
