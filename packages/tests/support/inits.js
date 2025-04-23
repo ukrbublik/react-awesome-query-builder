@@ -1646,6 +1646,57 @@ export const with_group_array_custom_operator = {
   ]
 };
 
+export const with_group_array_custom_operator2 = {
+  "and": [
+    { "custom2": [
+      "--some-extra-data-1--",
+      { "var": "cars" },
+      { "and": [
+        {
+          "==": [ { "var": "vendor" }, "Toyota" ]
+        }, {
+          ">=": [ { "var": "year" }, 2010 ]
+        }
+      ] }
+    ] }
+  ]
+};
+
+export const with_group_array_custom_operator3 = {
+  "and": [
+    { "custom3": [
+      "--some-extra-data-1--",
+      "cars",
+      123,
+      { "and": [
+        {
+          "==": [ { "var": "vendor" }, "Toyota" ]
+        }, {
+          ">=": [ { "var": "year" }, 2010 ]
+        }
+      ] }
+    ] }
+  ]
+};
+
+export const with_group_array_custom_operator4 = {
+  "and": [
+    { "custom4": [
+      "--some-extra-data-1--",
+      "cars",
+      123,
+      456,
+      { "and": [
+        {
+          "==": [ { "var": "vendor" }, "Toyota" ]
+        }, {
+          ">=": [ { "var": "year" }, 2010 ]
+        }
+      ] }
+    ] }
+  ]
+};
+
 export const with_autocomplete_strict_a = {
   "and": [{
     "==": [

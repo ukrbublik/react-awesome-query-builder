@@ -4,6 +4,7 @@ import {getFieldConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldPar
 import {extendConfig} from "../utils/configExtend";
 import {loadTree} from "./tree";
 import {defaultGroupConjunction} from "../utils/defaultUtils";
+import Immutable from "immutable";
 
 import moment from "moment";
 
@@ -14,7 +15,27 @@ const arrayUniq = (arr) => Array.from(new Set(arr));
 
 // constants
 const jlFieldMarker = "jlField";
-const jlArgsMarker = "jlArgs";
+const jlRawFieldMarker = "jlRawField";
+const jlHavingMarker = "jlHavingMarker";
+
+const jlArgsMarker = new Proxy({
+  __name: "jlArgs",
+  __test: (v) => {
+    const m = v?.match?.(/jlArgs\[(\d+)\]/);
+    if (m) {
+      return parseInt(m[1]);
+    }
+  },
+}, {
+  get: function(target, k) {
+    if (!isNaN(parseInt(k))) {
+      return "jlArgs["+k+"]";
+    } else {
+      return target[k];
+    }
+  }
+});
+
 const jlEqOps = ["==", "!="];
 const jlRangeOps = ["<", "<=", ">", ">="];
 const jlDualMeaningOps = ["in", "!in"]; // can be mapped to "select_any_in" or "like"
@@ -63,26 +84,36 @@ const buildConv = (config) => {
   let combinationOperators = {};
   for (let opKey in config.operators) {
     const opConfig = config.operators[opKey];
+    const cardinality = getOpCardinality(opConfig);
     if (typeof opConfig.jsonLogic == "string") {
       // example: "</2", "#in/1"
-      const opk = opConfig.jsonLogic + "/" + getOpCardinality(opConfig);
+      const opk = opConfig.jsonLogic + "/" + cardinality;
       if (!operators[opk])
         operators[opk] = [];
       operators[opk].push(opKey);
-    } else if(typeof opConfig.jsonLogic2 == "string") {
-      // example: all-in/1"
-      const isRevArgs = opConfig.jsonLogic2.startsWith("#");
-      const jsonLogic = (""+opConfig.jsonLogic2).replace(/^#/, "");
-      const opk = jsonLogic + "/" + getOpCardinality(opConfig);
+    } else if (typeof opConfig.jsonLogic === "function") {
+      // example: "all-in/1"
+      const isRevArgs = opConfig.jsonLogic2?.startsWith("#");
+      const newOp = opConfig.jsonLogic2?.replace(/^#/, "") ?? opKey;
+      const opk = newOp + "/" + cardinality;
       if (!operators[opk])
         operators[opk] = [];
       operators[opk].push(opKey);
+      let template;
+      try {
+        template = opConfig.jsonLogic(jlFieldMarker, opKey, jlArgsMarker, opConfig, new Immutable.Map({
+          having: jlHavingMarker,
+          groupField: jlRawFieldMarker,
+        }));
+      } catch(e) {
+        console.warn(`Error while running JsonLogic template for op ${opKey}`, e);
+      }
 
       if (!combinationOperators[opKey])
         combinationOperators[opKey] = {};
       combinationOperators[opKey] = {
-        "template": opConfig.jsonLogic(jlFieldMarker, opKey, jlArgsMarker), 
-        "jsonLogic2": jsonLogic,
+        "template": template, 
+        "newOp": newOp,
         "_jsonLogicIsExclamationOp": !!opConfig._jsonLogicIsExclamationOp,
         "isRevArgs": isRevArgs
       };
@@ -149,7 +180,7 @@ const matchAgainstTemplates = (jsonlogic, conv, meta, operatorsToCheck = null) =
             meta.errors.push(`Operator matched against 2 templates: ${response.newOp} and ${key}`);
           }
           // New op that is used to represent operator that is combosed of multiple operators
-          response["newOp"] = value.jsonLogic2;
+          response["newOp"] = value.newOp;
         }
       }
     }
@@ -169,7 +200,7 @@ const matchAgainstTemplates = (jsonlogic, conv, meta, operatorsToCheck = null) =
  * @returns {Object} The updated response object after checking the current template level. It includes whether the current level 
  * matches (match: true/false), any identified fields (jlField), and any arguments (jlArgs).
  */
-const isTemplateMatch = (template, jsonlogic, response = {"match": true, "jlField": null, "jlArgs": []}) => {
+const isTemplateMatch = (template, jsonlogic, response = {"match": true, "jlField": null, "jlArgs": [], "jlHaving": null}) => {
   if (template == undefined || jsonlogic == undefined) {
     response.match = false;
     return response;    
@@ -191,12 +222,20 @@ const isTemplateMatch = (template, jsonlogic, response = {"match": true, "jlFiel
       // Checks that both have exact same key at exact same place. Kind of pointless for arrays but whatever
       response.match = false;
       return response;
+    }
+    const maybeArgIndex = jlArgsMarker.__test(value);
+    if (maybeArgIndex !== undefined) {
+      response.jlArgs[maybeArgIndex] = jsonlogic[key];
     } else if (value === jlFieldMarker && isJsonLogic(jsonlogic[key])) {
       // If jlFieldMarker is found in template AND it's field or func we take the value from corresponding place in jsonlogic
       response.jlField = jsonlogic[key];
+    } else if (value === jlRawFieldMarker) {
+      response.jlField = {var: jsonlogic[key]};
     } else if (value === jlArgsMarker) {
       // If jlArgsMarker is found in template we take the value from corresponding place in jsonlogic
       response.jlArgs.push(jsonlogic[key]);
+    } else if (value === jlHavingMarker) {
+      response.jlHaving = jsonlogic[key];
     } else if (typeof value === "object" && value !== null || Array.isArray(value)) {
       // Here we recurse thru objects and arrays of template until we have gone thru it completely
       response = isTemplateMatch(value, jsonlogic[key], response);
@@ -224,12 +263,15 @@ const convertFromLogic = (logic, conv, config, expectedTypes, meta, not = false,
 
   const {lockedOp} = config.settings.jsonLogic;
   const isEmptyOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && conv.varKeys.includes(Object.keys(vals[0])[0]));
-  // If matchAgainstTemplates returns match then op is replaced with special jsonlogic2 value
+  // If matchAgainstTemplates returns match then op is replaced with special `newOp` value (usually taken from jsonLogic2)
   const match = matchAgainstTemplates(logic, conv, meta);
   if (match) {
     // We reset vals if match found
     vals = [];
     vals[0] = match.jlField;
+    if (match.jlHaving) {
+      vals.push(match.jlHaving);
+    }
     match.jlArgs.forEach(arg => vals.push(arg));
     // We reset op to new op that represents multiple jsonlogic operators
     op = match.newOp;
@@ -389,7 +431,10 @@ const convertFieldRhs = (op, vals, conv, config, not, meta, parentField = null) 
   return undefined;
 };
 
-const convertLhs = (isGroup0, jlField, args, conv, config, not = null, fieldConfig = null, meta, parentField = null) => {
+const convertLhs = (groupOp, jlField, args, conv, config, not = null, fieldConfig = null, meta, parentField = null) => {
+  const groupOpConfig = config.operators[groupOp];
+  let isGroup = !!groupOpConfig;
+  // const isGroup0 = groupOpConfig?.cardinality == 0;
   let k = Object.keys(jlField)[0];
   let v = Object.values(jlField)[0];
 
@@ -399,16 +444,16 @@ const convertLhs = (isGroup0, jlField, args, conv, config, not = null, fieldConf
   };
 
   const beforeErrorsCnt = meta.errors.length;
-  let field, fieldSrc, having, isGroup;
+  let field, fieldSrc, having;
   const parsed = _parse(k, v);
   if (parsed) {
     field = parsed.field;
     fieldSrc = parsed.fieldSrc;
   }
-  if (isGroup0) {
-    isGroup = true;
+  if (isGroup) {
+    // If current op is in `config.groupOperators`, first arg is having query (see `match.jlHaving`)
     having = args[0];
-    args = [];
+    args = args.splice(1);
   }
   // reduce/filter for group ext
   if (k == "reduce" && Array.isArray(v) && v.length == 3) {
@@ -736,11 +781,14 @@ const _parseRule = (op, arity, vals, parentField, conv, config, meta) => {
   const isAllOrSomeInForMultiselect = multiselectOps
     .map((opName) => config.operators[opName]?.jsonLogic2)
     .includes(op);
-  const isGroup0 = config.settings.groupOperators.includes(op) && !isAllOrSomeInForMultiselect;
-  let cardinality = isGroup0 ? 0 : arity - 1;
-  if (isGroup0)
-    cardinality = 0;
-  else if (jlEqOps.includes(op) && cardinality == 1 && vals[1] === null) {
+  const groupOp = config.settings.groupOperators.find(groupOp => {
+    const groupOpConfig = config.operators[groupOp];
+    return [groupOp, typeof groupOpConfig.jsonLogic === "string" && groupOpConfig.jsonLogic, groupOpConfig.jsonLogic2].includes(op);
+  });
+  const groupOpConfig = config.operators[groupOp];
+  const isGroup0 = groupOp && groupOpConfig?.cardinality == 0 && !isAllOrSomeInForMultiselect;
+  let cardinality = groupOpConfig?.cardinality ?? (arity - 1);
+  if (!isGroup0 && jlEqOps.includes(op) && cardinality == 1 && vals[1] === null) {
     arity = 1;
     cardinality = 0;
     vals = [vals[0]];
@@ -769,7 +817,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, meta) => {
       continue; // try another operator
     }
 
-    const lhs = convertLhs(isGroup0, jlField, jlArgs, conv, config, null, null, meta, parentField);
+    const lhs = convertLhs(groupOp, jlField, jlArgs, conv, config, null, null, meta, parentField);
     if (!lhs) {
       continue; // try another operator
     }

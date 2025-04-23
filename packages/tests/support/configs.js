@@ -1497,7 +1497,10 @@ export const with_group_array_custom_operator = (BasicConfig) => ({
       conjunctions: ["AND", "OR"],
       showNot: true,
       operators: [
-        "custom_group_operator"
+        "custom_group_operator",
+        "custom_group_operator2",
+        "custom_group_operator3",
+        "custom_group_operator4",
       ],
       defaultOperator: "some",
       initialEmptyWhere: true, // if default operator is not in config.settings.groupOperators, true - to set no children, false - to add 1 empty
@@ -1523,7 +1526,13 @@ export const with_group_array_custom_operator = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    groupOperators: [...BasicConfig.settings.groupOperators, "custom_group_operator"]
+    groupOperators: [
+      ...BasicConfig.settings.groupOperators,
+      "custom_group_operator",
+      "custom_group_operator2",
+      "custom_group_operator3",
+      "custom_group_operator4",
+    ]
   },
   operators: {
     ...BasicConfig.operators,
@@ -1533,7 +1542,78 @@ export const with_group_array_custom_operator = (BasicConfig) => ({
       cardinality: 0,
       jsonLogic: "custom_group_operator",
     },
-  }
+    custom_group_operator2: {
+      label: "custom_group_operator2",
+      cardinality: 0,
+      jsonLogic2: "custom2",
+      jsonLogic: (field, op, vals, _opDef, operatorOptions, _fieldDef) => {
+        return {
+          "custom2": [
+            "--some-extra-data-1--",
+            field,
+            operatorOptions?.get("having")
+          ]
+        };
+      },
+    },
+    custom_group_operator3: {
+      // this operator has cardinality 1
+      label: "custom_group_operator3",
+      cardinality: 1,
+      jsonLogic2: "custom3",
+      jsonLogic: (field, op, vals, _opDef, operatorOptions, _fieldDef) => {
+        return {
+          "custom3": [
+            "--some-extra-data-1--",
+            operatorOptions?.get("groupField"),
+            vals, // single number
+            operatorOptions?.get("having"),
+          ]
+        };
+      },
+    },
+    custom_group_operator4: {
+      // this operator has cardinality 2
+      label: "custom_group_operator4",
+      cardinality: 2,
+      jsonLogic2: "custom4",
+      jsonLogic: (field, op, vals, _opDef, operatorOptions, _fieldDef) => {
+        return {
+          "custom4": [
+            "--some-extra-data-1--",
+            operatorOptions?.get("groupField"),
+            vals[0],
+            vals[1],
+            operatorOptions?.get("having"),
+          ]
+        };
+      },
+    },
+  },
+  types: {
+    // Need to add custom group operators with cardinality > 0 for number widget in special "!group" type
+    ...BasicConfig.types,
+    "!group": {
+      ...BasicConfig.types["!group"],
+      widgets: {
+        ...BasicConfig.types["!group"].widgets,
+        number: {
+          ...BasicConfig.types["!group"].widgets.number,
+          operators: [
+            ...BasicConfig.types["!group"].widgets.number.operators,
+            "custom_group_operator3",
+            "custom_group_operator4",
+          ],
+          opProps: {
+            ...BasicConfig.types["!group"].widgets.number.opProps,
+            custom_group_operator4: {
+              textSeparators: ["from", "to"],
+            },
+          },
+        }
+      },
+    },
+  },
 });
 
 export const with_autocomplete = (BasicConfig) => ({

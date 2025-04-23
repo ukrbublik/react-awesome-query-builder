@@ -1193,7 +1193,7 @@ export type Operators<C = Config> = TypedMap<Operator<C>>;
 
 interface WidgetConfigForType {
   widgetProps?: Optional<Widget>;
-  opProps?: Optional<Operator>;
+  opProps?: Record<string, Optional<Operator>>;
   operators?: Array<string>;
   defaultOperator?: string;
   valueLabel?: string;
