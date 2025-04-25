@@ -315,6 +315,10 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
       }
       for (let k in mixin) {
         if (Object.prototype.hasOwnProperty.call(mixin, k)) {
+          // Block prototype-polluting keys
+          if (k === "__proto__" || k === "constructor") {
+            continue;
+          }
           if (mixin[k] === "$$deleted") {
             delete target[k];
           } else {
