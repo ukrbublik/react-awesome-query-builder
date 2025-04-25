@@ -1,6 +1,6 @@
 import merge from "lodash/merge";
 import pick from "lodash/pick";
-import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual, isObject} from "./stuff";
+import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual, isObject, hasSafeOwnProperty} from "./stuff";
 import clone from "clone";
 import JL from "json-logic-js";
 import { addRequiredJsonLogicOperations, applyJsonLogic } from "./jsonLogic";
@@ -314,11 +314,7 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
         target = {};
       }
       for (let k in mixin) {
-        if (Object.prototype.hasOwnProperty.call(mixin, k)) {
-          // Block prototype-polluting keys
-          if (k === "__proto__" || k === "constructor") {
-            continue;
-          }
+        if (hasSafeOwnProperty(mixin, k)) {
           if (mixin[k] === "$$deleted") {
             delete target[k];
           } else {
