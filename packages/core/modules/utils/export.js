@@ -42,7 +42,7 @@ SqlString.escapeLike = (val, any_start = true, any_end = true, sqlDialect = unde
     // https://cloud.google.com/bigquery/docs/reference/standard-sql/operators#like_operator
     res = res.replace(/[%_\\]/g, "\\\\$&");
   } else {
-    res = res.replace(/[%_]/g, "\\$&");
+    res = res.replace(/[%_\\]/g, "\\\\$&");
   }
   // wrap with % for LIKE
   res = (any_start ? "%" : "") + res + (any_end ? "%" : "");
