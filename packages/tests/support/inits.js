@@ -1889,3 +1889,68 @@ export const tree_with_empty_cases = {
     },
   ]
 };
+
+export const with_html_injections = {
+  "and": [{
+    "==": [
+      { "var": "num" }, "",
+    ],
+  }, {
+    "==": [
+      { "var": "color" },
+      "yellow",
+    ],
+  }, {
+    "all": [
+      { "var": "multicolor" },
+      { "in": [
+        { "var": "" },
+        [ "yellow" ]
+      ] }
+    ]
+  }, {
+    "==": [
+      { "var": "selecttree" },
+      "8",
+    ],
+  }, {
+    "all": [
+      { "var": "multiselecttree" },
+      { "in": [
+        { "var": "" },
+        [ "8", "7" ]
+      ] }
+    ]
+  }]
+};
+
+
+export const tree_with_html_injections = {
+  "type": "group",
+  "children1": [
+    {
+      "type": "rule",
+      "properties": {
+        "field": "prox1",
+        "operator": "proximity",
+        "value": [
+          "",
+          "<img src=0 onerror=alert('xss@proximity_value')>",
+        ],
+        // "operatorOptions": {
+        //   "proximity": 3
+        // }
+      }
+    },
+    {
+      "type": "rule",
+      "properties": {
+        "field": "str",
+        "operator": "equal",
+        "value": [
+          "<img src=0 onerror=alert('xss@string_value')>",
+        ],
+      }
+    }
+  ]
+};

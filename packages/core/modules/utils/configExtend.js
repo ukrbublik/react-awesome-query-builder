@@ -9,6 +9,9 @@ import { compileConfig } from "./configSerialize";
 import { getFieldRawConfig } from "./configUtils";
 import { findExtendedConfigInAllMemos, getCommonMemo } from "./configMemo";
 
+const widgetPropsForDeepMerge = ["customProps"];
+const opPropsForDeepMerge = ["options"]; // tip: options for proximity
+
 export const extendConfig = (config, configId, canCompile = true) => {
   //operators, defaultOperator - merge
   //widgetProps (including valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel) - concrete by widget
@@ -298,17 +301,21 @@ function extendFieldConfig(fieldConfig, config, path = [], isFuncArg = false, is
     }
 
     // merge widgetProps
-    if (widget === fieldConfig.mainWidget) {
-      fieldWidgetConfig.widgetProps = {
-        ...(typeWidgetConfig.widgetProps || {}),
-        ...(fieldConfig.mainWidgetProps || {}),
-        ...(fieldWidgetConfig.widgetProps || {}),
-      };
-    } else {
-      fieldWidgetConfig.widgetProps = {
-        ...(typeWidgetConfig.widgetProps || {}),
-        ...(fieldWidgetConfig.widgetProps || {}),
-      };
+    fieldWidgetConfig.widgetProps = {
+      ...(typeWidgetConfig.widgetProps || {}),
+      ...(widget === fieldConfig.mainWidget && fieldConfig.mainWidgetProps || {}),
+      ...(fieldWidgetConfig.widgetProps || {}),
+    };
+    // merge some object-type props (like `customProps`) deeply
+    for (const prop of widgetPropsForDeepMerge) {
+      if (fieldWidgetConfig.widgetProps[prop]) {
+        fieldWidgetConfig.widgetProps[prop] = {
+          ...(config.widgets[widget]?.[prop] || {}),
+          ...(typeWidgetConfig.widgetProps?.[prop] || {}),
+          ...(widget === fieldConfig.mainWidget && fieldConfig.mainWidgetProps?.[prop] || {}),
+          ...(fieldWidgetConfig.widgetProps?.[prop] || {}),
+        };
+      }
     }
 
     // merge opProps
@@ -323,6 +330,16 @@ function extendFieldConfig(fieldConfig, config, path = [], isFuncArg = false, is
           ...(typeWidgetConfig.opProps?.[op] || {}),
           ...(fieldWidgetConfig.opProps?.[op] || {}),
         };
+        // merge some object-type props (like `options` for `complexity` op) deeply
+        for (const opProp of opPropsForDeepMerge) {
+          if (opProps[op][opProp]) {
+            opProps[op][opProp] = {
+              ...(config.operators?.[op]?.[opProp] || {}),
+              ...(typeWidgetConfig.opProps?.[op]?.[opProp] || {}),
+              ...(fieldWidgetConfig.opProps?.[op]?.[opProp] || {}),
+            };
+          }
+        }
       }
       fieldWidgetConfig.opProps = opProps;
     }

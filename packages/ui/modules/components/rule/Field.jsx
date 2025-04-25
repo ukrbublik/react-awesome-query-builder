@@ -172,6 +172,9 @@ export default class Field extends Component {
   render() {
     const {config, customProps, setFieldSrc, readonly, id, groupId} = this.props;
     const {renderField} = config.settings;
+    if (!this.meta.items) {
+      return null;
+    }
     const renderProps = {
       id,
       groupId,
