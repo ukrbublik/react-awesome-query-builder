@@ -1885,3 +1885,124 @@ export const with_no_field_placeholder = (BasicConfig) => ({
     fieldPlaceholder: null,
   }
 });
+
+
+
+export const with_html_injections = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    num: {
+      label: "<img src=0 onerror=alert('xss@fieldLabel')>",
+      type: "number",
+      preferWidgets: ["number"],
+      mainWidgetProps: {
+        valueLabel: "<img src=0 onerror=alert('xss@widgetValueLabel')>",
+        valuePlaceholder: "<img src=0 onerror=alert('xss@widgetValuePlaceholder')>",
+      },
+    },
+    color: {
+      label: "Color",
+      type: "select",
+      valueSources: ["value", "field"],
+      fieldSettings: {
+        listValues: [
+          { value: "yellow", title: "<img src=0 onerror=alert('xss@select_listValues_title')>", },
+          { value: "green", title: "Green" },
+          { value: "orange", title: "Orange" },
+        ],
+      }
+    },
+    multicolor: {
+      label: "Colors",
+      type: "multiselect",
+      valueSources: ["value", "field"],
+      fieldSettings: {
+        listValues: {
+          yellow: "<img src=0 onerror=alert('xss@multiselect_listValues_title')>",
+          green: "Green",
+          orange: "Orange"
+        },
+        allowCustomValues: false
+      }
+    },
+    selecttree: {
+      label: "Color Tree",
+      type: "treeselect",
+      fieldSettings: {
+        treeExpandAll: true,
+        treeValues: [
+          { value: "1", title: "Warm colors" },
+          { value: "2", title: "Red", parent: "1" },
+          { value: "3", title: "Orange", parent: "1" },
+          { value: "4", title: "Cool colors" },
+          { value: "5", title: "Green", parent: "4" },
+          { value: "6", title: "Blue", parent: "4" },
+          { value: "7", title: "<img src=0 onerror=alert('xss@selecttree_treeValues_title')>", parent: "6" },
+          { value: "8", title: "<img src=0 onerror=alert('xss@selecttree_treeValues_title')>", parent: "7" },
+        ],
+      }
+    },
+    multiselecttree: {
+      label: "Colors (tree)",
+      type: "treemultiselect",
+      fieldSettings: {
+        treeExpandAll: true,
+        treeValues: [
+          { value: "1", title: "Warm colors", children: [
+            { value: "2", title: "Red" },
+            { value: "3", title: "Orange" }
+          ] },
+          { value: "4", title: "Cool colors", children: [
+            { value: "5", title: "Green" },
+            { value: "6", title: "Blue", children: [
+              { value: "7", title: "<img src=0 onerror=alert('xss@multiselecttree_treeValues_title')>", children: [
+                { value: "8", title: "<img src=0 onerror=alert('xss@multiselecttree_treeValues_title')>" }
+              ] }
+            ] }
+          ] }
+        ],
+        customProps: {
+          treeCheckStrictly: true
+        }
+      }
+    },
+    prox1: {
+      label: "Prox1",
+      type: "text",
+      operators: ["proximity"],
+      widgets: {
+        text: {
+          opProps: {
+            proximity: {
+              valueLabels: [
+                { label: "<img src='' onerror=alert('xss@proximity_valueLabels_label') />", placeholder: "<img src='' onerror=alert('xss@proximity_valueLabels_placeholder') />" },
+                { label: "Word 2", placeholder: "Enter second word" },
+              ],
+              options: {
+                optionLabel: "<img src='' onerror=alert('xss@proximity_optionLabel') />",
+                optionTextBefore: "<img src='' onerror=alert('xss@proximity_optionTextBefore') />",
+                optionPlaceholder: "<img src='' onerror=alert('xss@proximity_optionPlaceholder') />",
+              }
+            }
+          }
+        }
+      }
+    },
+    str: {
+      label: "String",
+      type: "text",
+      tooltip: "<img src=0 onerror=alert('xss@fieldTooltip')>"
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+    fieldPlaceholder: "<img src=0 onerror=alert('xss@settings_fieldPlaceholder')>",
+    addRuleLabel: "<img src=0 onerror=alert('xss@settings_addRuleLabel')>",
+    valueSourcesPopupTitle: "<img src=0 onerror=alert('xss@settings_valueSourcesPopupTitle')>",
+    removeRuleConfirmOptions: {
+      title: "<img src=0 onerror=alert('xss@settings_removeRuleConfirmOptions_title')>",
+      okText: "<img src=0 onerror=alert('xss@settings_removeRuleConfirmOptions_okText')>",
+    },
+  }
+});
+

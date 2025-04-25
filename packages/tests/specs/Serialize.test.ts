@@ -42,7 +42,7 @@ describe("Serialized config", () => {
         const strConfig = UNSAFE_serializeConfig(config);
         const deserConfig = UNSAFE_deserializeConfig(strConfig, BaseConfig.ctx);
         export_checks(() => deserConfig, inits.with_ops, "JsonLogic", {}, [], {
-          withRender: configKey !== "CoreConfig"
+          withRenderOnExport: configKey !== "CoreConfig"
         });
       });
     });

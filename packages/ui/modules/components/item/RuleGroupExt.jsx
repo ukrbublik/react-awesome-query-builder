@@ -51,7 +51,7 @@ class RuleGroupExt extends BasicGroup {
   canAddRule() {
     const {config, selectedField} = this.props;
     const selectedFieldConfig = getFieldConfig(config, selectedField);
-    const maxNumberOfRules = selectedFieldConfig.maxNumberOfRules;
+    const maxNumberOfRules = selectedFieldConfig?.maxNumberOfRules;
     const totalRulesCnt = this.props.totalRulesCnt;
     if (maxNumberOfRules) {
       return totalRulesCnt < maxNumberOfRules;

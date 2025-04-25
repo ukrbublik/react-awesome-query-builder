@@ -32,6 +32,7 @@ import { SqlUtils } from "@react-awesome-query-builder/sql";
 
 let currentTestName: string;
 let currentTest: Mocha.Test;
+let currentSkin: string | undefined;
 export const setCurrentTest = (test: Mocha.Test) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   currentTest = test;
@@ -40,7 +41,13 @@ export const setCurrentTestName = (name: string) => {
   currentTestName = name;
 };
 export const getCurrentTestName = () => {
-  return currentTestName;
+  return currentTestName + (currentSkin ? ` (${currentSkin})` : "");
+};
+export const setCurrentSkin = (name: string | undefined) => {
+  currentSkin = name;
+};
+export const getCurrentSkin = () => {
+  return currentSkin;
 };
 export const setCurrentTestTimeout = (ms: number) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
@@ -58,9 +65,16 @@ const ConsoleMethods = [
 type ConsoleIgnoreFn = (errText: string) => boolean;
 type ConsoleMethod = Extract<Exclude<keyof Console, "Console">, typeof ConsoleMethods[number]>;
 type ConsoleData = Partial<Record<ConsoleMethod, string[]>>;
+type AlertData = string[];
+type AlertIgnoreFn = (message: string) => boolean;
 interface MockedConsole extends Console {
   __origConsole: Console;
   __consoleData: ConsoleData;
+}
+type Alert = typeof alert;
+interface MockedAlert extends Alert {
+  __origAlert: Alert;
+  __alertData: AlertData;
 }
 type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | "SQL" | null | undefined;
 type TreeValue = JsonLogicTree | JsonTree | string | undefined;
@@ -91,8 +105,10 @@ interface DebugUtils {
   initialTree: ImmutableTree;
   initialJsonTree: JsonTree;
   consoleData: ConsoleData;
+  alertData: AlertData;
   pauseTest: (addToGlobal?: Record<string, unknown>) => Promise<void>;
   continueTest: () => void;
+  skinName?: string;
 }
 interface CheckMeta extends CheckExpects, DebugUtils  {
 }
@@ -101,10 +117,12 @@ interface DoOptions {
   debug?: boolean;
   strict?: boolean;
   ignoreLog?: ConsoleIgnoreFn;
-  withRender?: boolean;
-  insideIt?: boolean;
+  ignoreAlert?: AlertIgnoreFn;
   expectedLoadErrors?: string[];
   sanitizeOptions?: SanitizeOptions;
+  delayAfterRender?: number;
+  insideIt?: boolean; // for export_checks
+  withRenderOnExport?: boolean; // for export_checks
 }
 
 const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
@@ -118,7 +136,43 @@ const globalIgnoreFn: ConsoleIgnoreFn = (errText) => {
       && errText.includes("a useEffect cleanup function") && errText.includes("at Overflow");
 };
 
-const mockConsole = (options?: DoOptions, _configName?: string) => {
+const mockAlert = (options?: DoOptions, _skinName?: string) => {
+  let origAlert = global.alert;
+  let alertData: AlertData;
+  let mockedAlert: Alert;
+
+  if ((origAlert as MockedAlert).__origAlert) {
+    mockedAlert = origAlert as MockedAlert;
+    alertData = (origAlert as MockedAlert).__alertData;
+    origAlert = (origAlert as MockedAlert).__origAlert;
+  } else {
+    alertData = [];
+    mockedAlert = (message: any) => {
+      const messageStr = ""+message;
+      const ignore = options?.ignoreAlert?.(messageStr);
+      alertData.push(messageStr);
+      if (!ignore) {
+        origAlert.apply(null, [messageStr + " @ " + getCurrentTestName()]);
+      }
+    };
+    (mockedAlert as MockedAlert).__origAlert = origAlert;
+    (mockedAlert as MockedAlert).__alertData = alertData;
+  }
+
+  // @ts-ignore
+  // eslint-disable-next-line no-global-assign
+  global.alert = mockedAlert;
+
+  const restoreAlert = () => {
+    // @ts-ignore
+    // eslint-disable-next-line no-global-assign
+    global.alert = origAlert;
+  };
+
+  return {alertData, restoreAlert, mockedAlert, origAlert};
+};
+
+const mockConsole = (options?: DoOptions, _skinName?: string) => {
   let origConsole = console;
   let consoleData: ConsoleData;
   let mockedConsole: Console;
@@ -332,7 +386,7 @@ const renderQueryBuilder = (
   config: Config,
   tree: ImmutableTree,
   options?: DoOptions,
-  configName?: string,
+  skinName?: string,
   extraDebug?: Record<string, unknown>,
 ) => {
   // eslint-disable-next-line prefer-const
@@ -341,7 +395,9 @@ const renderQueryBuilder = (
   const onInit = spy() as DebugUtils["onInit"];
 
   // mock console
-  const {restoreConsole, consoleData} = mockConsole(options, configName);
+  const {restoreConsole, consoleData} = mockConsole(options, skinName);
+  // mock alert
+  const {restoreAlert, alertData} = mockAlert(options, skinName);
 
   // idle
   const buildDebugVars = () => {
@@ -425,8 +481,10 @@ const renderQueryBuilder = (
     pauseTest,
     continueTest,
     consoleData,
+    alertData,
     initialTree,
     initialJsonTree,
+    skinName,
     // tree,
   };
 
@@ -456,6 +514,7 @@ const renderQueryBuilder = (
     await sleep(0);
 
     restoreConsole();
+    restoreAlert();
   };
 
   return {
@@ -464,82 +523,92 @@ const renderQueryBuilder = (
     debugUtils,
   };
 };
-  
+
 const do_with_qb = async (
-  configName: string, BasicConfig: Config, config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat,
+  skinName: string, BasicConfig: Config, config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat,
   checks: ChecksFn, options?: DoOptions
 ) => {
-  const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
-  const config = config_fns.reduce((c, f) => f(c), BasicConfig);
-  // normally config should be saved at state in `onChange`, see README
-  const extendedConfig = ConfigUtils.extendConfig(config);
+  setCurrentSkin(skinName);
+  try {
+    const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
+    const config = config_fns.reduce((c, f) => f(c), BasicConfig);
+    // normally config should be saved at state in `onChange`, see README
+    const extendedConfig = ConfigUtils.extendConfig(config);
 
-  // Load tree
-  const {tree, errors} = load_tree(value, config, valueFormat, options);
-  if (errors?.length) {
-    if (options?.expectedLoadErrors) {
-      for (let i = 0 ; i < Math.max(options.expectedLoadErrors.length, errors.length) ; i++) {
-        expect(errors[i], `load error ${i}`).to.equal(options.expectedLoadErrors[i]);
+    // Load tree
+    const {tree, errors} = load_tree(value, config, valueFormat, options);
+    if (errors?.length) {
+      if (options?.expectedLoadErrors) {
+        for (let i = 0 ; i < Math.max(options.expectedLoadErrors.length, errors.length) ; i++) {
+          expect(errors[i], `load error ${i}`).to.equal(options.expectedLoadErrors[i]);
+        }
+        expect(errors.join("; ")).to.equal(options?.expectedLoadErrors?.join("; "));
+      } else {
+        const errText = `Error while loading as ${valueFormat || "?"} with ${getCurrentTestName()}:`
+        + "\n" + errors.join("\n")
+        + "\n" + JSON.stringify(value);
+        if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText)) {
+          console.error(errText);
+        }
       }
-      expect(errors.join("; ")).to.equal(options?.expectedLoadErrors?.join("; "));
     } else {
-      const errText = `Error while loading as ${valueFormat || "?"} with ${configName} @ ${getCurrentTestName()}:`
-      + "\n" + errors.join("\n")
-      + "\n" + JSON.stringify(value);
-      if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText)) {
-        console.error(errText);
-      }
+      expect(options?.expectedLoadErrors?.length ?? 0, "expectedLoadErrors count").equal(0);
     }
-  } else {
-    expect(options?.expectedLoadErrors?.length ?? 0, "expectedLoadErrors count").equal(0);
+
+    // Render
+    const {
+      qb,
+      destroyQb,
+      debugUtils,
+    } = renderQueryBuilder(config, tree!, options, skinName, {
+      errors,
+      extendedConfig,
+    });
+    const { onChange, consoleData } = debugUtils;
+
+    // Checks
+    const checkMeta: CheckMeta = {
+      ...debugUtils,
+      // expects
+      expect_jlogic: (jlogics, changeIndex = 0) => {
+        expect_jlogic_before_and_after(config, tree as ImmutableTree, onChange, jlogics, changeIndex);
+      },
+      expect_queries: (queries) => {
+        expect_queries_before_and_after(config, tree as ImmutableTree, onChange, queries);
+      },
+      expect_checks: async (expects) => {
+        await do_export_checks(extendedConfig, tree as ImmutableTree, expects, {
+          ...options,
+          withRenderOnExport: false, 
+          insideIt: true,
+        });
+      },
+      expect_tree_validation_errors_in_console: (expectedLines) => {
+        const errs = consoleData.warn?.filter(
+          // Get console errors from `validateAndFixTree` or `checkTree`
+          e => e.startsWith("Tree check errors:") || e.startsWith("Fixed tree errors:")
+        );
+        expect(errs?.length, "tree errors in console").eq(expectedLines.length ? 1 : 0);
+        const lines = errs?.[0]?.split("\n") || [];
+        for (let i = 0 ; i < Math.max(expectedLines.length, lines.length) ; i++) {
+          expect(lines[i], `line ${i}`).to.equal(expectedLines[i]);
+        }
+        expect(errs?.[0] ?? "").to.equal(expectedLines.join("\n"));
+      },
+    };
+
+    if (options?.delayAfterRender) {
+      await sleep(options.delayAfterRender);
+    }
+
+    // @ts-ignore
+    await checks(qb, checkMeta);
+
+    // Destroy
+    await destroyQb();
+  } finally {
+    setCurrentSkin(undefined);
   }
-
-  // Render
-  const {
-    qb,
-    destroyQb,
-    debugUtils,
-  } = renderQueryBuilder(config, tree!, options, configName, {
-    errors,
-    extendedConfig,
-  });
-  const { onChange, consoleData } = debugUtils;
-
-  // Checks
-  const checkMeta: CheckMeta = {
-    ...debugUtils,
-    // expects
-    expect_jlogic: (jlogics, changeIndex = 0) => {
-      expect_jlogic_before_and_after(config, tree as ImmutableTree, onChange, jlogics, changeIndex);
-    },
-    expect_queries: (queries) => {
-      expect_queries_before_and_after(config, tree as ImmutableTree, onChange, queries);
-    },
-    expect_checks: async (expects) => {
-      await do_export_checks(extendedConfig, tree as ImmutableTree, expects, {
-        ...options,
-        withRender: false, 
-        insideIt: true,
-      });
-    },
-    expect_tree_validation_errors_in_console: (expectedLines) => {
-      const errs = consoleData.warn?.filter(
-        // Get console errors from `validateAndFixTree` or `checkTree`
-        e => e.startsWith("Tree check errors:") || e.startsWith("Fixed tree errors:")
-      );
-      expect(errs?.length, "tree errors in console").eq(expectedLines.length ? 1 : 0);
-      const lines = errs?.[0]?.split("\n") || [];
-      for (let i = 0 ; i < Math.max(expectedLines.length, lines.length) ; i++) {
-        expect(lines[i], `line ${i}`).to.equal(expectedLines[i]);
-      }
-      expect(errs?.[0] ?? "").to.equal(expectedLines.join("\n"));
-    },
-  };
-  // @ts-ignore
-  await checks(qb, checkMeta);
-
-  // Destroy
-  await destroyQb();
 };
 
 export const empty_value = {id: uuid(), type: "group"};
@@ -634,12 +703,12 @@ const do_export_checks = async (config: Config, tree: ImmutableTree, expects?: E
         expect_objects_equal(errors, expectedExportErrors || []);
       });
     }
-  
+
     // doIt("should work to QueryBuilder", () => {
     //   const _res = queryBuilderFormat(tree, config);
     // });
 
-    if (options?.withRender && tree) {
+    if (options?.withRenderOnExport && tree) {
       const render = async () => {
         // Render
         const { destroyQb } = renderQueryBuilder(config, tree!, options);
@@ -664,7 +733,7 @@ export const export_checks = (
   const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
   const config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
 
-  const withRender = options?.insideIt ? false : (options?.withRender ?? true);
+  const withRenderOnExport = options?.insideIt ? false : (options?.withRenderOnExport ?? true);
 
   let tree, errors: string[] = [];
   try {
@@ -686,7 +755,7 @@ export const export_checks = (
 
       do_export_checks(config, tree as ImmutableTree, expects, {
         ...options,
-        withRender,
+        withRenderOnExport,
       });
     } else {
       doIt("should load tree without errors", () => {
@@ -696,7 +765,7 @@ export const export_checks = (
   } else {
     do_export_checks(config, tree as ImmutableTree, expects, {
       ...options,
-      withRender,
+      withRenderOnExport,
     });
   }
 };
@@ -711,7 +780,7 @@ export const export_checks_in_it = (config_fn: ConfigFn, value: TreeValue, value
   } else {
     do_export_checks(config, tree as ImmutableTree, expects, {
       ...options,
-      withRender: true,
+      withRenderOnExport: true,
       insideIt: true,
     });
   }
