@@ -51,7 +51,7 @@ const App: React.FC = () => {
           <br />
           You can notice issues when trying to delete rule/group.
           <br />
-          <a href="https://ant.design/docs/react/v5-for-19" target="_blank">Read more</a>
+          <a href="https://ant.design/docs/react/v5-for-19" target="_blank" rel="noopener noreferrer">Read more</a>
         </div>
       )}
       <Demo skin={state.skin} />
