@@ -1,8 +1,23 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
+// https://ant.design/docs/react/v5-for-19
+import "@ant-design/v5-patch-for-react-19";
+import { unstableSetRender } from "antd";
 import Demo from "./demo/demo";
 
 console.log("React version:", React.version);
+
+// https://ant.design/docs/react/v5-for-19
+console.log("Using unstableSetRender for antd + react 19, see https://ant.design/docs/react/v5-for-19");
+unstableSetRender((node, container) => {
+  (container as any)._reactRoot ||= createRoot(container);
+  const root = (container as any)._reactRoot;
+  root.render(node);
+  return async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    root.unmount();
+  };
+});
 
 interface AppState {
   skin: string;
