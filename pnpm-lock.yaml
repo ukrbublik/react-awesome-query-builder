@@ -100,6 +100,9 @@ importers:
 
   packages/antd:
     dependencies:
+      '@babel/runtime':
+        specifier: ^7.24.5
+        version: 7.24.5
       '@react-awesome-query-builder/ui':
         specifier: workspace:^
         version: link:../ui
@@ -146,9 +149,6 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.24.1
         version: 7.24.1(@babel/core@7.24.5)
-      '@babel/runtime':
-        specifier: ^7.24.5
-        version: 7.24.5
       '@types/react':
         specifier: ^17.0.39
         version: 17.0.80
@@ -173,6 +173,9 @@ importers:
 
   packages/bootstrap:
     dependencies:
+      '@babel/runtime':
+        specifier: ^7.24.5
+        version: 7.24.5
       '@react-awesome-query-builder/ui':
         specifier: workspace:^
         version: link:../ui
@@ -207,9 +210,6 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.24.1
         version: 7.24.1(@babel/core@7.24.5)
-      '@babel/runtime':
-        specifier: ^7.24.5
-        version: 7.24.5
       '@fortawesome/fontawesome-svg-core':
         specifier: ^6.5.2
         version: 6.5.2
@@ -548,6 +548,9 @@ importers:
 
   packages/fluent:
     dependencies:
+      '@babel/runtime':
+        specifier: ^7.24.5
+        version: 7.24.5
       '@react-awesome-query-builder/ui':
         specifier: workspace:^
         version: link:../ui
@@ -582,9 +585,6 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.24.1
         version: 7.24.1(@babel/core@7.24.5)
-      '@babel/runtime':
-        specifier: ^7.24.5
-        version: 7.24.5
       '@fluentui/font-icons-mdl2':
         specifier: ^8.5.39
         version: 8.5.39(@types/react@17.0.80)(react@17.0.2)
@@ -612,6 +612,9 @@ importers:
 
   packages/material:
     dependencies:
+      '@babel/runtime':
+        specifier: ^7.24.5
+        version: 7.24.5
       '@date-io/core':
         specifier: ^1.3.13
         version: 1.3.13
@@ -658,9 +661,6 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.24.1
         version: 7.24.1(@babel/core@7.24.5)
-      '@babel/runtime':
-        specifier: ^7.24.5
-        version: 7.24.5
       '@material-ui/core':
         specifier: ^4.12.4
         version: 4.12.4(@types/react@17.0.80)(react-dom@17.0.2)(react@17.0.2)
@@ -697,6 +697,9 @@ importers:
 
   packages/mui:
     dependencies:
+      '@babel/runtime':
+        specifier: ^7.24.5
+        version: 7.24.5
       '@react-awesome-query-builder/ui':
         specifier: workspace:^
         version: link:../ui
@@ -737,9 +740,6 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.24.1
         version: 7.24.1(@babel/core@7.24.5)
-      '@babel/runtime':
-        specifier: ^7.24.5
-        version: 7.24.5
       '@emotion/react':
         specifier: ^11.11.4
         version: 11.11.4(@types/react@17.0.80)(react@17.0.2)
@@ -977,6 +977,9 @@ importers:
 
   packages/sql:
     dependencies:
+      '@babel/runtime':
+        specifier: ^7.24.5
+        version: 7.24.8
       clone:
         specifier: ^2.1.2
         version: 2.1.2
@@ -1014,9 +1017,6 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.24.1
         version: 7.24.1(@babel/core@7.24.5)
-      '@babel/runtime':
-        specifier: ^7.24.5
-        version: 7.24.8
       '@react-awesome-query-builder/core':
         specifier: workspace:^
         version: link:../core
@@ -1267,6 +1267,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@babel/runtime':
+        specifier: ^7.24.5
+        version: 7.24.5
       '@react-awesome-query-builder/core':
         specifier: workspace:^
         version: link:../core
@@ -1316,9 +1319,6 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.24.1
         version: 7.24.1(@babel/core@7.24.5)
-      '@babel/runtime':
-        specifier: ^7.24.5
-        version: 7.24.5
       '@types/prop-types':
         specifier: ^15.7.3
         version: 15.7.12

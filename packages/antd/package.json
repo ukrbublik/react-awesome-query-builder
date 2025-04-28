@@ -47,6 +47,7 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
+    "@babel/runtime": "^7.24.5",
     "@react-awesome-query-builder/ui": "workspace:^",
     "lodash": "^4.17.21",
     "prop-types": "^15.8.1",

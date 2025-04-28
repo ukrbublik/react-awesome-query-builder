@@ -42,6 +42,7 @@
     "tsc-emit-esm-with-dts": "tsc -p . --outDir esm  --declaration"
   },
   "dependencies": {
+    "@babel/runtime": "^7.24.5",
     "clone": "^2.1.2",
     "node-sql-parser": "^5.3.5",
     "sqlstring": "^2.3.3"

@@ -62,6 +62,7 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
+    "@babel/runtime": "^7.24.5",
     "@react-awesome-query-builder/core": "workspace:^",
     "classnames": "^2.5.1",
     "lodash": "^4.17.21",
