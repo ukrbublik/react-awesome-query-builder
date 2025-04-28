@@ -74,7 +74,7 @@
     "@babel/preset-react": "^7.26.3",
     "@babel/preset-typescript": "^7.27.0",
     "@babel/runtime": "^7.27.0",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.16",
     "@types/clone": "^2.1.1",
     "@types/lodash": "^4.14.170",
     "@types/react": "^17.0.39",

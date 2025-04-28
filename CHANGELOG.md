@@ -3,6 +3,7 @@
   - Fixed support of AntDesign 4.x DatePicker (PR #1239) (issue #1238)
   - Prevent potential prototype pollution in `OtherUtils.mergeIn` and `OtherUtils.setIn` (PR #1240)
   - Fix XSS vulnerability in antd package (PR #1243) (issue #1009)
+  - Updated dependencies. `@babel/runtime` is now dep for all packages (PR #1246) (issue #964)
 - 6.6.14
   - Fixed import from JsonLogic when like op is used inside group with some group op (PR #1225) (issue #1221)
   - Support React 19 (PR #1229) (issue #1205)
