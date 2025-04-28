@@ -45,6 +45,15 @@ const App: React.FC = () => {
         <option value={"mui"}>mui</option>
         <option value={"antd"}>antd</option>
       </select>
+      {state.skin === "antd" && (
+        <div>
+          Warning: antd v5 is not fully compatible with React 19.
+          <br />
+          You can notice issues when trying to delete rule/group.
+          <br />
+          <a href="https://ant.design/docs/react/v5-for-19" target="_blank">Read more</a>
+        </div>
+      )}
       <Demo skin={state.skin} />
     </div>
   );
