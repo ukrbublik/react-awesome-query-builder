@@ -54,10 +54,10 @@
     "serialize-javascript": "^6.0.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.24.5",
-    "@babel/preset-env": "^7.24.5",
-    "@babel/preset-react": "^7.24.1",
-    "@babel/preset-typescript": "^7.24.1",
+    "@babel/core": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
+    "@babel/preset-typescript": "^7.27.0",
     "@next/eslint-plugin-next": "^14.2.3",
     "@types/jsonfile": "^6.1.4",
     "@types/lodash": "^4.14.170",
