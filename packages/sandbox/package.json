@@ -51,7 +51,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.24.5",
+    "@babel/core": "^7.26.10",
     "@types/lodash": "^4.14.170",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",

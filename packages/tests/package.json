@@ -60,8 +60,8 @@
     "serialize-javascript": "^6.0.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.24.5",
-    "@babel/runtime": "^7.24.5",
+    "@babel/core": "^7.26.10",
+    "@babel/runtime": "^7.27.0",
     "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
     "@types/chai": "^4.2.18",
     "@types/chai-subset-in-order": "^3.1.2",
