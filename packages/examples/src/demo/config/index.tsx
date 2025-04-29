@@ -234,8 +234,6 @@ export default (skin: string) => {
     ...InitialConfig.settings,
     ...localeSettings,
 
-    sqlDialect: "BigQuery",
-
     defaultSliderWidth: "200px",
     defaultSelectWidth: "200px",
     defaultSearchWidth: "100px",
