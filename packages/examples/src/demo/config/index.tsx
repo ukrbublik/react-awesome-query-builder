@@ -283,6 +283,9 @@ export default (skin: string) => {
       }
     },
 
+    
+    sqlDialect: "BigQuery",
+
     defaultSliderWidth: "200px",
     defaultSelectWidth: "200px",
     defaultSearchWidth: "100px",
