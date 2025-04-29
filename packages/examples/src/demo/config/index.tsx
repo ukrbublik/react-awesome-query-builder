@@ -380,7 +380,7 @@ export default (skin: string) => {
           fieldSettings: {
             listValues: ["abc", "def", "xyz"],
           } as SelectFieldSettings,
-          valueSources: ["value"],
+          valueSources: ["value", "field"],
         },
         score: {
           type: "number",
@@ -388,7 +388,29 @@ export default (skin: string) => {
             min: 0,
             max: 100,
           },
-          valueSources: ["value"],
+          valueSources: ["value", "field"],
+        },
+        score2: {
+          type: "number",
+          fieldSettings: {
+            min: 0,
+            max: 100,
+          },
+          valueSources: ["value", "field"],
+        },
+        results2: {
+          label: "Results2",
+          type: "!group",
+          subfields: {
+            score22: {
+              type: "number",
+              fieldSettings: {
+                min: 0,
+                max: 100,
+              },
+              valueSources: ["value", "field"],
+            },
+          }
         }
       }
     },
@@ -438,11 +460,19 @@ export default (skin: string) => {
             min: 1990,
             max: 2021,
           },
-          valueSources: ["value"],
+          valueSources: ["value", "field"],
         },
+        // yearEnd: {
+        //   type: "number",
+        //   fieldSettings: {
+        //     min: 1990,
+        //     max: 2021,
+        //   },
+        //   valueSources: ["value", "field"],
+        // },
         model: {
           type: "text",
-          valueSources: ["value"],
+          valueSources: ["value", "field"],
         },
       }
     },
@@ -462,45 +492,45 @@ export default (skin: string) => {
       },
       funcs: ["number.LINEAR_REGRESSION"],
     },
-    slider: {
-      label: "Slider",
-      type: "number",
-      preferWidgets: ["slider", "rangeslider"],
-      valueSources: ["value", "field"],
-      fieldSettings: {
-        min: 0,
-        max: 100,
-        step: 1,
-        marks: {
-          0: <strong>0%</strong>,
-          100: <strong>100%</strong>
-        },
-        validateValue: ((val, fieldSettings) => {
-          const ret: ReturnType<ValidateValue> = (val < 50 ? null : {
-            // error: "Invalid slider value, see validateValue()",
-            error: {key: "custom:INVALID_SLIDER_VALUE", args: {val}},
-            fixedValue: 49
-          });
-          return ret;
-        }),
-      } as NumberFieldSettings,
-      //overrides
-      widgets: {
-        slider: {
-          widgetProps: {
-            valuePlaceholder: "..Slider",
-          }
-        },
-        rangeslider: {
-          widgetProps: {
-            valueLabels: [
-              { label: "Number from", placeholder: "from" },
-              { label: "Number to", placeholder: "to" },
-            ],
-          }
-        },
-      },
-    },
+    // slider: {
+    //   label: "Slider",
+    //   type: "number",
+    //   preferWidgets: ["slider", "rangeslider"],
+    //   valueSources: ["value", "field"],
+    //   fieldSettings: {
+    //     min: 0,
+    //     max: 100,
+    //     step: 1,
+    //     marks: {
+    //       0: <strong>0%</strong>,
+    //       100: <strong>100%</strong>
+    //     },
+    //     validateValue: ((val, fieldSettings) => {
+    //       const ret: ReturnType<ValidateValue> = (val < 50 ? null : {
+    //         // error: "Invalid slider value, see validateValue()",
+    //         error: {key: "custom:INVALID_SLIDER_VALUE", args: {val}},
+    //         fixedValue: 49
+    //       });
+    //       return ret;
+    //     }),
+    //   } as NumberFieldSettings,
+    //   //overrides
+    //   widgets: {
+    //     slider: {
+    //       widgetProps: {
+    //         valuePlaceholder: "..Slider",
+    //       }
+    //     },
+    //     rangeslider: {
+    //       widgetProps: {
+    //         valueLabels: [
+    //           { label: "Number from", placeholder: "from" },
+    //           { label: "Number to", placeholder: "to" },
+    //         ],
+    //       }
+    //     },
+    //   },
+    // },
     date: {
       label: "Date",
       type: "date",
