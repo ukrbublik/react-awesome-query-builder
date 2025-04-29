@@ -269,6 +269,7 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
     }
     const value = logic.value; // todo: convert ?
     if (valueType === "text") {
+      // todo: unescape properly
       // fix issues with date/time values
       if (value.match(/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}/)) {
         _maybeValueType = "datetime";

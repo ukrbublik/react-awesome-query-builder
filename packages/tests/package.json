@@ -52,6 +52,7 @@
     "antd": "^5.24.5",
     "bootstrap": "^5.3.3",
     "lodash": "^4.17.21",
+    "node-sql-parser": "^5.3.5",
     "moment": "^2.30.1",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
