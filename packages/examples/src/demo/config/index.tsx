@@ -431,7 +431,7 @@ export default (skin: string) => {
           fieldSettings: {
             listValues: ["abc", "def", "xyz"],
           } as SelectFieldSettings,
-          valueSources: ["value"],
+          valueSources: ["value", "field"],
         },
         score: {
           type: "number",
@@ -517,11 +517,19 @@ export default (skin: string) => {
             min: 1990,
             max: 2021,
           },
-          valueSources: ["value"],
+          valueSources: ["value", "field"],
         },
+        // yearEnd: {
+        //   type: "number",
+        //   fieldSettings: {
+        //     min: 1990,
+        //     max: 2021,
+        //   },
+        //   valueSources: ["value", "field"],
+        // },
         model: {
           type: "text",
-          valueSources: ["value"],
+          valueSources: ["value", "field"],
         },
         class: {
           type: "!group",

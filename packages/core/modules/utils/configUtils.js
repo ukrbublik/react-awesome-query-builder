@@ -421,6 +421,9 @@ export function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, va
       if (widget === "func") {
         canAdd = canAdd && filterValueSourcesForField(config, ["func"], field, fieldConfig, operator).length > 0;
       }
+      if (widget === "field" && field == 'cars.year') {
+        console.log(11, canAdd)
+      }
       // If can't check operators, don't add
       // Func args don't have operators
       if (valueSrc === "value" && !widgetConfig.operators && !isFuncArg && field !== "!case_value")
@@ -462,6 +465,7 @@ export function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, va
   widgets.sort((w1, w2) => (widgetWeight(w2) - widgetWeight(w1)));
 
   const res = { widgets, valueSrcs };
+  console.log(1, field, res)
   _saveToConfigCache(config, "_getWidgetsAndSrcsForFieldOp", cacheKey, res);
   return res;
 }
