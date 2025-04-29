@@ -250,6 +250,7 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
     }
     const value = logic.value; // todo: convert ?
     if (valueType === "text") {
+      // todo: unescape properly
       // fix issues with date/time values
       valueType = undefined;
     }
