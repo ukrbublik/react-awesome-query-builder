@@ -1175,9 +1175,6 @@ importers:
       moment:
         specifier: ^2.30.1
         version: 2.30.1
-      node-sql-parser:
-        specifier: ^5.3.5
-        version: 5.3.5
       prop-types:
         specifier: ^15.8.1
         version: 15.8.1

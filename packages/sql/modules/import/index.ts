@@ -34,7 +34,6 @@ export const loadFromSql = (
   if (!options?.database) {
     // todo
     options.database = "Postgresql";
-    options.database = "MariaDB";
   }
   if (!sqlStr.startsWith("SELECT ")) {
     sqlStr = "SELECT * FROM t WHERE " + sqlStr;
