@@ -19,17 +19,13 @@ SqlString.unescapeLike = (val, sqlDialect = undefined) => {
     return val;
   }
   let res = val;
-  if (!sqlDialect) {
+  // unescape % and _
+  if (sqlDialect === "BigQuery") {
+    // https://cloud.google.com/bigquery/docs/reference/standard-sql/operators#like_operator
     res = res.replace(/\\\\([%_])/g, "$1");
-    res = res.replace(/\\(['"])/g, "$1"); // todo: not automatically ? 
-    res = res.replace(/\\\\\\\\/g, "\\");
+  } else {
+    res = res.replace(/\\([%_])/g, "$1");
   }
-  // if (sqlDialect === "BigQuery") {
-  //   // https://cloud.google.com/bigquery/docs/reference/standard-sql/operators#like_operator
-  //   res = res.replace(/\\\\([%_])/g, "$1");
-  // } else {
-  //   res = res.replace(/\\\\([%_])/g, "$1");
-  // }
   return res;
 };
 
@@ -37,49 +33,21 @@ SqlString.escapeLike = (val, any_start = true, any_end = true, sqlDialect = unde
   if (typeof val !== "string") {
     return val;
   }
-
-  let res = val;
-
-  if (!sqlDialect) {
-    // escape % and _ and \ with \
-    res = res.replace(/[%_\\]/g, "\\$&");
-    // wrap with % for LIKE
-    res = (any_start ? "%" : "") + res + (any_end ? "%" : "");
-    // escape (will escape all \ with \)
-    res = SqlString.escape(res);
+  // normal escape
+  let res = SqlString.escape(val);
+  // unwrap ''
+  res = SqlString.trim(res);
+  // escape % and _
+  if (sqlDialect === "BigQuery") {
+    // https://cloud.google.com/bigquery/docs/reference/standard-sql/operators#like_operator
+    res = res.replace(/[%_\\]/g, "\\\\$&");
   } else {
-    // normal escape
-    res = SqlString.escape(res);
-    // unwrap ''
-    res = SqlString.trim(res);
-    if (sqlDialect === "PostgreSQL") {
-      // TODO: for PostgreSQL it should just replace ' -> '' (without \), for like it should escape % ) and \
-      //!!!!!!
-    } else if (sqlDialect === "BigQuery") {
-      // https://cloud.google.com/bigquery/docs/reference/standard-sql/operators#like_operator
-      // escape \ with \\
-      res = res.replace(/(\\\\)/g, "\\$&");
-      // escape % and _ with \\
-      res = res.replace(/[%_]/g, "\\\\$&");
-    } else if (sqlDialect === "MySQL") {
-      // https://dev.mysql.com/doc/refman/8.4/en/string-comparison-functions.html
-      // tip: for mysql it can be \_ or \\_ for escaping _ BUT it's ALWAYS \\\\ for one \
-      // escape \ -> \\\\
-      res = res.replace(/(\\\\)/g, "\\\\$&");
-      // escape % and _ with \
-      res = res.replace(/[%_]/g, "\\$&");
-    } else {
-      // escape \ -> \\\\
-      res = res.replace(/(\\\\)/g, "\\\\$&");
-      // escape % and _ with \\
-      res = res.replace(/[%_]/g, "\\\\$&");
-    }
-    // wrap with % for LIKE
-    res = (any_start ? "%" : "") + res + (any_end ? "%" : "");
-    // wrap with ''
-    res = "'" + res + "'";
+    res = res.replace(/[%_\\]/g, "\\\\$&");
   }
-
+  // wrap with % for LIKE
+  res = (any_start ? "%" : "") + res + (any_end ? "%" : "");
+  // wrap ''
+  res = "'" + res + "'";
   return res;
 };
 
