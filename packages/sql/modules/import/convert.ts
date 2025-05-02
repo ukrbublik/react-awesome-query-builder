@@ -9,6 +9,7 @@ import {
   FuncValue,
   Field,
   JsonRuleGroup,
+  SqlType,
 } from "@react-awesome-query-builder/core";
 import { getLogicDescr } from "./ast";
 import { SqlPrimitiveTypes } from "./conv";
@@ -261,14 +262,23 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
 const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, meta: Meta, parentLogic?: OutLogic): ValueObj | undefined => {
   const { fieldSeparator } = config.settings;
   if (logic?.valueType) {
-    const sqlType = logic?.valueType;
+    const sqlType = logic?.valueType as SqlType;
     let valueType: string | undefined = SqlPrimitiveTypes[sqlType];
-    let _maybeValueType;
+    const rawValue = logic?.value;
+    if (sqlType === "origin") {
+      const t = Utils.ExportUtils.SqlString.trimQuote(rawValue as string, config.settings.sqlDialect, sqlType);
+      if (t?.prefix) {
+        // eg. E'string'
+        valueType = "text";
+      }
+    }
     if (!valueType) {
       meta.warnings.push(`Unexpected value type ${sqlType}`);
     }
-    const value = logic.value; // todo: convert ?
+    let value = rawValue; // todo: convert ?
+    let _maybeValueType;
     if (valueType === "text") {
+      value = Utils.ExportUtils.SqlString.unescapeStr(rawValue as string, config.settings.sqlDialect, sqlType);
       // fix issues with date/time values
       if (value.match(/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}/)) {
         _maybeValueType = "datetime";
@@ -285,6 +295,9 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
       value,
     };
   } else if (logic?.field) {
+    // todo: [MySQL] replace `` with ` in table and field (if idQuotesType == backticks_quote_string or undefined)
+    // todo: [PostgreSQL] replace "" with " in table and field (if idQuotesType == double_quote_string or undefined)
+    //       BUT using "f""oo" throws error in node-sql-parser 
     let field = [logic.table, logic.field].filter(v => !!v).join(fieldSeparator);
     for (const [fieldPath, fieldConfig, fieldKey] of Utils.ConfigUtils.iterateFields(config)) {
       if (fieldConfig.tableName === logic.table && fieldKey === logic.field) {
