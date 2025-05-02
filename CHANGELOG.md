@@ -1,4 +1,7 @@
 # Changelog
+- 6.7.0
+  - Removed `Utils.ExportUtils.SqlString.trim`
+  - Now `Utils.ExportUtils.SqlString.unescapeLike` returns object instead of string
 - 6.6.15
   - Fixed support of AntDesign 4.x DatePicker (PR #1239) (issue #1238)
   - Prevent potential prototype pollution in `OtherUtils.mergeIn` and `OtherUtils.setIn` (PR #1240)
