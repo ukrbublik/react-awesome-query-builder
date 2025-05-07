@@ -234,6 +234,9 @@ export default (skin: string) => {
     ...InitialConfig.settings,
     ...localeSettings,
 
+    //sqlDialect: "MySQL",
+    sqlDialect: "PostgreSQL",
+
     defaultSliderWidth: "200px",
     defaultSelectWidth: "200px",
     defaultSearchWidth: "100px",
