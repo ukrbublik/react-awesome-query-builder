@@ -15,6 +15,7 @@ describe("query with !struct and !group", () => {
         // }
       });
     });
+
     it("should handle custom operator in !group arrays", async () => {
       await with_qb_skins(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator, "JsonLogic", async (qb, {onChange, expect_jlogic, expect_checks}) => {
         await expect_checks({
@@ -36,6 +37,93 @@ describe("query with !struct and !group", () => {
               }
             ]
           }
+        });
+      }, {
+        //ignoreLog
+      });
+    });
+
+    it("should handle custom operator with cardinality 0 in !group that has jsonLogic function", async () => {
+      await with_qb_skins(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator2, "JsonLogic", async (qb, {onChange, expect_jlogic, expect_checks}) => {
+        await expect_checks({
+          "logic": {
+            "and": [
+              {
+                "custom2": [
+                  "--some-extra-data-1--",
+                  {"var": "cars"},
+                  {
+                    "and": [
+                      {
+                        "==": [{"var": "vendor"}, "Toyota"]
+                      }, {
+                        ">=": [{"var": "year"}, 2010]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        });
+      }, {
+        //ignoreLog
+      });
+    });
+
+    it("should handle custom operator with cardinality 1 in !group that has jsonLogic function", async () => {
+      await with_qb_skins(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator3, "JsonLogic", async (qb, {onChange, expect_jlogic, expect_checks}) => {
+        await expect_checks({
+          "logic": {
+            "and": [
+              {
+                "custom3": [
+                  "--some-extra-data-1--",
+                  "cars",
+                  123,
+                  {
+                    "and": [
+                      {
+                        "==": [{"var": "vendor"}, "Toyota"]
+                      }, {
+                        ">=": [{"var": "year"}, 2010]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        });
+      }, {
+        //ignoreLog
+      });
+    });
+
+    it("should handle custom operator with cardinality 2 in !group that has jsonLogic function", async () => {
+      await with_qb_skins(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator4, "JsonLogic", async (qb, {onChange, expect_jlogic, expect_checks}) => {
+        await expect_checks({
+          "logic": {
+            "and": [
+              {
+                "custom4": [
+                  "--some-extra-data-1--",
+                  "cars",
+                  123,
+                  456,
+                  {
+                    "and": [
+                      {
+                        "==": [{"var": "vendor"}, "Toyota"]
+                      }, {
+                        ">=": [{"var": "year"}, 2010]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
         });
       }, {
         //ignoreLog

@@ -185,33 +185,41 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
   // rule_group (issue #246)
   if (isRuleGroupArray) {
     const formattedField = formatField(meta, config, field, parentField);
-    if (isGroup0) {
-      // config.settings.groupOperators
-      const op = groupOperator || "some";
-      resultQuery = {
-        [op]: [
-          formattedField,
-          resultQuery
-        ]
-      };
+    // if groupOperator defines its own jsonLogic function, then we should use it (issue #1241)
+    if (typeof groupOperatorDef?.jsonLogic === "function") {
+      resultQuery = formatLogic(config, properties, formattedField, formattedValue, groupOperator, new Map({
+        having: resultQuery,
+        groupField: field,
+      }), fieldDefinition);
     } else {
-      // there is rule for count
-      const filter = !list.size
-        ? formattedField
-        : {
-          "filter": [
+      if (isGroup0) {
+        // config.settings.groupOperators
+        const op = groupOperator || "some";
+        resultQuery = {
+          [op]: [
             formattedField,
             resultQuery
           ]
         };
-      const count = {
-        "reduce": [
-          filter,
-          { "+": [1, { var: "accumulator" }] },
-          0
-        ]
-      };
-      resultQuery = formatLogic(config, properties, count, formattedValue, groupOperator, null, fieldDefinition);
+      } else {
+        // there is rule for count
+        const filter = !list.size
+          ? formattedField
+          : {
+            "filter": [
+              formattedField,
+              resultQuery
+            ]
+          };
+        const count = {
+          "reduce": [
+            filter,
+            { "+": [1, { var: "accumulator" }] },
+            0
+          ]
+        };
+        resultQuery = formatLogic(config, properties, count, formattedValue, groupOperator, null, fieldDefinition);
+      }
     }
   }
 
