@@ -14,8 +14,8 @@ const useListValuesAutocomplete = ({
   asyncFetch, useLoadMore, useAsyncSearch, forceAsyncSearch,
   asyncListValues: selectedAsyncListValues,
   listValues: staticListValues, allowCustomValues,
-  value: selectedValue, setValue, placeholder, 
-  config
+  value: selectedValue, setValue, placeholder,
+  config,field
 }, {
   debounceTimeout,
   multiple,
@@ -41,9 +41,21 @@ const useListValuesAutocomplete = ({
 
   // compute
   const nSelectedAsyncListValues = listValuesToArray(selectedAsyncListValues);
-  const listValues = asyncFetch
-    ? (selectedAsyncListValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
-    : staticListValues;
+  // const listValues = asyncFetch
+  //   ? (selectedAsyncListValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
+  //   : staticListValues;
+  const listValues = React.useMemo(() => {
+    return asyncFetch
+      ? (selectedAsyncListValues
+        ? mergeListValues(asyncListValues || [], nSelectedAsyncListValues, true)
+        : asyncListValues || [])
+      : listValuesToArray(staticListValues);
+  }, [asyncFetch, selectedAsyncListValues, asyncListValues, staticListValues, nSelectedAsyncListValues]);
+
+  React.useEffect(() => {
+    setAsyncListValues(undefined);
+  }, [field]);
+
   let listValuesToDisplay = asyncFetch
     ? asyncListValues
     : staticListValues;
@@ -95,7 +107,7 @@ const useListValuesAutocomplete = ({
     const { values, hasMore, meta: newMeta } = res?.values
       ? res
       : { values: res } // fallback, if response contains just array, not object
-    ;
+      ;
     const nValues = listValuesToArray(values);
     let assumeHasMore;
     let newValues;
@@ -123,7 +135,25 @@ const useListValuesAutocomplete = ({
     return newValues;
   };
 
+  // const loadListValues = async (filter = null, isLoadMore = false) => {
+  //   setLoadingCnt(x => (x + 1));
+  //   setIsLoadingMore(isLoadMore);
+  //   const list = await fetchListValues(filter, isLoadMore);
+  //   if (!componentIsMounted.current) {
+  //     return;
+  //   }
+  //   if (list != null) {
+  //     // tip: null can be used for reject (eg, if user don't want to filter by input)
+  //     setAsyncListValues(list);
+  //   }
+  //   setLoadingCnt(x => (x - 1));
+  //   setIsLoadingMore(false);
+  // };
   const loadListValues = async (filter = null, isLoadMore = false) => {
+    if (!isLoadMore) {
+      setAsyncListValues(undefined);
+    }
+
     setLoadingCnt(x => (x + 1));
     setIsLoadingMore(isLoadMore);
     const list = await fetchListValues(filter, isLoadMore);
@@ -131,13 +161,16 @@ const useListValuesAutocomplete = ({
       return;
     }
     if (list != null) {
-      // tip: null can be used for reject (eg, if user don't want to filter by input)
       setAsyncListValues(list);
     }
     setLoadingCnt(x => (x - 1));
     setIsLoadingMore(false);
   };
-  const loadListValuesDebounced = React.useCallback(debounce(loadListValues, debounceTimeout), []);
+  // const loadListValuesDebounced = React.useCallback(debounce(loadListValues, debounceTimeout), []);
+  const loadListValuesDebounced = React.useMemo(
+    () => debounce(loadListValues, debounceTimeout),
+    [loadListValues, debounceTimeout]
+  );
 
   React.useEffect(() => {
     componentIsMounted.current++;
@@ -215,10 +248,10 @@ const useListValuesAutocomplete = ({
     if (shouldIgnore) {
       return;
     }
-    const isAddingCustomOptionFromSearch 
+    const isAddingCustomOptionFromSearch
       = multiple
       && val.length && val.length > (selectedValue || []).length
-      && val[val.length-1] == inputValue
+      && val[val.length - 1] == inputValue
       && !getListValue(inputValue, asyncListValues);
 
     if (specialValue == "LOAD_MORE") {
@@ -231,7 +264,7 @@ const useListValuesAutocomplete = ({
       if (multiple) {
         const [newSelectedValues, newSelectedListValues] = optionsToListValues(val, listValues, allowCustomValues);
         setValue(newSelectedValues, asyncFetch ? newSelectedListValues : undefined);
-        
+
         if (isAddingCustomOptionFromSearch) {
           await sleep(0);
           await onInputChange(null, "", "my-reset");
@@ -253,13 +286,13 @@ const useListValuesAutocomplete = ({
     // - (multiple v4) select option while searching - e = null, newInputValue = ''  # unwanted
 
     const shouldIgnore = uif === "mui" && eventType === "reset"
-    // && (
-    //   e != null
-    //   // for MUI 4 if search "A" and select any option -> should NOT reset search
-    //   // for MUI 5 if search "A" and close -> let's hold search but hide, as it's done in antd
-    //   || e === null && inputValue && multiple
-    // )
-    ;
+      // && (
+      //   e != null
+      //   // for MUI 4 if search "A" and select any option -> should NOT reset search
+      //   // for MUI 5 if search "A" and close -> let's hold search but hide, as it's done in antd
+      //   || e === null && inputValue && multiple
+      // )
+      ;
     const val = newInputValue;
     if (val === loadMoreTitle || val === loadingMoreTitle || shouldIgnore) {
       return;
@@ -349,7 +382,7 @@ const useListValuesAutocomplete = ({
     onClose,
     onDropdownVisibleChange,
     onChange,
-    
+
     inputValue,
     onInputChange,
     canShowLoadMore,
