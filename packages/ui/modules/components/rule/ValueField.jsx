@@ -146,12 +146,12 @@ export default class ValueField extends Component {
           // todo: use getCommonGroupField ????
           // Support of canCompareWithAncestors (take from outer): - for JL, + for Mongo, + for SpEL (with "#root.field" inside ".?[]")
           // !!! there can be func COUNT and arg should be field of type !group
-          console.log('?has=', hasInitialPath, parentFieldPath, subpath, isGroup)
+     //     console.log('?has=', hasInitialPath, parentFieldPath, subpath, isGroup)
           if (isGroup && !hasInitialPath) {
-            console.log('!delete',parentFieldPath, {hasInitialPath, subpath, parentFieldPath})
+     //       console.log('!delete',parentFieldPath, {hasInitialPath, subpath, parentFieldPath})
             delete list[rightFieldKey];
           } else {
-            console.log('f',parentFieldPath, subpath)
+      //      console.log('f',parentFieldPath, subpath)
             if (_filter(subfields, subpath) == 0)
               delete list[rightFieldKey];
           }
