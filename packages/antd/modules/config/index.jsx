@@ -14,19 +14,19 @@ const settings = {
   // renderField: (props, {RCE, W: {FieldCascader}}) => RCE(FieldCascader, props),
   // renderField: (props, {RCE, W: {FieldTreeSelect}}) => RCE(FieldTreeSelect, props),
 
-  renderOperator: (props, { RCE, W: { FieldSelect } }) => RCE(FieldSelect, props),
+  renderOperator: (props, {RCE, W: {FieldSelect}}) => RCE(FieldSelect, props),
   // renderOperator: (props, {RCE, W: {FieldDropdown}}) => RCE(FieldDropdown, props),
 
-  renderFunc: (props, { RCE, W: { FieldSelect } }) => RCE(FieldSelect, props),
-  renderConjs: (props, { RCE, W: { Conjs } }) => RCE(Conjs, props),
-  renderSwitch: (props, { RCE, W: { Switch } }) => RCE(Switch, props),
-  renderButton: (props, { RCE, W: { Button } }) => RCE(Button, props),
-  renderIcon: (props, { RCE, W: { Icon } }) => RCE(Icon, props),
+  renderFunc: (props, {RCE, W: {FieldSelect}}) => RCE(FieldSelect, props),
+  renderConjs: (props, {RCE, W: {Conjs}}) => RCE(Conjs, props),
+  renderSwitch: (props, {RCE, W: {Switch}}) => RCE(Switch, props),
+  renderButton: (props, {RCE, W: {Button}}) => RCE(Button, props),
+  renderIcon: (props, {RCE, W: {Icon}}) => RCE(Icon, props),
   renderButtonGroup: (props, {RCE, W: {ButtonGroup}}) => RCE(ButtonGroup, props),
   renderValueSources: (props, {RCE, W: {ValueSources}}) => RCE(ValueSources, props),
   renderFieldSources: (props, {RCE, W: {ValueSources}}) => RCE(ValueSources, props),
-  renderProvider: (props, { RCE, W: { Provider } }) => RCE(Provider, props),
-  renderConfirm: (props, { W: { confirm } }) => confirm(props),
+  renderProvider: (props, {RCE, W: {Provider}}) => RCE(Provider, props),
+  renderConfirm: (props, {W: {confirm}}) => confirm(props),
 
   // localization
   locale: {
@@ -47,7 +47,7 @@ const widgets = {
   },
   textarea: {
     ...BasicConfig.widgets.textarea,
-    factory: (props, { RCE, W: { TextAreaWidget } }) => RCE(TextAreaWidget, props),
+    factory: (props, {RCE, W: {TextAreaWidget}}) => RCE(TextAreaWidget, props),
   },
   number: {
     ...BasicConfig.widgets.number,
@@ -59,17 +59,17 @@ const widgets = {
   },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
-    factory: (props, { RCE, W: { AutocompleteWidget, MultiSelectWidget } }) => {
-      return (props.asyncFetch || props.showSearch)
-        ? RCE(AutocompleteWidget, { ...props, multiple: true })
+    factory: (props, {RCE, W: {AutocompleteWidget, MultiSelectWidget}}) => {
+      return (props.asyncFetch || props.showSearch) 
+        ? RCE(AutocompleteWidget, {...props, multiple: true}) 
         : RCE(MultiSelectWidget, props);
     },
   },
   select: {
     ...BasicConfig.widgets.select,
-    factory: (props, { RCE, W: { AutocompleteWidget, SelectWidget } }) => {
-      return (props.asyncFetch || props.showSearch || props.allowCustomValues)
-        ? RCE(AutocompleteWidget, props)
+    factory: (props, {RCE, W: {AutocompleteWidget, SelectWidget}}) => {
+      return (props.asyncFetch || props.showSearch || props.allowCustomValues) 
+        ? RCE(AutocompleteWidget, props) 
         : RCE(SelectWidget, props);
     },
   },
@@ -79,7 +79,7 @@ const widgets = {
   },
   boolean: {
     ...BasicConfig.widgets.boolean,
-    factory: (props, { RCE, W: { BooleanWidget } }) => RCE(BooleanWidget, props),
+    factory: (props, {RCE, W: {BooleanWidget}}) => RCE(BooleanWidget, props),
   },
   date: {
     ...BasicConfig.widgets.date,
@@ -91,7 +91,7 @@ const widgets = {
   },
   datetime: {
     ...BasicConfig.widgets.datetime,
-    factory: (props, { RCE, W: { DateTimeWidget } }) => RCE(DateTimeWidget, props),
+    factory: (props, {RCE, W: {DateTimeWidget}}) => RCE(DateTimeWidget, props),
   },
 
   rangeslider: {
@@ -100,11 +100,11 @@ const widgets = {
   },
   treeselect: {
     ...BasicConfig.widgets.treeselect,
-    factory: (props, { RCE, W: { TreeSelectWidget } }) => RCE(TreeSelectWidget, props),
+    factory: (props, {RCE, W: {TreeSelectWidget}}) => RCE(TreeSelectWidget, props),
   },
   treemultiselect: {
     ...BasicConfig.widgets.treemultiselect,
-    factory: (props, { RCE, W: { TreeSelectWidget } }) => RCE(TreeSelectWidget, { ...props, treeMultiple: true }),
+    factory: (props, {RCE, W: {TreeSelectWidget}}) => RCE(TreeSelectWidget, {...props, treeMultiple: true}),
   },
 };
 
