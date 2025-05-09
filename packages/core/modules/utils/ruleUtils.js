@@ -111,8 +111,8 @@ export const formatFieldName = (field, config, meta, parentField = null, options
   if (fieldDef.fieldName) {
     fieldName = fieldDef.fieldName;
   }
-  const canCutParentField = true;
-  if (parentField && canCutParentField) {
+  const cutParentField = true;
+  if (parentField && cutParentField) {
     let parentFieldName = formatFieldName(parentField, config, meta, null, { useTableName: options.useTableName });
     if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
       fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
@@ -121,7 +121,11 @@ export const formatFieldName = (field, config, meta, parentField = null, options
       // for Mongo use "$$el." for right field - recheck formatRightField() it should be wrong  -- see "$$models.mnf" (q2) at my playground
     } else {
       //todo: for spel use "#root."
-      meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
+      if (fieldDef.fieldName) {
+        // ignore
+      } else {
+        meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
+      }
     }
   }
   return fieldName;

@@ -74,7 +74,7 @@ export const extendConfig = (config, configId, canCompile = true) => {
 
   deepFreeze(config);
 
-  console.log(config.__fieldsCntByType)
+///  console.log(config.__fieldsCntByType)
 
   // Save to memo (cache)
   const memo = getCommonMemo(extendConfig);
