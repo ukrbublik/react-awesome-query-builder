@@ -421,9 +421,6 @@ export function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, va
       if (widget === "func") {
         canAdd = canAdd && filterValueSourcesForField(config, ["func"], field, fieldConfig, operator).length > 0;
       }
-      if (widget === "field" && field == 'cars.year') {
-        console.log(11, canAdd)
-      }
       // If can't check operators, don't add
       // Func args don't have operators
       if (valueSrc === "value" && !widgetConfig.operators && !isFuncArg && field !== "!case_value")
@@ -465,7 +462,6 @@ export function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, va
   widgets.sort((w1, w2) => (widgetWeight(w2) - widgetWeight(w1)));
 
   const res = { widgets, valueSrcs };
-  console.log(1, field, res)
   _saveToConfigCache(config, "_getWidgetsAndSrcsForFieldOp", cacheKey, res);
   return res;
 }
@@ -519,7 +515,7 @@ export const filterValueSourcesForField = (config, valueSrcs, field, fieldDefini
           if (!canCompareWithAncestors && !isClosestGroup) {
             continue;
           }
-          canAddByType = canAddByType || config.__fieldsCntByType[fieldType][groupPathStr] > (excludeSelfField && isClosestGroup ? 1 : 0);
+          canAddByType = canAddByType || config.__fieldsCntByType[fieldType]?.[groupPathStr] > (excludeSelfField && isClosestGroup ? 1 : 0);
         }
         // todo: support of canCompareWithChilds is tricky
         //  eg. for func arg with type "multiselect<number>" (if func is in root) we should look at __fieldsCntByType[number]["<path without dots>"]
