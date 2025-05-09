@@ -1,12 +1,22 @@
-$custom-select-option-color: lightcoral !default;
+@import '@react-awesome-query-builder/ui/css/vars.scss';
 
 .query-builder {
   .MuiIconButton-sizeSmall {
     padding: 3px; // smaller button
+  }
+  .MuiSlider-markLabel {
+    margin-top: -12px;
   }
 }
 
 /* should be outside of .query-builder */
 .customSelectOption {
   color: $custom-select-option-color;
+}
+
+.query-builder {
+  .group--conjunctions > .MuiFormControl-root > .MuiButtonGroup-root {
+    border-radius: $conjunctions-radius;
+    overflow: hidden;
+  }
 }

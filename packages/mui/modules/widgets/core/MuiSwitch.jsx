@@ -19,13 +19,13 @@ export default ({value, setValue, label, checkedLabel, hideLabel, id, config, ty
       return <IconButton
         key={id+postfix}
         onClick={onClick}
-        size={"small"}
+        size={renderSize}
       >{icon}</IconButton>;
     } else {
       return <Button
         key={id+postfix}
         onClick={onClick}
-        size={"small"}
+        size={renderSize}
         startIcon={icon}
       >{showLabel}</Button>;
     }
@@ -34,7 +34,7 @@ export default ({value, setValue, label, checkedLabel, hideLabel, id, config, ty
   return <FormControlLabel 
     control={<Switch
       checked={!!value}
-      size={"small"}
+      size={renderSize}
       onChange={onChange}
     />} 
     label={showLabel} 

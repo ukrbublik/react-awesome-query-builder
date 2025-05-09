@@ -1,1 +1,4 @@
+$inactive_conjs: (".MuiButton-root:not(.MuiButton-colorPrimary, .MuiButton-colorError)");
+$active_conjs: (".MuiButton-colorPrimary, .MuiButton-colorError");
 $seps-offset-bottom: 8px;
+

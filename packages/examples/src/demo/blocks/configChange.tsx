@@ -4,6 +4,7 @@ import {
 } from "@react-awesome-query-builder/ui";
 import type { DemoQueryBuilderState } from "../types";
 import clone from "clone";
+import merge from "lodash/merge";
 
 
 export const useConfigChange = (
@@ -11,14 +12,26 @@ export const useConfigChange = (
   setState: Dispatch<SetStateAction<DemoQueryBuilderState>>,
 ) => {
   const switchShowLock = () => {
-    const newConfig: Config = clone(state.config);
-    newConfig.settings.showLock = !newConfig.settings.showLock;
+    let newConfig: Config = clone(state.config);
+    state.configChanges = merge(state.configChanges, {
+      settings: {
+        showLock: !(state.configChanges?.settings?.showLock ?? false),
+      }
+    });
+    window._configChanges = state.configChanges;
+    newConfig = merge(newConfig, state.configChanges);
     setState({...state, config: newConfig});
   };
 
   const switchShowErrors = () => {
-    const newConfig: Config = clone(state.config);
-    newConfig.settings.showErrorMessage = !newConfig.settings.showErrorMessage;
+    let newConfig: Config = clone(state.config);
+    state.configChanges = merge(state.configChanges, {
+      settings: {
+        showErrorMessage: !(state.configChanges?.settings?.showErrorMessage ?? false),
+      }
+    });
+    window._configChanges = state.configChanges;
+    newConfig = merge(newConfig, state.configChanges);
     setState({...state, config: newConfig});
   };
 

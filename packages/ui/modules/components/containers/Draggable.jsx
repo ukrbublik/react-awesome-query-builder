@@ -56,7 +56,8 @@ export default (className) => (GroupOrRule) =>
       const cn = classNames(className, "group-or-rule",
         isDraggingMe && isDraggingTempo ? "qb-draggable" : null,
         isDraggingMe && !isDraggingTempo ? "qb-placeholder" : null,
-        isTrueLocked ? "locked" : null
+        isTrueLocked ? "locked" : null,
+        "level-" + this.props.lev
       );
 
       return (
