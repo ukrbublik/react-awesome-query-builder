@@ -52,14 +52,11 @@ export default class ValueField extends Component {
   }
 
   getItems({config, field, fieldType, operator, parentField, isFuncArg, fieldDefinition}) {
-    const {canCompareFieldWithField} = config.settings;
     // const fieldSeparator = config.settings.fieldSeparator;
     const parentFieldPath = getFieldParts(parentField, config);
-    const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
-    const sourceFields = parentField ? parentFieldConfig?.subfields : config.fields;
 
-    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldType);
-    const items = this.buildOptions(parentFieldPath, config, filteredFields, parentFieldPath);
+    const filteredFields = this.filterFields(config, field, parentField, operator, isFuncArg, fieldDefinition, fieldType);
+    const items = this.buildOptions(parentFieldPath, config, filteredFields);
     return items;
   }
 
@@ -92,8 +89,9 @@ export default class ValueField extends Component {
   }
 
   // todo: move to core
-  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldType) {
-    fields = clone(fields);
+  filterFields(config, leftFieldFullkey, parentField, operator, isFuncArg, fieldDefinition, fieldType) {
+    const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
+    const parentFieldPath = getFieldParts(parentField, config);
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
     const _relyOnWidgetType = false; //TODO: remove this, see issue #758
@@ -114,42 +112,78 @@ export default class ValueField extends Component {
       expectedType = fieldType;
     }
     // todo: (for select fields) use listValuesType
+
+    // todo: flag in settings / in group config / in field config ?
+    const canCompareWithAncestors = true; // todo: for spel for grA.grB.x3 we can't refer to grA.x2 , only to #root.x1  (fr JL - no refers at all!), for Mongo - possible
+    const canCompareWithChilds = false;  // !!!!!!! todo for multiselect we can be able to select field inside !group (projection - ".!" for spel, "map" for JL, $map in Mongo)
+    // support of canCompareWithChilds makes sense only for custom aggr. func like "COUNT"
+
+    const sourceFields = parentField ? parentFieldConfig?.subfields : config.fields;
+    const fieldsToFilter = canCompareWithAncestors ? config.fields : sourceFields;
+    const fields = clone(fieldsToFilter);
+    const initialPathToFilter = canCompareWithAncestors ? [] : parentFieldPath;
     
-    function _filter(list, path, isInsideGroup) {
+    function _filter(list, path) {
       for (let rightFieldKey in list) {
         const subfields = list[rightFieldKey].subfields;
         const subpath = (path ? path : []).concat(rightFieldKey);
         const rightFieldFullkey = subpath.join(fieldSeparator);
         const rightFieldConfig = getFieldConfig(config, rightFieldFullkey);
         const isGroup = rightFieldConfig.type === "!group";
+        const isStruct = rightFieldConfig.type === "!struct";
         if (!rightFieldConfig) {
           delete list[rightFieldKey];
-        } else if (rightFieldConfig.type === "!struct" || rightFieldConfig.type === "!group") {
-          if (_filter(subfields, subpath, isInsideGroup || isGroup) == 0)
+        } else if (isStruct || isGroup) {
+          const hasInitialPath = !parentFieldPath.length ? true
+            : !subpath.find((f, i) => parentFieldPath[i] === undefined || parentFieldPath[i] !== f);
+          // *** situation: 
+          // [grA] -> [grB] -> [grC]
+          //       -> [grG]
+          // [grX] -> *
+          // strA -> strB
+          // if we are in grB - we do include grA and grB but not grC, not grX, not grG ; do include strA, strB
+
+          // todo: use getCommonGroupField ????
+          // Support of canCompareWithAncestors (take from outer): - for JL, + for Mongo, + for SpEL (with "#root.field" inside ".?[]")
+          // !!! there can be func COUNT and arg should be field of type !group
+          console.log('?has=', hasInitialPath, parentFieldPath, subpath, isGroup)
+          if (isGroup && !hasInitialPath) {
+            console.log('!delete',parentFieldPath, {hasInitialPath, subpath, parentFieldPath})
             delete list[rightFieldKey];
+          } else {
+            console.log('f',parentFieldPath, subpath)
+            if (_filter(subfields, subpath) == 0)
+              delete list[rightFieldKey];
+          }
         } else {
           // tip: LHS field can be used as arg in RHS function
           let canUse = (!expectedType || rightFieldConfig.type == expectedType)
-            && (isFuncArg ? true : rightFieldFullkey != leftFieldFullkey)
-            && !isInsideGroup;
-          let fn = canCompareFieldWithField || config.settings.canCompareFieldWithField;
+            && (isFuncArg ? true : rightFieldFullkey != leftFieldFullkey);
+          let fn = config.settings.canCompareFieldWithField;
           if (fn)
             canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig, operator);
-          if (!canUse)
+          if (!canUse) {
             delete list[rightFieldKey];
+          }
         }
       }
       return keys(list).length;
     }
 
-    _filter(fields, parentFieldPath || [], false);
+    _filter(fields, initialPathToFilter, false);
 
     return fields;
   }
 
   buildOptions(parentFieldPath, config, fields, path = null, optGroup = null) {
+    // todo: even if canCompareWithAncestors == true but all fields are within parentFieldPath - don't display nesting
+    // todo: if canCompareWithAncestors == true and the are fields inside parentFieldPath + outside -> divide with separator? move inside to top?
     if (!fields)
       return null;
+    const canCompareWithAncestors = true;
+    if (!canCompareWithAncestors && path === null) {
+      path = parentFieldPath;
+    }
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
     const prefix = path?.length ? path.join(fieldSeparator) + fieldSeparator : "";
 
@@ -159,6 +193,10 @@ export default class ValueField extends Component {
       const label = this.getFieldLabel(field, fullFieldPath, config);
       const partsLabels = getFieldPathLabels(fullFieldPath, config);
       let fullLabel = partsLabels.join(fieldSeparatorDisplay);
+      // todo:
+      //   " || parentFieldPath" looks like old bad hack!!!!
+      // use `getFieldPathLabels(fullFieldPath, config, parentFieldPath)` instead to get partial label
+      // ! same used in 4 places - 2 in this file + 2 in Field.jsx
       if (fullLabel == label || parentFieldPath)
         fullLabel = null;
       const altLabel = field.label2;
@@ -197,6 +235,7 @@ export default class ValueField extends Component {
     }).filter(o => !!o);
   }
 
+  // todo: same funcs are used in FuncSelect, Field  -  DRY! move to core
   getFieldLabel(fieldOpts, fieldKey, config) {
     if (!fieldKey) return null;
     let maxLabelsLength = config.settings.maxLabelsLength;

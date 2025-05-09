@@ -500,6 +500,8 @@ export const filterValueSourcesForField = (config, valueSrcs, field, fieldDefini
         const groupFields = getAncestorGroupFields(field, config) ?? [];
         const isInGroup = groupFields.length > 0;
         const closestGroupField = groupFields[0] ?? "";
+        const canCompareWithAncestors = true; // (issue #928 #547) todo: flag in settings / in group config / in field config ?
+        const canCompareWithChilds = false;
         // todo: (for select fields) use listValuesType and __fieldsCntByListValuesType
         // tip: LHS field can be used:
         //       - in RHS with value source "field" if LHS has field source "field" --> ONLY in this case we should prevent comparing same fields
@@ -513,9 +515,15 @@ export const filterValueSourcesForField = (config, valueSrcs, field, fieldDefini
         //       BUT in filterFields in ValueField it should be fixed
         for (const groupPathStr of [...groupFields, ""]) {
           // tip: "" means not inside group (in root)
-          const k = groupPathStr === "" ? fieldType : `${groupPathStr}_${fieldType}`;
-          canAddByType = canAddByType || config.__fieldsCntByType[k] > (excludeSelfField && groupPathStr === closestGroupField ? 1 : 0);
+          const isClosestGroup = groupPathStr === closestGroupField;
+          if (!canCompareWithAncestors && !isClosestGroup) {
+            continue;
+          }
+          canAddByType = canAddByType || config.__fieldsCntByType[fieldType][groupPathStr] > (excludeSelfField && isClosestGroup ? 1 : 0);
         }
+        // todo: support of canCompareWithChilds is tricky
+        //  eg. for func arg with type "multiselect<number>" (if func is in root) we should look at __fieldsCntByType[number]["<path without dots>"]
+        //  but if func is not in root but in `cars` group - we should look at __fieldsCntByType[number]["cars." + "<path without dots>"]
         canAdd = canAdd && canAddByType;
       }
     }
@@ -590,11 +598,15 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
     });
 };
 
+// if `field` is of type "!group" - return it's closest group
 export const getClosestGroupField = (field, config) => {
-  return getFieldPartsConfigs(field, config)?.reverse().find(({path, cnf}) => cnf?.type === "!group")?.path;
+  const fieldPath = getFieldPath(field, config);
+  return getFieldPartsConfigs(field, config)?.reverse().find(({path, cnf}) => cnf?.type === "!group" && fieldPath !== path)?.path;
 };
 
 // order - from closest to farthest
+// if `field` is of type "!group" - don't include it in results
 export const getAncestorGroupFields = (field, config) => {
-  return getFieldPartsConfigs(field, config)?.reverse()?.filter(({path, cnf}) => cnf?.type === "!group")?.map(({path, cnf}) => path);
+  const fieldPath = getFieldPath(field, config);
+  return getFieldPartsConfigs(field, config)?.reverse()?.filter(({path, cnf}) => cnf?.type === "!group" && fieldPath !== path)?.map(({path, cnf}) => path);
 };
