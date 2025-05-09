@@ -464,6 +464,14 @@ export default (skin: string) => {
           },
           valueSources: ["value", "field"],
         },
+        year2: {
+          type: "number",
+          fieldSettings: {
+            min: 1990,
+            max: 2021,
+          },
+          valueSources: ["value", "field"],
+        },
         // yearEnd: {
         //   type: "number",
         //   fieldSettings: {
