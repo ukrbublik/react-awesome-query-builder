@@ -1334,11 +1334,8 @@ importers:
         specifier: ^7.26.3
         version: 7.26.3(@babel/core@7.26.10)
       '@babel/preset-typescript':
-        specifier: ^7.24.1
-        version: 7.24.1(@babel/core@7.24.5)
-      '@babel/runtime':
-        specifier: ^7.24.5
-        version: 7.24.5
+        specifier: ^7.27.0
+        version: 7.27.0(@babel/core@7.26.10)
       '@types/chroma-js':
         specifier: ^3.1.1
         version: 3.1.1
