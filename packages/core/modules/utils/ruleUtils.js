@@ -96,6 +96,7 @@ export const getValueLabel = (config, field, operator, delta, valueSrc = null, i
 
 // can use alias (fieldName)
 // even if `parentField` is provided, `field` is still a full path
+//todo: add cutParentField to options
 export const formatFieldName = (field, config, meta, parentField = null, options = {}) => {
   if (!field) return;
   const fieldDef = getFieldConfig(config, field) || {};
@@ -110,18 +111,17 @@ export const formatFieldName = (field, config, meta, parentField = null, options
   if (fieldDef.fieldName) {
     fieldName = fieldDef.fieldName;
   }
-  if (parentField) {
-    const parentFieldDef = getFieldConfig(config, parentField) || {};
-    let parentFieldName = parentField;
+  const canCutParentField = true;
+  if (parentField && canCutParentField) {
+    let parentFieldName = formatFieldName(parentField, config, meta, null, { useTableName: options.useTableName });
     if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
       fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
       // fieldName = "#this." + fieldName; // ? for spel
+      // todo: add format: "SpEL" to options
+      // for Mongo use "$$el." for right field - recheck formatRightField() it should be wrong  -- see "$$models.mnf" (q2) at my playground
     } else {
-      if (fieldDef.fieldName) {
-        // ignore
-      } else {
-        meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
-      }
+      //todo: for spel use "#root."
+      meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
     }
   }
   return fieldName;

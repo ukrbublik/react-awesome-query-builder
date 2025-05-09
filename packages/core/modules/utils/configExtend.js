@@ -238,17 +238,21 @@ function extendFieldConfig(fieldConfig, config, path = [], isInsideGroup = false
 
   if (!isFuncArg && !isFunc && !isCaseValue && !isInsideGroup) {
     if (!config.__fieldsCntByType[type])
-      config.__fieldsCntByType[type] = 0;
-    config.__fieldsCntByType[type]++;
+      config.__fieldsCntByType[type] = {};
+    if (!config.__fieldsCntByType[type][""])
+      config.__fieldsCntByType[type][""] = 0;
+    config.__fieldsCntByType[type][""]++;
 
     // todo: fill __fieldsCntByListValuesType (for select fields)
   }
   if (isInsideGroup) {
     const groupField = getClosestGroupField(path, config);
-    const k = `${groupField}_${type}`;
-    if (!config.__fieldsCntByType[k])
-      config.__fieldsCntByType[k] = 0;
-    config.__fieldsCntByType[k]++;
+    const k = groupField;
+    if (!config.__fieldsCntByType[type])
+      config.__fieldsCntByType[type] = {};
+    if (!config.__fieldsCntByType[type][k])
+      config.__fieldsCntByType[type][k] = 0;
+    config.__fieldsCntByType[type][k]++;
   }
 
   if (isFuncArg) {
