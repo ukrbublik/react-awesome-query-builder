@@ -41,8 +41,42 @@ describe("query with switch-case", () => {
         }
     });
 
-    export_checks([configs.with_all_types, configs.with_cases], inits.with_cases_simple, undefined, {
+    export_checks([configs.with_all_types, configs.with_cases, configs.with_case_value_field_text], inits.spel_with_cases_vars, "SpEL", {
+      logic: inits.with_cases_vars,
+      spel: inits.spel_with_cases_vars,
+    });
+
+    export_checks([configs.with_all_types, configs.with_cases], inits.with_cases_simple, "JsonLogic", {
       spel: "(str == '222' ? 'foo' : 'bar')"
+    });
+
+    export_checks([configs.with_all_types, configs.with_cases, configs.with_case_value_field_text], inits.with_cases_vars, "JsonLogic", {
+      spel: inits.spel_with_cases_vars,
+      logic: inits.with_cases_vars
+    });
+  });
+
+  describe("1 default case with field", () => {
+    export_checks([configs.with_all_types, configs.with_cases, configs.with_case_value_field_text], inits.spel_with_default_case_field, "SpEL", {
+      logic: inits.with_default_case_field,
+      spel: inits.spel_with_default_case_field,
+    });
+
+    export_checks([configs.with_all_types, configs.with_cases, configs.with_case_value_field_text], inits.with_default_case_field, "JsonLogic", {
+      logic: inits.with_default_case_field,
+      spel: inits.spel_with_default_case_field,
+    });
+  });
+
+  describe("1 default case with func", () => {
+    export_checks([configs.with_all_types, configs.with_cases, configs.with_funcs, configs.with_case_value_field_text], inits.spel_with_default_case_func, "SpEL", {
+      logic: inits.with_default_case_func,
+      spel: inits.spel_with_default_case_func,
+    });
+
+    export_checks([configs.with_all_types, configs.with_cases, configs.with_funcs, configs.with_case_value_field_text], inits.with_default_case_func, "JsonLogic", {
+      logic: inits.with_default_case_func,
+      spel: inits.spel_with_default_case_func,
     });
   });
 

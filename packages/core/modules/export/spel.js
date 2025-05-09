@@ -425,9 +425,9 @@ const formatField = (meta, config, field, parentField = null) => {
     let parent;
     if (parentCnf) {
       if (parentCnf.type == "!struct" || parentCnf.type == "!group" && parentCnf.mode == "struct")
-        parent = cnf.isSpelMap ? "map" : "class";
+        parent = cnf?.isSpelMap ? "map" : "class";
       else if (parentCnf.type == "!group")
-        parent = cnf.isSpelItemMap ? "[map]" : "[class]";
+        parent = cnf?.isSpelItemMap ? "[map]" : "[class]";
       else
         parent = "class";
     }

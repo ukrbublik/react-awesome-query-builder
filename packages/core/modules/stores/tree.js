@@ -845,7 +845,7 @@ const setValueSrc = (state, path, delta, srcKey, config, _meta = {}) => {
     state = state.setIn(expandTreePath(path, "properties", "valueError", delta), null);
 
     // if current operator is range, clear possible range error
-    if (operatorConfig.validateValues) {
+    if (operatorConfig?.validateValues) {
       state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), null);
     }
   }

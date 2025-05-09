@@ -7,6 +7,9 @@ import initLogicWithNotInSome from "./logic/with_not_in_some";
 import initLogicWithFuncInLhs from "./logic/with_func_in_lhs";
 import initLogicGroupSomeInAny from "./logic/with_group_some_in_any";
 import initLogicGroupSomeInLike from "./logic/with_group_some_in_like";
+import initLogicSwitchWith2Cases from "./logic/switch_with_2_cases";
+import initLogicSwitchWithDefaultCaseField from "./logic/switch_with_default_case_field";
+import initLogicSwitchWithDefaultCaseFunc from "./logic/switch_with_default_case_func";
 
 import {
   Utils, JsonTree,
@@ -30,6 +33,9 @@ export const initFiles: Record<string, any> = {
   "logic/autocomplete": initLogicAutocomplete,
   "logic/with_group_some_in_any": initLogicGroupSomeInAny,
   "logic/with_group_some_in_like": initLogicGroupSomeInLike,
+  "logic/switch_with_2_cases": initLogicSwitchWith2Cases,
+  "logic/switch_with_default_case_field": initLogicSwitchWithDefaultCaseField,
+  "logic/switch_with_default_case_func": initLogicSwitchWithDefaultCaseFunc,
 
   "tree/complex": initTreeComplex,
   "tree/empty": emptyTree,
