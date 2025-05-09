@@ -6,6 +6,8 @@
   - Updated dependencies. `@babel/runtime` is now dep for all packages (PR #1246) (issue #964)
   - Fix group operator's custom jsonLogic function not being called (PR #1242) (issue #1241)
   - Fix import switch from JsonLogic (PR #1235) (issue #1230)
+  - Removed `Utils.ExportUtils.SqlString.trim`
+  - Now `Utils.ExportUtils.SqlString.unescapeLike` returns object instead of string
 - 6.6.14
   - Fixed import from JsonLogic when like op is used inside group with some group op (PR #1225) (issue #1221)
   - Support React 19 (PR #1229) (issue #1205)
