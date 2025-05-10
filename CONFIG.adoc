@@ -21,6 +21,8 @@ endif::[]
 :d_ts:         https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/core/modules/index.d.ts
 :ts-pattern:   https://github.com/gvergnaud/ts-pattern
 
+:number-format: https://s-yadav.github.io/react-number-format/docs/numeric_format
+
 = Config format
 
 Has 8 sections:
@@ -117,8 +119,9 @@ const {
   },
   widgets: {
     text,
-    textarea,
+    textarea, // multiline text
     number,
+    price, // same as number but with decimal separator etc.
     slider,
     rangeslider, // missing in `BasicConfig`, `BootstrapConfig`, `FluentUIConfig`
     select,
@@ -210,14 +213,18 @@ Example:
 |fieldName | | |By default field name for export is constructed from current feild key and ancestors keys joined by `settings.fieldSeparator`. You can override this by specifying `fieldName`
 |tooltip | | |Optional tooltip to be displayed in field list by hovering on item
 |fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
-  Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
-  Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`, `useKeyboard`. +
+  Available settings for Number/Slider widgets: `min`, `max`, `step`. +
+  Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
+  Available settings for Price widgets: `thousandSeparator`, `decimalSeparator`, `decimalScale`, `prefix`, `suffix`, `allowNegative` (see {d_ts}[type] `PriceFieldSettings` and {number-format}[react-number-format]). +
+  Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`. +
   Available settings for text widget: `maxLength`, `maxRows`. +
   See table for other `fieldSettings` below.
 |defaultValue | | |Default value
-|preferWidgets | | |See usecase at {config3}[`packages/examples/src/demo/config`] for `slider` field. +
-  Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
-  So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input.
+|preferWidgets | | |See usecase at {config3}[`packages/examples/src/demo/config`] for `slider` field. Its type is `number`. +
+  There are 4 widgets defined for `number` type: `number`, `price`, `slider`, `rangeslider`. +
+  So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider instead of number input. +
+  Setting `preferWidgets: ['price']` will render price input (supports thousands separator). +
+  Also you can use `preferWidgets: ['textarea']` for type `text` for multiline input.
 |operators, defaultOperator, widgets, valueSources | | |You can override config of corresponding type (see below at section link:#configtypes[config.types])
 |mainWidgetProps | | |Shorthand for `widgets.<main>.widgetProps`
 |excludeOperators | | |Can exclude some operators. Example: `['proximity']` for `text` type
@@ -232,45 +239,54 @@ Example:
 
 `fieldSettings`
 
-[cols="1m,1,5a",options="header"]
+[cols="1m,1,1,5a",options="header"]
 |===
-|key |default |meaning
-|listValues | |Static list of values. *Required* for `(multi)select` widgets without `asyncFetch`. +
+|key |default |for widgets |meaning
+|validateValue | |* |Function to validate input value. +
+  Simple way: return true/false. Advanced: if value is valid, return `null`, otherwise return error string or object `{error, fixedValue?}`. +
+  `error` can be a string or an object `{key, args}` to use {i18n}[i18n]. +
+  `(val: any, fieldSettings: Object) => boolean \| string \| {error: string \| Object, fixedValue?: any} \| null`
+|listValues | |`select`, `multiselect` |*Required* if `asyncFetch` is not provided. Static list of values. +
   Example: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
    (or alternatively `{ yellow: 'Yellow', green: 'Green' }`) +
   You can also use `groupTitle` to group values. 
   Example: `[{value: 'red', groupTitle: 'Warm colors'}, {value: 'orange', groupTitle: 'Warm colors'} ...]`
-|treeValues | |Static list of values. *Required* for `tree(multi)select` widgets. +
+|treeValues | |`treeselect`, `treemultiselect` |*Required*. Static list of values. +
   Example: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]` +
    (or alternatively `[{value: 'warm', title: 'Warm colors', children: [ {value: 'red', title: 'Red'}, {value: 'orange', title: 'Orange'} ]}]`)
-|validateValue | |Function to validate input value. +
-  Simple way: return true/false. Advanced: if value is valid, return `null`, otherwise return error string or object `{error, fixedValue?}`. +
-  `error` can be a string or an object `{key, args}` to use {i18n}[i18n]. +
-  `(val: any, fieldSettings: Object) => boolean \| string \| {error: string \| Object, fixedValue?: any} \| null`
-|allowCustomValues |false |For `(multi)select` widgets. If true, user can provide own options in multiselect. +
+|maxLength | |`text`, `textarea` |Max text length in characters
+|maxRows | |`textarea` |Max rows
+|allowCustomValues |false |`select`, `multiselect` |If true, user can provide own options in multiselect. +
   Otherwise they will be limited to static `listValues` (or values loaded via `asyncFetch`)
-|showSearch |false |For `(multi)select` and `tree(multi)select` widgets. Show search (autocomplete)?
-|treeExpandAll |false |For `tree(multi)select` widgets. Whether to expand all nodes by default
-|treeSelectOnlyLeafs |true |For `treeselect` widget. Can select only leafs or any node?
-|asyncFetch | |For `(multi)select` widgets. *Required* if `listValues` is not provided. +
+|showSearch |false |`select`, `multiselect`, `treeselect`, `treemultiselect` |Show search (autocomplete)?
+|treeExpandAll |false |`treeselect`, `treemultiselect` |Whether to expand all nodes by default
+|treeSelectOnlyLeafs |true |`treeselect` |Can select only leafs or any node?
+|asyncFetch | |`select`, `multiselect` |*Required* if `listValues` is not provided. +
   Async function to load list of options from server. +
   Function format: `async (string search, int offset) => { values: Array, hasMore: boolean }` +
   `values` - list of `{title: string, value: string/number, groupTitle?: string}` +
   See also `useLoadMore`, `useAsyncSearch`, `fetchSelectedValuesOnInit`.
-|useAsyncSearch |false |For `(multi)select` widgets with `asyncFetch` provided. +
-  If true, `asyncFetch` supports server-side search. +
+|useAsyncSearch |false |`select`, `multiselect` with `asyncFetch` |If true, `asyncFetch` supports server-side search. +
   Otherwise search will be performed locally only within already loaded list values from server.
-|useLoadMore |false |For `(multi)select` widgets with `asyncFetch` defined. +
-  If true, `asyncFetch` supports pagination.
-|forceAsyncSearch |false |For `(multi)select` widgets with `asyncFetch` provided. +
-  If true, list of options will be loaded only when user types into search string (if search is empty, no options to be presented).
-|fetchSelectedValuesOnInit |false |For `(multi)select` widgets with `asyncFetch` provided. +
-  If true, selected list values will be initially fetched from server (on query load) to resolve their titles for UI. +
+|useLoadMore |false |`select`, `multiselect` with `asyncFetch` |If true, `asyncFetch` supports pagination.
+|forceAsyncSearch |false |`select`, `multiselect` with `asyncFetch` |If true, list of options will be loaded only when user types into search string (if search is empty, no options to be presented).
+|fetchSelectedValuesOnInit |false |`select`, `multiselect` with `asyncFetch` |If true, selected list values will be initially fetched from server (on query load) to resolve their titles for UI. +
   `asyncFetch` should support format `async (Array selectedValues) => { values: Array }` +
   where `selectedValues` - array of values (string/number) and `values` - list of `{title: string, value: mixed, groupTitle?: string}` +
   Example for `multiselect`: `asyncFetch(['#FFFF00', '#008000', '#20B2A2'])` should be resolved with `[{title: "Yellow", value: "#FFFF00"}, {title: "Green", value: "#008000"}]` to display color names in UI. (Assuming `#20B2A2` is a custom value entered by user) +
   Example for `select`: `asyncFetch(['#FFFF00'])` should be resolved with `[{title: "Yellow", value: "#FFFF00"}]`. +
   See `logic/autocomplete` data in demo app.
+|thousandSeparator | |`price` |Defines the thousands separator character (eg. `,`).
+|decimalSeparator |`.` |`price` |Defines the decimal character.
+|decimalScale | |`price` |If defined, it limits the number of digits after the decimal point.
+|prefix | |`price` |Adds the prefix character before the input value (useful for currency).
+|suffix | |`price` |Adds the suffix after the input value (useful for currency).
+|allowNegative |true |`price` |If set to false, negative numbers will not be allowed.
+|timeFormat |`HH:mm` |`time`, `datetime` |Format to render time in widget
+|dateFormat |`DD.MM.YYYY` |`date`, `datetime` |Format to render date in widget
+|valueFormat |`YYYY-MM-DD HH:mm:ss` |`date`, `time`, `datetime` |Format to store date/time in query. +
+  By default `YYYY-MM-DD` for date, `HH:mm:ss` for time, `YYYY-MM-DD HH:mm:ss` for datetime.
+|use12Hours |false |`time`, `datetime` |Use AM/PM?
 |===
 
 {nbsp} +
@@ -424,10 +440,10 @@ Render settings:
 |renderSwitchPrefix |`IF` | For ternary mode - render on top of all confitions
 |renderBeforeCaseValue |`<span>then</span>` | For ternary mode - render before case value (except default case), after case condition tree
 |renderAfterCaseValue | | For ternary mode - render after case value (except default case)
-|defaultSliderWidth |`200px` |Width for slider
-|defaultSelectWidth |`200px` |Width for select
-|defaultSearchWidth |`100px` |Width for search in autocomplete
-|defaultMaxRows |5 | Max rows for textarea
+|defaultSliderWidth |`200px` |Width for `slider`
+|defaultSelectWidth |`200px` |Width for `select`
+|defaultSearchWidth |`100px` |Width for search in autocomplete inputs
+|defaultMaxRows |5 | Max rows for `textarea` widget
 |===
 
 Other settings:
@@ -700,13 +716,20 @@ const {
   `(string esQueryType, mixed val, string op, string field, Object config) => Object`
 |valueLabel | |`config.settings.valueLabel` |Common option, text to be placed on top of widget if `config.settings.showLabels` is true
 |valuePlaceholder | |`config.settings.valuePlaceholder` |Common option, placeholder text to be shown in widget for empty value
+|timeFormat | |`HH:mm` |Option for `<TimeWidget>`, `<DateTimeWidget>` to display time in widget. Example: `'HH:mm'`
+|use12Hours | |`false` |Option for `<TimeWidget>`. Use AM/PM?
+|dateFormat | |`DD.MM.YYYY` |Option for `<DateWidget>`, `<DateTimeWidget>` to display date in widget. Example: `YYYY-MM-DD`
+|valueFormat | |`YYYY-MM-DD HH:mm:ss` |Option for `<TimeWidget>`, `<DateWidget>`, `<DateTimeWidget>` to prepare string representation of value to be stored. Example: `YYYY-MM-DD HH:mm`. +
+  By default `YYYY-MM-DD` for date, `HH:mm:ss` for time, `YYYY-MM-DD HH:mm:ss` for datetime.
 |maxLength | | |Option for `<TextWidget>`, `<TextAreaWidget>`
 |maxRows | | |Option for `<TextAreaWidget>`
-|timeFormat | |`HH:mm:ss` |Option for `<TimeWidget>`, `<DateTimeWidget>` to display time in widget. Example: `'HH:mm'`
-|use12Hours | |`false` |Option for `<TimeWidget>`
-|dateFormat | |`YYYY-MM-DD` |Option for `<DateWidget>`, `<DateTimeWidget>` to display date in widget. Example: `YYYY-MM-DD`
-|valueFormat | | |Option for `<TimeWidget>`, `<DateWidget>`, `<DateTimeWidget>` to prepare string representation of value to be stored. Example: `YYYY-MM-DD HH:mm`
 |labelYes, labelNo | | |Option for `<BooleanWidget>`
+|thousandSeparator|  | |Option for `<PriceWidget>`. Defines the thousands separator character (eg. `,`). +
+|decimalSeparator|  |`.` |Option for `<PriceWidget>`. Defines the decimal character. +
+|decimalScale|  | |Option for `<PriceWidget>`. If defined, it limits the number of digits after the decimal point. +
+|prefix|  | |Option for `<PriceWidget>`. Adds the prefix character before the input value (useful for currency). +
+|suffix|  | |Option for `<PriceWidget>`. Adds the suffix after the input value (useful for currency). +
+|allowNegative|  |true |Option for `<PriceWidget>`. If set to false, negative numbers will not be allowed.
 |customProps | | |You can pass any props directly to widget with `customProps`. +
   For example enable search for https://ant.design/components/select/[`<Select>`] widget: `customProps: {showSearch: true}`
 |hideOperator | | |Hide operator?
@@ -759,7 +782,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`. If `'value'` is included, you can compare field with values. If `'field'` is included, you can compare field with another field of same type. If `'func'` is included, you can compare field with result of function (see link:#configfuncs[config.funcs]).
 |defaultOperator | | |If specified, it will be auto selected when user selects field
 |widgets.* |+ | |Available widgets for current type and their config. +
-  Normally there is only 1 widget per type. But see type `number` at {config3}[`packages/examples/src/demo/config`] - it has 3 widgets `number`, `slider`, `rangeslider`. +
+  Normally there is only 1 widget per type. But see type `number` at {config3}[`packages/examples/src/demo/config`] - it has 4 widgets: `number`, `slider`, `rangeslider`, `price`. +
   Or see type `select` - it has widget `select` for operator `=` and widget `multiselect` for operator `IN`.
 |widgets.<widget>.operators | | |List of operators for widget, described in link:#configoperators[config.operators]
 |widgets.<widget>.widgetProps | | |Can be used to override config of corresponding widget specified in link:#configwidgets[config.widgets]. Example: `{timeFormat: 'h:mm:ss A'}` for time field with AM/PM.
