@@ -284,8 +284,6 @@ Example:
 |allowNegative |true |`price` |If set to false, negative numbers will not be allowed.
 |timeFormat |`HH:mm` |`time`, `datetime` |Format to render time in widget
 |dateFormat |`DD.MM.YYYY` |`date`, `datetime` |Format to render date in widget
-|valueFormat |`YYYY-MM-DD HH:mm:ss` |`date`, `time`, `datetime` |Format to store date/time in query. +
-  By default `YYYY-MM-DD` for date, `HH:mm:ss` for time, `YYYY-MM-DD HH:mm:ss` for datetime.
 |use12Hours |false |`time`, `datetime` |Use AM/PM?
 |===
 
