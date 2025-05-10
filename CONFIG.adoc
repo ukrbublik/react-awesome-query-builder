@@ -223,7 +223,7 @@ Example:
 |preferWidgets | | |See usecase at {config3}[`packages/examples/src/demo/config`] for `slider` field. Its type is `number`. +
   There are 4 widgets defined for `number` type: `number`, `price`, `slider`, `rangeslider`. +
   So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider instead of number input. +
-  Setting `preferWidgets: ['price']` will render price input (supports thousands separator). +
+  Setting `preferWidgets: ['price']` will render price input (supports thousands separator) instead of number. +
   Also you can use `preferWidgets: ['textarea']` for type `text` for multiline input.
 |operators, defaultOperator, widgets, valueSources | | |You can override config of corresponding type (see below at section link:#configtypes[config.types])
 |mainWidgetProps | | |Shorthand for `widgets.<main>.widgetProps`
