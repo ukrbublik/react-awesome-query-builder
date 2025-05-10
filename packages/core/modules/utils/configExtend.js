@@ -132,7 +132,7 @@ function extendFieldsConfig(subconfig, config, path = [], isInsideGroup = false)
   for (let field in subconfig) {
     const fieldPathArr = [...path, field];
     extendFieldConfig(subconfig[field], config, fieldPathArr, isInsideGroup);
-    const isGroup = subconfig[field].type === "!group";
+    const isGroup = subconfig[field].type === "!group"; // todo: mode == array
     if (subconfig[field].subfields) {
       extendFieldsConfig(subconfig[field].subfields, config, fieldPathArr, isInsideGroup || isGroup);
     }

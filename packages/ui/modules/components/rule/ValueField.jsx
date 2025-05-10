@@ -129,7 +129,7 @@ export default class ValueField extends Component {
         const subpath = (path ? path : []).concat(rightFieldKey);
         const rightFieldFullkey = subpath.join(fieldSeparator);
         const rightFieldConfig = getFieldConfig(config, rightFieldFullkey);
-        const isGroup = rightFieldConfig.type === "!group";
+        const isGroup = rightFieldConfig.type === "!group"; // todo: mode = array
         const isStruct = rightFieldConfig.type === "!struct";
         if (!rightFieldConfig) {
           delete list[rightFieldKey];
