@@ -13,6 +13,16 @@ export default (props) => {
   };
   const numberValue = value == undefined ? "" : value;
   return (
-    <Input type="number" bsSize={"sm"} value={numberValue} placeholder={placeholder} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
+    <Input
+      type="number"
+      bsSize={"sm"}
+      value={numberValue}
+      placeholder={placeholder}
+      disabled={readonly}
+      min={min}
+      max={max}
+      step={step}
+      onChange={onChange}
+    />
   );
 };

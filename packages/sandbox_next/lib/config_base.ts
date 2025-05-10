@@ -3,7 +3,7 @@ import merge from "lodash/merge";
 import {
   BasicFuncs, CoreConfig,
   // types:
-  Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs, OperatorProximity, Func, SerializedFunction,
+  Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs, OperatorProximity, Func, SerializedFunction, PriceFieldSettings,
 } from "@react-awesome-query-builder/core";
 
 // Create a config for demo app based on CoreConfig - add fields, funcs, some overrides.
@@ -50,9 +50,9 @@ function createConfig(InitialConfig: CoreConfig): Config {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             validateValue: {
               and: [
-                { "<": [ {strlen: {var: "val"}}, 10 ] },
+                { "<": [{ strlen: { var: "val" } }, 10] },
                 { or: [
-                  { "===": [ {var: "val"}, "" ] },
+                  { "===": [{ var: "val" }, ""] },
                   { regexTest: [ {var: "val"}, "^[A-Za-z0-9_-]+$" ] }
                 ]}
               ]
@@ -68,6 +68,16 @@ function createConfig(InitialConfig: CoreConfig): Config {
           },
         }
       }
+    },
+    price: {
+      label: "Price",
+      type: "number",
+      preferWidgets: ["price"],
+      fieldSettings: {
+        valuePlaceholder: "Enter your Price",
+        prefix: "$",
+        allowNegative: false,
+      } as PriceFieldSettings,
     },
     prox1: {
       label: "prox",
@@ -250,6 +260,14 @@ function createConfig(InitialConfig: CoreConfig): Config {
     // examples of  overriding
     text: {
       ...InitialConfig.widgets.text,
+    },
+    price: {
+      ...InitialConfig.widgets.price,
+      // prefix: "$",
+      // allowNegative: false,
+      thousandSeparator: ",",
+      decimalSeparator: ".",
+      decimalScale: 2,
     },
     slider: {
       ...InitialConfig.widgets.slider,

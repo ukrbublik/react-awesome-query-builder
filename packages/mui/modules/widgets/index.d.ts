@@ -1,7 +1,7 @@
 import { ElementType } from "react";
 import {
   FieldProps, ConjsProps, SwitchProps, ButtonProps, ButtonGroupProps, ProviderProps, ValueSourcesProps, ConfirmFunc,
-  BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, RangeSliderWidgetProps
+  BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, RangeSliderWidgetProps, PriceWidgetProps
 } from "@react-awesome-query-builder/ui";
 
 export interface MuiWidgets {
@@ -27,6 +27,7 @@ export interface MuiWidgets {
   MuiMultiSelectWidget: ElementType<SelectWidgetProps>,
   MuiSelectWidget: ElementType<SelectWidgetProps>,
   MuiNumberWidget: ElementType<NumberWidgetProps>,
+  MuiPriceWidget: ElementType<PriceWidgetProps>;
   MuiSliderWidget: ElementType<NumberWidgetProps>,
   MuiRangeWidget: ElementType<RangeSliderWidgetProps>,
   MuiAutocompleteWidget: ElementType<SelectWidgetProps>,

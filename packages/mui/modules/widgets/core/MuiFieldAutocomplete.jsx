@@ -72,6 +72,7 @@ const fieldAdapter = ({
     disableClearable: !isValueField,
     value,
     isFieldAutocomplete: true,
+    dontFixOptionsOrder: true, // don't apply fixListValuesGroupOrder() for options
   };
 };
 

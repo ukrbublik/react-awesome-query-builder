@@ -357,5 +357,27 @@
                 }
             }
 		},
+		{
+			"label": "test-debug",
+			"type": "npm",
+			"script": "test-debug",
+			"group": "test",
+			"isBackground": true,
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "running": {
+                        "backgroundColor": "statusBarItem.warningBackground"
+                    }
+                }
+            }
+		},
 	]
 }

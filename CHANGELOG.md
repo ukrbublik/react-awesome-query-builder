@@ -1,4 +1,6 @@
 # Changelog
+- 6.7.0
+  - Added `price` widget based on `react-number-format` (PR #1206) (issue #1025)
 - 6.6.15
   - Fixed support of AntDesign 4.x DatePicker (PR #1239) (issue #1238)
   - Prevent potential prototype pollution in `OtherUtils.mergeIn` and `OtherUtils.setIn` (PR #1240)
