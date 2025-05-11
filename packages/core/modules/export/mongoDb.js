@@ -335,6 +335,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     operatorOptions,
     fieldDef,
   ];
+  // `mongoFormatOp` function SHOULD handle `not`
   let ruleQuery = fn.call(config.ctx, ...args);
   if (wrapExpr) {
     // if (not) {
