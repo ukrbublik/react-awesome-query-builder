@@ -556,6 +556,7 @@ interface Autocomplete {
   listValueToOption(listItem: ListItem): ListOptionUi;
 }
 interface ConfigUtils {
+  areConfigsSame(config1: Config, config2: Config): boolean;
   compressConfig(config: Config, baseConfig: Config): ZipConfig;
   decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
   compileConfig(config: Config): Config;

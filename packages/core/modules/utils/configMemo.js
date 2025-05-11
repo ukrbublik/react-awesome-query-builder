@@ -6,6 +6,10 @@ let configId = 0;
 let commonMemo;
 const memos = {};
 
+export const areConfigsSame = (config1, config2) => {
+  return configKeys.map(k => config1[k] === config2[k]).filter(v => !v).length === 0;
+};
+
 export const getCommonMemo = (extendConfig) => {
   if (!commonMemo) {
     commonMemo = createConfigMemo({
@@ -69,7 +73,7 @@ export const createConfigMemo = (meta = {
   const findBasic = (findConfig) => {
     for (const basicConfig of configStore.keys()) {
       const extConfig = configStore.get(basicConfig);
-      const found = configKeys.map(k => extConfig[k] === findConfig[k]).filter(v => !v).length === 0;
+      const found = areConfigsSame(extConfig, findConfig);
       if (found) {
         return basicConfig;
       }
