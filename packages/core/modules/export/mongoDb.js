@@ -138,6 +138,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   }
 
   let resultQuery;
+  let shortQuery = false;
   if (list.size == 1) {
     resultQuery = list.first();
   } else if (list.size > 1) {
@@ -173,8 +174,11 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
         return acc;
       }, {});
     }
-    if (!resultQuery) {
+    if (resultQuery) {
+      shortQuery = true;
+    } else {
       // can't be shorten
+      shortQuery = false;
       resultQuery = { [mongoConj] : rules };
     }
   }
@@ -189,6 +193,9 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
           ]
         }
       };
+      if (filterNot && resultQuery) {
+        resultQuery = { "$not": resultQuery };
+      }
       const filterQuery = resultQuery ? {
         "$size": {
           "$ifNull": [
@@ -204,16 +211,18 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
         }
       } : totalQuery;
       resultQuery = formatItem(
-        parents, item.set("type", "rule"), config, meta, filterNot, false, (_f => filterQuery), totalQuery
+        parents, item.set("type", "rule"), config, meta, not, false, (_f => filterQuery), totalQuery
       );
+      not = false;
       resultQuery = { "$expr": resultQuery };
     } else {
       resultQuery = { [groupFieldName]: {"$elemMatch": resultQuery} };
+      // todo: $not ??
     }
   }
 
   if (not) {
-    resultQuery = { "$not": resultQuery };
+    resultQuery = { "$nor": [ resultQuery ] };
   }
 
   return resultQuery;
@@ -325,10 +334,14 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   ];
   let ruleQuery = fn.call(config.ctx, ...args);
   if (wrapExpr) {
+    if (not) {
+      ruleQuery = { "$not": ruleQuery };
+    }
     ruleQuery = { "$expr": ruleQuery };
-  }
-  if (not) {
-    ruleQuery = { "$not": ruleQuery };
+  } else {
+    if (not) {
+      ruleQuery = { "$nor": [ ruleQuery ] };
+    }
   }
   return ruleQuery;
 };
