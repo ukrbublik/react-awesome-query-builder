@@ -530,7 +530,15 @@ describe("query with exclamation operators", () => {
 describe("query with exclamation operators in array group", () => {
   describe("reverseOperatorsForNot == false", () => {
     export_checks([configs.with_group_array_cars], inits.with_not_and_neg_in_some, "JsonLogic", {
-      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE NOT (year >= 1995 && year <= 2005) && SOME OF cars HAVE model Not Contains \"ggg\" && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
+      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
+        + " && SOME OF cars HAVE NOT (year >= 1995 && year <= 2005)"
+        + " && SOME OF cars HAVE model Not Contains \"ggg\""
+        + " && SOME OF cars HAVE NOT (model Not Contains \"ggg\")"
+        + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
+        + " && ALL OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\"))"
+        + " && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\"))"
+        + " && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\"))"
+        + " && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
       "logic": {
         "and": [
           { "some": [
@@ -544,6 +552,10 @@ describe("query with exclamation operators in array group", () => {
           { "some": [
             { "var": "cars" },
             { "!": { "in": [ "ggg", { "var": "model" } ] } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "!": { "in": [ "ggg", { "var": "model" } ] } } }
           ] },
           { "all": [
             { "var": "cars" },
@@ -655,6 +667,37 @@ describe("query with exclamation operators in array group", () => {
                                 "$$el.model",
                                 "ggg"
                               ]
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$not": {
+                                "$regex": [
+                                  "$$el.model",
+                                  "ggg"
+                                ]
+                              }
                             }
                           }
                         }
@@ -843,7 +886,15 @@ describe("query with exclamation operators in array group", () => {
   });
   describe("reverseOperatorsForNot == true", () => {
     export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_and_neg_in_some, "JsonLogic", {
-      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE (year < 1995 || year > 2005) && SOME OF cars HAVE model Not Contains \"ggg\" && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
+      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
+      + " && SOME OF cars HAVE (year < 1995 || year > 2005)"
+      + " && SOME OF cars HAVE model Not Contains \"ggg\""
+      + " && SOME OF cars HAVE model Contains \"ggg\""
+      + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
+      + " && ALL OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
+      + " && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
+      + " && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
+      + " && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
       "logic": inits.with_not_and_neg_in_some_reversed,
       "mongo": {
         "$and": [
@@ -934,6 +985,33 @@ describe("query with exclamation operators in array group", () => {
                                 "ggg"
                               ]
                             }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$regex": [
+                              "$$el.model",
+                              "ggg"
+                            ]
                           }
                         }
                       },
