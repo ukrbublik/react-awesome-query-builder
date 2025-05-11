@@ -534,6 +534,7 @@ describe("query with exclamation operators in array group", () => {
         + " && SOME OF cars HAVE NOT (year >= 1995 && year <= 2005)"
         + " && SOME OF cars HAVE model Not Contains \"ggg\""
         + " && SOME OF cars HAVE NOT (model Not Contains \"ggg\")"
+        + " && SOME OF cars HAVE NOT (cars.model Not Contains \"ggg\")" // todo: fix "cars.model" !!!
         + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
         + " && ALL OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\"))"
         + " && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\"))"
@@ -552,6 +553,10 @@ describe("query with exclamation operators in array group", () => {
           { "some": [
             { "var": "cars" },
             { "!": { "in": [ "ggg", { "var": "model" } ] } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "!": { "in": [ "ggg", { "var": "model" } ] } } }
           ] },
           { "some": [
             { "var": "cars" },
@@ -581,7 +586,7 @@ describe("query with exclamation operators in array group", () => {
       },
       "mongo": {
         "$and": [
-          // some
+          // some (vendor)
           {
             "$expr": {
               "$gt": [
@@ -611,7 +616,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some
+          // some (year)
           {
             "$expr": {
               "$gt": [
@@ -650,7 +655,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some
+          // some (model)
           {
             "$expr": {
               "$gt": [
@@ -679,7 +684,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some
+          // some (model)
           {
             "$expr": {
               "$gt": [
@@ -710,7 +715,38 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // all
+          // some (model)
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$not": {
+                                "$regex": [
+                                  "$$el.model",
+                                  "ggg"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // all (vendor)
           {
             "$expr": {
               "$eq": [
@@ -747,7 +783,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // all
+          // all (vendor)
           {
             "$expr": {
               "$eq": [
@@ -786,7 +822,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some
+          // some (vendor)
           {
             "$expr": {
               "$gt": [
@@ -818,7 +854,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some
+          // some (vendor)
           {
             "$expr": {
               "$gt": [
@@ -850,7 +886,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some
+          // some (vendor)
           {
             "$expr": {
               "$gt": [
@@ -890,6 +926,7 @@ describe("query with exclamation operators in array group", () => {
       + " && SOME OF cars HAVE (year < 1995 || year > 2005)"
       + " && SOME OF cars HAVE model Not Contains \"ggg\""
       + " && SOME OF cars HAVE model Contains \"ggg\""
+      + " && SOME OF cars HAVE NOT (cars.model Not Contains \"ggg\")" // todo: fix "cars.model" !!!
       + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
       + " && ALL OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
       + " && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
@@ -898,7 +935,7 @@ describe("query with exclamation operators in array group", () => {
       "logic": inits.with_not_and_neg_in_some_reversed,
       "mongo": {
         "$and": [
-          // some
+          // some (vendor)
           {
             "$expr": {
               "$gt": [
@@ -928,7 +965,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some
+          // some (year)
           {
             "$expr": {
               "$gt": [
@@ -967,7 +1004,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some
+          // some (model)
           {
             "$expr": {
               "$gt": [
@@ -996,7 +1033,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some
+          // some (model)
           {
             "$expr": {
               "$gt": [
@@ -1023,7 +1060,34 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // all
+          // some (model)
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$regex": [
+                              "$$el.model",
+                              "ggg"
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // all (vendor)
           {
             "$expr": {
               "$eq": [
@@ -1060,7 +1124,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // all
+          // all (vendor)
           {
             "$expr": {
               "$eq": [
@@ -1097,7 +1161,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some
+          // some (vendor)
           {
             "$expr": {
               "$gt": [
@@ -1127,7 +1191,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some
+          // some (vendor)
           {
             "$expr": {
               "$gt": [
@@ -1157,7 +1221,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some
+          // some (vendor)
           {
             "$expr": {
               "$gt": [

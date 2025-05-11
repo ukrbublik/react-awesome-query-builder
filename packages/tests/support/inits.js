@@ -465,6 +465,10 @@ export const with_not_and_neg_in_some = {
       { "var": "cars" },
       { "!": { "!": { "in": [ "ggg", { "var": "model" } ] } } }
     ] },
+    { "some": [
+      { "var": "cars" },
+      { "and": [ { "!": { "and": [ { "!": { "in": [ "ggg", { "var": "model" } ] } } ] } } ] }
+    ] },
     { "all": [
       { "var": "cars" },
       { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
@@ -501,6 +505,10 @@ export const with_not_and_neg_in_some_reversed = {
     { "some": [
       { "var": "cars" },
       { "!": { "in": [ "ggg", { "var": "model" } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "in": [ "ggg", { "var": "model" } ] }
     ] },
     { "some": [
       { "var": "cars" },
