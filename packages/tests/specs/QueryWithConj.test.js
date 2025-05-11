@@ -90,7 +90,7 @@ describe("query with conjunction", () => {
         "queryHuman": "NOT (Number < 2 OR login = ukrbublik)",
         "sql": "NOT (num < 2 OR login = 'ukrbublik')",
         "mongo": {
-          "$not": {
+          "$nor": [{
             "$or": [
               {
                 "num": {
@@ -101,7 +101,7 @@ describe("query with conjunction", () => {
                 "login": "ukrbublik"
               }
             ]
-          }
+          }]
         },
         "logic": {
           "!": {
@@ -162,12 +162,12 @@ describe("query with conjunction", () => {
         export_checks([configs.with_number_and_string, configs.without_short_mongo_query], inits.with_not_number_and_string, "JsonLogic", {
           "spel": "!(num < 2 || login == 'ukrbublik')",
           "mongo": {
-            "$not": {
+            "$nor": [{
               "$or": [
                 { "num": { "$lt": 2 } },
                 { "login": "ukrbublik" }
               ]
-            }
+            }]
           },
         }, []);
       });

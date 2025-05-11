@@ -195,11 +195,11 @@ describe("query with ops", () => {
             }
           },
           {
-            "$not": {
+            "$nor": [{
               "str": {
                 "$regex": "xyz"
               }
-            }
+            }]
           },
           {
             "num": {
@@ -208,12 +208,12 @@ describe("query with ops", () => {
             }
           },
           {
-            "$not": {
+            "$nor": [{
               "num": {
                 "$gte": 3,
                 "$lte": 4
               }
-            }
+            }]
           },
           {
             "num": null
@@ -226,20 +226,20 @@ describe("query with ops", () => {
             }
           },
           {
-            "$not": {
+            "$nor": [{
               "color": {
                 "$in": [
                   "green"
                 ]
               }
-            }
+            }]
           },
           {
-            "$not": {
+            "$nor": [{
               "multicolor": [
                 "yellow"
               ]
-            }
+            }]
           }
         ]
       },
@@ -419,11 +419,11 @@ describe("query with ops", () => {
             }
           },
           {
-            "$not": {
+            "$nor": [{
               "str": {
                 "$regex": "xyz"
               }
-            }
+            }]
           },
           {
             "num": {
@@ -432,12 +432,12 @@ describe("query with ops", () => {
             }
           },
           {
-            "$not": {
+            "$nor": [{
               "num": {
                 "$gte": 3,
                 "$lte": 4
               }
-            }
+            }]
           },
           {
             "num": null
@@ -450,20 +450,20 @@ describe("query with ops", () => {
             }
           },
           {
-            "$not": {
+            "$nor": [{
               "color": {
                 "$in": [
                   "green"
                 ]
               }
-            }
+            }]
           },
           {
-            "$not": {
+            "$nor": [{
               "multicolor": [
                 "yellow"
               ]
-            }
+            }]
           }
         ]
       },
