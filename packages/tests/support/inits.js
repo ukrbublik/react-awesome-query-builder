@@ -453,6 +453,14 @@ export const with_not_and_neg_in_some = {
       { "var": "cars" },
       { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
     ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "and": [ { "<=": [ 1995, { "var": "year" }, 2005 ] } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "in": [ "ggg", { "var": "model" } ] } }
+    ] },
     { "all": [
       { "var": "cars" },
       { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
@@ -481,6 +489,14 @@ export const with_not_and_neg_in_some_reversed = {
     { "some": [
       { "var": "cars" },
       { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "<=": [ 1995, { "var": "year" }, 2005 ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "in": [ "ggg", { "var": "model" } ] } }
     ] },
     { "all": [
       { "var": "cars" },

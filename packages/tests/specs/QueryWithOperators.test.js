@@ -530,12 +530,20 @@ describe("query with exclamation operators", () => {
 describe("query with exclamation operators in array group", () => {
   describe("reverseOperatorsForNot == false", () => {
     export_checks([configs.with_group_array_cars], inits.with_not_and_neg_in_some, "JsonLogic", {
-      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
+      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE NOT (year >= 1995 && year <= 2005) && SOME OF cars HAVE model Not Contains \"ggg\" && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\")) && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
       "logic": {
         "and": [
           { "some": [
             { "var": "cars" },
             { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "and": [ { "<=": [ 1995, { "var": "year" }, 2005 ] } ] } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "in": [ "ggg", { "var": "model" } ] } }
           ] },
           { "all": [
             { "var": "cars" },
@@ -559,12 +567,550 @@ describe("query with exclamation operators in array group", () => {
           ] }
         ]
       },
+      "mongo": {
+        "$and": [
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$in": [
+                              "$$el.vendor",
+                              [
+                                "Ford",
+                                "Toyota"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$and": [
+                                {
+                                  "$gte": [
+                                    "$$el.year",
+                                    1995
+                                  ]
+                                },
+                                {
+                                  "$lte": [
+                                    "$$el.year",
+                                    2005
+                                  ]
+                                }
+                              ]
+                            }
+                          },
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$regex": [
+                                "$$el.model",
+                                "ggg"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // all
+          {
+            "$expr": {
+              "$eq": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$nin": [
+                              "$$el.vendor",
+                              [
+                                "Ford",
+                                "Toyota"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                {
+                  "$size": {
+                    "$ifNull": [
+                      "$cars",
+                      []
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          // all
+          {
+            "$expr": {
+              "$eq": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$nin": [
+                                "$$el.vendor",
+                                [
+                                  "Ford",
+                                  "Toyota"
+                                ]
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                {
+                  "$size": {
+                    "$ifNull": [
+                      "$cars",
+                      []
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$nin": [
+                                "$$el.vendor",
+                                [
+                                  "Ford",
+                                  "Toyota"
+                                ]
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$nin": [
+                                "$$el.vendor",
+                                [
+                                  "Ford",
+                                  "Toyota"
+                                ]
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$nin": [
+                              "$$el.vendor",
+                              [
+                                "Ford",
+                                "Toyota"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          }
+        ]
+      }
     });
   });
   describe("reverseOperatorsForNot == true", () => {
     export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_and_neg_in_some, "JsonLogic", {
-      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
-      "logic": inits.with_not_and_neg_in_some_reversed
+      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE (year < 1995 || year > 2005) && SOME OF cars HAVE model Not Contains \"ggg\" && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\") && ALL OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\") && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
+      "logic": inits.with_not_and_neg_in_some_reversed,
+      "mongo": {
+        "$and": [
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$in": [
+                              "$$el.vendor",
+                              [
+                                "Ford",
+                                "Toyota"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$and": [
+                                {
+                                  "$gte": [
+                                    "$$el.year",
+                                    1995
+                                  ]
+                                },
+                                {
+                                  "$lte": [
+                                    "$$el.year",
+                                    2005
+                                  ]
+                                }
+                              ]
+                            }
+                          },
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$regex": [
+                                "$$el.model",
+                                "ggg"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // all
+          {
+            "$expr": {
+              "$eq": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$nin": [
+                              "$$el.vendor",
+                              [
+                                "Ford",
+                                "Toyota"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                {
+                  "$size": {
+                    "$ifNull": [
+                      "$cars",
+                      []
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          // all
+          {
+            "$expr": {
+              "$eq": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$in": [
+                              "$$el.vendor",
+                              [
+                                "Ford",
+                                "Toyota"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                {
+                  "$size": {
+                    "$ifNull": [
+                      "$cars",
+                      []
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$in": [
+                              "$$el.vendor",
+                              [
+                                "Ford",
+                                "Toyota"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$in": [
+                              "$$el.vendor",
+                              [
+                                "Ford",
+                                "Toyota"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$nin": [
+                              "$$el.vendor",
+                              [
+                                "Ford",
+                                "Toyota"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          }
+        ]
+      }
     });
   });
 });

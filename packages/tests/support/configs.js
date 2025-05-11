@@ -1474,7 +1474,11 @@ export const with_group_array_cars = (BasicConfig) => ({
             max: 2021,
           },
           valueSources: ["value"],
-        }
+        },
+        model: {
+          type: "text",
+          valueSources: ["value"],
+        },
       }
     },
   },
