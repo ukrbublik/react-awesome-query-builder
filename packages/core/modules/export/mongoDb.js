@@ -53,12 +53,12 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const {canShortMongoQuery, fieldSeparator} = config.settings;
   const sep = fieldSeparator;
 
-  const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
+  const parentRuleGroup = parents.filter(it => it.get("type") == "rule_group")?.slice(-1)?.pop();
   const parentPath = parents
     .filter(it => it.get("type") == "rule_group")
     .map(it => it.get("properties").get("field"))
     .slice(-1).pop();
-  const realParentPath = hasParentRuleGroup && parentPath;
+  const realParentPath = !!parentRuleGroup && parentPath;
 
   const isRuleGroup = (type === "rule_group");
   const groupField = isRuleGroup ? properties.get("field") : null;
@@ -91,13 +91,13 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const groupOpNeedsReverse = !groupOperatorDef?.mongoFormatOp && !!reversedGroupOpDef?.mongoFormatOp;
   const groupOpCanReverse = !!reversedGroupOpDef?.mongoFormatOp;
   const oneChildType = getOneChildOrDescendant(item)?.get("type");
-  const canRevChildren = !!config.settings.reverseOperatorsForNot
-    && (!isRuleGroup && not && oneChildType === "rule" || filterNot && children?.size === 1);
+  const isSimpleGroupWithOneChild = !isRuleGroup && oneChildType === "rule";
+  const canRevChildren = (not && isSimpleGroupWithOneChild || filterNot && children?.size === 1); // && !!config.settings.reverseOperatorsForNot;
   if (canRevChildren) {
-    if (isRuleGroupWithChildren) {
-      filterNot = !filterNot;
-    } else {
+    if (isSimpleGroupWithOneChild) {
       not = !not;
+    } else {
+      filterNot = !filterNot;
     }
     revChildren = true;
   }
@@ -128,9 +128,11 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
 
   const mongoConj = conjunctionDefinition.mongoConj;
 
+  const canWrapExpr = !groupField && !parentRuleGroup; // can't use "$expr" inside "$filter"."cond" or inside "$elemMatch"
+  const formatFieldNameFn = mode == "array" ? (f => `$$el${sep}${f}`) : _formatFieldName;
   const list = children
     .map((currentChild) => formatItem(
-      [...parents, item], currentChild, config, meta, revChildren, mode != "array", mode == "array" ? (f => `$$el${sep}${f}`) : undefined)
+      [...parents, item], currentChild, config, meta, revChildren, canWrapExpr, formatFieldNameFn)
     )
     .filter((formattedChild) => typeof formattedChild !== "undefined");
   if (!canHaveEmptyChildren && !list.size) {
@@ -232,12 +234,12 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
 const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = true, _formatFieldName = undefined, _value = undefined) => {
   const properties = item.get("properties") || new Map();
 
-  const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
+  const parentRuleGroup = parents.filter(it => it.get("type") == "rule_group")?.slice(-1)?.pop();
   const parentPath = parents
     .filter(it => it.get("type") == "rule_group")
     .map(it => it.get("properties").get("field"))
     .slice(-1).pop();
-  const realParentPath = hasParentRuleGroup && parentPath;
+  const realParentPath = !!parentRuleGroup && parentPath;
 
   let operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
@@ -325,6 +327,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     formattedField,
     operator,
     _value !== undefined && formattedValue == null ? _value : formattedValue,
+    not,
     useExpr,
     (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
     (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
@@ -334,14 +337,14 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   ];
   let ruleQuery = fn.call(config.ctx, ...args);
   if (wrapExpr) {
-    if (not) {
-      ruleQuery = { "$not": ruleQuery };
-    }
+    // if (not) {
+    //   ruleQuery = { "$not": ruleQuery };
+    // }
     ruleQuery = { "$expr": ruleQuery };
   } else {
-    if (not) {
-      ruleQuery = { "$nor": [ ruleQuery ] };
-    }
+    // if (not) {
+    //   ruleQuery = { "$nor": [ ruleQuery ] };
+    // }
   }
   return ruleQuery;
 };

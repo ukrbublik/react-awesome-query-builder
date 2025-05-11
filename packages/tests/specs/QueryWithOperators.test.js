@@ -173,8 +173,8 @@ describe("query with ops", () => {
     });
   });
 
-  describe("reverseOperatorsForNot == false", () => {
-    export_checks([configs.with_all_types], inits.with_ops_and_negation_groups, "JsonLogic", {
+  describe("@short reverseOperatorsForNot == false", () => {
+    export_checks([configs.with_all_types, configs.without_short_mongo_query], inits.with_ops_and_negation_groups, "JsonLogic", {
       "spel": "(text == 'Long\nText' && num != 2 && str.contains('abc') && !(str.contains('xyz')) && (num >= 1 && num <= 2) && !(num >= 3 && num <= 4) && num == null && {'yellow'}.?[true].contains(color) && !({'green'}.?[true].contains(color)) && !(multicolor.equals({'yellow'})))",
       "query": "(text == \"Long\\nText\" && num != 2 && str Contains \"abc\" && NOT (str Contains \"xyz\") && num >= 1 && num <= 2 && NOT (num >= 3 && num <= 4) && !num && color IN (\"yellow\") && NOT (color IN (\"green\")) && NOT (multicolor == [\"yellow\"]))",
       "queryHuman": "(Textarea = Long\nText AND Number != 2 AND String Contains abc AND NOT (String Contains xyz) AND Number BETWEEN 1 AND 2 AND NOT (Number BETWEEN 3 AND 4) AND Number IS NULL AND Color IN (Yellow) AND NOT (Color IN (Green)) AND NOT (Colors = [Yellow]))",
@@ -195,11 +195,11 @@ describe("query with ops", () => {
             }
           },
           {
-            "$nor": [{
-              "str": {
+            "str": {
+              "$not": {
                 "$regex": "xyz"
               }
-            }]
+            }
           },
           {
             "num": {
@@ -208,12 +208,12 @@ describe("query with ops", () => {
             }
           },
           {
-            "$nor": [{
-              "num": {
+            "num": {
+              "$not": {
                 "$gte": 3,
                 "$lte": 4
               }
-            }]
+            }
           },
           {
             "num": null
@@ -226,21 +226,23 @@ describe("query with ops", () => {
             }
           },
           {
-            "$nor": [{
-              "color": {
+            "color": {
+              "$not": {
                 "$in": [
                   "green"
                 ]
               }
-            }]
+            }
           },
           {
-            "$nor": [{
-              "multicolor": [
-                "yellow"
-              ]
-            }]
-          }
+            "multicolor": {
+              "$not": {
+                "$eq": [
+                  "yellow"
+                ]
+              }
+            }
+          },
         ]
       },
       "logic": {
@@ -419,11 +421,11 @@ describe("query with ops", () => {
             }
           },
           {
-            "$nor": [{
-              "str": {
+            "str": {
+              "$not": {
                 "$regex": "xyz"
               }
-            }]
+            }
           },
           {
             "num": {
@@ -432,12 +434,12 @@ describe("query with ops", () => {
             }
           },
           {
-            "$nor": [{
-              "num": {
+            "num": {
+              "$not": {
                 "$gte": 3,
                 "$lte": 4
               }
-            }]
+            }
           },
           {
             "num": null
@@ -450,20 +452,22 @@ describe("query with ops", () => {
             }
           },
           {
-            "$nor": [{
-              "color": {
+            "color": {
+              "$not": {
                 "$in": [
                   "green"
                 ]
               }
-            }]
+            }
           },
           {
-            "$nor": [{
-              "multicolor": [
-                "yellow"
-              ]
-            }]
+            "multicolor": {
+              "$not": {
+                "$eq": [
+                  "yellow"
+                ]
+              }
+            }
           }
         ]
       },
@@ -532,9 +536,9 @@ describe("query with exclamation operators in array group", () => {
     export_checks([configs.with_group_array_cars], inits.with_not_and_neg_in_some, "JsonLogic", {
       "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
         + " && SOME OF cars HAVE NOT (year >= 1995 && year <= 2005)"
-        + " && SOME OF cars HAVE model Not Contains \"ggg\""
-        + " && SOME OF cars HAVE NOT (model Not Contains \"ggg\")"
-        + " && SOME OF cars HAVE NOT (cars.model Not Contains \"ggg\")" // todo: fix "cars.model" !!!
+        + " && SOME OF cars HAVE model Not Contains \"ggg1\""
+        + " && SOME OF cars HAVE NOT (model Not Contains \"ggg2\")"
+        + " && SOME OF cars HAVE NOT (cars.model Not Contains \"ggg3\")" // todo: fix "cars.model" !!!
         + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
         + " && ALL OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\"))"
         + " && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\"))"
@@ -552,15 +556,15 @@ describe("query with exclamation operators in array group", () => {
           ] },
           { "some": [
             { "var": "cars" },
-            { "!": { "in": [ "ggg", { "var": "model" } ] } }
+            { "!": { "in": [ "ggg1", { "var": "model" } ] } }
           ] },
           { "some": [
             { "var": "cars" },
-            { "!": { "!": { "in": [ "ggg", { "var": "model" } ] } } }
+            { "!": { "!": { "in": [ "ggg2", { "var": "model" } ] } } }
           ] },
           { "some": [
             { "var": "cars" },
-            { "!": { "!": { "in": [ "ggg", { "var": "model" } ] } } }
+            { "!": { "!": { "in": [ "ggg3", { "var": "model" } ] } } }
           ] },
           { "all": [
             { "var": "cars" },
@@ -670,7 +674,7 @@ describe("query with exclamation operators in array group", () => {
                             "$not": {
                               "$regex": [
                                 "$$el.model",
-                                "ggg"
+                                "ggg1"
                               ]
                             }
                           }
@@ -696,14 +700,11 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$not": {
-                              "$not": {
-                                "$regex": [
-                                  "$$el.model",
-                                  "ggg"
-                                ]
-                              }
-                            }
+                            // todo: $not $not
+                            "$regex": [
+                              "$$el.model",
+                              "ggg2"
+                            ]
                           }
                         }
                       },
@@ -727,14 +728,11 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$not": {
-                              "$not": {
-                                "$regex": [
-                                  "$$el.model",
-                                  "ggg"
-                                ]
-                              }
-                            }
+                            // todo: $not $not
+                            "$regex": [
+                              "$$el.model",
+                              "ggg3"
+                            ]
                           }
                         }
                       },
@@ -924,9 +922,9 @@ describe("query with exclamation operators in array group", () => {
     export_checks([configs.with_group_array_cars, configs.with_reverse_operators], inits.with_not_and_neg_in_some, "JsonLogic", {
       "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
       + " && SOME OF cars HAVE (year < 1995 || year > 2005)"
-      + " && SOME OF cars HAVE model Not Contains \"ggg\""
-      + " && SOME OF cars HAVE model Contains \"ggg\""
-      + " && SOME OF cars HAVE NOT (cars.model Not Contains \"ggg\")" // todo: fix "cars.model" !!!
+      + " && SOME OF cars HAVE model Not Contains \"ggg1\""
+      + " && SOME OF cars HAVE model Contains \"ggg2\""
+      + " && SOME OF cars HAVE NOT (cars.model Not Contains \"ggg3\")" // todo: fix "cars.model" !!!
       + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
       + " && ALL OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
       + " && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
@@ -1019,7 +1017,7 @@ describe("query with exclamation operators in array group", () => {
                             "$not": {
                               "$regex": [
                                 "$$el.model",
-                                "ggg"
+                                "ggg1"
                               ]
                             }
                           }
@@ -1047,7 +1045,7 @@ describe("query with exclamation operators in array group", () => {
                           "cond": {
                             "$regex": [
                               "$$el.model",
-                              "ggg"
+                              "ggg2"
                             ]
                           }
                         }
@@ -1074,7 +1072,7 @@ describe("query with exclamation operators in array group", () => {
                           "cond": {
                             "$regex": [
                               "$$el.model",
-                              "ggg"
+                              "ggg3"
                             ]
                           }
                         }

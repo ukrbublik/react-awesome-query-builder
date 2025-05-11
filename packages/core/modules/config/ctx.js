@@ -7,14 +7,14 @@ import {escapeRegExp} from "../utils/stuff";
 import {getTitleInListValues} from "../utils/listValues";
 
 // helpers for mongo format
-export const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+export const mongoFormatOp1 = (mop, mc, opNot,  field, _op, value, not, useExpr, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
   const $field = typeof field == "string" && !field.startsWith("$") ? "$"+field : field;
   const mv = mc(value, fieldDef);
   if (mv === undefined)
     return undefined;
-  if (not) {
-    if (!useExpr && (!mop || mop == "$eq"))
-      return { [field]: { "$ne": mv } }; // short form
+  if (not ^ opNot) {
+    // if (!useExpr && (!mop || mop == "$eq"))
+    //   return { [field]: { "$ne": mv } }; // short form
     return !useExpr
       ? { [field]: { "$not": { [mop]: mv } } } 
       : { "$not": { [mop]: [$field, mv] } };
@@ -27,9 +27,9 @@ export const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr, valueS
   }
 };
 
-export const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr, valueSrcs, valueTypes, opDef, operatorOptions, fieldDef) => {
+export const mongoFormatOp2 = (mops, opNot,  field, _op, values, not, useExpr, valueSrcs, valueTypes, opDef, operatorOptions, fieldDef) => {
   const $field = typeof field == "string" && !field.startsWith("$") ? "$"+field : field;
-  if (not) {
+  if (not ^ opNot) {
     return !useExpr
       ? { [field]: { "$not": { [mops[0]]: values[0], [mops[1]]: values[1] } } } 
       : {"$not":

@@ -459,15 +459,15 @@ export const with_not_and_neg_in_some = {
     ] },
     { "some": [
       { "var": "cars" },
-      { "!": { "in": [ "ggg", { "var": "model" } ] } }
+      { "!": { "in": [ "ggg1", { "var": "model" } ] } }
     ] },
     { "some": [
       { "var": "cars" },
-      { "!": { "!": { "in": [ "ggg", { "var": "model" } ] } } }
+      { "!": { "!": { "in": [ "ggg2", { "var": "model" } ] } } }
     ] },
     { "some": [
       { "var": "cars" },
-      { "and": [ { "!": { "and": [ { "!": { "in": [ "ggg", { "var": "model" } ] } } ] } } ] }
+      { "and": [ { "!": { "and": [ { "!": { "in": [ "ggg3", { "var": "model" } ] } } ] } } ] }
     ] },
     { "all": [
       { "var": "cars" },
@@ -504,15 +504,15 @@ export const with_not_and_neg_in_some_reversed = {
     ] },
     { "some": [
       { "var": "cars" },
-      { "!": { "in": [ "ggg", { "var": "model" } ] } }
+      { "!": { "in": [ "ggg1", { "var": "model" } ] } }
     ] },
     { "some": [
       { "var": "cars" },
-      { "in": [ "ggg", { "var": "model" } ] }
+      { "in": [ "ggg2", { "var": "model" } ] }
     ] },
     { "some": [
       { "var": "cars" },
-      { "in": [ "ggg", { "var": "model" } ] }
+      { "in": [ "ggg3", { "var": "model" } ] }
     ] },
     { "all": [
       { "var": "cars" },
