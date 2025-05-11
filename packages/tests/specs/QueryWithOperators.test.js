@@ -672,10 +672,10 @@ describe("query with exclamation operators in array group", () => {
                           "as": "el",
                           "cond": {
                             "$not": {
-                              "$regex": [
-                                "$$el.model",
-                                "ggg1"
-                              ]
+                              "$regexFind": {
+                                "input": "$$el.model",
+                                "regex": "ggg1"
+                              }
                             }
                           }
                         }
@@ -701,10 +701,10 @@ describe("query with exclamation operators in array group", () => {
                           "as": "el",
                           "cond": {
                             // todo: $not $not
-                            "$regex": [
-                              "$$el.model",
-                              "ggg2"
-                            ]
+                            "$regexFind": {
+                              "input": "$$el.model",
+                              "regex": "ggg2"
+                            }
                           }
                         }
                       },
@@ -729,10 +729,10 @@ describe("query with exclamation operators in array group", () => {
                           "as": "el",
                           "cond": {
                             // todo: $not $not
-                            "$regex": [
-                              "$$el.model",
-                              "ggg3"
-                            ]
+                            "$regexFind": {
+                              "input": "$$el.model",
+                              "regex": "ggg3"
+                            }
                           }
                         }
                       },
@@ -1015,10 +1015,10 @@ describe("query with exclamation operators in array group", () => {
                           "as": "el",
                           "cond": {
                             "$not": {
-                              "$regex": [
-                                "$$el.model",
-                                "ggg1"
-                              ]
+                              "$regexFind": {
+                                "input": "$$el.model",
+                                "regex": "ggg1"
+                              }
                             }
                           }
                         }
@@ -1043,10 +1043,10 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$regex": [
-                              "$$el.model",
-                              "ggg2"
-                            ]
+                            "$regexFind": {
+                              "input": "$$el.model",
+                              "regex": "ggg2"
+                            }
                           }
                         }
                       },
@@ -1070,10 +1070,10 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$regex": [
-                              "$$el.model",
-                              "ggg3"
-                            ]
+                            "$regexFind": {
+                              "input": "$$el.model",
+                              "regex": "ggg3"
+                            }
                           }
                         }
                       },

@@ -12,7 +12,23 @@ export const mongoFormatOp1 = (mop, mc, opNot,  field, _op, value, not, useExpr,
   const mv = mc(value, fieldDef);
   if (mv === undefined)
     return undefined;
-  if (not ^ opNot) {
+  const neg = not ^ opNot;
+
+  if (useExpr && mop == "$regex") {
+    // https://stackoverflow.com/questions/35750920/regex-as-filter-in-projection
+    let e = {
+      "$regexFind": {
+        input: $field,
+        regex: mv
+      }
+    };
+    if (neg) {
+      e = { "$not": e };
+    }
+    return e;
+  }
+
+  if (neg) {
     // if (!useExpr && (!mop || mop == "$eq"))
     //   return { [field]: { "$ne": mv } }; // short form
     return !useExpr
