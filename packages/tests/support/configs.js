@@ -1463,7 +1463,7 @@ export const with_group_array_cars = (BasicConfig) => ({
         vendor: {
           type: "select",
           fieldSettings: {
-            listValues: ["Ford", "Toyota", "Tesla"],
+            listValues: ["Ford", "Toyota", "Tesla", "BMW", "Mercedes"],
           },
           valueSources: ["value"],
         },

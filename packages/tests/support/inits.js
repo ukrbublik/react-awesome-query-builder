@@ -471,23 +471,23 @@ export const with_not_and_neg_in_some = {
     ] },
     { "all": [
       { "var": "cars" },
-      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Tesla" ] ] } }
     ] },
     { "all": [
       { "var": "cars" },
-      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } ] } }
+      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "BMW", "Toyota" ] ] } } ] } }
     ] },
     { "some": [
       { "var": "cars" },
-      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } ] } }
+      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "Tesla", "Toyota" ] ] } } ] } }
     ] },
     { "some": [
       { "var": "cars" },
-      { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+      { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "BMW" ] ] } } }
     ] },
     { "some": [
       { "var": "cars" },
-      { "!": { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } } }
+      { "!": { "!": { "!": { "in": [ { "var": "vendor" }, [ "BMW", "Tesla" ] ] } } } }
     ] }
   ]
 };
@@ -516,23 +516,23 @@ export const with_not_and_neg_in_some_reversed = {
     ] },
     { "all": [
       { "var": "cars" },
-      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Tesla" ] ] } }
     ] },
     { "all": [
       { "var": "cars" },
-      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+      { "in": [ { "var": "vendor" }, [ "BMW", "Toyota" ] ] }
     ] },
     { "some": [
       { "var": "cars" },
-      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+      { "in": [ { "var": "vendor" }, [ "Tesla", "Toyota" ] ] }
     ] },
     { "some": [
       { "var": "cars" },
-      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+      { "in": [ { "var": "vendor" }, [ "Ford", "BMW" ] ] }
     ] },
     { "some": [
       { "var": "cars" },
-      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+      { "!": { "in": [ { "var": "vendor" }, [ "BMW", "Tesla" ] ] } }
     ] }
   ]
 };

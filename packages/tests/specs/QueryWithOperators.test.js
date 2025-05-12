@@ -539,11 +539,11 @@ describe("query with exclamation operators in array group", () => {
         + " && SOME OF cars HAVE model Not Contains \"ggg1\""
         + " && SOME OF cars HAVE NOT (model Not Contains \"ggg2\")"
         + " && SOME OF cars HAVE NOT (cars.model Not Contains \"ggg3\")" // todo: fix "cars.model" !!!
-        + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
-        + " && ALL OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\"))"
-        + " && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\"))"
-        + " && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"Toyota\"))"
-        + " && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
+        + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Tesla\")"
+        + " && ALL OF cars HAVE NOT (vendor NOT IN (\"BMW\", \"Toyota\"))"
+        + " && SOME OF cars HAVE NOT (vendor NOT IN (\"Tesla\", \"Toyota\"))"
+        + " && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"BMW\"))"
+        + " && SOME OF cars HAVE vendor NOT IN (\"BMW\", \"Tesla\"))",
       "logic": {
         "and": [
           { "some": [
@@ -568,29 +568,29 @@ describe("query with exclamation operators in array group", () => {
           ] },
           { "all": [
             { "var": "cars" },
-            { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+            { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Tesla" ] ] } }
           ] },
           { "all": [
             { "var": "cars" },
-            { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+            { "!": { "!": { "in": [ { "var": "vendor" }, [ "BMW", "Toyota" ] ] } } }
           ] },
           { "some": [
             { "var": "cars" },
-            { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+            { "!": { "!": { "in": [ { "var": "vendor" }, [ "Tesla", "Toyota" ] ] } } }
           ] },
           { "some": [
             { "var": "cars" },
-            { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+            { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "BMW" ] ] } } }
           ] },
           { "some": [
             { "var": "cars" },
-            { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+            { "!": { "in": [ { "var": "vendor" }, [ "BMW", "Tesla" ] ] } }
           ] }
         ]
       },
       "mongo": {
         "$and": [
-          // some (vendor)
+          // some (vendor) Ford,Toyota
           {
             "$expr": {
               "$gt": [
@@ -659,7 +659,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some (model)
+          // some (model) ggg1
           {
             "$expr": {
               "$gt": [
@@ -688,7 +688,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some (model)
+          // some (model) ggg2
           {
             "$expr": {
               "$gt": [
@@ -716,7 +716,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some (model)
+          // some (model) ggg3
           {
             "$expr": {
               "$gt": [
@@ -744,7 +744,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // all (vendor)
+          // all (vendor) Ford,Tesla
           {
             "$expr": {
               "$eq": [
@@ -760,7 +760,7 @@ describe("query with exclamation operators in array group", () => {
                               "$$el.vendor",
                               [
                                 "Ford",
-                                "Toyota"
+                                "Tesla"
                               ]
                             ]
                           }
@@ -781,7 +781,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // all (vendor)
+          // all (vendor) BMW,Toyota
           {
             "$expr": {
               "$eq": [
@@ -797,7 +797,7 @@ describe("query with exclamation operators in array group", () => {
                               "$nin": [
                                 "$$el.vendor",
                                 [
-                                  "Ford",
+                                  "BMW",
                                   "Toyota"
                                 ]
                               ]
@@ -820,7 +820,39 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some (vendor)
+          // some (vendor) Tesla,Toyota
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$nin": [
+                                "$$el.vendor",
+                                [
+                                  "Tesla",
+                                  "Toyota"
+                                ]
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some (vendor) Ford,BMW
           {
             "$expr": {
               "$gt": [
@@ -837,7 +869,7 @@ describe("query with exclamation operators in array group", () => {
                                 "$$el.vendor",
                                 [
                                   "Ford",
-                                  "Toyota"
+                                  "BMW"
                                 ]
                               ]
                             }
@@ -852,39 +884,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some (vendor)
-          {
-            "$expr": {
-              "$gt": [
-                {
-                  "$size": {
-                    "$ifNull": [
-                      {
-                        "$filter": {
-                          "input": "$cars",
-                          "as": "el",
-                          "cond": {
-                            "$not": {
-                              "$nin": [
-                                "$$el.vendor",
-                                [
-                                  "Ford",
-                                  "Toyota"
-                                ]
-                              ]
-                            }
-                          }
-                        }
-                      },
-                      []
-                    ]
-                  }
-                },
-                0
-              ]
-            }
-          },
-          // some (vendor)
+          // some (vendor) BMW,Tesla
           {
             "$expr": {
               "$gt": [
@@ -899,8 +899,8 @@ describe("query with exclamation operators in array group", () => {
                             "$nin": [
                               "$$el.vendor",
                               [
-                                "Ford",
-                                "Toyota"
+                                "BMW",
+                                "Tesla"
                               ]
                             ]
                           }
@@ -925,15 +925,15 @@ describe("query with exclamation operators in array group", () => {
       + " && SOME OF cars HAVE model Not Contains \"ggg1\""
       + " && SOME OF cars HAVE model Contains \"ggg2\""
       + " && SOME OF cars HAVE NOT (cars.model Not Contains \"ggg3\")" // todo: fix "cars.model" !!!
-      + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
-      + " && ALL OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
-      + " && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
-      + " && SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
-      + " && SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\"))",
+      + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Tesla\")"
+      + " && ALL OF cars HAVE vendor IN (\"BMW\", \"Toyota\")"
+      + " && SOME OF cars HAVE vendor IN (\"Tesla\", \"Toyota\")"
+      + " && SOME OF cars HAVE vendor IN (\"Ford\", \"BMW\")"
+      + " && SOME OF cars HAVE vendor NOT IN (\"BMW\", \"Tesla\"))",
       "logic": inits.with_not_and_neg_in_some_reversed,
       "mongo": {
         "$and": [
-          // some (vendor)
+          // some (vendor) Ford,Toyota
           {
             "$expr": {
               "$gt": [
@@ -1002,7 +1002,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some (model)
+          // some (model) ggg1
           {
             "$expr": {
               "$gt": [
@@ -1031,7 +1031,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some (model)
+          // some (model) ggg2
           {
             "$expr": {
               "$gt": [
@@ -1058,7 +1058,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some (model)
+          // some (model) ggg3
           {
             "$expr": {
               "$gt": [
@@ -1085,7 +1085,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // all (vendor)
+          // all (vendor) Ford,Tesla
           {
             "$expr": {
               "$eq": [
@@ -1101,6 +1101,43 @@ describe("query with exclamation operators in array group", () => {
                               "$$el.vendor",
                               [
                                 "Ford",
+                                "Tesla"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                {
+                  "$size": {
+                    "$ifNull": [
+                      "$cars",
+                      []
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          // all (vendor) BMW,Toyota
+          {
+            "$expr": {
+              "$eq": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$in": [
+                              "$$el.vendor",
+                              [
+                                "BMW",
                                 "Toyota"
                               ]
                             ]
@@ -1122,10 +1159,10 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // all (vendor)
+          // some (vendor) Tesla,Toyota
           {
             "$expr": {
-              "$eq": [
+              "$gt": [
                 {
                   "$size": {
                     "$ifNull": [
@@ -1137,7 +1174,7 @@ describe("query with exclamation operators in array group", () => {
                             "$in": [
                               "$$el.vendor",
                               [
-                                "Ford",
+                                "Tesla",
                                 "Toyota"
                               ]
                             ]
@@ -1148,18 +1185,11 @@ describe("query with exclamation operators in array group", () => {
                     ]
                   }
                 },
-                {
-                  "$size": {
-                    "$ifNull": [
-                      "$cars",
-                      []
-                    ]
-                  }
-                }
+                0
               ]
             }
           },
-          // some (vendor)
+          // some (vendor) Ford,BMW
           {
             "$expr": {
               "$gt": [
@@ -1175,7 +1205,7 @@ describe("query with exclamation operators in array group", () => {
                               "$$el.vendor",
                               [
                                 "Ford",
-                                "Toyota"
+                                "BMW"
                               ]
                             ]
                           }
@@ -1189,37 +1219,7 @@ describe("query with exclamation operators in array group", () => {
               ]
             }
           },
-          // some (vendor)
-          {
-            "$expr": {
-              "$gt": [
-                {
-                  "$size": {
-                    "$ifNull": [
-                      {
-                        "$filter": {
-                          "input": "$cars",
-                          "as": "el",
-                          "cond": {
-                            "$in": [
-                              "$$el.vendor",
-                              [
-                                "Ford",
-                                "Toyota"
-                              ]
-                            ]
-                          }
-                        }
-                      },
-                      []
-                    ]
-                  }
-                },
-                0
-              ]
-            }
-          },
-          // some (vendor)
+          // some (vendor) BMW,Tesla
           {
             "$expr": {
               "$gt": [
@@ -1234,8 +1234,8 @@ describe("query with exclamation operators in array group", () => {
                             "$nin": [
                               "$$el.vendor",
                               [
-                                "Ford",
-                                "Toyota"
+                                "BMW",
+                                "Tesla"
                               ]
                             ]
                           }
