@@ -571,7 +571,7 @@ interface ConfigUtils {
   isJSX(jsx: any): boolean;
   isDirtyJSX(jsx: any): boolean;
   cleanJSX(jsx: any): Object;
-  applyJsonLogic(logic: any, data?: any): any;
+  applyJsonLogic: JsonLogicUtils["applyJsonLogic"];
   iterateFuncs(config: Config): Iterable<[funcPath: string, funcConfig: Func]>;
   iterateFields(config: Config): Iterable<[fieldPath: string, fieldConfig: Field, fieldKey: string]>;
 }
@@ -644,6 +644,12 @@ interface TreeUtils {
 }
 interface MongoUtils {
   mongoEmptyValue(fieldDef?: Field): string;
+}
+interface JsonLogicUtils {
+  applyJsonLogic(logic: JsonLogicValue, data?: any): any;
+  addJsonLogicOperation(name: string, operation: (...args: any[]) => JsonLogicValue): void;
+  customJsonLogicOperations: TypedMap<(...args: any[]) => JsonLogicValue>;
+  addRequiredJsonLogicOperations(): void;
 }
 
 interface MixSymbols<T> {
@@ -724,6 +730,7 @@ export interface Utils extends Import, Export,
   DefaultUtils: DefaultUtils;
   ExportUtils: ExportUtils;
   MongoUtils: MongoUtils;
+  JsonLogicUtils: JsonLogicUtils;
   ListUtils: ListUtils;
   TreeUtils: TreeUtils;
   OtherUtils: OtherUtils;
