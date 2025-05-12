@@ -390,6 +390,10 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
     } else {
       ret = currentValue;
     }
+    if (ret?.["$dateFromString"]) {
+      // $dateFromString (or $toDate) is an aggregation operator only
+      useExpr = true;
+    }
   }
 
   return [ret, useExpr];

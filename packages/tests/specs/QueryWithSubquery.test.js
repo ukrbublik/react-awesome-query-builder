@@ -22,10 +22,37 @@ describe("query with subquery and datetime types", () => {
       "mongo": {
         "$or": [
           {
-            "datetime": "2020-05-18T21:50:01.000Z"
-          }, {
-            "date": "2020-05-18T00:00:00.000Z",
-            "time": 3000
+            "$expr": {
+              "$eq": [
+                "$datetime",
+                {
+                  "$dateFromString": {
+                    "dateString": "2020-05-18 21:50:01",
+                    "format": "%Y-%m-%d %H:%M:%S"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "$and": [
+              {
+                "$expr": {
+                  "$eq": [
+                    "$date",
+                    {
+                      "$dateFromString": {
+                        "dateString": "2020-05-18",
+                        "format": "%Y-%m-%d"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "time": 3000
+              }
+            ]
           }
         ]
       },
