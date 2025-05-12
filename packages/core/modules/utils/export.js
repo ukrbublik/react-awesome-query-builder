@@ -1,5 +1,7 @@
 import SqlStringOrig from "sqlstring";
 
+// todo: move to sqlUtils
+
 export const SqlString = SqlStringOrig;
 
 SqlString.trim = (val) => {
