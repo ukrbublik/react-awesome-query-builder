@@ -754,13 +754,15 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$nin": [
-                              "$$el.vendor",
-                              [
-                                "Ford",
-                                "Tesla"
+                            "$not": {
+                              "$in": [
+                                "$$el.vendor",
+                                [
+                                  "Ford",
+                                  "Tesla"
+                                ]
                               ]
-                            ]
+                            }
                           }
                         }
                       },
@@ -791,15 +793,13 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$not": {
-                              "$nin": [
-                                "$$el.vendor",
-                                [
-                                  "BMW",
-                                  "Toyota"
-                                ]
+                            "$in": [
+                              "$$el.vendor",
+                              [
+                                "BMW",
+                                "Toyota"
                               ]
-                            }
+                            ]
                           }
                         }
                       },
@@ -830,15 +830,13 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$not": {
-                              "$nin": [
-                                "$$el.vendor",
-                                [
-                                  "Tesla",
-                                  "Toyota"
-                                ]
+                            "$in": [
+                              "$$el.vendor",
+                              [
+                                "Tesla",
+                                "Toyota"
                               ]
-                            }
+                            ]
                           }
                         }
                       },
@@ -862,15 +860,13 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$not": {
-                              "$nin": [
-                                "$$el.vendor",
-                                [
-                                  "Ford",
-                                  "BMW"
-                                ]
+                            "$in": [
+                              "$$el.vendor",
+                              [
+                                "Ford",
+                                "BMW"
                               ]
-                            }
+                            ]
                           }
                         }
                       },
@@ -894,13 +890,15 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$nin": [
-                              "$$el.vendor",
-                              [
-                                "BMW",
-                                "Tesla"
+                            "$not": {
+                              "$in": [
+                                "$$el.vendor",
+                                [
+                                  "BMW",
+                                  "Tesla"
+                                ]
                               ]
-                            ]
+                            }
                           }
                         }
                       },
@@ -1095,13 +1093,15 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$nin": [
-                              "$$el.vendor",
-                              [
-                                "Ford",
-                                "Tesla"
+                            "$not": {
+                              "$in": [
+                                "$$el.vendor",
+                                [
+                                  "Ford",
+                                  "Tesla"
+                                ]
                               ]
-                            ]
+                            }
                           }
                         }
                       },
@@ -1229,13 +1229,15 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$nin": [
-                              "$$el.vendor",
-                              [
-                                "BMW",
-                                "Tesla"
+                            "$not": {
+                              "$in": [
+                                "$$el.vendor",
+                                [
+                                  "BMW",
+                                  "Tesla"
+                                ]
                               ]
-                            ]
+                            }
                           }
                         }
                       },
@@ -1251,7 +1253,7 @@ describe("query with exclamation operators in array group", () => {
       }
     });
   });
-  describe("@new exportPreserveGroups == true", () => {
+  describe("exportPreserveGroups == true", () => {
     export_checks([configs.with_group_array_cars, configs.with_export_preserve_groups], inits.with_not_and_neg_in_some, "JsonLogic", {
       "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
         + " && SOME OF cars HAVE NOT (year >= 1995 && year <= 2005)"
@@ -1481,13 +1483,15 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$nin": [
-                              "$$el.vendor",
-                              [
-                                "Ford",
-                                "Tesla"
+                            "$not": {
+                              "$in": [
+                                "$$el.vendor",
+                                [
+                                  "Ford",
+                                  "Tesla"
+                                ]
                               ]
-                            ]
+                            }
                           }
                         }
                       },
@@ -1519,13 +1523,15 @@ describe("query with exclamation operators in array group", () => {
                           "as": "el",
                           "cond": {
                             "$not": {
-                              "$nin": [
-                                "$$el.vendor",
-                                [
-                                  "BMW",
-                                  "Toyota"
+                              "$not": {
+                                "$in": [
+                                  "$$el.vendor",
+                                  [
+                                    "BMW",
+                                    "Toyota"
+                                  ]
                                 ]
-                              ]
+                              }
                             }
                           }
                         }
@@ -1558,13 +1564,15 @@ describe("query with exclamation operators in array group", () => {
                           "as": "el",
                           "cond": {
                             "$not": {
-                              "$nin": [
-                                "$$el.vendor",
-                                [
-                                  "Tesla",
-                                  "Toyota"
+                              "$not": {
+                                "$in": [
+                                  "$$el.vendor",
+                                  [
+                                    "Tesla",
+                                    "Toyota"
+                                  ]
                                 ]
-                              ]
+                              }
                             }
                           }
                         }
@@ -1590,13 +1598,15 @@ describe("query with exclamation operators in array group", () => {
                           "as": "el",
                           "cond": {
                             "$not": {
-                              "$nin": [
-                                "$$el.vendor",
-                                [
-                                  "Ford",
-                                  "BMW"
+                              "$not": {
+                                "$in": [
+                                  "$$el.vendor",
+                                  [
+                                    "Ford",
+                                    "BMW"
+                                  ]
                                 ]
-                              ]
+                              }
                             }
                           }
                         }
@@ -1621,13 +1631,15 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            "$nin": [
-                              "$$el.vendor",
-                              [
-                                "BMW",
-                                "Tesla"
+                            "$not": {
+                              "$in": [
+                                "$$el.vendor",
+                                [
+                                  "BMW",
+                                  "Tesla"
+                                ]
                               ]
-                            ]
+                            }
                           }
                         }
                       },

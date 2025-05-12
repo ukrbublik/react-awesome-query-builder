@@ -15,7 +15,14 @@ export const mongoFormatOp1 = (mop, mc, opNot,  field, _op, value, not, useExpr,
   const mv = mc(value, fieldDef);
   if (mv === undefined)
     return undefined;
-  const neg = not ^ opNot;
+  let neg = not ^ opNot;
+
+  if (useExpr && mop == "$nin") {
+    // There is only `$in` aggregation operator but not `$nin` (`$nin` is only a query operator)
+    // https://www.mongodb.com/docs/manual/reference/operator/aggregation/in/
+    neg = !neg;
+    mop = "$in";
+  }
 
   if (useExpr && mop == "$regex") {
     // https://stackoverflow.com/questions/35750920/regex-as-filter-in-projection
