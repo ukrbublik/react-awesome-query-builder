@@ -157,20 +157,32 @@ describe("query with conjunction", () => {
           "login": { "$ne": "ukrbublik" },
         },
       }, []);
+    });
 
-      describe("canShortMongoQuery == false", () => {
-        export_checks([configs.with_number_and_string, configs.without_short_mongo_query], inits.with_not_number_and_string, "JsonLogic", {
-          "spel": "!(num < 2 || login == 'ukrbublik')",
-          "mongo": {
-            "$nor": [{
-              "$or": [
-                { "num": { "$lt": 2 } },
-                { "login": "ukrbublik" }
-              ]
-            }]
-          },
-        }, []);
-      });
+    describe("reverseOperatorsForNot == true and canShortMongoQuery == false", () => {
+      export_checks([configs.with_number_and_string, configs.with_reverse_operators, configs.without_short_mongo_query], inits.with_not_number_and_string, "JsonLogic", {
+        "spel": "!(num < 2 || login == 'ukrbublik')",
+        "mongo": {
+          "$and": [
+            { "num": { "$gte": 2 } },
+            { "login": { "$ne": "ukrbublik" } }
+          ]
+        },
+      }, []);
+    });
+
+    describe("exportPreserveGroups == true", () => {
+      export_checks([configs.with_number_and_string, configs.with_export_preserve_groups], inits.with_not_number_and_string, "JsonLogic", {
+        "spel": "!(num < 2 || login == 'ukrbublik')",
+        "mongo": {
+          "$nor": [{
+            "$or": [
+              { "num": { "$lt": 2 } },
+              { "login": "ukrbublik" }
+            ]
+          }]
+        },
+      }, []);
     });
 
   });

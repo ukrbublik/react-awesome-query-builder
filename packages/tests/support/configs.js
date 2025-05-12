@@ -933,7 +933,7 @@ export const with_dont_leave_empty_group = (BasicConfig) => ({
 });
 
 export const with_allow_empty_groups_on_load = (BasicConfig) => ({
-  ...simple_with_number(BasicConfig),
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     removeEmptyGroupsOnLoad: false
