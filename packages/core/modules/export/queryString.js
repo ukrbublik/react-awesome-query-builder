@@ -22,7 +22,7 @@ export const queryString = (item, config, isForDisplay = false, isDebugMode = fa
   };
 
   const extendedConfig = extendConfig(config, undefined, false);
-  const res = formatItem(item, extendedConfig, meta, null);
+  const res = formatItem([], item, extendedConfig, meta, null);
 
   if (meta.errors.length)
     console.warn("Errors while exporting to string:", meta.errors);
@@ -30,27 +30,35 @@ export const queryString = (item, config, isForDisplay = false, isDebugMode = fa
 };
 
 
-const formatItem = (item, config, meta, parentField = null) => {
+const formatItem = (parents, item, config, meta, parentField = null) => {
   if (!item) return undefined;
   const type = item.get("type");
   const children = item.get("children1");
 
   if ((type === "group" || type === "rule_group") ) {
-    return formatGroup(item, config, meta, parentField);
+    return formatGroup(parents, item, config, meta, parentField);
   } else if (type === "rule") {
-    return formatRule(item, config, meta, parentField);
+    return formatRule(parents, item, config, meta, parentField);
   }
 
   return undefined;
 };
 
 
-const formatGroup = (item, config, meta, parentField = null) => {
+const formatGroup = (parents, item, config, meta, parentField = null) => {
   const { isForDisplay, isDebugMode } = meta.settings;
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const mode = properties.get("mode");
   const children = item.get("children1") || new List();
+
+  // const parentRuleGroup = parents.filter(it => it.get("type") == "rule_group")?.slice(-1)?.pop();
+  // const isInsideRuleGroup = !!parentRuleGroup;
+  // const parentRuleGroupField = parentRuleGroup?.get("properties").get("field");
+  // const isInsideRuleGroupArray = isInsideRuleGroup && parentRuleGroup.get("properties").get("mode") == "array";
+  // // TIP: don't cut group for mode == 'struct'
+  // const realParentGroupField = isInsideRuleGroupArray && parentRuleGroupField;
+  const realParentGroupField = parentField;
 
   const isRuleGroup = (type === "rule_group");
   // TIP: don't cut group for mode == 'struct' and don't do aggr format (maybe later)
@@ -60,7 +68,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
   const canHaveEmptyChildren = isRuleGroup && mode === "array" && groupOperatorCardinality >= 1;
   const not = properties.get("not");
   const list = children
-    .map((currentChild) => formatItem(currentChild, config, meta, groupField))
+    .map((currentChild) => formatItem([...parents, item], currentChild, config, meta, groupField ?? realParentGroupField))
     .filter((currentChild) => typeof currentChild !== "undefined");
   if (!canHaveEmptyChildren && !list.size && !isDebugMode) {
     return undefined;
@@ -75,7 +83,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
   
   let ret;
   if (groupField) {
-    const aggrArgs = formatRule(item, config, meta, parentField, true);
+    const aggrArgs = formatRule(parents, item, config, meta, realParentGroupField, true);
     if (aggrArgs) {
       const isRev = aggrArgs.pop();
       const args = [
@@ -177,7 +185,7 @@ const buildFnToFormatOp = (operator, operatorDefinition, meta) => {
   return fn;
 };
 
-const formatRule = (item, config, meta, parentField = null, returnArgs = false) => {
+const formatRule = (parents, item, config, meta, parentField = null, returnArgs = false) => {
   const { isForDisplay, isDebugMode } = meta.settings;
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");

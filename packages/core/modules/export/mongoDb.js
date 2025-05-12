@@ -56,25 +56,21 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
 
   const parentRuleGroup = parents.filter(it => it.get("type") == "rule_group")?.slice(-1)?.pop();
   const isInsideRuleGroup = !!parentRuleGroup;
-  const parentPath = parents
-    .filter(it => it.get("type") == "rule_group")
-    .map(it => it.get("properties").get("field"))
-    .slice(-1).pop();
-  const realParentPath = isInsideRuleGroup && parentPath;
+  const parentRuleGroupField = parentRuleGroup?.get("properties").get("field");
+  const isInsideRuleGroupArray = isInsideRuleGroup && parentRuleGroup.get("properties").get("mode") == "array";
 
   const isRuleGroup = (type === "rule_group");
   const groupField = isRuleGroup ? properties.get("field") : null;
   let groupOperator = isRuleGroup ? properties.get("operator") : null;
   let groupOperatorDef = groupOperator && getOperatorConfig(config, groupOperator, groupField) || null;
   const groupOperatorCardinality = groupOperator ? groupOperatorDef?.cardinality ?? 1 : undefined;
-  const groupFieldName = formatFieldName(groupField, config, meta, realParentPath);
+  const groupFieldName = formatFieldName(groupField, config, meta, parentRuleGroupField);
   const groupFieldDef = getFieldConfig(config, groupField) || {};
   const mode = groupFieldDef.mode; //properties.get("mode");
   const canHaveEmptyChildren = groupField && mode === "array" && groupOperatorCardinality >= 1;
   const isRuleGroupArray = isRuleGroup && mode != "struct";
   const isRuleGroupWithChildren = isRuleGroup && children?.size > 0;
   const isRuleGroupWithoutChildren = isRuleGroup && !children?.size;
-  const isInsideRuleGroupArray = isInsideRuleGroup && parentRuleGroup.get("properties").get("mode") == "array";
 
   // rev
   let revChildren = false;
@@ -250,11 +246,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   const properties = item.get("properties") || new Map();
 
   const parentRuleGroup = parents.filter(it => it.get("type") == "rule_group")?.slice(-1)?.pop();
-  const parentPath = parents
-    .filter(it => it.get("type") == "rule_group")
-    .map(it => it.get("properties").get("field"))
-    .slice(-1).pop();
-  const realParentPath = !!parentRuleGroup && parentPath;
+  const parentRuleGroupField = parentRuleGroup?.get("properties").get("field");
 
   let operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
@@ -297,9 +289,9 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   let formattedField;
   let useExpr = false;
   if (fieldSrc == "func") {
-    [formattedField, useExpr] = formatFunc(meta, config, field, realParentPath);
+    [formattedField, useExpr] = formatFunc(meta, config, field, parentRuleGroupField);
   } else {
-    formattedField = formatFieldName(field, config, meta, realParentPath);
+    formattedField = formatFieldName(field, config, meta, parentRuleGroupField);
     formattedField = mongoFieldEscape(formattedField);
     if (_formatFieldName) {
       useExpr = true;
@@ -321,7 +313,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
       const fieldWidgetDef = getFieldWidgetConfig(config, field, operator, widget, valueSrc, { forExport: true });
       const [fv, fvUseExpr] = formatValue(
-        meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, realParentPath,  operator, operatorDefinition, asyncListValues
+        meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, parentRuleGroupField, operator, operatorDefinition, asyncListValues
       );
       if (fv !== undefined) {
         useExpr = useExpr || fvUseExpr;

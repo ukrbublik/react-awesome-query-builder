@@ -538,7 +538,7 @@ describe("query with exclamation operators in array group", () => {
         + " && SOME OF cars HAVE NOT (year >= 1995 && year <= 2005)"
         + " && SOME OF cars HAVE model Not Contains \"ggg1\""
         + " && SOME OF cars HAVE NOT (model Not Contains \"ggg2\")"
-        + " && SOME OF cars HAVE NOT (cars.model Not Contains \"ggg3\")" // todo: fix "cars.model" !!!
+        + " && SOME OF cars HAVE NOT (model Not Contains \"ggg3\")"
         + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Tesla\")"
         + " && ALL OF cars HAVE NOT (vendor NOT IN (\"BMW\", \"Toyota\"))"
         + " && SOME OF cars HAVE NOT (vendor NOT IN (\"Tesla\", \"Toyota\"))"
@@ -924,7 +924,7 @@ describe("query with exclamation operators in array group", () => {
       + " && SOME OF cars HAVE (year < 1995 || year > 2005)"
       + " && SOME OF cars HAVE model Not Contains \"ggg1\""
       + " && SOME OF cars HAVE model Contains \"ggg2\""
-      + " && SOME OF cars HAVE NOT (cars.model Not Contains \"ggg3\")" // todo: fix "cars.model" !!!
+      + " && SOME OF cars HAVE NOT (model Not Contains \"ggg3\")"
       + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Tesla\")"
       + " && ALL OF cars HAVE vendor IN (\"BMW\", \"Toyota\")"
       + " && SOME OF cars HAVE vendor IN (\"Tesla\", \"Toyota\")"
