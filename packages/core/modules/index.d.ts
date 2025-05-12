@@ -98,7 +98,7 @@ export type ConfigContextUtils = {
   spelFixList: ExportUtils["spelFixList"];
   wrapWithBrackets: ExportUtils["wrapWithBrackets"];
   stringifyForDisplay: ExportUtils["stringifyForDisplay"];
-  mongoEmptyValue: ExportUtils["mongoEmptyValue"];
+  mongoEmptyValue: MongoUtils["mongoEmptyValue"];
   spelEscape: ExportUtils["spelEscape"];
 
   moment: OtherUtils["moment"];
@@ -600,7 +600,6 @@ interface ExportUtils {
   spelEscape(val: any): string;
   spelFixList(listStr: string): string;
   sqlEmptyValue(fieldDef?: Field): string;
-  mongoEmptyValue(fieldDef?: Field): string;
   SqlString: {
     trim(val?: string): string;
     escape(val?: string): string;
@@ -642,6 +641,9 @@ interface TreeUtils {
   isEmptyTree(tree: ImmutableTree): boolean;
   // case mode
   getSwitchValues(tree: ImmutableTree): Array<any | null>;
+}
+interface MongoUtils {
+  mongoEmptyValue(fieldDef?: Field): string;
 }
 
 interface MixSymbols<T> {
@@ -721,6 +723,7 @@ export interface Utils extends Import, Export,
   ConfigUtils: ConfigUtils;
   DefaultUtils: DefaultUtils;
   ExportUtils: ExportUtils;
+  MongoUtils: MongoUtils;
   ListUtils: ListUtils;
   TreeUtils: TreeUtils;
   OtherUtils: OtherUtils;

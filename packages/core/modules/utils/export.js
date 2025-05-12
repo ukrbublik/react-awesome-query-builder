@@ -62,15 +62,6 @@ export const sqlEmptyValue = (fieldDef) => {
   return v;
 };
 
-export const mongoEmptyValue = (fieldDef) => {
-  let v = "";
-  const type = fieldDef?.type;
-  if (type == "number") {
-    v = 0;
-  }
-  return v;
-};
-
 
 const spelEscapeString = (val) => {
   // Strings are delimited by single quotes. To put a single quote itself in a string, use two single quote characters. 

@@ -4,6 +4,7 @@ export * as FuncUtils from "./funcUtils";
 export * as DefaultUtils from "./defaultRuleUtils";
 export * as TreeUtils from "./treeUtils";
 export * as ExportUtils from "./export";
+export * as MongoUtils from "./mongoUtils";
 export * as ListUtils from "./listValues";
 export * as Autocomplete from "./autocomplete";
 export * as Validation from "./validation";
