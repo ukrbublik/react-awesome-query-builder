@@ -117,7 +117,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   // rev conj
   const reversedConj = conjunctionDefinition.reversedConj;
   const canRev = not && conjunction?.toLowerCase() === "or" && reversedConj && !isRuleGroup
-    && !!canShortMongoQuery && !!reverseOperatorsForNot && !exportPreserveGroups;
+     && !!reverseOperatorsForNot && !exportPreserveGroups;
   if (canRev) {
     conjunction = reversedConj;
     conjunctionDefinition = config.conjunctions[conjunction];
