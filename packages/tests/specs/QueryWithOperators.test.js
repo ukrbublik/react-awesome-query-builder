@@ -700,7 +700,6 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            // todo: $not $not
                             "$regexFind": {
                               "input": "$$el.model",
                               "regex": "ggg2"
@@ -728,7 +727,6 @@ describe("query with exclamation operators in array group", () => {
                           "input": "$cars",
                           "as": "el",
                           "cond": {
-                            // todo: $not $not
                             "$regexFind": {
                               "input": "$$el.model",
                               "regex": "ggg3"
@@ -1208,6 +1206,398 @@ describe("query with exclamation operators in array group", () => {
                                 "BMW"
                               ]
                             ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some (vendor) BMW,Tesla
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$nin": [
+                              "$$el.vendor",
+                              [
+                                "BMW",
+                                "Tesla"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          }
+        ]
+      }
+    });
+  });
+  describe("@new exportPreserveGroups == true", () => {
+    export_checks([configs.with_group_array_cars, configs.with_export_preserve_groups], inits.with_not_and_neg_in_some, "JsonLogic", {
+      "query": "(SOME OF cars HAVE vendor IN (\"Ford\", \"Toyota\")"
+        + " && SOME OF cars HAVE NOT (year >= 1995 && year <= 2005)"
+        + " && SOME OF cars HAVE model Not Contains \"ggg1\""
+        + " && SOME OF cars HAVE NOT (model Not Contains \"ggg2\")"
+        + " && SOME OF cars HAVE NOT (model Not Contains \"ggg3\")"
+        + " && ALL OF cars HAVE vendor NOT IN (\"Ford\", \"Tesla\")"
+        + " && ALL OF cars HAVE NOT (vendor NOT IN (\"BMW\", \"Toyota\"))"
+        + " && SOME OF cars HAVE NOT (vendor NOT IN (\"Tesla\", \"Toyota\"))"
+        + " && SOME OF cars HAVE NOT (vendor NOT IN (\"Ford\", \"BMW\"))"
+        + " && SOME OF cars HAVE vendor NOT IN (\"BMW\", \"Tesla\"))",
+      "logic": {
+        "and": [
+          { "some": [
+            { "var": "cars" },
+            { "and": [{ "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }] }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "and": [ { "<=": [ 1995, { "var": "year" }, 2005 ] } ] } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "and": [{ "!": { "in": [ "ggg1", { "var": "model" } ] } }] }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "and": [{ "!": { "in": [ "ggg2", { "var": "model" } ] } }] } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "and": [{ "!": { "and": [{ "!": { "in": [ "ggg3", { "var": "model" } ] } }] } }] }
+          ] },
+          { "all": [
+            { "var": "cars" },
+            { "and": [{ "!": { "in": [ { "var": "vendor" }, [ "Ford", "Tesla" ] ] } }] }
+          ] },
+          { "all": [
+            { "var": "cars" },
+            { "!": { "and": [{ "!": { "in": [ { "var": "vendor" }, [ "BMW", "Toyota" ] ] } }] } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "and": [{ "!": { "in": [ { "var": "vendor" }, [ "Tesla", "Toyota" ] ] } }] } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "!": { "and": [{ "!": { "in": [ { "var": "vendor" }, [ "Ford", "BMW" ] ] } }] } }
+          ] },
+          { "some": [
+            { "var": "cars" },
+            { "and": [{ "!": { "in": [ { "var": "vendor" }, [ "BMW", "Tesla" ] ] } }] }
+          ] }
+        ]
+      },
+      "mongo": {
+        "$and": [
+          // some (vendor) Ford,Toyota
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$in": [
+                              "$$el.vendor",
+                              [
+                                "Ford",
+                                "Toyota"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some (year)
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$and": [
+                                {
+                                  "$gte": [
+                                    "$$el.year",
+                                    1995
+                                  ]
+                                },
+                                {
+                                  "$lte": [
+                                    "$$el.year",
+                                    2005
+                                  ]
+                                }
+                              ]
+                            }
+                          },
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some (model) ggg1
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$regexFind": {
+                                "input": "$$el.model",
+                                "regex": "ggg1"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some (model) ggg2
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$not": {
+                                "$regexFind": {
+                                  "input": "$$el.model",
+                                  "regex": "ggg2"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some (model) ggg3
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$not": {
+                                "$regexFind": {
+                                  "input": "$$el.model",
+                                  "regex": "ggg3"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // all (vendor) Ford,Tesla
+          {
+            "$expr": {
+              "$eq": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$nin": [
+                              "$$el.vendor",
+                              [
+                                "Ford",
+                                "Tesla"
+                              ]
+                            ]
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                {
+                  "$size": {
+                    "$ifNull": [
+                      "$cars",
+                      []
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          // all (vendor) BMW,Toyota
+          {
+            "$expr": {
+              "$eq": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$nin": [
+                                "$$el.vendor",
+                                [
+                                  "BMW",
+                                  "Toyota"
+                                ]
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                {
+                  "$size": {
+                    "$ifNull": [
+                      "$cars",
+                      []
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          // some (vendor) Tesla,Toyota
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$nin": [
+                                "$$el.vendor",
+                                [
+                                  "Tesla",
+                                  "Toyota"
+                                ]
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      []
+                    ]
+                  }
+                },
+                0
+              ]
+            }
+          },
+          // some (vendor) Ford,BMW
+          {
+            "$expr": {
+              "$gt": [
+                {
+                  "$size": {
+                    "$ifNull": [
+                      {
+                        "$filter": {
+                          "input": "$cars",
+                          "as": "el",
+                          "cond": {
+                            "$not": {
+                              "$nin": [
+                                "$$el.vendor",
+                                [
+                                  "Ford",
+                                  "BMW"
+                                ]
+                              ]
+                            }
                           }
                         }
                       },
