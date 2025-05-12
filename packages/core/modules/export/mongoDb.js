@@ -5,6 +5,7 @@ import {
 import {extendConfig} from "../utils/configExtend";
 import {getFieldPathLabels, formatFieldName, completeValue, getOneChildOrDescendant} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
+import { mongoFieldEscape } from "../utils/mongoUtils";
 import pick from "lodash/pick";
 import {List, Map} from "immutable";
 
@@ -50,22 +51,20 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const properties = item.get("properties") || new Map();
   const origNot = !!properties.get("not");
   const children = item.get("children1") || new List();
-  const {canShortMongoQuery, fieldSeparator} = config.settings;
+  const {canShortMongoQuery, fieldSeparator, exportPreserveGroups, reverseOperatorsForNot} = config.settings;
   const sep = fieldSeparator;
 
-  const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
-  const parentPath = parents
-    .filter(it => it.get("type") == "rule_group")
-    .map(it => it.get("properties").get("field"))
-    .slice(-1).pop();
-  const realParentPath = hasParentRuleGroup && parentPath;
+  const parentRuleGroup = parents.filter(it => it.get("type") == "rule_group")?.slice(-1)?.pop();
+  const isInsideRuleGroup = !!parentRuleGroup;
+  const parentRuleGroupField = parentRuleGroup?.get("properties").get("field");
+  const isInsideRuleGroupArray = isInsideRuleGroup && parentRuleGroup.get("properties").get("mode") == "array";
 
   const isRuleGroup = (type === "rule_group");
   const groupField = isRuleGroup ? properties.get("field") : null;
   let groupOperator = isRuleGroup ? properties.get("operator") : null;
   let groupOperatorDef = groupOperator && getOperatorConfig(config, groupOperator, groupField) || null;
   const groupOperatorCardinality = groupOperator ? groupOperatorDef?.cardinality ?? 1 : undefined;
-  const groupFieldName = formatFieldName(groupField, config, meta, realParentPath);
+  const groupFieldName = formatFieldName(groupField, config, meta, parentRuleGroupField);
   const groupFieldDef = getFieldConfig(config, groupField) || {};
   const mode = groupFieldDef.mode; //properties.get("mode");
   const canHaveEmptyChildren = groupField && mode === "array" && groupOperatorCardinality >= 1;
@@ -91,17 +90,17 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const groupOpNeedsReverse = !groupOperatorDef?.mongoFormatOp && !!reversedGroupOpDef?.mongoFormatOp;
   const groupOpCanReverse = !!reversedGroupOpDef?.mongoFormatOp;
   const oneChildType = getOneChildOrDescendant(item)?.get("type");
-  const canRevChildren = !!config.settings.reverseOperatorsForNot
-    && (!isRuleGroup && not && oneChildType === "rule" || filterNot && children?.size === 1);
+  const isSimpleGroupWithOneChild = !isRuleGroup && oneChildType === "rule";
+  const canRevChildren = (not && isSimpleGroupWithOneChild || filterNot && children?.size === 1) && !exportPreserveGroups; // && !!reverseOperatorsForNot;
   if (canRevChildren) {
-    if (isRuleGroupWithChildren) {
-      filterNot = !filterNot;
-    } else {
+    if (isSimpleGroupWithOneChild) {
       not = !not;
+    } else {
+      filterNot = !filterNot;
     }
     revChildren = true;
   }
-  let canRevGroupOp = not && isRuleGroup && groupOpCanReverse && (!!config.settings.reverseOperatorsForNot || groupOpNeedsReverse);
+  let canRevGroupOp = not && isRuleGroup && groupOpCanReverse && (!!reverseOperatorsForNot && !exportPreserveGroups || groupOpNeedsReverse);
   if (canRevGroupOp) {
     not = !not;
     [groupOperator, reversedGroupOp] = [reversedGroupOp, groupOperator];
@@ -118,7 +117,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   // rev conj
   const reversedConj = conjunctionDefinition.reversedConj;
   const canRev = not && conjunction?.toLowerCase() === "or" && reversedConj && !isRuleGroup
-    && !!config.settings.canShortMongoQuery && !!config.settings.reverseOperatorsForNot;
+     && !!reverseOperatorsForNot && !exportPreserveGroups;
   if (canRev) {
     conjunction = reversedConj;
     conjunctionDefinition = config.conjunctions[conjunction];
@@ -128,9 +127,13 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
 
   const mongoConj = conjunctionDefinition.mongoConj;
 
+  // tip: can't use "$expr" inside "$filter"."cond" or inside "$elemMatch"
+  const canWrapExpr = !isRuleGroup && !isInsideRuleGroup;
+  const formatFieldNameFn = mode == "array" ? (f => `$$el${sep}${f}`) : _formatFieldName;
+
   const list = children
     .map((currentChild) => formatItem(
-      [...parents, item], currentChild, config, meta, revChildren, mode != "array", mode == "array" ? (f => `$$el${sep}${f}`) : undefined)
+      [...parents, item], currentChild, config, meta, revChildren, canWrapExpr, formatFieldNameFn)
     )
     .filter((formattedChild) => typeof formattedChild !== "undefined");
   if (!canHaveEmptyChildren && !list.size) {
@@ -138,11 +141,12 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   }
 
   let resultQuery;
+  let shortQuery;
   if (list.size == 1) {
     resultQuery = list.first();
   } else if (list.size > 1) {
     const rules = list.toList().toJS();
-    const canShort = canShortMongoQuery && (mongoConj == "$and");
+    const canShort = canShortMongoQuery && (mongoConj == "$and") && !exportPreserveGroups;
     if (canShort) {
       resultQuery = rules.reduce((acc, rule) => {
         if (!acc) return undefined;
@@ -173,8 +177,11 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
         return acc;
       }, {});
     }
-    if (!resultQuery) {
+    if (resultQuery) {
+      shortQuery = true;
+    } else {
       // can't be shorten
+      shortQuery = false;
       resultQuery = { [mongoConj] : rules };
     }
   }
@@ -184,17 +191,21 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
       const totalQuery = {
         "$size": {
           "$ifNull": [
-            "$" + groupFieldName,
+            "$" + mongoFieldEscape(groupFieldName),
             []
           ]
         }
       };
+      if (filterNot && resultQuery) {
+        resultQuery = { "$not": resultQuery };
+        filterNot = false;
+      }
       const filterQuery = resultQuery ? {
         "$size": {
           "$ifNull": [
             {
               "$filter": {
-                input: "$" + groupFieldName,
+                input: "$" + mongoFieldEscape(groupFieldName),
                 as: "el",
                 cond: resultQuery
               }
@@ -203,17 +214,28 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
           ]
         }
       } : totalQuery;
+      const notForRule = !exportPreserveGroups ? not : false;
       resultQuery = formatItem(
-        parents, item.set("type", "rule"), config, meta, filterNot, false, (_f => filterQuery), totalQuery
+        parents, item.set("type", "rule"), config, meta, notForRule, false, (_f => filterQuery), totalQuery
       );
+      if (notForRule) {
+        not = false;
+      }
       resultQuery = { "$expr": resultQuery };
     } else {
-      resultQuery = { [groupFieldName]: {"$elemMatch": resultQuery} };
+      // tip: $elemMatch can't have $not and $expr inside BUT can have $nor
+      resultQuery = { [mongoFieldEscape(groupFieldName)]: {"$elemMatch": resultQuery} };
     }
   }
 
   if (not) {
-    resultQuery = { "$not": resultQuery };
+    // tip: $nor can't be inside $filter.cond or $expr
+    if (isInsideRuleGroupArray) {
+      // inside $filter.cond
+      resultQuery = { "$not": resultQuery };
+    } else {
+      resultQuery = { "$nor": [ resultQuery ] };
+    }
   }
 
   return resultQuery;
@@ -223,12 +245,8 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
 const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = true, _formatFieldName = undefined, _value = undefined) => {
   const properties = item.get("properties") || new Map();
 
-  const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
-  const parentPath = parents
-    .filter(it => it.get("type") == "rule_group")
-    .map(it => it.get("properties").get("field"))
-    .slice(-1).pop();
-  const realParentPath = hasParentRuleGroup && parentPath;
+  const parentRuleGroup = parents.filter(it => it.get("type") == "rule_group")?.slice(-1)?.pop();
+  const parentRuleGroupField = parentRuleGroup?.get("properties").get("field");
 
   let operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
@@ -271,9 +289,10 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   let formattedField;
   let useExpr = false;
   if (fieldSrc == "func") {
-    [formattedField, useExpr] = formatFunc(meta, config, field, realParentPath);
+    [formattedField, useExpr] = formatFunc(meta, config, field, parentRuleGroupField);
   } else {
-    formattedField = formatFieldName(field, config, meta, realParentPath);
+    formattedField = formatFieldName(field, config, meta, parentRuleGroupField);
+    formattedField = mongoFieldEscape(formattedField);
     if (_formatFieldName) {
       useExpr = true;
       formattedField = _formatFieldName(formattedField);
@@ -294,7 +313,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
       const fieldWidgetDef = getFieldWidgetConfig(config, field, operator, widget, valueSrc, { forExport: true });
       const [fv, fvUseExpr] = formatValue(
-        meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, realParentPath,  operator, operatorDefinition, asyncListValues
+        meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, parentRuleGroupField, operator, operatorDefinition, asyncListValues
       );
       if (fv !== undefined) {
         useExpr = useExpr || fvUseExpr;
@@ -316,6 +335,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     formattedField,
     operator,
     _value !== undefined && formattedValue == null ? _value : formattedValue,
+    not,
     useExpr,
     (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
     (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
@@ -323,12 +343,17 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     operatorOptions,
     fieldDef,
   ];
+  // `mongoFormatOp` function SHOULD handle `not`
   let ruleQuery = fn.call(config.ctx, ...args);
   if (wrapExpr) {
+    // if (not) {
+    //   ruleQuery = { "$not": ruleQuery };
+    // }
     ruleQuery = { "$expr": ruleQuery };
-  }
-  if (not) {
-    ruleQuery = { "$not": ruleQuery };
+  } else {
+    // if (not) {
+    //   ruleQuery = { "$nor": [ ruleQuery ] };
+    // }
   }
   return ruleQuery;
 };
@@ -365,6 +390,10 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
     } else {
       ret = currentValue;
     }
+    if (ret?.["$dateFromString"]) {
+      // $dateFromString (or $toDate) is an aggregation operator only
+      useExpr = true;
+    }
   }
 
   return [ret, useExpr];
@@ -384,7 +413,7 @@ const formatRightField = (meta, config, rightField, parentPath) => {
     const formatFieldFn = config.settings.formatField;
     const rightFieldName = formatFieldName(rightField, config, meta, parentPath);
     const formattedField = formatFieldFn(rightFieldName, fieldParts, fieldFullLabel, rightFieldDefinition, config, false);
-    ret = "$" + formattedField;
+    ret = "$" + mongoFieldEscape(formattedField);
   }
 
   return [ret, useExpr];

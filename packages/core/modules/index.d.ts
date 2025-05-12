@@ -95,11 +95,11 @@ export interface SpelRawValue {
 export type ConfigContextUtils = {
   SqlString: ExportUtils["SqlString"];
   sqlEmptyValue: ExportUtils["sqlEmptyValue"];
-  spelFixList: ExportUtils["spelFixList"];
+  spelFixList: SpelUtils["spelFixList"];
   wrapWithBrackets: ExportUtils["wrapWithBrackets"];
   stringifyForDisplay: ExportUtils["stringifyForDisplay"];
-  mongoEmptyValue: ExportUtils["mongoEmptyValue"];
-  spelEscape: ExportUtils["spelEscape"];
+  mongoEmptyValue: MongoUtils["mongoEmptyValue"];
+  spelEscape: SpelUtils["spelEscape"];
 
   moment: OtherUtils["moment"];
   escapeRegExp: OtherUtils["escapeRegExp"];
@@ -556,6 +556,7 @@ interface Autocomplete {
   listValueToOption(listItem: ListItem): ListOptionUi;
 }
 interface ConfigUtils {
+  areConfigsSame(config1: Config, config2: Config): boolean;
   compressConfig(config: Config, baseConfig: Config): ZipConfig;
   decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
   compileConfig(config: Config): Config;
@@ -570,7 +571,7 @@ interface ConfigUtils {
   isJSX(jsx: any): boolean;
   isDirtyJSX(jsx: any): boolean;
   cleanJSX(jsx: any): Object;
-  applyJsonLogic(logic: any, data?: any): any;
+  applyJsonLogic: JsonLogicUtils["applyJsonLogic"];
   iterateFuncs(config: Config): Iterable<[funcPath: string, funcConfig: Func]>;
   iterateFields(config: Config): Iterable<[fieldPath: string, fieldConfig: Field, fieldKey: string]>;
 }
@@ -594,12 +595,9 @@ interface DefaultUtils {
   // createListWithOneElement<TItem>(el: TItem): ImmutableList<TItem>;
   // createListFromArray<TItem>(array: TItem[]): ImmutableList<TItem>;
 }
-interface ExportUtils {
+interface ExportUtils extends PickDeprecated<SpelUtils, "spelFixList" | "spelEscape" | "spelFormatConcat" | "spelImportConcat">, PickDeprecated<MongoUtils, "mongoEmptyValue"> {
   wrapWithBrackets(val?: string): string;
-  spelEscape(val: any): string;
-  spelFixList(listStr: string): string;
   sqlEmptyValue(fieldDef?: Field): string;
-  mongoEmptyValue(fieldDef?: Field): string;
   SqlString: {
     trim(val?: string): string;
     escape(val?: string): string;
@@ -607,14 +605,6 @@ interface ExportUtils {
     unescapeLike(val?: string, sqlDialect?: SqlDialect): string;
   },
   stringifyForDisplay(val: any): string;
-  /**
-   * @deprecated
-   */
-  spelFormatConcat(parts: SpelConcatParts): string;
-  /**
-   * @deprecated
-   */
-  spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>];
 }
 interface ListUtils {
   getTitleInListValues(listValues: ListValues, value: string | number): string;
@@ -641,6 +631,29 @@ interface TreeUtils {
   isEmptyTree(tree: ImmutableTree): boolean;
   // case mode
   getSwitchValues(tree: ImmutableTree): Array<any | null>;
+}
+interface MongoUtils {
+  mongoEmptyValue(fieldDef?: Field): string;
+  mongoFieldEscape(fieldName: string): string;
+  mongoFieldUnescape(fieldName: string): string;
+}
+interface JsonLogicUtils {
+  applyJsonLogic(logic: JsonLogicValue, data?: any): any;
+  addJsonLogicOperation(name: string, operation: (...args: any[]) => JsonLogicValue): void;
+  customJsonLogicOperations: TypedMap<(...args: any[]) => JsonLogicValue>;
+  addRequiredJsonLogicOperations(): void;
+}
+interface SpelUtils {
+  spelFixList(listStr: string): string;
+  spelEscape(val: any): string;
+  /**
+   * @deprecated
+   */
+  spelFormatConcat(parts: SpelConcatParts): string;
+  /**
+   * @deprecated
+   */
+  spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>];
 }
 
 interface MixSymbols<T> {
@@ -720,6 +733,9 @@ export interface Utils extends Import, Export,
   ConfigUtils: ConfigUtils;
   DefaultUtils: DefaultUtils;
   ExportUtils: ExportUtils;
+  MongoUtils: MongoUtils;
+  JsonLogicUtils: JsonLogicUtils;
+  SpelUtils: SpelUtils;
   ListUtils: ListUtils;
   TreeUtils: TreeUtils;
   OtherUtils: OtherUtils;
@@ -1118,7 +1134,7 @@ export interface ConjsProps {
 
 // tip: for multiselect widget `vals` is always Array, for between/proximity op `vals` can be Array or ImmutableList (only for sql, simple string - TODO: onvert to [])
 type FormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[] | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, isForDisplay?: boolean, fieldDef?: Field) => string | undefined;
-type MongoFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => Object | undefined;
+type MongoFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: MongoValue | Array<MongoValue>, not?: boolean, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => Object | undefined;
 type SqlFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[] | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string | undefined;
 type SpelFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[], valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string | undefined;
 type JsonLogicFormatOperator = (this: ConfigContext, field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => JsonLogicTree | undefined;

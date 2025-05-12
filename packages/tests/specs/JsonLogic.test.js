@@ -1,5 +1,5 @@
 import { Utils } from "@react-awesome-query-builder/core";
-const { applyJsonLogic } = Utils.ConfigUtils;
+const { applyJsonLogic } = Utils.JsonLogicUtils;
 import { expect } from "chai";
 
 describe("JsonLogic", () => {

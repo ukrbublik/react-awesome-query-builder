@@ -3,7 +3,7 @@ import pick from "lodash/pick";
 import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual, isObject, hasSafeOwnProperty} from "./stuff";
 import clone from "clone";
 import JL from "json-logic-js";
-import { addRequiredJsonLogicOperations, applyJsonLogic } from "./jsonLogic";
+import { addRequiredJsonLogicOperations, applyJsonLogic } from "./jsonLogicUtils";
 import * as BasicFuncs from "../config/funcs";
 import { getFieldRawConfig, configKeys } from "./configUtils";
 

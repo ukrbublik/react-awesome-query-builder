@@ -5,7 +5,7 @@ export function applyJsonLogic(logic, data) {
   return JL.apply(logic, data);
 }
 
-function addJsonLogicOperation(name, op) {
+export function addJsonLogicOperation(name, op) {
   return JL.add_operation(name, op);
 }
 
@@ -27,3 +27,36 @@ export function addRequiredJsonLogicOperations() {
     addJsonLogicOperation(k, customJsonLogicOperations[k]);
   }
 }
+
+/**
+ * @deprecated
+ */
+export const jsonLogicFormatConcat = (parts) => {
+  if (parts && Array.isArray(parts) && parts.length) {
+    return parts
+      .map(part => part?.value ?? part)
+      .filter(r => r != undefined);
+  } else {
+    return undefined;
+  }
+};
+
+/**
+ * @deprecated
+ */
+export const jsonLogicImportConcat = (val) => {
+  if (val == undefined)
+    return undefined;
+  const errors = [];
+  const parts = Array.isArray(val) ? val : [val];
+  const res = parts.filter(v => v != undefined).map(v => {
+    return {
+      type: "property", 
+      value: val
+    };
+  });
+  if (errors.length) {
+    throw new Error(errors.join("\n"));
+  }
+  return res;
+};

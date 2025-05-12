@@ -3,7 +3,7 @@ import {
   ImmutableTree,
 } from "@react-awesome-query-builder/ui";
 import type { DemoQueryBuilderState } from "../types";
-import { importFromInitFile } from "../utils";
+import { importFromInitFile, initTreeWithValidation } from "../utils";
 import { initFiles } from "../init_data";
 
 const stringify = JSON.stringify;
@@ -16,7 +16,7 @@ export const useInitFiles = (
 ) => {
   const changeInitFile = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newInitFile = e.target.value;
-    const {tree: importedTree, errors} = importFromInitFile(newInitFile,  state.config);
+    const {tree: importedTree, errors} = initTreeWithValidation(newInitFile,  state.config);
     setState({
       ...state,
       initFile: newInitFile,
@@ -27,7 +27,7 @@ export const useInitFiles = (
   };
 
   const loadFromInitFile = () => {
-    const {tree: importedTree, errors} = importFromInitFile(state.initFile,  state.config);
+    const {tree: importedTree, errors} = initTreeWithValidation(state.initFile,  state.config);
     setState({
       ...state,
       tree: importedTree,

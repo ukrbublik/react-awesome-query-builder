@@ -1147,7 +1147,7 @@ describe("query with dot but without !struct", () => {
 describe("query with empty and single rule groups", () => {
 
   describe("should preserve unnecessary groups during export when preserveGroups is true", () => {
-    export_checks(configs.with_export_preserve_groups, inits.with_empty_and_single_rule_groups, "JsonLogic", {
+    export_checks([configs.simple_with_number, configs.with_export_preserve_groups], inits.with_empty_and_single_rule_groups, "JsonLogic", {
       "logic": inits.with_empty_and_single_rule_groups,
     }, [], {
       // Adding custom sanitization options here
@@ -1158,7 +1158,7 @@ describe("query with empty and single rule groups", () => {
   });
 
   describe("should not preserve unnecessary groups during export when preserveGroups is false/default", () => {
-    export_checks(configs.with_allow_empty_groups_on_load, inits.with_empty_and_single_rule_groups, "JsonLogic", {
+    export_checks([configs.simple_with_number, configs.with_allow_empty_groups_on_load], inits.with_empty_and_single_rule_groups, "JsonLogic", {
       "logic":{ "or": [ {"==": [ { "var": "num" }, 1 ]} ]}
     }, ["Group #2 (index path: 2)  >>  Empty group"], {
       // Adding custom sanitization options here

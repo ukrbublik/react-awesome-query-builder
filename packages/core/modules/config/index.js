@@ -876,7 +876,15 @@ const widgets = {
     },
     mongoFormatValue: function (val, fieldDef, wgtDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
-      return dateVal.isValid() ? dateVal.toDate() : undefined;
+      if (dateVal.isValid()) {
+        return {
+          "$dateFromString": {
+            "dateString": dateVal.format("YYYY-MM-DD"),
+            "format": "%Y-%m-%d"
+          }
+        };
+      }
+      return undefined;
     }
   },
   time: {
@@ -1053,7 +1061,14 @@ const widgets = {
     // https://www.mongodb.com/docs/manual/reference/operator/aggregation/toDate/
     mongoFormatValue: function (val, fieldDef, wgtDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
-      return dateVal.isValid() ? dateVal.toDate() : undefined;
+      if (dateVal.isValid()) {
+        return {
+          "$dateFromString": {
+            "dateString": dateVal.format("YYYY-MM-DD HH:mm:ss"),
+            "format": "%Y-%m-%d %H:%M:%S"
+          }
+        };
+      }
     }
   },
   boolean: {

@@ -36,12 +36,12 @@ describe("LHS func", () => {
         // todo: Operator starts_with is not supported
         "mongo": {
           "$expr": {
-            "$regex": [
-              {
+            "$regexFind": {
+              "input": {
                 "$toLower": "$str"
               },
-              "^aaa"
-            ]
+              "regex": "^aaa"
+            }
           }
         }
       });

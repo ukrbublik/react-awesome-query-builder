@@ -81,11 +81,15 @@ const DemoQueryBuilder: React.FC = () => {
   }, [state.renderBocks]);
 
   const updateResult = throttle(() => {
-    setState(prevState => ({
-      ...prevState,
-      tree: memo.current.immutableTree!,
-      config: memo.current.config!
-    }));
+    setState(prevState => {
+      const tree = memo.current.immutableTree!;
+      const config = Utils.ConfigUtils.areConfigsSame(memo.current.config, prevState.config) ? prevState.config : memo.current.config;
+      return {
+        ...prevState,
+        tree,
+        config,
+      };
+    });
   }, 100);
 
   const clearValue = () => {

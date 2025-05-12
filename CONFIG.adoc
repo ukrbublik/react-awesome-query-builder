@@ -580,7 +580,7 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
   `value` - string (already formatted value) for `cardinality==1` -or- `Immutable.List` of strings for `cardinality>1`
 |labelForFormat | | |If `formatOp` is missing, `labelForFormat` will be used to join operands when building query string
 |mongoFormatOp |+ for MongoDB format | |Function for formatting MongoDb expression, used to join operands into rule. +
-  `(string field, string op, mixed value, bool useExpr, string valueSrc, string valueType, Object opDef, Object operatorOptions, Object fieldDef) => object` +
+  `(string field, string op, mixed value, bool not, bool useExpr, string valueSrc, string valueType, Object opDef, Object operatorOptions, Object fieldDef) => object` +
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2` +
   `useExpr` - true if resulted expression will be wrapped in https://docs.mongodb.com/manual/reference/operator/query/expr/index.html[`{'$expr': {...}}`] (used only if you compare field with another field or function) (you need to use aggregation operators in this case, like https://docs.mongodb.com/manual/reference/operator/aggregation/eq/[$eq (aggregation)] instead of https://docs.mongodb.com/manual/reference/operator/query/eq/[$eq])
 |sqlOp |+ for SQL format | |Operator name in SQL

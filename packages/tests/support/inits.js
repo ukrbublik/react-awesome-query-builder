@@ -453,25 +453,41 @@ export const with_not_and_neg_in_some = {
       { "var": "cars" },
       { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
     ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "and": [ { "<=": [ 1995, { "var": "year" }, 2005 ] } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "in": [ "ggg1", { "var": "model" } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "!": { "in": [ "ggg2", { "var": "model" } ] } } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "and": [ { "!": { "and": [ { "!": { "in": [ "ggg3", { "var": "model" } ] } } ] } } ] }
+    ] },
     { "all": [
       { "var": "cars" },
-      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Tesla" ] ] } }
     ] },
     { "all": [
       { "var": "cars" },
-      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } ] } }
+      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "BMW", "Toyota" ] ] } } ] } }
     ] },
     { "some": [
       { "var": "cars" },
-      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } ] } }
+      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "Tesla", "Toyota" ] ] } } ] } }
     ] },
     { "some": [
       { "var": "cars" },
-      { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } }
+      { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "BMW" ] ] } } }
     ] },
     { "some": [
       { "var": "cars" },
-      { "!": { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } } } }
+      { "!": { "!": { "!": { "in": [ { "var": "vendor" }, [ "BMW", "Tesla" ] ] } } } }
     ] }
   ]
 };
@@ -482,25 +498,41 @@ export const with_not_and_neg_in_some_reversed = {
       { "var": "cars" },
       { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
     ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "<=": [ 1995, { "var": "year" }, 2005 ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "in": [ "ggg1", { "var": "model" } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "in": [ "ggg2", { "var": "model" } ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "in": [ "ggg3", { "var": "model" } ] }
+    ] },
     { "all": [
       { "var": "cars" },
-      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Tesla" ] ] } }
     ] },
     { "all": [
       { "var": "cars" },
-      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+      { "in": [ { "var": "vendor" }, [ "BMW", "Toyota" ] ] }
     ] },
     { "some": [
       { "var": "cars" },
-      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+      { "in": [ { "var": "vendor" }, [ "Tesla", "Toyota" ] ] }
     ] },
     { "some": [
       { "var": "cars" },
-      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+      { "in": [ { "var": "vendor" }, [ "Ford", "BMW" ] ] }
     ] },
     { "some": [
       { "var": "cars" },
-      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+      { "!": { "in": [ { "var": "vendor" }, [ "BMW", "Tesla" ] ] } }
     ] }
   ]
 };

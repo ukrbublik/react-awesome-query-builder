@@ -15,7 +15,7 @@ const {
   FieldTreeSelect,
 } = AntdWidgets;
 const {
-  ExportUtils
+  SpelUtils, JsonLogicUtils
 } = Utils;
 
 export const simple_with_number = (BasicConfig) => ({
@@ -933,7 +933,7 @@ export const with_dont_leave_empty_group = (BasicConfig) => ({
 });
 
 export const with_allow_empty_groups_on_load = (BasicConfig) => ({
-  ...simple_with_number(BasicConfig),
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     removeEmptyGroupsOnLoad: false
@@ -1463,7 +1463,7 @@ export const with_group_array_cars = (BasicConfig) => ({
         vendor: {
           type: "select",
           fieldSettings: {
-            listValues: ["Ford", "Toyota", "Tesla"],
+            listValues: ["Ford", "Toyota", "Tesla", "BMW", "Mercedes"],
           },
           valueSources: ["value"],
         },
@@ -1474,7 +1474,11 @@ export const with_group_array_cars = (BasicConfig) => ({
             max: 2021,
           },
           valueSources: ["value"],
-        }
+        },
+        model: {
+          type: "text",
+          valueSources: ["value"],
+        },
       }
     },
   },
@@ -1842,9 +1846,9 @@ export const with_concat_case_value = (BasicConfig) => ({
     ...BasicConfig.widgets,
     case_value: {
       ...BasicConfig.widgets.case_value,
-      spelFormatValue: ExportUtils.spelFormatConcat,
-      spelImportValue: ExportUtils.spelImportConcat,
-      jsonLogic: ExportUtils.jsonLogicFormatConcat,
+      spelFormatValue: SpelUtils.spelFormatConcat,
+      spelImportValue: SpelUtils.spelImportConcat,
+      jsonLogic: JsonLogicUtils.jsonLogicFormatConcat,
     },
   },
 });
