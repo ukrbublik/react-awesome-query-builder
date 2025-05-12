@@ -644,6 +644,8 @@ interface TreeUtils {
 }
 interface MongoUtils {
   mongoEmptyValue(fieldDef?: Field): string;
+  mongoFieldEscape(fieldName: string): string;
+  mongoFieldUnescape(fieldName: string): string;
 }
 interface JsonLogicUtils {
   applyJsonLogic(logic: JsonLogicValue, data?: any): any;

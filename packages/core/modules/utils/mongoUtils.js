@@ -66,3 +66,12 @@ export const mongoFormatOp2 = (mops, opNot,  field, _op, values, not, useExpr, v
       ]};
   }
 };
+
+
+export const mongoFieldEscape = (input) => {
+  return input.replace(/\$/g, "\uFF04");
+};
+
+export const mongoFieldUnescape = (input) => {
+  return input.replace(/\uFF04/g, "$");
+};

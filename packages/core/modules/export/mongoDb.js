@@ -5,6 +5,7 @@ import {
 import {extendConfig} from "../utils/configExtend";
 import {getFieldPathLabels, formatFieldName, completeValue, getOneChildOrDescendant} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
+import { mongoFieldEscape } from "../utils/mongoUtils";
 import pick from "lodash/pick";
 import {List, Map} from "immutable";
 
@@ -190,7 +191,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
       const totalQuery = {
         "$size": {
           "$ifNull": [
-            "$" + groupFieldName,
+            "$" + mongoFieldEscape(groupFieldName),
             []
           ]
         }
@@ -203,7 +204,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
           "$ifNull": [
             {
               "$filter": {
-                input: "$" + groupFieldName,
+                input: "$" + mongoFieldEscape(groupFieldName),
                 as: "el",
                 cond: resultQuery
               }
@@ -218,7 +219,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
       not = false;
       resultQuery = { "$expr": resultQuery };
     } else {
-      resultQuery = { [groupFieldName]: {"$elemMatch": resultQuery} };
+      resultQuery = { [mongoFieldEscape(groupFieldName)]: {"$elemMatch": resultQuery} };
       // todo: $not ??
     }
   }
@@ -285,6 +286,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     [formattedField, useExpr] = formatFunc(meta, config, field, realParentPath);
   } else {
     formattedField = formatFieldName(field, config, meta, realParentPath);
+    formattedField = mongoFieldEscape(formattedField);
     if (_formatFieldName) {
       useExpr = true;
       formattedField = _formatFieldName(formattedField);
@@ -401,7 +403,7 @@ const formatRightField = (meta, config, rightField, parentPath) => {
     const formatFieldFn = config.settings.formatField;
     const rightFieldName = formatFieldName(rightField, config, meta, parentPath);
     const formattedField = formatFieldFn(rightFieldName, fieldParts, fieldFullLabel, rightFieldDefinition, config, false);
-    ret = "$" + formattedField;
+    ret = "$" + mongoFieldEscape(formattedField);
   }
 
   return [ret, useExpr];
