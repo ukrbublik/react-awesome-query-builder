@@ -51,15 +51,16 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const properties = item.get("properties") || new Map();
   const origNot = !!properties.get("not");
   const children = item.get("children1") || new List();
-  const {canShortMongoQuery, fieldSeparator} = config.settings;
+  const {canShortMongoQuery, fieldSeparator, exportPreserveGroups, reverseOperatorsForNot} = config.settings;
   const sep = fieldSeparator;
 
   const parentRuleGroup = parents.filter(it => it.get("type") == "rule_group")?.slice(-1)?.pop();
+  const isInsideRuleGroup = !!parentRuleGroup;
   const parentPath = parents
     .filter(it => it.get("type") == "rule_group")
     .map(it => it.get("properties").get("field"))
     .slice(-1).pop();
-  const realParentPath = !!parentRuleGroup && parentPath;
+  const realParentPath = isInsideRuleGroup && parentPath;
 
   const isRuleGroup = (type === "rule_group");
   const groupField = isRuleGroup ? properties.get("field") : null;
@@ -73,6 +74,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const isRuleGroupArray = isRuleGroup && mode != "struct";
   const isRuleGroupWithChildren = isRuleGroup && children?.size > 0;
   const isRuleGroupWithoutChildren = isRuleGroup && !children?.size;
+  const isInsideRuleGroupArray = isInsideRuleGroup && parentRuleGroup.get("properties").get("mode") == "array";
 
   // rev
   let revChildren = false;
@@ -93,7 +95,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const groupOpCanReverse = !!reversedGroupOpDef?.mongoFormatOp;
   const oneChildType = getOneChildOrDescendant(item)?.get("type");
   const isSimpleGroupWithOneChild = !isRuleGroup && oneChildType === "rule";
-  const canRevChildren = (not && isSimpleGroupWithOneChild || filterNot && children?.size === 1); // && !!config.settings.reverseOperatorsForNot;
+  const canRevChildren = (not && isSimpleGroupWithOneChild || filterNot && children?.size === 1) && !exportPreserveGroups; // && !!reverseOperatorsForNot;
   if (canRevChildren) {
     if (isSimpleGroupWithOneChild) {
       not = !not;
@@ -102,7 +104,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
     }
     revChildren = true;
   }
-  let canRevGroupOp = not && isRuleGroup && groupOpCanReverse && (!!config.settings.reverseOperatorsForNot || groupOpNeedsReverse);
+  let canRevGroupOp = not && isRuleGroup && groupOpCanReverse && (!!reverseOperatorsForNot && !exportPreserveGroups || groupOpNeedsReverse);
   if (canRevGroupOp) {
     not = !not;
     [groupOperator, reversedGroupOp] = [reversedGroupOp, groupOperator];
@@ -119,7 +121,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   // rev conj
   const reversedConj = conjunctionDefinition.reversedConj;
   const canRev = not && conjunction?.toLowerCase() === "or" && reversedConj && !isRuleGroup
-    && !!config.settings.canShortMongoQuery && !!config.settings.reverseOperatorsForNot;
+    && !!canShortMongoQuery && !!reverseOperatorsForNot && !exportPreserveGroups;
   if (canRev) {
     conjunction = reversedConj;
     conjunctionDefinition = config.conjunctions[conjunction];
@@ -129,8 +131,10 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
 
   const mongoConj = conjunctionDefinition.mongoConj;
 
-  const canWrapExpr = !groupField && !parentRuleGroup; // can't use "$expr" inside "$filter"."cond" or inside "$elemMatch"
+  // tip: can't use "$expr" inside "$filter"."cond" or inside "$elemMatch"
+  const canWrapExpr = !isRuleGroup && !isInsideRuleGroup;
   const formatFieldNameFn = mode == "array" ? (f => `$$el${sep}${f}`) : _formatFieldName;
+
   const list = children
     .map((currentChild) => formatItem(
       [...parents, item], currentChild, config, meta, revChildren, canWrapExpr, formatFieldNameFn)
@@ -141,12 +145,12 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   }
 
   let resultQuery;
-  let shortQuery = false;
+  let shortQuery;
   if (list.size == 1) {
     resultQuery = list.first();
   } else if (list.size > 1) {
     const rules = list.toList().toJS();
-    const canShort = canShortMongoQuery && (mongoConj == "$and");
+    const canShort = canShortMongoQuery && (mongoConj == "$and") && !exportPreserveGroups;
     if (canShort) {
       resultQuery = rules.reduce((acc, rule) => {
         if (!acc) return undefined;
@@ -198,6 +202,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
       };
       if (filterNot && resultQuery) {
         resultQuery = { "$not": resultQuery };
+        filterNot = false;
       }
       const filterQuery = resultQuery ? {
         "$size": {
@@ -213,19 +218,28 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
           ]
         }
       } : totalQuery;
+      const notForRule = !exportPreserveGroups ? not : false;
       resultQuery = formatItem(
-        parents, item.set("type", "rule"), config, meta, not, false, (_f => filterQuery), totalQuery
+        parents, item.set("type", "rule"), config, meta, notForRule, false, (_f => filterQuery), totalQuery
       );
-      not = false;
+      if (notForRule) {
+        not = false;
+      }
       resultQuery = { "$expr": resultQuery };
     } else {
+      // tip: $elemMatch can't have $not and $expr inside BUT can have $nor
       resultQuery = { [mongoFieldEscape(groupFieldName)]: {"$elemMatch": resultQuery} };
-      // todo: $not ??
     }
   }
 
   if (not) {
-    resultQuery = { "$nor": [ resultQuery ] };
+    // tip: $nor can't be inside $filter.cond or $expr
+    if (isInsideRuleGroupArray) {
+      // inside $filter.cond
+      resultQuery = { "$not": resultQuery };
+    } else {
+      resultQuery = { "$nor": [ resultQuery ] };
+    }
   }
 
   return resultQuery;
