@@ -15,7 +15,7 @@ const {
   FieldTreeSelect,
 } = AntdWidgets;
 const {
-  ExportUtils
+  SpelUtils, JsonLogicUtils
 } = Utils;
 
 export const simple_with_number = (BasicConfig) => ({
@@ -1846,9 +1846,9 @@ export const with_concat_case_value = (BasicConfig) => ({
     ...BasicConfig.widgets,
     case_value: {
       ...BasicConfig.widgets.case_value,
-      spelFormatValue: ExportUtils.spelFormatConcat,
-      spelImportValue: ExportUtils.spelImportConcat,
-      jsonLogic: ExportUtils.jsonLogicFormatConcat,
+      spelFormatValue: SpelUtils.spelFormatConcat,
+      spelImportValue: SpelUtils.spelImportConcat,
+      jsonLogic: JsonLogicUtils.jsonLogicFormatConcat,
     },
   },
 });

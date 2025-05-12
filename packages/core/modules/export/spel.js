@@ -10,7 +10,7 @@ import pick from "lodash/pick";
 import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
-import {spelEscape} from "../utils/export";
+import {spelEscape} from "../utils/spelUtils";
 
 // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions
 

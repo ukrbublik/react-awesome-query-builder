@@ -95,11 +95,11 @@ export interface SpelRawValue {
 export type ConfigContextUtils = {
   SqlString: ExportUtils["SqlString"];
   sqlEmptyValue: ExportUtils["sqlEmptyValue"];
-  spelFixList: ExportUtils["spelFixList"];
+  spelFixList: SpelUtils["spelFixList"];
   wrapWithBrackets: ExportUtils["wrapWithBrackets"];
   stringifyForDisplay: ExportUtils["stringifyForDisplay"];
   mongoEmptyValue: MongoUtils["mongoEmptyValue"];
-  spelEscape: ExportUtils["spelEscape"];
+  spelEscape: SpelUtils["spelEscape"];
 
   moment: OtherUtils["moment"];
   escapeRegExp: OtherUtils["escapeRegExp"];
@@ -597,8 +597,6 @@ interface DefaultUtils {
 }
 interface ExportUtils {
   wrapWithBrackets(val?: string): string;
-  spelEscape(val: any): string;
-  spelFixList(listStr: string): string;
   sqlEmptyValue(fieldDef?: Field): string;
   SqlString: {
     trim(val?: string): string;
@@ -607,14 +605,6 @@ interface ExportUtils {
     unescapeLike(val?: string, sqlDialect?: SqlDialect): string;
   },
   stringifyForDisplay(val: any): string;
-  /**
-   * @deprecated
-   */
-  spelFormatConcat(parts: SpelConcatParts): string;
-  /**
-   * @deprecated
-   */
-  spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>];
 }
 interface ListUtils {
   getTitleInListValues(listValues: ListValues, value: string | number): string;
@@ -652,6 +642,18 @@ interface JsonLogicUtils {
   addJsonLogicOperation(name: string, operation: (...args: any[]) => JsonLogicValue): void;
   customJsonLogicOperations: TypedMap<(...args: any[]) => JsonLogicValue>;
   addRequiredJsonLogicOperations(): void;
+}
+interface SpelUtils {
+  spelFixList(listStr: string): string;
+  spelEscape(val: any): string;
+  /**
+   * @deprecated
+   */
+  spelFormatConcat(parts: SpelConcatParts): string;
+  /**
+   * @deprecated
+   */
+  spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>];
 }
 
 interface MixSymbols<T> {
@@ -733,6 +735,7 @@ export interface Utils extends Import, Export,
   ExportUtils: ExportUtils;
   MongoUtils: MongoUtils;
   JsonLogicUtils: JsonLogicUtils;
+  SpelUtils: SpelUtils;
   ListUtils: ListUtils;
   TreeUtils: TreeUtils;
   OtherUtils: OtherUtils;

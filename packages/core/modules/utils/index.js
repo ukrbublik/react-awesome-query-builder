@@ -6,6 +6,7 @@ export * as TreeUtils from "./treeUtils";
 export * as ExportUtils from "./export";
 export * as MongoUtils from "./mongoUtils";
 export * as JsonLogicUtils from "./jsonLogicUtils";
+export * as SpelUtils from "./spelUtils";
 export * as ListUtils from "./listValues";
 export * as Autocomplete from "./autocomplete";
 export * as Validation from "./validation";
