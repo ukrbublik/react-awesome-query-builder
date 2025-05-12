@@ -1,7 +1,10 @@
 import SqlStringOrig from "sqlstring";
 
-// todo: move to sqlUtils
+// @deprecated Use dedicated utils instead
+export { mongoEmptyValue } from "./mongoUtils";
+export { spelEscape, spelFixList, spelFormatConcat, spelImportConcat } from "./spelUtils";
 
+// todo: move to sqlUtils
 export const SqlString = SqlStringOrig;
 
 SqlString.trim = (val) => {

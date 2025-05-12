@@ -595,7 +595,7 @@ interface DefaultUtils {
   // createListWithOneElement<TItem>(el: TItem): ImmutableList<TItem>;
   // createListFromArray<TItem>(array: TItem[]): ImmutableList<TItem>;
 }
-interface ExportUtils {
+interface ExportUtils extends PickDeprecated<SpelUtils, "spelFixList" | "spelEscape">, PickDeprecated<MongoUtils, "mongoEmptyValue"> {
   wrapWithBrackets(val?: string): string;
   sqlEmptyValue(fieldDef?: Field): string;
   SqlString: {
