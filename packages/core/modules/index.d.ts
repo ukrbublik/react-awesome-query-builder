@@ -72,6 +72,9 @@ export type AsyncListValues = Array<any>;
 export type MongoValue = any;
 export type ElasticSearchQueryType = string;
 
+interface JsonLogicLib {
+  apply(logic: JsonLogicValue, data: Object): JsonLogicValue;
+}
 export type JsonLogicResult = {
   logic?: JsonLogicTree;
   data?: Object;
@@ -639,9 +642,9 @@ interface MongoUtils {
 }
 interface JsonLogicUtils {
   applyJsonLogic(logic: JsonLogicValue, data?: any): any;
-  addJsonLogicOperation(name: string, operation: (...args: any[]) => JsonLogicValue): void;
+  addJsonLogicOperation(name: string, operation: (...args: any[]) => JsonLogicValue, jl?: JsonLogicLib): void;
   customJsonLogicOperations: TypedMap<(...args: any[]) => JsonLogicValue>;
-  addRequiredJsonLogicOperations(): void;
+  addRequiredJsonLogicOperations(jl?: JsonLogicLib): void;
 }
 interface SpelUtils {
   spelFixList(listStr: string): string;
