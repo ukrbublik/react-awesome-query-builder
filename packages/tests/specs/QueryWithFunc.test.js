@@ -188,11 +188,47 @@ describe("query with func", () => {
             ]
           }
         ]
+      },
+      "tree": {
+        "type": "group",
+        "children1": [
+          {
+            "type": "rule",
+            "properties": {
+              "field": "datetime",
+              "operator": "equal",
+              "value": [
+                {
+                  "func": "RELATIVE_DATETIME",
+                  "args": {
+                    "date": {
+                      "valueType": "datetime",
+                      "valueSrc": "func",
+                      "value": {
+                        "func": "NOW",
+                        "args": {}
+                      },
+                    },
+                    "op": {
+                      "value": "plus",
+                    },
+                    "val": {
+                      "value": 2,
+                    },
+                    "dim": {
+                      "value": "day",
+                    },
+                  }
+                }
+              ]
+            }
+          }
+        ]
       }
     });
   });
 
-  describe("@new loads tree with func RELATIVE_DATE", () => {
+  describe("loads tree with func RELATIVE_DATE", () => {
     export_checks([with_all_types, with_funcs], inits.with_func_relative_date, "JsonLogic", {
       "query": "date == TODAY + 2 day",
       "queryHuman": "Date = TODAY + 2 day",
@@ -211,6 +247,42 @@ describe("query with func", () => {
                 ]
               }
             ]
+          }
+        ]
+      },
+      "tree": {
+        "type": "group",
+        "children1": [
+          {
+            "type": "rule",
+            "properties": {
+              "field": "date",
+              "operator": "equal",
+              "value": [
+                {
+                  "func": "RELATIVE_DATE",
+                  "args": {
+                    "date": {
+                      "valueType": "date",
+                      "valueSrc": "func",
+                      "value": {
+                        "func": "TODAY",
+                        "args": {}
+                      },
+                    },
+                    "op": {
+                      "value": "plus",
+                    },
+                    "val": {
+                      "value": 2,
+                    },
+                    "dim": {
+                      "value": "day",
+                    },
+                  }
+                }
+              ]
+            }
           }
         ]
       }
