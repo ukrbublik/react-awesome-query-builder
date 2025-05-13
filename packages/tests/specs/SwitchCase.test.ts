@@ -5,7 +5,7 @@ import {export_checks} from "../support/utils";
 
 describe("query with switch-case", () => {
 
-  describe("@sql 2 cases and 1 default", () => {
+  describe("2 cases and 1 default", () => {
     export_checks([configs.with_all_types, configs.with_cases], inits.spel_with_cases, "SpEL", {
       "spel": "(str == '222' ? 'is_string' : (num == 4 ? 'is_number' : 'unknown'))",
       logic:

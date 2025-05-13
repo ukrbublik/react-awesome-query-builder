@@ -485,33 +485,33 @@ describe("query with ops", () => {
     });
   });
 
-  describe("@sql operators", () => {
+  describe("operators", () => {
     export_checks([configs.with_all_types], inits.with_ops_sql, "SQL", {
       "sql": inits.with_ops_sql,
     });
   });
 
-  describe("@sql LIKE escape", () => {
+  describe("LIKE escape", () => {
     export_checks([configs.with_all_types], "str LIKE '%h\\%\\_h%'", "SQL", {
       "sql": "str LIKE '%h\\%\\_h%'",
       "spel": "str.contains('h%_h')"
     });
   });
 
-  describe("@sql LIKE escape for BigQuery", () => {
+  describe("LIKE escape for BigQuery", () => {
     export_checks([configs.with_all_types, configs.with_sql_dialect("BigQuery")], "str LIKE '%h\\\\%\\\\_h%'", "SQL", {
       "sql": "str LIKE '%h\\\\%\\\\_h%'",
       "spel": "str.contains('h%_h')"
     });
   });
 
-  describe("@spel multiselect_contains import works", () => {
+  describe("multiselect_contains import works", () => {
     export_checks([configs.with_all_types], "T(CollectionUtils).containsAny(multicolor, {'yellow'})", "SpEL", {
       spel: "T(CollectionUtils).containsAny(multicolor, {'yellow'})",
     });
   });
 
-  describe("@spel multiselect_contains import is backward compatible", () => {
+  describe("multiselect_contains import is backward compatible", () => {
     export_checks([configs.with_all_types], "CollectionUtils.containsAny(multicolor, {'yellow'})", "SpEL", {
       spel: "T(CollectionUtils).containsAny(multicolor, {'yellow'})",
     });
