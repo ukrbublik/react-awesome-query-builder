@@ -48,9 +48,9 @@ const TODAY = {
 const START_OF_DAY = {
   label: "Start of day",
   returnType: "datetime",
-  jsonLogic: "today",
+  jsonLogic: "start_of_date",
   jsonLogicCustomOps: {
-    today: {},
+    start_of_date: {},
   },
   spelFunc: "T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).DAYS)",
   // todo: import fails

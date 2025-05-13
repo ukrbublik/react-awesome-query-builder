@@ -400,8 +400,8 @@ const convertFunc = (spel, conv, config, meta, parentSpel = null) => {
 
           // Special case to distinct date and datetime
           let isOk = true;
-          const expectedFuncType = funcConfig?.returnType;
-          if (["date", "datetime"].includes(expectedFuncType)) {
+          const funcType = funcConfig?.returnType;
+          if (["date", "datetime"].includes(funcType)) {
             const dateArgsKeys = Object.keys(funcConfig.args ?? []).filter(k => ["date", "datetime"].includes(funcConfig.args[k].type));
             for (const k of dateArgsKeys) {
               const argConfig = funcConfig.args[k];

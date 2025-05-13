@@ -26,7 +26,7 @@ describe("LHS func", () => {
     });
   });
 
-  describe("load from SpEL", () => {
+  describe("@spel load from SpEL", () => {
     describe(".toLowerCase().startsWith()", () => {
       export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_lhs_toLowerCase, "SpEL", {
         "query": "LOWER(str) Starts with \"aaa\"",
