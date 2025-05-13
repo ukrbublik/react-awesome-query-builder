@@ -5,8 +5,8 @@ export function applyJsonLogic(logic, data) {
   return JL.apply(logic, data);
 }
 
-export function addJsonLogicOperation(name, op) {
-  return JL.add_operation(name, op);
+export function addJsonLogicOperation(name, op, jl = JL) {
+  return jl.add_operation(name, op);
 }
 
 export const customJsonLogicOperations = {
@@ -17,14 +17,15 @@ export const customJsonLogicOperations = {
   strlen: (str) => (str?.length || 0),
   regexTest: (str, pattern, flags) => str?.match(new RegExp(pattern, flags)) != null,
   now: () => new Date(),
+  today: () => new Date(), // todo today JL
   date_add: (date, val, dim) => { return moment(date).add(val, dim).toDate(); },
   toLowerCase: (str) => str.toLowerCase(),
   toUpperCase: (str) => str.toUpperCase(),
 };
 
-export function addRequiredJsonLogicOperations() {
+export function addRequiredJsonLogicOperations(jl = JL) {
   for (let k in customJsonLogicOperations) {
-    addJsonLogicOperation(k, customJsonLogicOperations[k]);
+    addJsonLogicOperation(k, customJsonLogicOperations[k], jl);
   }
 }
 

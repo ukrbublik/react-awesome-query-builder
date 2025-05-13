@@ -241,10 +241,10 @@ export default (skin: string) => {
 
     // Example of how to correctly configure default LHS funtion with args:
     // defaultField: {
-    //   func: "date.RELATIVE_DATETIME",
+    //   func: "datetime.RELATIVE_DATETIME",
     //   args: {
     //     date: {
-    //       value: {func: "date.NOW", args: {}},
+    //       value: {func: "datetime.NOW", args: {}},
     //       valueSrc: "func"
     //     },
     //     op: {
@@ -505,7 +505,7 @@ export default (skin: string) => {
     date: {
       label: "Date",
       type: "date",
-      valueSources: ["value"],
+      valueSources: ["value", "func"],
       fieldSettings: {
         dateFormat: "DD-MM-YYYY",
         validateValue: (val, fieldSettings: DateTimeFieldSettings) => {
@@ -748,15 +748,30 @@ export default (skin: string) => {
         }),
       }
     },
+    datetime: {
+      type: "!struct",
+      label: "Datetime",
+      subfields: {
+        NOW: BasicFuncs.NOW,
+        START_OF_DAY: BasicFuncs.START_OF_DAY,
+        RELATIVE_DATETIME: merge({}, BasicFuncs.RELATIVE_DATETIME, {
+          args: {
+            date: {
+              defaultValue: {func: "datetime.NOW", args: []},
+            }
+          }
+        }),
+      }
+    },
     date: {
       type: "!struct",
       label: "Date",
       subfields: {
-        NOW: BasicFuncs.NOW,
-        RELATIVE_DATETIME: merge({}, BasicFuncs.RELATIVE_DATETIME, {
+        TODAY: BasicFuncs.TODAY,
+        RELATIVE_DATE: merge({}, BasicFuncs.RELATIVE_DATE, {
           args: {
             date: {
-              defaultValue: {func: "date.NOW", args: []},
+              defaultValue: {func: "date.TODAY", args: []},
             }
           }
         }),

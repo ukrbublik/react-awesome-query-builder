@@ -1188,6 +1188,15 @@ export const with_func_relative_datetime = {
   } ]
 };
 
+export const with_func_relative_date = {
+  "and": [ {
+    "==": [
+      { "var": "date" },
+      { "date_add": [ { "today": [] }, 2, "day" ] }
+    ]
+  } ]
+};
+
 export const with_func_sum_of_multiselect = {
   "and": [ {
     "==": [
@@ -1897,9 +1906,10 @@ export const spel_with_lhs_toLowerCase_toUpperCase = "str.toLowerCase().toUpperC
 //export const spel_with_SimpleDateFormat = "datetime == new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-15')";
 export const spel_with_LocalTime = "time == T(java.time.LocalTime).parse('02:03:00')";
 export const spel_with_new_String = "str == new String('hello world').toUpperCase()";
-export const spel_with_lhs_compareTo = "datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(6)) < 0";
-export const spel_with_lhs_compareTo_parse = "datetime.compareTo(T(java.time.LocalDateTime).parse('2005-11-12 11:11:12', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss'))) == 0";
-export const spel_with_lhs_compareTo_parse_plusDays = "datetime.compareTo(T(java.time.LocalDateTime).parse('2023-01-01 00:00:00', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss')).plusDays(7)) > 0";
+export const spel_with_datetime_compareTo = "datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(6)) < 0";
+export const spel_with_date_compareTo = "date.compareTo(T(java.time.LocalDate).now().plusDays(6)) < 0";
+export const spel_with_datetime_compareTo_parse = "datetime.compareTo(T(java.time.LocalDateTime).parse('2005-11-12 11:11:12', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss'))) == 0";
+export const spel_with_datetime_compareTo_parse_plusDays = "datetime.compareTo(T(java.time.LocalDateTime).parse('2023-01-01 00:00:00', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss')).plusDays(7)) > 0";
 
 export const spel_with_lhs_toLowerCase2 = "str.toLowerCase2() == 'aaa'";
 export const tree_with_lhs_toLowerCase2 = {

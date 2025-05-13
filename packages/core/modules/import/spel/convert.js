@@ -397,12 +397,31 @@ const convertFunc = (spel, conv, config, meta, parentSpel = null) => {
           for (let argKey in parsed) {
             argsObj[argKey] = convertFuncArg(parsed[argKey]);
           }
+
+          // Special case to distinct date and datetime
+          let isOk = true;
+          const expectedFuncType = funcConfig?.returnType;
+          if (["date", "datetime"].includes(expectedFuncType)) {
+            const dateArgsKeys = Object.keys(funcConfig.args ?? []).filter(k => ["date", "datetime"].includes(funcConfig.args[k].type));
+            for (const k of dateArgsKeys) {
+              const argConfig = funcConfig.args[k];
+              const expectedType = argConfig.type;
+              const realType = argsObj[k]?.valueType;
+              const argVal = argsObj[k];
+              if (argVal && realType != expectedType) {
+                isOk = false;
+              }
+            }
+          }
+          if (isOk) {
+            break;
+          }
         }
       }
     }
   }
 
-  // convert
+  // final convert
   if (funcKey) {
     const funcArgs = {};
     for (let argKey in funcConfig.args) {

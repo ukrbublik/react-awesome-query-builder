@@ -13,8 +13,58 @@ const NOW = {
   spelFunc: "T(java.time.LocalDateTime).now()",
   sqlFormatFunc: () => "NOW()",
   sqlFunc: "NOW",
-  mongoFormatFunc: () => new Date(),
+  mongoFormatFunc: function () {
+    return {
+      "$dateFromString": {
+        "dateString": this.utils.moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+        "format": "%Y-%m-%d %H:%M:%S"
+      }
+    };
+  },
   formatFunc: () => "NOW",
+};
+
+const TODAY = {
+  label: "Today",
+  returnType: "date",
+  jsonLogic: "today",
+  jsonLogicCustomOps: {
+    today: {},
+  },
+  spelFunc: "T(java.time.LocalDate).now()",
+  sqlFormatFunc: () => "CURDATE()",
+  sqlFunc: "CURDATE",
+  mongoFormatFunc: function () {
+    return {
+      "$dateFromString": {
+        "dateString": this.utils.moment(new Date()).format("YYYY-MM-DD"),
+        "format": "%Y-%m-%d"
+      }
+    };
+  },
+  formatFunc: () => "TODAY",
+};
+
+const START_OF_DAY = {
+  label: "Start of day",
+  returnType: "datetime",
+  jsonLogic: "today",
+  jsonLogicCustomOps: {
+    today: {},
+  },
+  spelFunc: "T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).DAYS)",
+  // todo: import fails
+  sqlFormatFunc: () => "CURDATE()",
+  sqlFunc: "CURDATE",
+  mongoFormatFunc: function () {
+    return {
+      "$dateFromString": {
+        "dateString": this.utils.moment(new Date()).format("YYYY-MM-DD"),
+        "format": "%Y-%m-%d"
+      }
+    };
+  },
+  formatFunc: () => "TODAY",
 };
 
 const RELATIVE_DATETIME = {
@@ -83,7 +133,7 @@ const RELATIVE_DATETIME = {
   formatFunc: ({date, op, val, dim}) => (!val ? date : `${date} ${op == "minus" ? "-" : "+"} ${val} ${dim}`),
   args: {
     date: {
-      label: "Date",
+      label: "Datetime",
       type: "datetime",
       defaultValue: {func: "NOW", args: []},
       valueSources: ["func", "field", "value"],
@@ -138,6 +188,24 @@ const RELATIVE_DATETIME = {
       escapeForFormat: false,
     },
   }
+};
+
+
+const RELATIVE_DATE = {
+  ...RELATIVE_DATETIME,
+  label: "Relative",
+  returnType: "date",
+  args: {
+    date: {
+      ...RELATIVE_DATETIME.args.date,
+      label: "Date",
+      type: "date",
+      defaultValue: {func: "TODAY", args: []},
+    },
+    op: {...RELATIVE_DATETIME.args.op},
+    val: {...RELATIVE_DATETIME.args.val},
+    dim: {...RELATIVE_DATETIME.args.dim},
+  },
 };
 
 const LOWER = {
@@ -246,6 +314,9 @@ export {
   LOWER,
   UPPER,
   NOW,
+  TODAY,
+  START_OF_DAY,
   RELATIVE_DATETIME,
+  RELATIVE_DATE,
   LINEAR_REGRESSION,
 };

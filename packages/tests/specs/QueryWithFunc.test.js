@@ -192,6 +192,31 @@ describe("query with func", () => {
     });
   });
 
+  describe("@new loads tree with func RELATIVE_DATE", () => {
+    export_checks([with_all_types, with_funcs], inits.with_func_relative_date, "JsonLogic", {
+      "query": "date == TODAY + 2 day",
+      "queryHuman": "Date = TODAY + 2 day",
+      "sql": "date = DATE_ADD(CURDATE(), INTERVAL 2 day)",
+      "spel": "date.compareTo(T(java.time.LocalDate).now().plusDays(2)) == 0",
+      "logic": {
+        "and": [
+          {
+            "==": [
+              { "var": "date" },
+              {
+                "date_add": [
+                  { "today": [] },
+                  2,
+                  "day"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
   describe("loads tree with func SUM_OF_MULTISELECT", () => {
     export_checks([with_all_types, with_funcs], inits.with_func_sum_of_multiselect, "JsonLogic", {
       "query": "num == SUM_OF_MULTISELECT(3,5)",

@@ -136,7 +136,7 @@ describe("LHS func", () => {
     });
 
     describe(".compareTo() + T(LocalDateTime).now().plusDays()", () => {
-      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_lhs_compareTo, "SpEL", {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_datetime_compareTo, "SpEL", {
         "sql": "datetime < DATE_ADD(NOW(), INTERVAL 6 day)",
         "spel": "datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(6)) < 0",
         "logic": {
@@ -158,8 +158,31 @@ describe("LHS func", () => {
       });
     });
 
+    describe(".compareTo() + T(LocalDate).now().plusDays()", () => {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_date_compareTo, "SpEL", {
+        "sql": "date < DATE_ADD(CURDATE(), INTERVAL 6 day)",
+        "spel": "date.compareTo(T(java.time.LocalDate).now().plusDays(6)) < 0",
+        "logic": {
+          "and": [
+            {
+              "<": [
+                { "var": "date" },
+                {
+                  "date_add": [
+                    { "today": [] },
+                    6,
+                    "day"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      });
+    });
+
     describe(".compareTo() + T(LocalDateTime).parse(v, T(DateTimeFormatter).ofPattern(p))", () => {
-      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_lhs_compareTo_parse, "SpEL", {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_datetime_compareTo_parse, "SpEL", {
         "sql": "datetime = '2005-11-12 11:11:12.000'",
         "spel": "datetime.compareTo(T(java.time.LocalDateTime).parse('2005-11-12 11:11:12', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss'))) == 0",
         "logic": {
@@ -176,7 +199,7 @@ describe("LHS func", () => {
     });
 
     describe(".compareTo() + T(LocalDateTime).parse(v, T(DateTimeFormatter).ofPattern(p)).plusDays()", () => {
-      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_lhs_compareTo_parse_plusDays, "SpEL", {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_datetime_compareTo_parse_plusDays, "SpEL", {
         "sql": "datetime > DATE_ADD('2023-01-01 00:00:00', INTERVAL 7 day)",
         "spel": "datetime.compareTo(T(java.time.LocalDateTime).parse('2023-01-01 00:00:00', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss')).plusDays(7)) > 0",
         "logic": {
