@@ -80,6 +80,7 @@ export interface ValueObj {
   value: RuleValue;
   valueSrc: ValueSource;
   valueError?: string;
+  _maybeValueType?: string;
 }
 
 export type FuncArgsObj = Record<string, ValueObj>;

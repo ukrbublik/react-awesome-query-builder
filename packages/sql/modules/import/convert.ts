@@ -167,8 +167,9 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
     operatorOptions = convFuncOp.operatorOptions;
   } else if (logic.operator) {
     // Predict return type for function at RHS based on field type in LHS (and vice versa) (needed to distinguish between date and datetime)
+    const sideVals = (logic.children || []).filter(a => a.value).map(a => convertArg(a, conv, config, meta, logic));
     const sideFields = (logic.children || []).filter(a => a.field).map(a => convertArg(a, conv, config, meta, logic));
-    const expectedSideTypes = [...new Set(sideFields.map(f => f?.valueType))];
+    const expectedSideTypes = [...new Set([...sideFields.map(f => f?.valueType), ...sideVals.map(v => v?._maybeValueType)].filter(v => !!v))];
     const expectedSideType = expectedSideTypes.length === 1 ? expectedSideTypes[0] : undefined;
     for (const child of logic.children || []) {
       if (child.func && !child._type) {
@@ -255,17 +256,25 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
   if (logic?.valueType) {
     const sqlType = logic?.valueType;
     let valueType: string | undefined = SqlPrimitiveTypes[sqlType];
+    let _maybeValueType;
     if (!valueType) {
       meta.warnings.push(`Unexpected value type ${sqlType}`);
     }
     const value = logic.value; // todo: convert ?
     if (valueType === "text") {
       // fix issues with date/time values
+      if (value.match(/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}/)) {
+        _maybeValueType = "datetime";
+      }
+      if (value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        _maybeValueType = "date";
+      }
       valueType = undefined;
     }
     return {
       valueSrc: "value",
       valueType,
+      _maybeValueType,
       value,
     };
   } else if (logic?.field) {
