@@ -1183,7 +1183,7 @@ export const with_func_relative_datetime = {
   "and": [ {
     "==": [
       { "var": "datetime" },
-      { "date_add": [ { "now": [] }, 2, "day" ] }
+      { "datetime_add": [ { "now": [] }, 2, "day" ] }
     ]
   } ]
 };
@@ -1936,7 +1936,7 @@ export const jl_with_date_funcs_in_lhs_and_rhs = {
     {
       "==": [
         { "now": [] },
-        { "date_add": [ { "now": [] }, 2, "day" ] }
+        { "datetime_add": [ { "now": [] }, 2, "day" ] }
       ]
     }
   ]
@@ -1978,7 +1978,7 @@ export const jl_with_datetime_func_in_lhs_and_value_in_rhs = {
   "and": [
     {
       "==": [
-        { "date_add": [
+        { "datetime_add": [
           { "now": [] },
           2,
           "day"
@@ -2000,7 +2000,7 @@ export const jl_with_field_in_lhs_and_date_func_in_rhs = {
     {
       "==": [
         { "var": "datetime" },
-        { "date_add": [ { "now": [] }, 2, "day" ] }
+        { "datetime_add": [ { "now": [] }, 2, "day" ] }
       ]
     },
   ]
@@ -2017,7 +2017,7 @@ export const jl_with_field_in_lhs_and_date_func_in_rhs_2 = {
     {
       "==": [
         { "var": "datetime" },
-        { "date_add": [ { "var": "datetime" }, 4, "day" ] }
+        { "datetime_add": [ { "var": "datetime" }, 4, "day" ] }
       ]
     },
   ]

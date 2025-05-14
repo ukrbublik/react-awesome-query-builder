@@ -53,9 +53,18 @@ const START_OF_DAY = {
     start_of_date: {},
   },
   spelFunc: "T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).DAYS)",
-  // todo: import fails
-  sqlFormatFunc: () => "CURDATE()",
-  sqlFunc: "CURDATE",
+  // todo: import fails for spel
+  sqlFormatFunc: () => "DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00')",
+  sqlImport: function (sqlObj, _, sqlDialect) {
+    if (sqlObj?.func === "DATE_FORMAT" && sqlObj.children?.length === 2) {
+      const [date, format] = sqlObj.children;
+      if (format?.value == "%Y-%m-%d 00:00:00" && date?.func == "NOW") {
+        return {
+          args: {}
+        };
+      }
+    }
+  },
   mongoFormatFunc: function () {
     return {
       "$dateFromString": {
@@ -95,21 +104,21 @@ const RELATIVE_DATETIME = {
     }
   },
   jsonLogic: ({date, op, val, dim}) => ({
-    "date_add": [
+    "datetime_add": [
       date,
       val * (op == "minus" ? -1 : +1),
       dim
     ]
   }),
   jsonLogicImport: (v) => {
-    const date = v["date_add"][0];
-    const val = Math.abs(v["date_add"][1]);
-    const op = v["date_add"][1] >= 0 ? "plus" : "minus";
-    const dim = v["date_add"][2];
+    const date = v["datetime_add"][0];
+    const val = Math.abs(v["datetime_add"][1]);
+    const op = v["datetime_add"][1] >= 0 ? "plus" : "minus";
+    const dim = v["datetime_add"][2];
     return [date, op, val, dim];
   },
   jsonLogicCustomOps: {
-    date_add: {},
+    datetime_add: {},
   },
   // MySQL
   //todo: other SQL dialects?
@@ -195,6 +204,23 @@ const RELATIVE_DATE = {
   ...RELATIVE_DATETIME,
   label: "Relative",
   returnType: "date",
+  jsonLogic: ({date, op, val, dim}) => ({
+    "date_add": [
+      date,
+      val * (op == "minus" ? -1 : +1),
+      dim
+    ]
+  }),
+  jsonLogicImport: (v) => {
+    const date = v["date_add"][0];
+    const val = Math.abs(v["date_add"][1]);
+    const op = v["date_add"][1] >= 0 ? "plus" : "minus";
+    const dim = v["date_add"][2];
+    return [date, op, val, dim];
+  },
+  jsonLogicCustomOps: {
+    date_add: {},
+  },
   args: {
     date: {
       ...RELATIVE_DATETIME.args.date,

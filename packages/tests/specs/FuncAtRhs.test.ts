@@ -62,7 +62,7 @@ describe("RHS func", () => {
               "<": [
                 { "var": "datetime" },
                 {
-                  "date_add": [
+                  "datetime_add": [
                     { "now": [] },
                     6,
                     "day"
@@ -125,7 +125,7 @@ describe("RHS func", () => {
               ">": [
                 { "var": "datetime" },
                 {
-                  "date_add": [
+                  "datetime_add": [
                     "2023-01-01T00:00:00.000Z",
                     7,
                     "day"

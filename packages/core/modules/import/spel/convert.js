@@ -407,8 +407,7 @@ const convertFunc = (spel, conv, config, meta, parentSpel = null) => {
               const argConfig = funcConfig.args[k];
               const expectedType = argConfig.type;
               const realType = argsObj[k]?.valueType;
-              const argVal = argsObj[k];
-              if (argVal && realType != expectedType) {
+              if (realType && realType != expectedType) {
                 isOk = false;
               }
             }

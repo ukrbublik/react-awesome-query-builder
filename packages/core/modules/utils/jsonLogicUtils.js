@@ -20,6 +20,7 @@ export const customJsonLogicOperations = {
   today: () => new Date(), // todo today JL
   start_of_date: () => new Date(), // todo same as today
   date_add: (date, val, dim) => { return moment(date).add(val, dim).toDate(); },
+  datetime_add: (datetime, val, dim) => { return moment(datetime).add(val, dim).toDate(); },
   toLowerCase: (str) => str.toLowerCase(),
   toUpperCase: (str) => str.toUpperCase(),
 };

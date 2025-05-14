@@ -186,7 +186,7 @@ describe("query with func", () => {
               "==": [
                 { "var": "datetime" },
                 {
-                  "date_add": [
+                  "datetime_add": [
                     { "now": [] },
                     2,
                     "day"
@@ -306,9 +306,8 @@ describe("query with func", () => {
       describe("from SQL", () => {
         export_checks([with_all_types, with_funcs], inits.sql_with_date_funcs_in_lhs_and_rhs, "SQL", {
           "sql": inits.sql_with_date_funcs_in_lhs_and_rhs,
-          // todo
-          // "spel": inits.spel_with_date_funcs_in_lhs_and_rhs,
-          // "logic": inits.jl_with_date_funcs_in_lhs_and_rhs,
+          "spel": inits.spel_with_date_funcs_in_lhs_and_rhs,
+          "logic": inits.jl_with_date_funcs_in_lhs_and_rhs,
         });
       });
       describe("from JsonLogic", () => {
@@ -331,9 +330,8 @@ describe("query with func", () => {
       describe("from SQL", () => {
         export_checks([with_all_types, with_funcs], inits.sql_with_now_funcs_in_lhs_and_rhs, "SQL", {
           "sql": inits.sql_with_now_funcs_in_lhs_and_rhs,
-          // todo
-          // "spel": inits.spel_with_now_funcs_in_lhs_and_rhs,
-          // "logic": inits.jl_with_now_funcs_in_lhs_and_rhs,
+          "spel": inits.spel_with_now_funcs_in_lhs_and_rhs,
+          "logic": inits.jl_with_now_funcs_in_lhs_and_rhs,
         });
       });
       describe("from JsonLogic", () => {
@@ -360,10 +358,9 @@ describe("query with func", () => {
           "logic": inits.jl_with_date_func_in_lhs_and_value_in_rhs,
         });
       });
-      describe("from JsonLogic", () => {
+      describe("@new from JsonLogic", () => {
         export_checks([with_all_types, with_funcs], inits.jl_with_date_func_in_lhs_and_value_in_rhs, "JsonLogic", {
-          // todo
-          // "sql": inits.sql_with_date_func_in_lhs_and_value_in_rhs,
+          "sql": inits.sql_with_date_func_in_lhs_and_value_in_rhs,
           // "spel": inits.spel_with_date_func_in_lhs_and_value_in_rhs,
           // "logic": inits.jl_with_date_func_in_lhs_and_value_in_rhs,
         });
