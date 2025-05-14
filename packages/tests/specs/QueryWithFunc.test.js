@@ -439,6 +439,30 @@ describe("query with func", () => {
         });
       });
     });
+
+    describe("loads tree with START_OF_DAY in RHS", () => {
+      describe("from SQL", () => {
+        export_checks([with_all_types, with_funcs], inits.sql_with_start_of_day_in_rhs, "SQL", {
+          "sql": inits.sql_with_start_of_day_in_rhs,
+          "spel": inits.spel_with_start_of_day_in_rhs,
+          "logic": inits.jl_with_start_of_day_in_rhs,
+        });
+      });
+      describe("from SpEL", () => {
+        export_checks([with_all_types, with_funcs], inits.spel_with_start_of_day_in_rhs, "SpEL", {
+          "sql": inits.sql_with_start_of_day_in_rhs,
+          "spel": inits.spel_with_start_of_day_in_rhs,
+          "logic": inits.jl_with_start_of_day_in_rhs,
+        });
+      });
+      describe("from JsonLogic", () => {
+        export_checks([with_all_types, with_funcs], inits.jl_with_start_of_day_in_rhs, "JsonLogic", {
+          "sql": inits.sql_with_start_of_day_in_rhs,
+          "spel": inits.spel_with_start_of_day_in_rhs,
+          "logic": inits.jl_with_start_of_day_in_rhs,
+        });
+      });
+    });
   });
 
   describe("other functions", () => {
