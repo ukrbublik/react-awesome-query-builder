@@ -53,6 +53,21 @@ const START_OF_DAY = {
     start_of_date: {},
   },
   spelFunc: "T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).DAYS)",
+  spelImport: (spel) => {
+    const { obj, args } = spel;
+    const isTruncate = spel?.type === "!func" && spel?.methodName === "truncatedTo";
+    const isObjNow = obj?.methodName === "now" && obj?.obj?.cls?.join(".") === "java.time.LocalDateTime";
+    const argsLength = args?.length || 0;
+    const oneArg = args?.[0];
+    const oneArgType = oneArg?.children?.[0];
+    const oneArgProperty = oneArg?.children?.[1];
+    const oneArgCls = oneArgType?.type === "!type" && oneArgType?.cls?.join(".");
+    const oneArgConst = oneArgProperty?.type === "property" && oneArgProperty?.val;
+    const isArgDays = argsLength === 1 && oneArg.type === "compound" && oneArgCls === "java.time.temporal.ChronoUnit" && oneArgConst === "DAYS";
+    if (isObjNow && isTruncate && isArgDays) {
+      return {};
+    }
+  },
   // todo: import fails for spel
   sqlFormatFunc: () => "DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00')",
   sqlImport: function (sqlObj, _, sqlDialect) {
