@@ -69,7 +69,7 @@ const formatCase = (item, config, meta, parentField = null) => {
   }
   const properties = item.get("properties") || new Map();
   
-  const [formattedValue, valueSrc, valueType] = formatItemValue(
+  const {value: formattedValue, valueSrc, valueType} = formatItemValue(
     config, properties, meta, null, parentField, "!case_value"
   );
 
@@ -137,7 +137,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
   const conjunctionDefinition = config.conjunctions[conjunction];
   const not = properties.get("not");
 
-  const isRuleGroup = type === "rule_group";
+  const isRuleGroup = type === "rule_group" && field;
   const isRuleGroupArray = isRuleGroup && mode != "struct";
   const groupField = isRuleGroupArray ? field : parentField;
   const groupFieldDef = getFieldConfig(config, groupField) || {};
@@ -155,7 +155,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
   const isGroup0 = isRuleGroup && (!realGroupOperator || realGroupOperatorDefinition.cardinality == 0);
   
   // build value for aggregation op
-  const [formattedValue, valueSrc, valueType] = formatItemValue(
+  const {value: formattedValue, valueSrc, valueType} = formatItemValue(
     config, properties, meta, realGroupOperator, parentField, null
   );
   
@@ -179,7 +179,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
   // build result
   let ret;
   if (isRuleGroupArray) {
-    const formattedField = formatField(meta, config, field, parentField);
+    const {value: formattedField} = formatField(meta, config, field, parentField);
     const sep = fieldSeparator || ".";
     const getSize = sep + (isSpelArray ? "length" : "size()");
     const fullSize = `${formattedField}${getSize}`;
@@ -237,7 +237,7 @@ const formatExpression = (meta, config, properties, formattedField, formattedVal
   const operatorOptions = properties.get("operatorOptions");
 
   //find fn to format expr
-  const fn = opDef.spelFormatOp || buildFnToFormatOp(operator, opDef, valueType);
+  const fn = opDef.spelFormatOp || buildFnToFormatOp(operator, opDef, valueType ?? fieldDef.type);
   if (!fn) {
     meta.errors.push(`Operator ${operator} is not supported`);
     return undefined;
@@ -306,14 +306,14 @@ const formatRule = (item, config, meta, parentField = null) => {
   const isRev = realOp != operator;
 
   //format value
-  const [formattedValue, valueSrc, valueType] = formatItemValue(
+  const {value: formattedValue, valueSrc, valueType} = formatItemValue(
     config, properties, meta, realOp, parentField, null
   );
   if (formattedValue === undefined)
     return undefined;
       
   //format field
-  const formattedField = formatLhs(meta, config, field, fieldSrc, parentField);
+  const {value: formattedField, valueSrc: _fieldSrc, valueType: fieldType} = formatLhs(meta, config, field, fieldSrc, parentField) ?? {};
   if (formattedField === undefined)
     return undefined;
   
@@ -370,11 +370,11 @@ const formatItemValue = (config, properties, meta, operator, parentField, expect
     }
   }
   
-  return [
-    formattedValue, 
-    (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
-    (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-  ];
+  return {
+    value: formattedValue,
+    valueSrc: (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
+    valueType: (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
+  };
 };
 
 const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef, parentField = null, asyncListValues) => {
@@ -382,9 +382,11 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
     return undefined;
   let ret;
   if (valueSrc === "field") {
-    ret = formatField(meta, config, currentValue, parentField);
+    // formatField() returns type {value, valueSrc, valueType}
+    ret = formatField(meta, config, currentValue, parentField)?.value;
   } else if (valueSrc === "func") {
-    ret = formatFunc(meta, config, currentValue, parentField);
+    // formatFunc() returns type {value, valueSrc, valueType}
+    ret = formatFunc(meta, config, currentValue, parentField, valueType)?.value;
   } else {
     if (typeof fieldWidgetDef?.spelFormatValue === "function") {
       const fn = fieldWidgetDef.spelFormatValue;
@@ -440,11 +442,11 @@ const formatField = (meta, config, field, parentField = null) => {
     };
   });
   const formattedField = formatFieldFn.call(config.ctx, fieldName, parentField, fieldParts, fieldPartsMeta, fieldDefinition, config);
-  return formattedField;
+  return {value: formattedField, valueSrc: "field", valueType: fieldDefinition?.type};
 };
 
 
-const formatFunc = (meta, config, currentValue, parentField = null) => {
+const formatFunc = (meta, config, currentValue, parentField = null, valueType = null) => {
   const funcKey = currentValue.get?.("func");
   const args = currentValue.get?.("args");
   const funcConfig = getFuncConfig(config, funcKey);
@@ -543,5 +545,6 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   } else {
     meta.errors.push(`Func ${funcKey} is not supported`);
   }
-  return ret;
+  // tip: returnType should equal valueType
+  return {value: ret, valueSrc: "func", valueType: funcConfig.returnType};
 };

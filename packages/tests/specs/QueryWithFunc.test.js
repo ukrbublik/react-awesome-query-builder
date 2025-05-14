@@ -354,15 +354,15 @@ describe("query with func", () => {
       describe("from SQL", () => {
         export_checks([with_all_types, with_funcs], inits.sql_with_date_func_in_lhs_and_value_in_rhs, "SQL", {
           "sql": inits.sql_with_date_func_in_lhs_and_value_in_rhs,
-          // "spel": inits.spel_with_date_func_in_lhs_and_value_in_rhs, // todo: compareTo is missing
+          "spel": inits.spel_with_date_func_in_lhs_and_value_in_rhs,
           "logic": inits.jl_with_date_func_in_lhs_and_value_in_rhs,
         });
       });
-      describe("@new from JsonLogic", () => {
+      describe("from JsonLogic", () => {
         export_checks([with_all_types, with_funcs], inits.jl_with_date_func_in_lhs_and_value_in_rhs, "JsonLogic", {
           "sql": inits.sql_with_date_func_in_lhs_and_value_in_rhs,
-          // "spel": inits.spel_with_date_func_in_lhs_and_value_in_rhs,
-          // "logic": inits.jl_with_date_func_in_lhs_and_value_in_rhs,
+          "spel": inits.spel_with_date_func_in_lhs_and_value_in_rhs,
+          "logic": inits.jl_with_date_func_in_lhs_and_value_in_rhs,
         });
       });
     });
@@ -378,7 +378,7 @@ describe("query with func", () => {
       describe("from SQL", () => {
         export_checks([with_all_types, with_funcs], inits.sql_with_datetime_func_in_lhs_and_value_in_rhs, "SQL", {
           "sql": inits.sql_with_datetime_func_in_lhs_and_value_in_rhs,
-          // "spel": inits.spel_with_datetime_func_in_lhs_and_value_in_rhs, // todo: compareTo is missing
+          "spel": inits.spel_with_datetime_func_in_lhs_and_value_in_rhs,
           "logic": inits.jl_with_datetime_func_in_lhs_and_value_in_rhs,
         });
       });
