@@ -68,7 +68,6 @@ const START_OF_DAY = {
       return {};
     }
   },
-  // todo: import fails for spel
   sqlFormatFunc: () => "DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00')",
   sqlImport: function (sqlObj, _, sqlDialect) {
     if (sqlObj?.func === "DATE_FORMAT" && sqlObj.children?.length === 2) {
