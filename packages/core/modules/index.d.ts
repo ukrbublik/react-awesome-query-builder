@@ -1553,7 +1553,7 @@ export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettin
 // Funcs
 /////////////////
 
-export type SqlFormatFunc        = (this: ConfigContext, formattedArgs: TypedMap<string>) => string;
+export type SqlFormatFunc        = (this: ConfigContext, formattedArgs: TypedMap<string>, sqlDialect?: SqlDialect) => string;
 export type SqlImportFunc        = (this: ConfigContext, sql: Object, wgtDef?: Widget, sqlDialect?: SqlDialect) => Record<string, RuleValue> | undefined; // can throw, should return {func?, args: {}} or {operator?, children: []}
 export type FormatFunc           = (this: ConfigContext, formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
 export type MongoFormatFunc      = (this: ConfigContext, formattedArgs: TypedMap<MongoValue>) => MongoValue;

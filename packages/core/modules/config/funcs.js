@@ -151,6 +151,188 @@ const START_OF_TODAY = {
   formatFunc: () => "START_OF_TODAY",
 };
 
+const TRUNCATE_DATETIME = {
+  label: "Truncate",
+  returnType: "datetime",
+  renderBrackets: ["", ""],
+  renderSeps: ["to"],
+  jsonLogicCustomOps: {
+    datetime_truncate: {},
+  },
+  jsonLogic: ({date, dim}) => ({
+    "datetime_truncate": [
+      date,
+      dim
+    ]
+  }),
+  jsonLogicImport: (v) => {
+    if (v["datetime_truncate"]) {
+      const date = v["datetime_truncate"][0];
+      const dim = v["datetime_truncate"][1];
+      return [date, dim];
+    }
+  },
+  spelFormatFunc: ({date, dim}) => {
+    const dimPluralUppercase = (dim.charAt(0).toUpperCase() + dim.slice(1) + "s").toUpperCase();
+    return `${date}.truncatedTo(T(java.time.temporal.ChronoUnit).${dimPluralUppercase})`;
+  },
+  spelImport: (spel) => {
+    // spel = {
+    //   "type": "!func",
+    //   "methodName": "truncatedTo",
+    //   "args": [
+    //     {
+    //       "type": "compound",
+    //       "children": [
+    //         { "type": "!type", "cls": [ "java", "time", "temporal", "ChronoUnit" ] },
+    //         { "type": "property", "val": "DAYS" }
+    //       ]
+    //     }
+    //   ],
+    // }
+    const { args } = spel;
+    const isTruncate = spel?.type === "!func" && spel?.methodName === "truncatedTo";
+    const argsLength = args?.length || 0;
+    const oneArg = args?.[0];
+    const oneArgType = oneArg?.children?.[0];
+    const oneArgProperty = oneArg?.children?.[1];
+    const oneArgCls = oneArgType?.type === "!type" && oneArgType?.cls?.join(".");
+    const oneArgConst = oneArgProperty?.type === "property" && oneArgProperty?.val;
+    const isArgDays = argsLength === 1 && oneArg.type === "compound" && oneArgCls === "java.time.temporal.ChronoUnit" && oneArgConst;
+    const dim = oneArgConst.toLowerCase().substring(0, oneArgConst.length - 1); 
+    if (isTruncate && isArgDays) {
+      return {
+        date: spel.obj,
+        dim: {type: "string", val: dim},
+      };
+    }
+  },
+  // MySQL
+  sqlFormatFunc: ({date, dim}, sqlDialect) => {
+    if (!sqlDialect || sqlDialect === "MySQL") {
+      dim = dim.replace(/^'|'$/g, "");
+      switch (dim) {
+      case "second":
+        return `DATE_FORMAT(${date}, '%Y-%m-%d %H:%i:%s')`;
+      case "minute":
+        return `DATE_FORMAT(${date}, '%Y-%m-%d %H:%i:00')`;
+      case "hour":
+        return `DATE_FORMAT(${date}, '%Y-%m-%d %H:00:00')`;
+      case "day":
+        return `DATE_FORMAT(${date}, '%Y-%m-%d 00:00:00')`;
+      case "week":
+        return `DATE_SUB(DATE_FORMAT(${date}, '%Y-%m-%d 00:00:00'), INTERVAL WEEKDAY(${date}) DAY)`;
+      case "month":
+        return `DATE_FORMAT(${date}, '%Y-%m-01 00:00:00')`;
+      case "year":
+        return `DATE_FORMAT(${date}, '%Y-01-01 00:00:00')`;
+      }
+    } else if (sqlDialect === "PostgreSQL") {
+      return `date_trunc(${dim}, ${date})`;
+    }
+  },
+  sqlImport: function (sqlObj, _, sqlDialect) {
+    if (!sqlDialect || sqlDialect === "MySQL") {
+      console.log(11, sqlObj)
+      if (sqlObj?.func === "DATE_FORMAT" && sqlObj.children?.length === 2) {
+        const [date, format] = sqlObj.children;
+        let dim;
+        switch (format?.value) {
+        case "%Y-%m-%d %H:%i:%s":
+          dim = "second";
+          break;
+        case "%Y-%m-%d %H:%i:00":
+          dim = "minute";
+          break;
+        case "%Y-%m-%d %H:00:00":
+          dim = "hour";
+          break;
+        case "%Y-%m-%d 00:00:00":
+          dim = "day";
+          break;
+        case "%Y-%m-01 00:00:00":
+          dim = "month";
+          break;
+        case "%Y-01-01 00:00:00":
+          dim = "year";
+        }
+        if (dim) {
+          return {
+            args: {
+              date,
+              dim
+            }
+          };
+        }
+      } else if (sqlObj?.func === "DATE_SUB" && sqlObj.children?.length === 2) {
+        const [dateFormat, interval] = sqlObj.children;
+        const isFormat = dateFormat?.func === "DATE_FORMAT" && dateFormat.children?.length === 2;
+        const isIntervalDay = interval._type == "interval" && interval.unit === "day";
+        if (isFormat && isIntervalDay) {
+          const [date, format] = dateFormat.children;
+          if (format?.value === "%Y-%m-%d 00:00:00") {
+            return {
+              args: {
+                date,
+                dim: "week"
+              }
+            };
+          }
+        }
+      }
+      return undefined;
+    } else if (sqlDialect === "PostgreSQL") {
+      if (sqlObj?.func === "date_trunc" && sqlObj.children?.length === 2) {
+        const [dim, date] = sqlObj.children;
+        return {
+          args: {
+            date,
+            dim: dim.value,
+          }
+        };
+      }
+    }
+  },
+  mongoFormatFunc: function ({date, dim}) {
+    return {
+      "$dateTrunc": {
+        "date": date,
+        "unit": dim,
+      }
+    };
+  },
+  formatFunc: ({date, dim}) => (`TRUNCATE ${date} TO ${dim}`),
+  args: {
+    date: {
+      label: "Datetime",
+      type: "datetime",
+      defaultValue: {func: "NOW", args: []},
+      valueSources: ["value", "field", "func"],
+      escapeForFormat: true,
+    },
+    dim: {
+      label: "Dimension",
+      type: "select",
+      defaultValue: "day",
+      valueSources: ["value"],
+      mainWidgetProps: {
+        customProps: {
+          showSearch: false
+        }
+      },
+      fieldSettings: {
+        listValues: {
+          day: "day",
+          week: "week",
+          month: "month",
+          year: "year",
+        },
+      },
+      escapeForFormat: false,
+    },
+  }
+};
+
 const RELATIVE_DATETIME = {
   label: "Relative",
   returnType: "datetime",
@@ -186,11 +368,13 @@ const RELATIVE_DATETIME = {
     ]
   }),
   jsonLogicImport: (v) => {
-    const date = v["datetime_add"][0];
-    const val = Math.abs(v["datetime_add"][1]);
-    const op = v["datetime_add"][1] >= 0 ? "plus" : "minus";
-    const dim = v["datetime_add"][2];
-    return [date, op, val, dim];
+    if (v["datetime_add"]) {
+      const date = v["datetime_add"][0];
+      const val = Math.abs(v["datetime_add"][1]);
+      const op = v["datetime_add"][1] >= 0 ? "plus" : "minus";
+      const dim = v["datetime_add"][2];
+      return [date, op, val, dim];
+    }
   },
   jsonLogicCustomOps: {
     datetime_add: {},
@@ -228,7 +412,7 @@ const RELATIVE_DATETIME = {
       label: "Datetime",
       type: "datetime",
       defaultValue: {func: "NOW", args: []},
-      valueSources: ["func", "field", "value"],
+      valueSources: ["value", "field", "func"],
       escapeForFormat: true,
     },
     op: {
@@ -426,6 +610,7 @@ export {
   TODAY,
   START_OF_TODAY,
   RELATIVE_DATETIME,
+  TRUNCATE_DATETIME,
   RELATIVE_DATE,
   LINEAR_REGRESSION,
 };

@@ -754,6 +754,13 @@ export default (skin: string) => {
       subfields: {
         NOW: BasicFuncs.NOW,
         START_OF_TODAY: BasicFuncs.START_OF_TODAY,
+        TRUNCATE_DATETIME: merge({}, BasicFuncs.TRUNCATE_DATETIME, {
+          args: {
+            date: {
+              defaultValue: {func: "datetime.NOW", args: []},
+            }
+          }
+        }),
         RELATIVE_DATETIME: merge({}, BasicFuncs.RELATIVE_DATETIME, {
           args: {
             date: {
@@ -779,7 +786,7 @@ export default (skin: string) => {
     },
     number: {
       type: "!struct",
-      label: "Number",
+      label: "Math",
       subfields: {
         LINEAR_REGRESSION: BasicFuncs.LINEAR_REGRESSION,
       }

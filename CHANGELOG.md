@@ -8,7 +8,7 @@
   - Fix import switch from JsonLogic (PR #1235) (issue #1230)
   - Fix incorrect using of "$not" as top-level operator in output to MongoDb (PR #1254) (issue #1250)
   - Fix using incorrect date format in output to MongoDb (PR #1254)
-  - Added date/datetime functions: `TODAY`, `START_OF_TODAY`, `RELATIVE_DATE` (PR #1256) (issue #1237)
+  - Added date/datetime functions: `TODAY`, `START_OF_TODAY`, `RELATIVE_DATE`, `TRUNCATE_DATETIME` (PR #1256) (issue #1237)
   - Fix datetime functions: fix `NOW`, `RELATIVE_DATETIME` for MongoDb (PR #1256)
 - 6.6.14
   - Fixed import from JsonLogic when like op is used inside group with some group op (PR #1225) (issue #1221)

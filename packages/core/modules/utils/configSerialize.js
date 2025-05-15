@@ -109,7 +109,7 @@ const compileMetaFunc = {
   spelImport: { type: "f", args: ["spel"] },
   sqlImport: { type: "f", args: ["sqlObj", "_", "sqlDialect"] },
   formatFunc: { type: "f", args: ["formattedArgs", "isForDisplay"] },
-  sqlFormatFunc: { type: "f", args: ["formattedArgs"] },
+  sqlFormatFunc: { type: "f", args: ["formattedArgs", "sqlDialect"] },
   mongoFormatFunc: { type: "f", args: ["formattedArgs"] },
   spelFormatFunc: { type: "f", args: ["formattedArgs"] },
 };

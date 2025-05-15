@@ -324,7 +324,8 @@ const formatFunc = (meta, config, currentValue) => {
   if (typeof funcConfig.sqlFormatFunc === "function") {
     const fn = funcConfig.sqlFormatFunc;
     const args = [
-      formattedArgs
+      formattedArgs,
+      config.settings.sqlDialect,
     ];
     ret = fn.call(config.ctx, ...args);
   } else {
