@@ -231,9 +231,24 @@ describe("query with func", () => {
               }
             }
           ]
+        },
+        "mongo": {
+          "$expr": {
+            "$eq": [
+              "$datetime",
+              {
+                "$dateAdd": {
+                  "startDate": { "$toDate": "$$NOW" },
+                  "unit": "day",
+                  "amount": 2
+                }
+              }
+            ]
+          }
         }
       });
     });
+
     describe("loads tree with func RELATIVE_DATE from JsonLogic", () => {
       export_checks([with_all_types, with_funcs], inits.with_func_relative_date, "JsonLogic", {
         "query": "date == TODAY + 2 day",
@@ -291,7 +306,28 @@ describe("query with func", () => {
               }
             }
           ]
-        }
+        },
+        "mongo": {
+          "$expr": {
+            "$eq": [
+              "$date",
+              {
+                "$dateAdd": {
+                  "startDate": {
+                    "$dateTrunc": {
+                      "date": {
+                        "$toDate": "$$NOW"
+                      },
+                      "unit": "day"
+                    }
+                  },
+                  "unit": "day",
+                  "amount": 2
+                }
+              }
+            ]
+          }
+        },
       });
     });
 

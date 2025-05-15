@@ -15,11 +15,14 @@ const NOW = {
   sqlFunc: "NOW",
   mongoFormatFunc: function () {
     return {
-      "$dateFromString": {
-        "dateString": this.utils.moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
-        "format": "%Y-%m-%d %H:%M:%S"
-      }
+      "$toDate": "$$NOW"
     };
+    // return {
+    //   "$dateFromString": {
+    //     "dateString": this.utils.moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+    //     "format": "%Y-%m-%d %H:%M:%S"
+    //   }
+    // };
   },
   formatFunc: () => "NOW",
 };
@@ -36,11 +39,18 @@ const TODAY = {
   sqlFunc: "CURDATE",
   mongoFormatFunc: function () {
     return {
-      "$dateFromString": {
-        "dateString": this.utils.moment(new Date()).format("YYYY-MM-DD"),
-        "format": "%Y-%m-%d"
+      "$dateTrunc": {
+        // or "date": "$$NOW",
+        "date": { "$toDate": "$$NOW" },
+        "unit": "day"
       }
     };
+    // return {
+    //   "$dateFromString": {
+    //     "dateString": this.utils.moment(new Date()).format("YYYY-MM-DD"),
+    //     "format": "%Y-%m-%d"
+    //   }
+    // };
   },
   formatFunc: () => "TODAY",
 };
@@ -102,11 +112,17 @@ const START_OF_DAY = {
   },
   mongoFormatFunc: function () {
     return {
-      "$dateFromString": {
-        "dateString": this.utils.moment(new Date()).format("YYYY-MM-DD"),
-        "format": "%Y-%m-%d"
+      "$dateTrunc": {
+        "date": { "$toDate": "$$NOW" },
+        "unit": "day"
       }
     };
+    // return {
+    //   "$dateFromString": {
+    //     "dateString": this.utils.moment(new Date()).format("YYYY-MM-DD"),
+    //     "format": "%Y-%m-%d"
+    //   }
+    // };
   },
   formatFunc: () => "TODAY",
 };
@@ -173,7 +189,15 @@ const RELATIVE_DATETIME = {
       }
     }
   },
-  mongoFormatFunc: null, //todo: support?
+  mongoFormatFunc: function ({date, op, val, dim}) {
+    return {
+      "$dateAdd": {
+        "startDate": date,
+        "unit": dim,
+        "amount": val * (op == "minus" ? -1 : +1),
+      }
+    };
+  },
   formatFunc: ({date, op, val, dim}) => (!val ? date : `${date} ${op == "minus" ? "-" : "+"} ${val} ${dim}`),
   args: {
     date: {

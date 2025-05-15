@@ -17,8 +17,8 @@ export const customJsonLogicOperations = {
   strlen: (str) => (str?.length || 0),
   regexTest: (str, pattern, flags) => str?.match(new RegExp(pattern, flags)) != null,
   now: () => new Date(),
-  today: () => new Date(), // todo today JL
-  start_of_date: () => new Date(), // todo same as today
+  today: () => { return moment().startOf("day").toDate(); },
+  start_of_date: () => { return moment().startOf("day").toDate(); },
   date_add: (date, val, dim) => { return moment(date).add(val, dim).toDate(); },
   datetime_add: (datetime, val, dim) => { return moment(datetime).add(val, dim).toDate(); },
   toLowerCase: (str) => str.toLowerCase(),
