@@ -54,6 +54,27 @@ const START_OF_DAY = {
   },
   spelFunc: "T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).DAYS)",
   spelImport: (spel) => {
+    // spel = {
+    //   "type": "!func",
+    //   "methodName": "truncatedTo",
+    //   "args": [
+    //     {
+    //       "type": "compound",
+    //       "children": [
+    //         { "type": "!type", "cls": [ "java", "time", "temporal", "ChronoUnit" ] },
+    //         { "type": "property", "val": "DAYS" }
+    //       ]
+    //     }
+    //   ],
+    //   "obj": {
+    //     "type": "!func",
+    //     "methodName": "now",
+    //     "obj": {
+    //       "type": "!type",
+    //       "cls": [ "java", "time", "LocalDateTime" ]
+    //     }
+    //   }
+    // }
     const { obj, args } = spel;
     const isTruncate = spel?.type === "!func" && spel?.methodName === "truncatedTo";
     const isObjNow = obj?.methodName === "now" && obj?.obj?.cls?.join(".") === "java.time.LocalDateTime";
