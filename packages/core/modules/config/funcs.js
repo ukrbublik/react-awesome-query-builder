@@ -5,9 +5,17 @@
 const NOW = {
   label: "Now",
   returnType: "datetime",
-  jsonLogic: "now",
   jsonLogicCustomOps: {
     now: {},
+  },
+  // jsonLogic: "now",
+  jsonLogic: () => {
+    return {now: []};
+  },
+  jsonLogicImport: (v) => {
+    if (v["now"]) {
+      return [];
+    }
   },
   //spelFunc: "new java.util.Date()",
   spelFunc: "T(java.time.LocalDateTime).now()",
@@ -30,9 +38,17 @@ const NOW = {
 const TODAY = {
   label: "Today",
   returnType: "date",
-  jsonLogic: "today",
+  //jsonLogic: "today",
   jsonLogicCustomOps: {
     today: {},
+  },
+  jsonLogic: () => {
+    return {today: []};
+  },
+  jsonLogicImport: (v) => {
+    if (v["today"]) {
+      return [];
+    }
   },
   spelFunc: "T(java.time.LocalDate).now()",
   sqlFormatFunc: () => "CURDATE()",
@@ -55,12 +71,20 @@ const TODAY = {
   formatFunc: () => "TODAY",
 };
 
-const START_OF_DAY = {
-  label: "Start of day",
+const START_OF_TODAY = {
+  label: "Start of today",
   returnType: "datetime",
-  jsonLogic: "start_of_date",
   jsonLogicCustomOps: {
-    start_of_date: {},
+    start_of_today: {},
+  },
+  // jsonLogic: "start_of_today",
+  jsonLogic: () => {
+    return {start_of_today: []};
+  },
+  jsonLogicImport: (v) => {
+    if (v["start_of_today"]) {
+      return [];
+    }
   },
   spelFunc: "T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).DAYS)",
   spelImport: (spel) => {
@@ -124,7 +148,7 @@ const START_OF_DAY = {
     //   }
     // };
   },
-  formatFunc: () => "TODAY",
+  formatFunc: () => "START_OF_TODAY",
 };
 
 const RELATIVE_DATETIME = {
@@ -400,7 +424,7 @@ export {
   UPPER,
   NOW,
   TODAY,
-  START_OF_DAY,
+  START_OF_TODAY,
   RELATIVE_DATETIME,
   RELATIVE_DATE,
   LINEAR_REGRESSION,

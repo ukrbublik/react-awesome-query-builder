@@ -753,7 +753,7 @@ export default (skin: string) => {
       label: "Datetime",
       subfields: {
         NOW: BasicFuncs.NOW,
-        START_OF_DAY: BasicFuncs.START_OF_DAY,
+        START_OF_TODAY: BasicFuncs.START_OF_TODAY,
         RELATIVE_DATETIME: merge({}, BasicFuncs.RELATIVE_DATETIME, {
           args: {
             date: {
