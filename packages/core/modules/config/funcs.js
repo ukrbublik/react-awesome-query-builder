@@ -35,6 +35,8 @@ const NOW = {
   formatFunc: () => "NOW",
 };
 
+// todo: add option like `resolveWithValueOnExport: false` for NOW, TODAY, START_OF_TODAY (issue #1234) ???
+
 const TODAY = {
   label: "Today",
   returnType: "date",
@@ -233,7 +235,6 @@ const TRUNCATE_DATETIME = {
   },
   sqlImport: function (sqlObj, _, sqlDialect) {
     if (!sqlDialect || sqlDialect === "MySQL") {
-      console.log(11, sqlObj)
       if (sqlObj?.func === "DATE_FORMAT" && sqlObj.children?.length === 2) {
         const [date, format] = sqlObj.children;
         let dim;
@@ -500,6 +501,8 @@ const RELATIVE_DATE = {
     dim: {...RELATIVE_DATETIME.args.dim},
   },
 };
+
+// todo: add DATEDIFF (issue #142)
 
 const LOWER = {
   label: "Lowercase",

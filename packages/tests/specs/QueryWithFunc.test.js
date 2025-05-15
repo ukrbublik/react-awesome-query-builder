@@ -514,6 +514,8 @@ describe("query with func", () => {
         });
       });
     });
+
+    // todo: test TRUNCATE_DATETIME
   });
 
   describe("other functions", () => {

@@ -547,24 +547,26 @@ const formatField = (meta, config, field, parentField = null) => {
   return ret;
 };
 
-const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formattedValue) => {
-  let formatteOp = operator;
+const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formattedValue, expectedType) => {
+  let formattedOp = operator;
   const cardinality = getOpCardinality(operatorDefinition);
   if (typeof operatorDefinition.jsonLogic == "string")
-    formatteOp = operatorDefinition.jsonLogic;
+    formattedOp = operatorDefinition.jsonLogic;
   const rangeOps = ["<", "<=", ">", ">="];
   const eqOps = ["==", "!="];
   const fn = (field, op, val, opDef, opOpts) => {
-    if (cardinality == 0 && eqOps.includes(formatteOp))
-      return { [formatteOp]: [formattedField, null] };
+    if (cardinality == 0 && eqOps.includes(formattedOp))
+      return { [formattedOp]: [formattedField, null] };
     else if (cardinality == 0)
-      return { [formatteOp]: formattedField };
+      return { [formattedOp]: formattedField };
+    // else if (cardinality == 1 && eqOps.includes(formattedOp) && ["date", "datetime"].includes(expectedType))
+    //   return { [expectedType+formattedOp]: [formattedField, formattedValue] };
     else if (cardinality == 1)
-      return { [formatteOp]: [formattedField, formattedValue] };
-    else if (cardinality == 2 && rangeOps.includes(formatteOp))
-      return { [formatteOp]: [formattedValue[0], formattedField, formattedValue[1]] };
+      return { [formattedOp]: [formattedField, formattedValue] };
+    else if (cardinality == 2 && rangeOps.includes(formattedOp))
+      return { [formattedOp]: [formattedValue[0], formattedField, formattedValue[1]] };
     else
-      return { [formatteOp]: [formattedField, ...formattedValue] };
+      return { [formattedOp]: [formattedField, ...formattedValue] };
   };
   return fn;
 };
@@ -572,10 +574,12 @@ const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formatt
 const formatLogic = (config, properties, formattedField, formattedValue, operator, operatorOptions = null, fieldDefinition = null, isRev = false) => {
   const field = properties.get("field");
   //const fieldSrc = properties.get("fieldSrc");
+  const firstValueType = properties.get("valueType")?.get(0);
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
+  const expectedType = fieldDefinition?.type ?? firstValueType;
   let fn = typeof operatorDefinition.jsonLogic == "function"
     ? operatorDefinition.jsonLogic
-    : buildFnToFormatOp(operator, operatorDefinition, formattedField, formattedValue);
+    : buildFnToFormatOp(operator, operatorDefinition, formattedField, formattedValue, expectedType);
   const args = [
     formattedField,
     operator,
@@ -583,6 +587,7 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
     omit(operatorDefinition, opDefKeysToOmit),
     operatorOptions,
     fieldDefinition,
+    expectedType,
   ];
   let ruleQuery = fn.call(config.ctx, ...args);
 

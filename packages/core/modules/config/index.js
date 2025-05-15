@@ -98,7 +98,12 @@ const operators = {
         return `${field} ${opStr} ${value}`;
     },
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => v, false, ...args); },
-    jsonLogic: "==",
+    jsonLogic: (field, op, val, _opDef, _opOpts, _fieldDef, expectedType) => {
+      if (["date", "datetime"].includes(expectedType)) {
+        return { [`${expectedType}==`]: [field, val] };
+      }
+      return { "==": [field, val] };
+    },
     elasticSearchQueryType: "term",
   },
   not_equal: {
@@ -117,7 +122,12 @@ const operators = {
         return `${field} ${opDef.label} ${value}`;
     },
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$ne", v => v, false, ...args); },
-    jsonLogic: "!=",
+    jsonLogic: (field, op, val, _opDef, _opOpts, _fieldDef, expectedType) => {
+      if (["date", "datetime"].includes(expectedType)) {
+        return { [`${expectedType}!=`]: [field, val] };
+      }
+      return { "!=": [field, val] };
+    },
   },
   less: {
     label: "<",
@@ -868,7 +878,9 @@ const widgets = {
       }
     },
     jsonLogic: function (val, fieldDef, wgtDef) {
-      return this.utils.moment(val, wgtDef.valueFormat).toDate();
+      // tip: we use UTC to return same result as new Date(val)
+      // new Date("2000-01-01") is now the same as new Date("2000-01-01 00:00:00") (first one in UTC)
+      return this.utils.moment.utc(val, wgtDef.valueFormat).toDate();
     },
     toJS: function (val, fieldSettings) {
       const dateVal = this.utils.moment(val, fieldSettings.valueFormat);

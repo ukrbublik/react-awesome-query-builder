@@ -1137,7 +1137,7 @@ type FormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: 
 type MongoFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: MongoValue | Array<MongoValue>, not?: boolean, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => Object | undefined;
 type SqlFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[] | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string | undefined;
 type SpelFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[], valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string | undefined;
-type JsonLogicFormatOperator = (this: ConfigContext, field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => JsonLogicTree | undefined;
+type JsonLogicFormatOperator = (this: ConfigContext, field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field, expectedType?: string) => JsonLogicTree | undefined;
 type ElasticSearchFormatQueryType = (this: ConfigContext, valueType: string) => ElasticSearchQueryType;
 
 interface ProximityConfig {
