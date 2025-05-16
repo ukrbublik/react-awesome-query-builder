@@ -24,7 +24,7 @@ export default (props) => {
       max={max}
       step={step}
       onChange={onChange}
-      className={darkMode ? "bg-dark text-light border-dark  placeholder-light color-scheme-dark" : undefined}
+      className={darkMode ? "bg-dark text-light border-dark placeholder-light color-scheme-dark" : undefined}
     />
   );
 };
