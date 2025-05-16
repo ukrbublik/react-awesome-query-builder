@@ -3,7 +3,7 @@
     "target": "es6",
     "module": "esnext",
     "lib": [
-      "es2017"
+      "es2020"
     ],
     "allowJs": true,
 
