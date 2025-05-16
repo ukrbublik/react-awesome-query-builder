@@ -2,6 +2,21 @@
 
 // Tip: search for `customJsonLogicOperations` in codebase to see custom JL funcs we use in `jsonLogicCustomOps`
 
+const dateDimListValues = {
+  day: "day",
+  week: "week",
+  month: "month",
+  year: "year",
+};
+const dateDimDefault = "day";
+const datetimeDimListValues = {
+  // hour: "hour",
+  // minute: "minute",
+  // second: "second",
+  ...dateDimListValues,
+};
+const datetimeDimDefault = "day";
+
 const NOW = {
   label: "Now",
   returnType: "datetime",
@@ -314,7 +329,7 @@ const TRUNCATE_DATETIME = {
     dim: {
       label: "Dimension",
       type: "select",
-      defaultValue: "day",
+      defaultValue: datetimeDimDefault,
       valueSources: ["value"],
       mainWidgetProps: {
         customProps: {
@@ -322,12 +337,7 @@ const TRUNCATE_DATETIME = {
         }
       },
       fieldSettings: {
-        listValues: {
-          day: "day",
-          week: "week",
-          month: "month",
-          year: "year",
-        },
+        listValues: datetimeDimListValues,
       },
       escapeForFormat: false,
     },
@@ -351,7 +361,7 @@ const RELATIVE_DATETIME = {
       dim = matchRes[2].toLowerCase();
       op = matchRes[1];
       if (["minus", "plus"].includes(op)) {
-        if (["day", "week", "month", "year"].includes(dim)) {
+        if (Object.keys(datetimeDimListValues).includes(dim)) {
           op = {type: "string", val: op};
           dim = {type: "string", val: dim};
           val = spel.args[0];
@@ -447,7 +457,7 @@ const RELATIVE_DATETIME = {
     dim: {
       label: "Dimension",
       type: "select",
-      defaultValue: "day",
+      defaultValue: datetimeDimDefault,
       valueSources: ["value"],
       mainWidgetProps: {
         customProps: {
@@ -455,12 +465,7 @@ const RELATIVE_DATETIME = {
         }
       },
       fieldSettings: {
-        listValues: {
-          day: "day",
-          week: "week",
-          month: "month",
-          year: "year",
-        },
+        listValues: datetimeDimListValues,
       },
       escapeForFormat: false,
     },
@@ -498,7 +503,13 @@ const RELATIVE_DATE = {
     },
     op: {...RELATIVE_DATETIME.args.op},
     val: {...RELATIVE_DATETIME.args.val},
-    dim: {...RELATIVE_DATETIME.args.dim},
+    dim: {
+      ...RELATIVE_DATETIME.args.dim,
+      defaultValue: dateDimDefault,
+      fieldSettings: {
+        listValues: dateDimListValues,
+      },
+    },
   },
 };
 
