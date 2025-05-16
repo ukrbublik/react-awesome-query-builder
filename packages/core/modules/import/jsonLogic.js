@@ -36,7 +36,7 @@ const jlArgsMarker = new Proxy({
   }
 });
 
-const jlEqOps = ["==", "!="];
+const jlEqOps = ["==", "!=", "datetime==", "datetime!=", "date==", "date!="];
 const jlRangeOps = ["<", "<=", ">", ">="];
 const jlDualMeaningOps = ["in", "!in"]; // can be mapped to "select_any_in" or "like"
 const multiselectOps = [
@@ -92,13 +92,6 @@ const buildConv = (config) => {
         operators[opk] = [];
       operators[opk].push(opKey);
     } else if (typeof opConfig.jsonLogic === "function") {
-      // example: "all-in/1"
-      const isRevArgs = opConfig.jsonLogic2?.startsWith("#");
-      const newOp = opConfig.jsonLogic2?.replace(/^#/, "") ?? opKey;
-      const opk = newOp + "/" + cardinality;
-      if (!operators[opk])
-        operators[opk] = [];
-      operators[opk].push(opKey);
       let template;
       try {
         template = opConfig.jsonLogic(jlFieldMarker, opKey, jlArgsMarker, opConfig, new Immutable.Map({
@@ -107,7 +100,20 @@ const buildConv = (config) => {
         }));
       } catch(e) {
         console.warn(`Error while running JsonLogic template for op ${opKey}`, e);
+        continue;
       }
+      
+      const opInTemplate = Object.keys(template)[0];
+      const isRevArgs = opConfig.jsonLogic2?.startsWith("#");
+      // example: "all-in/1"
+      const newOp = opConfig.jsonLogic2?.replace(/^#/, "") ?? opInTemplate;
+      const ops = opConfig.jsonLogicOps ?? [newOp];
+      ops.map(op => {
+        const opk = op + "/" + cardinality;
+        if (!operators[opk])
+          operators[opk] = [];
+        operators[opk].push(opKey);
+      });
 
       if (!combinationOperators[opKey])
         combinationOperators[opKey] = {};

@@ -1,6 +1,7 @@
 export const settings = {
   reverseOperatorsForNot: false,
   canShortMongoQuery: true,
+  fixJsonLogicDateCompareOp: false, // todo: change to true in next minor/major version
   formatField: (field, parts, label2, fieldDefinition, config, isForDisplay) => {
     if (isForDisplay)
       return label2;

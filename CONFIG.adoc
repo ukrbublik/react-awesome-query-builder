@@ -381,6 +381,7 @@ Behaviour settings:
 |listKeysForSearch |`["title", "value"]` |Keys in list item (see {d_ts}[type] `ListItem`) available for search. Available keys: "title", "value", "groupTitle"
 |reverseOperatorsForNot |false |True to convert "!(x == 1)" to "x != 1" on import and export
 |canShortMongoQuery |true |True to simplify exported MongoDb query eg. `{$and: [ {num:{$gt:1}}, {num:{$ne:5} } ]}` to `{ num: {$gt: 1, $ne: 5} }`
+|fixJsonLogicDateCompareOp |false |Fix comparing of Date instances in JsonLogic by using custom ops `date==`/`datetime==` instead of `==`  and  `date1=`/`datetime!=` instead of `1=`
 |===
 
 TIP: For fully read-only mode use these settings:

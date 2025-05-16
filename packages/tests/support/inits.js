@@ -280,10 +280,10 @@ export const with_less = {
 
 export const with_date_and_time = {
   "or": [{
-    "==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]
+    "datetime==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]
   }, {
     "and": [{
-      "==": [ {  "var": "date" }, "2020-05-18T21:00:00.000Z" ]
+      "date==": [ {  "var": "date" }, "2020-05-18T21:00:00.000Z" ]
     }, {
       "==": [ { "var": "time" }, 3000 ]
     }]
@@ -293,7 +293,7 @@ export const with_date_and_time = {
 export const with_date_epoch = {
   "and": [
     {
-      "==": [ { "var": "datetime" }, "1736782768" ]
+      "datetime==": [ { "var": "datetime" }, "1736782768" ]
     }
   ]
 };
@@ -301,7 +301,7 @@ export const with_date_epoch = {
 export const with_date_epoch_ms = {
   "and": [
     {
-      "==": [ { "var": "datetime" }, "1736782768000" ]
+      "datetime==": [ { "var": "datetime" }, "1736782768000" ]
     }
   ]
 };
@@ -1181,9 +1181,18 @@ export const with_func_linear_regression = {
 
 export const with_func_relative_datetime = {
   "and": [ {
-    "==": [
+    "datetime==": [
       { "var": "datetime" },
-      { "date_add": [ { "now": [] }, 2, "day" ] }
+      { "datetime_add": [ { "now": [] }, 2, "day" ] }
+    ]
+  } ]
+};
+
+export const with_func_relative_date = {
+  "and": [ {
+    "date==": [
+      { "var": "date" },
+      { "date_add": [ { "today": [] }, 2, "day" ] }
     ]
   } ]
 };
@@ -1897,9 +1906,135 @@ export const spel_with_lhs_toLowerCase_toUpperCase = "str.toLowerCase().toUpperC
 //export const spel_with_SimpleDateFormat = "datetime == new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-15')";
 export const spel_with_LocalTime = "time == T(java.time.LocalTime).parse('02:03:00')";
 export const spel_with_new_String = "str == new String('hello world').toUpperCase()";
-export const spel_with_lhs_compareTo = "datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(6)) < 0";
-export const spel_with_lhs_compareTo_parse = "datetime.compareTo(T(java.time.LocalDateTime).parse('2005-11-12 11:11:12', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss'))) == 0";
-export const spel_with_lhs_compareTo_parse_plusDays = "datetime.compareTo(T(java.time.LocalDateTime).parse('2023-01-01 00:00:00', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss')).plusDays(7)) > 0";
+export const spel_with_datetime_compareTo = "datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(6)) < 0";
+export const spel_with_date_compareTo = "date.compareTo(T(java.time.LocalDate).now().plusDays(6)) < 0";
+export const spel_with_datetime_compareTo_parse = "datetime.compareTo(T(java.time.LocalDateTime).parse('2005-11-12 11:11:12', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss'))) == 0";
+export const spel_with_datetime_compareTo_parse_plusDays = "datetime.compareTo(T(java.time.LocalDateTime).parse('2023-01-01 00:00:00', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss')).plusDays(7)) > 0";
+
+export const spel_with_date_funcs_in_lhs_and_rhs = "(T(java.time.LocalDate).now().compareTo(T(java.time.LocalDate).now().plusDays(1)) == 0 && T(java.time.LocalDateTime).now().compareTo(T(java.time.LocalDateTime).now().plusDays(2)) == 0)";
+export const spel_with_now_funcs_in_lhs_and_rhs = "(T(java.time.LocalDate).now().compareTo(T(java.time.LocalDate).now()) == 0 && T(java.time.LocalDateTime).now().compareTo(T(java.time.LocalDateTime).now()) == 0)";
+export const spel_with_date_func_in_lhs_and_value_in_rhs = "T(java.time.LocalDate).now().plusDays(1).compareTo(T(java.time.LocalDate).parse('2025-05-01', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd'))) == 0";
+export const spel_with_datetime_func_in_lhs_and_value_in_rhs = "T(java.time.LocalDateTime).now().plusDays(2).compareTo(T(java.time.LocalDateTime).parse('2025-05-01 10:04:06', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss'))) == 0";
+export const spel_with_field_in_lhs_and_date_func_in_rhs = "(date.compareTo(T(java.time.LocalDate).now().plusDays(1)) == 0 && datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(2)) == 0)";
+export const spel_with_field_in_lhs_and_date_func_in_rhs_2 = "(date.compareTo(date.plusDays(3)) == 0 && datetime.compareTo(datetime.plusDays(4)) == 0)";
+export const spel_with_start_of_today_in_rhs = "datetime.compareTo(T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).DAYS)) > 0";
+
+export const sql_with_date_funcs_in_lhs_and_rhs = "(CURDATE() = DATE_ADD(CURDATE(), INTERVAL 1 day) AND NOW() = DATE_ADD(NOW(), INTERVAL 2 day))";
+export const sql_with_now_funcs_in_lhs_and_rhs = "(CURDATE() = CURDATE() AND NOW() = NOW())";
+export const sql_with_date_func_in_lhs_and_value_in_rhs = "DATE_ADD(CURDATE(), INTERVAL 1 day) = '2025-05-01'";
+export const sql_with_datetime_func_in_lhs_and_value_in_rhs = "DATE_ADD(NOW(), INTERVAL 2 day) = '2025-05-01 10:04:06.000'";
+export const sql_with_field_in_lhs_and_date_func_in_rhs = "(date = DATE_ADD(CURDATE(), INTERVAL 1 day) AND datetime = DATE_ADD(NOW(), INTERVAL 2 day))";
+export const sql_with_field_in_lhs_and_date_func_in_rhs_2 = "(date = DATE_ADD(date, INTERVAL 3 day) AND datetime = DATE_ADD(datetime, INTERVAL 4 day))";
+export const sql_with_start_of_today_in_rhs = "datetime > DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00')";
+
+export const jl_with_date_funcs_in_lhs_and_rhs = {
+  "and": [
+    {
+      "date==": [
+        { "today": [] },
+        { "date_add": [ { "today": [] }, 1, "day" ] }
+      ]
+    },
+    {
+      "datetime==": [
+        { "now": [] },
+        { "datetime_add": [ { "now": [] }, 2, "day" ] }
+      ]
+    }
+  ]
+};
+
+export const jl_with_now_funcs_in_lhs_and_rhs = {
+  "and": [
+    {
+      "date==": [
+        { "today": [] },
+        { "today": [] },
+      ]
+    },
+    {
+      "datetime==": [
+        { "now": [] },
+        { "now": [] },
+      ]
+    }
+  ]
+};
+
+export const jl_with_date_func_in_lhs_and_value_in_rhs = {
+  "and": [
+    {
+      "date==": [
+        { "date_add": [
+          { "today": [] },
+          1,
+          "day"
+        ] },
+        "2025-05-01T00:00:00.000Z"
+      ]
+    }
+  ]
+};
+
+export const jl_with_datetime_func_in_lhs_and_value_in_rhs = {
+  "and": [
+    {
+      "datetime==": [
+        { "datetime_add": [
+          { "now": [] },
+          2,
+          "day"
+        ] },
+        "2025-05-01T10:04:06.000Z"
+      ]
+    }
+  ]
+};
+
+export const jl_with_field_in_lhs_and_date_func_in_rhs = {
+  "and": [
+    {
+      "date==": [
+        { "var": "date" },
+        { "date_add": [ { "today": [] }, 1, "day" ] }
+      ]
+    },
+    {
+      "datetime==": [
+        { "var": "datetime" },
+        { "datetime_add": [ { "now": [] }, 2, "day" ] }
+      ]
+    },
+  ]
+};
+
+export const jl_with_field_in_lhs_and_date_func_in_rhs_2 = {
+  "and": [
+    {
+      "date==": [
+        { "var": "date" },
+        { "date_add": [ { "var": "date" }, 3, "day" ] }
+      ]
+    },
+    {
+      "datetime==": [
+        { "var": "datetime" },
+        { "datetime_add": [ { "var": "datetime" }, 4, "day" ] }
+      ]
+    },
+  ]
+};
+
+export const jl_with_start_of_today_in_rhs = {
+  "and": [
+    {
+      ">": [
+        { "var": "datetime" },
+        { "start_of_today": [] }
+      ]
+    }
+  ]
+};
 
 export const spel_with_lhs_toLowerCase2 = "str.toLowerCase2() == 'aaa'";
 export const tree_with_lhs_toLowerCase2 = {

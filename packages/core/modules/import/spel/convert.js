@@ -387,7 +387,8 @@ const convertFunc = (spel, conv, config, meta, parentSpel = null) => {
         let parsed;
         try {
           parsed = fc.spelImport.call(config.ctx, spel);
-        } catch(_e) {
+        } catch(e) {
+          logger.debug(`Error while using spelImport for ${f}`, e);
           // can't be parsed
         }
         if (parsed) {
@@ -397,12 +398,30 @@ const convertFunc = (spel, conv, config, meta, parentSpel = null) => {
           for (let argKey in parsed) {
             argsObj[argKey] = convertFuncArg(parsed[argKey]);
           }
+
+          // Special case to distinct date and datetime
+          let isOk = true;
+          const funcType = funcConfig?.returnType;
+          if (["date", "datetime"].includes(funcType)) {
+            const dateArgsKeys = Object.keys(funcConfig.args ?? []).filter(k => ["date", "datetime"].includes(funcConfig.args[k].type));
+            for (const k of dateArgsKeys) {
+              const argConfig = funcConfig.args[k];
+              const expectedType = argConfig.type;
+              const realType = argsObj[k]?.valueType;
+              if (realType && realType != expectedType) {
+                isOk = false;
+              }
+            }
+          }
+          if (isOk) {
+            break;
+          }
         }
       }
     }
   }
 
-  // convert
+  // final convert
   if (funcKey) {
     const funcArgs = {};
     for (let argKey in funcConfig.args) {

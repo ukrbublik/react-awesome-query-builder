@@ -639,9 +639,9 @@ interface MongoUtils {
 }
 interface JsonLogicUtils {
   applyJsonLogic(logic: JsonLogicValue, data?: any): any;
-  addJsonLogicOperation(name: string, operation: (...args: any[]) => JsonLogicValue): void;
+  addJsonLogicOperation(name: string, operation: (...args: any[]) => JsonLogicValue, jl?: any): void;
   customJsonLogicOperations: TypedMap<(...args: any[]) => JsonLogicValue>;
-  addRequiredJsonLogicOperations(): void;
+  addRequiredJsonLogicOperations(jl?: any): void;
 }
 interface SpelUtils {
   spelFixList(listStr: string): string;
@@ -1137,7 +1137,7 @@ type FormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: 
 type MongoFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: MongoValue | Array<MongoValue>, not?: boolean, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => Object | undefined;
 type SqlFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[] | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string | undefined;
 type SpelFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[], valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string | undefined;
-type JsonLogicFormatOperator = (this: ConfigContext, field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => JsonLogicTree | undefined;
+type JsonLogicFormatOperator = (this: ConfigContext, field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field, expectedType?: string, settings?: Settings) => JsonLogicTree | undefined;
 type ElasticSearchFormatQueryType = (this: ConfigContext, valueType: string) => ElasticSearchQueryType;
 
 interface ProximityConfig {
@@ -1178,6 +1178,7 @@ export interface BaseOperator {
   spelFormatOp?: SerializableType<SpelFormatOperator>;
   jsonLogic?: string | JsonLogicFormatOperator | JsonLogicFunction;
   jsonLogic2?: string;
+  jsonLogicOps?: string[];
   _jsonLogicIsExclamationOp?: boolean;
   elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType | JsonLogicFunction;
   valueSources?: Array<ValueSource>;
@@ -1492,6 +1493,7 @@ export interface LocaleSettings {
 export interface BehaviourSettings {
   reverseOperatorsForNot?: boolean;
   canShortMongoQuery?: boolean;
+  fixJsonLogicDateCompareOp?: boolean;
   defaultField?: AnyFieldValue;
   defaultOperator?: string;
   defaultConjunction?: string;
@@ -1553,7 +1555,7 @@ export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettin
 // Funcs
 /////////////////
 
-export type SqlFormatFunc        = (this: ConfigContext, formattedArgs: TypedMap<string>) => string;
+export type SqlFormatFunc        = (this: ConfigContext, formattedArgs: TypedMap<string>, sqlDialect?: SqlDialect) => string;
 export type SqlImportFunc        = (this: ConfigContext, sql: Object, wgtDef?: Widget, sqlDialect?: SqlDialect) => Record<string, RuleValue> | undefined; // can throw, should return {func?, args: {}} or {operator?, children: []}
 export type FormatFunc           = (this: ConfigContext, formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
 export type MongoFormatFunc      = (this: ConfigContext, formattedArgs: TypedMap<MongoValue>) => MongoValue;

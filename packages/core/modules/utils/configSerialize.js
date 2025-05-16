@@ -83,7 +83,7 @@ const compileMetaOperator = {
   mongoFormatOp: { type: "f", args: ["field", "op", "vals", "useExpr", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
   sqlFormatOp: { type: "f", args: ["field", "op", "vals", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
   spelFormatOp: { type: "f", args: ["field", "op", "vals", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
-  jsonLogic: { type: "f", ignore: "string", args: ["field", "op", "vals", "opDef", "operatorOptions", "fieldDef"] },
+  jsonLogic: { type: "f", ignore: "string", args: ["field", "op", "vals", "opDef", "operatorOptions", "fieldDef", "expectedType", "settings"] },
   sqlImport: { type: "f", args: ["sqlObj", "_", "sqlDialect"] },
   elasticSearchQueryType: { type: "f", ignore: "string", args: ["valueType"] },
   textSeparators: { type: "r", isArr: true },
@@ -109,7 +109,7 @@ const compileMetaFunc = {
   spelImport: { type: "f", args: ["spel"] },
   sqlImport: { type: "f", args: ["sqlObj", "_", "sqlDialect"] },
   formatFunc: { type: "f", args: ["formattedArgs", "isForDisplay"] },
-  sqlFormatFunc: { type: "f", args: ["formattedArgs"] },
+  sqlFormatFunc: { type: "f", args: ["formattedArgs", "sqlDialect"] },
   mongoFormatFunc: { type: "f", args: ["formattedArgs"] },
   spelFormatFunc: { type: "f", args: ["formattedArgs"] },
 };

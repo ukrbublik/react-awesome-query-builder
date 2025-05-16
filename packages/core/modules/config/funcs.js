@@ -2,19 +2,346 @@
 
 // Tip: search for `customJsonLogicOperations` in codebase to see custom JL funcs we use in `jsonLogicCustomOps`
 
+const dateDimListValues = {
+  day: "day",
+  week: "week",
+  month: "month",
+  year: "year",
+};
+const dateDimDefault = "day";
+const datetimeDimListValues = {
+  hour: "hour",
+  minute: "minute",
+  second: "second",
+  ...dateDimListValues,
+};
+const datetimeDimDefault = "day";
+
 const NOW = {
   label: "Now",
   returnType: "datetime",
-  jsonLogic: "now",
   jsonLogicCustomOps: {
     now: {},
+  },
+  // jsonLogic: "now",
+  jsonLogic: () => {
+    return {now: []};
+  },
+  jsonLogicImport: (v) => {
+    if (v["now"]) {
+      return [];
+    }
   },
   //spelFunc: "new java.util.Date()",
   spelFunc: "T(java.time.LocalDateTime).now()",
   sqlFormatFunc: () => "NOW()",
   sqlFunc: "NOW",
-  mongoFormatFunc: () => new Date(),
+  mongoFormatFunc: function () {
+    return {
+      "$toDate": "$$NOW"
+    };
+    // return {
+    //   "$dateFromString": {
+    //     "dateString": this.utils.moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+    //     "format": "%Y-%m-%d %H:%M:%S"
+    //   }
+    // };
+  },
   formatFunc: () => "NOW",
+};
+
+// todo: add option like `resolveWithValueOnExport: false` for NOW, TODAY, START_OF_TODAY (issue #1234) ???
+
+const TODAY = {
+  label: "Today",
+  returnType: "date",
+  //jsonLogic: "today",
+  jsonLogicCustomOps: {
+    today: {},
+  },
+  jsonLogic: () => {
+    return {today: []};
+  },
+  jsonLogicImport: (v) => {
+    if (v["today"]) {
+      return [];
+    }
+  },
+  spelFunc: "T(java.time.LocalDate).now()",
+  sqlFormatFunc: () => "CURDATE()",
+  sqlFunc: "CURDATE",
+  mongoFormatFunc: function () {
+    return {
+      "$dateTrunc": {
+        // or "date": "$$NOW",
+        "date": { "$toDate": "$$NOW" },
+        "unit": "day"
+      }
+    };
+    // return {
+    //   "$dateFromString": {
+    //     "dateString": this.utils.moment(new Date()).format("YYYY-MM-DD"),
+    //     "format": "%Y-%m-%d"
+    //   }
+    // };
+  },
+  formatFunc: () => "TODAY",
+};
+
+const START_OF_TODAY = {
+  label: "Start of today",
+  returnType: "datetime",
+  jsonLogicCustomOps: {
+    start_of_today: {},
+  },
+  // jsonLogic: "start_of_today",
+  jsonLogic: () => {
+    return {start_of_today: []};
+  },
+  jsonLogicImport: (v) => {
+    if (v["start_of_today"]) {
+      return [];
+    }
+  },
+  spelFunc: "T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).DAYS)",
+  spelImport: (spel) => {
+    // spel = {
+    //   "type": "!func",
+    //   "methodName": "truncatedTo",
+    //   "args": [
+    //     {
+    //       "type": "compound",
+    //       "children": [
+    //         { "type": "!type", "cls": [ "java", "time", "temporal", "ChronoUnit" ] },
+    //         { "type": "property", "val": "DAYS" }
+    //       ]
+    //     }
+    //   ],
+    //   "obj": {
+    //     "type": "!func",
+    //     "methodName": "now",
+    //     "obj": {
+    //       "type": "!type",
+    //       "cls": [ "java", "time", "LocalDateTime" ]
+    //     }
+    //   }
+    // }
+    const { obj, args } = spel;
+    const isTruncate = spel?.type === "!func" && spel?.methodName === "truncatedTo";
+    const isObjNow = obj?.methodName === "now" && obj?.obj?.cls?.join(".") === "java.time.LocalDateTime";
+    const argsLength = args?.length || 0;
+    const oneArg = args?.[0];
+    const oneArgType = oneArg?.children?.[0];
+    const oneArgProperty = oneArg?.children?.[1];
+    const oneArgCls = oneArgType?.type === "!type" && oneArgType?.cls?.join(".");
+    const oneArgConst = oneArgProperty?.type === "property" && oneArgProperty?.val;
+    const isArgDays = argsLength === 1 && oneArg.type === "compound" && oneArgCls === "java.time.temporal.ChronoUnit" && oneArgConst === "DAYS";
+    if (isObjNow && isTruncate && isArgDays) {
+      return {};
+    }
+  },
+  sqlFormatFunc: () => "DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00')",
+  sqlImport: function (sqlObj, _, sqlDialect) {
+    if (sqlObj?.func === "DATE_FORMAT" && sqlObj.children?.length === 2) {
+      const [date, format] = sqlObj.children;
+      if (format?.value == "%Y-%m-%d 00:00:00" && date?.func == "NOW") {
+        return {
+          args: {}
+        };
+      }
+    }
+  },
+  mongoFormatFunc: function () {
+    return {
+      "$dateTrunc": {
+        "date": { "$toDate": "$$NOW" },
+        "unit": "day"
+      }
+    };
+    // return {
+    //   "$dateFromString": {
+    //     "dateString": this.utils.moment(new Date()).format("YYYY-MM-DD"),
+    //     "format": "%Y-%m-%d"
+    //   }
+    // };
+  },
+  formatFunc: () => "START_OF_TODAY",
+};
+
+const TRUNCATE_DATETIME = {
+  label: "Truncate",
+  returnType: "datetime",
+  renderBrackets: ["", ""],
+  renderSeps: ["to"],
+  jsonLogicCustomOps: {
+    datetime_truncate: {},
+  },
+  jsonLogic: ({date, dim}) => ({
+    "datetime_truncate": [
+      date,
+      dim
+    ]
+  }),
+  jsonLogicImport: (v) => {
+    if (v["datetime_truncate"]) {
+      const date = v["datetime_truncate"][0];
+      const dim = v["datetime_truncate"][1];
+      return [date, dim];
+    }
+  },
+  spelFormatFunc: ({date, dim}) => {
+    const dimPluralUppercase = (dim.charAt(0).toUpperCase() + dim.slice(1) + "s").toUpperCase();
+    return `${date}.truncatedTo(T(java.time.temporal.ChronoUnit).${dimPluralUppercase})`;
+  },
+  spelImport: (spel) => {
+    // spel = {
+    //   "type": "!func",
+    //   "methodName": "truncatedTo",
+    //   "args": [
+    //     {
+    //       "type": "compound",
+    //       "children": [
+    //         { "type": "!type", "cls": [ "java", "time", "temporal", "ChronoUnit" ] },
+    //         { "type": "property", "val": "DAYS" }
+    //       ]
+    //     }
+    //   ],
+    // }
+    const { args } = spel;
+    const isTruncate = spel?.type === "!func" && spel?.methodName === "truncatedTo";
+    const argsLength = args?.length || 0;
+    const oneArg = args?.[0];
+    const oneArgType = oneArg?.children?.[0];
+    const oneArgProperty = oneArg?.children?.[1];
+    const oneArgCls = oneArgType?.type === "!type" && oneArgType?.cls?.join(".");
+    const oneArgConst = oneArgProperty?.type === "property" && oneArgProperty?.val;
+    const isArgDays = argsLength === 1 && oneArg.type === "compound" && oneArgCls === "java.time.temporal.ChronoUnit" && oneArgConst;
+    const dim = oneArgConst.toLowerCase().substring(0, oneArgConst.length - 1); 
+    if (isTruncate && isArgDays) {
+      return {
+        date: spel.obj,
+        dim: {type: "string", val: dim},
+      };
+    }
+  },
+  // MySQL
+  sqlFormatFunc: ({date, dim}, sqlDialect) => {
+    if (!sqlDialect || sqlDialect === "MySQL") {
+      dim = dim.replace(/^'|'$/g, "");
+      switch (dim) {
+      case "second":
+        return `DATE_FORMAT(${date}, '%Y-%m-%d %H:%i:%s')`;
+      case "minute":
+        return `DATE_FORMAT(${date}, '%Y-%m-%d %H:%i:00')`;
+      case "hour":
+        return `DATE_FORMAT(${date}, '%Y-%m-%d %H:00:00')`;
+      case "day":
+        return `DATE_FORMAT(${date}, '%Y-%m-%d 00:00:00')`;
+      case "week":
+        return `DATE_SUB(DATE_FORMAT(${date}, '%Y-%m-%d 00:00:00'), INTERVAL WEEKDAY(${date}) DAY)`;
+      case "month":
+        return `DATE_FORMAT(${date}, '%Y-%m-01 00:00:00')`;
+      case "year":
+        return `DATE_FORMAT(${date}, '%Y-01-01 00:00:00')`;
+      }
+    } else if (sqlDialect === "PostgreSQL") {
+      return `date_trunc(${dim}, ${date})`;
+    }
+  },
+  sqlImport: function (sqlObj, _, sqlDialect) {
+    if (!sqlDialect || sqlDialect === "MySQL") {
+      if (sqlObj?.func === "DATE_FORMAT" && sqlObj.children?.length === 2) {
+        const [date, format] = sqlObj.children;
+        let dim;
+        switch (format?.value) {
+        case "%Y-%m-%d %H:%i:%s":
+          dim = "second";
+          break;
+        case "%Y-%m-%d %H:%i:00":
+          dim = "minute";
+          break;
+        case "%Y-%m-%d %H:00:00":
+          dim = "hour";
+          break;
+        case "%Y-%m-%d 00:00:00":
+          dim = "day";
+          break;
+        case "%Y-%m-01 00:00:00":
+          dim = "month";
+          break;
+        case "%Y-01-01 00:00:00":
+          dim = "year";
+        }
+        if (dim) {
+          return {
+            args: {
+              date,
+              dim
+            }
+          };
+        }
+      } else if (sqlObj?.func === "DATE_SUB" && sqlObj.children?.length === 2) {
+        const [dateFormat, interval] = sqlObj.children;
+        const isFormat = dateFormat?.func === "DATE_FORMAT" && dateFormat.children?.length === 2;
+        const isIntervalDay = interval._type == "interval" && interval.unit === "day";
+        if (isFormat && isIntervalDay) {
+          const [date, format] = dateFormat.children;
+          if (format?.value === "%Y-%m-%d 00:00:00") {
+            return {
+              args: {
+                date,
+                dim: "week"
+              }
+            };
+          }
+        }
+      }
+      return undefined;
+    } else if (sqlDialect === "PostgreSQL") {
+      if (sqlObj?.func === "date_trunc" && sqlObj.children?.length === 2) {
+        const [dim, date] = sqlObj.children;
+        return {
+          args: {
+            date,
+            dim: dim.value,
+          }
+        };
+      }
+    }
+  },
+  mongoFormatFunc: function ({date, dim}) {
+    return {
+      "$dateTrunc": {
+        "date": date,
+        "unit": dim,
+      }
+    };
+  },
+  formatFunc: ({date, dim}) => (`TRUNCATE ${date} TO ${dim}`),
+  args: {
+    date: {
+      label: "Datetime",
+      type: "datetime",
+      defaultValue: {func: "NOW", args: []},
+      valueSources: ["value", "field", "func"],
+      escapeForFormat: true,
+    },
+    dim: {
+      label: "Dimension",
+      type: "select",
+      defaultValue: datetimeDimDefault,
+      valueSources: ["value"],
+      mainWidgetProps: {
+        customProps: {
+          showSearch: false
+        }
+      },
+      fieldSettings: {
+        listValues: datetimeDimListValues,
+      },
+      escapeForFormat: false,
+    },
+  }
 };
 
 const RELATIVE_DATETIME = {
@@ -34,7 +361,7 @@ const RELATIVE_DATETIME = {
       dim = matchRes[2].toLowerCase();
       op = matchRes[1];
       if (["minus", "plus"].includes(op)) {
-        if (["day", "week", "month", "year"].includes(dim)) {
+        if (Object.keys(datetimeDimListValues).includes(dim)) {
           op = {type: "string", val: op};
           dim = {type: "string", val: dim};
           val = spel.args[0];
@@ -45,21 +372,23 @@ const RELATIVE_DATETIME = {
     }
   },
   jsonLogic: ({date, op, val, dim}) => ({
-    "date_add": [
+    "datetime_add": [
       date,
       val * (op == "minus" ? -1 : +1),
       dim
     ]
   }),
   jsonLogicImport: (v) => {
-    const date = v["date_add"][0];
-    const val = Math.abs(v["date_add"][1]);
-    const op = v["date_add"][1] >= 0 ? "plus" : "minus";
-    const dim = v["date_add"][2];
-    return [date, op, val, dim];
+    if (v["datetime_add"]) {
+      const date = v["datetime_add"][0];
+      const val = Math.abs(v["datetime_add"][1]);
+      const op = v["datetime_add"][1] >= 0 ? "plus" : "minus";
+      const dim = v["datetime_add"][2];
+      return [date, op, val, dim];
+    }
   },
   jsonLogicCustomOps: {
-    date_add: {},
+    datetime_add: {},
   },
   // MySQL
   //todo: other SQL dialects?
@@ -79,14 +408,22 @@ const RELATIVE_DATETIME = {
       }
     }
   },
-  mongoFormatFunc: null, //todo: support?
+  mongoFormatFunc: function ({date, op, val, dim}) {
+    return {
+      "$dateAdd": {
+        "startDate": date,
+        "unit": dim,
+        "amount": val * (op == "minus" ? -1 : +1),
+      }
+    };
+  },
   formatFunc: ({date, op, val, dim}) => (!val ? date : `${date} ${op == "minus" ? "-" : "+"} ${val} ${dim}`),
   args: {
     date: {
-      label: "Date",
+      label: "Datetime",
       type: "datetime",
       defaultValue: {func: "NOW", args: []},
-      valueSources: ["func", "field", "value"],
+      valueSources: ["value", "field", "func"],
       escapeForFormat: true,
     },
     op: {
@@ -120,7 +457,7 @@ const RELATIVE_DATETIME = {
     dim: {
       label: "Dimension",
       type: "select",
-      defaultValue: "day",
+      defaultValue: datetimeDimDefault,
       valueSources: ["value"],
       mainWidgetProps: {
         customProps: {
@@ -128,17 +465,55 @@ const RELATIVE_DATETIME = {
         }
       },
       fieldSettings: {
-        listValues: {
-          day: "day",
-          week: "week",
-          month: "month",
-          year: "year",
-        },
+        listValues: datetimeDimListValues,
       },
       escapeForFormat: false,
     },
   }
 };
+
+
+const RELATIVE_DATE = {
+  ...RELATIVE_DATETIME,
+  label: "Relative",
+  returnType: "date",
+  jsonLogic: ({date, op, val, dim}) => ({
+    "date_add": [
+      date,
+      val * (op == "minus" ? -1 : +1),
+      dim
+    ]
+  }),
+  jsonLogicImport: (v) => {
+    const date = v["date_add"][0];
+    const val = Math.abs(v["date_add"][1]);
+    const op = v["date_add"][1] >= 0 ? "plus" : "minus";
+    const dim = v["date_add"][2];
+    return [date, op, val, dim];
+  },
+  jsonLogicCustomOps: {
+    date_add: {},
+  },
+  args: {
+    date: {
+      ...RELATIVE_DATETIME.args.date,
+      label: "Date",
+      type: "date",
+      defaultValue: {func: "TODAY", args: []},
+    },
+    op: {...RELATIVE_DATETIME.args.op},
+    val: {...RELATIVE_DATETIME.args.val},
+    dim: {
+      ...RELATIVE_DATETIME.args.dim,
+      defaultValue: dateDimDefault,
+      fieldSettings: {
+        listValues: dateDimListValues,
+      },
+    },
+  },
+};
+
+// todo: add DATEDIFF (issue #142)
 
 const LOWER = {
   label: "Lowercase",
@@ -246,6 +621,10 @@ export {
   LOWER,
   UPPER,
   NOW,
+  TODAY,
+  START_OF_TODAY,
   RELATIVE_DATETIME,
+  TRUNCATE_DATETIME,
+  RELATIVE_DATE,
   LINEAR_REGRESSION,
 };

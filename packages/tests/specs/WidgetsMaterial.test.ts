@@ -66,10 +66,10 @@ describe("material-ui widgets interactions", () => {
       expect_jlogic([null,
         {
           "or": [{
-            "==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]
+            "datetime==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]
           }, {
             "and": [{
-              "==": [ {  "var": "date" }, "2020-05-11T00:00:00.000Z" ]
+              "date==": [ {  "var": "date" }, "2020-05-11T00:00:00.000Z" ]
             }, {
               "==": [ { "var": "time" }, 3000 ]
             }]

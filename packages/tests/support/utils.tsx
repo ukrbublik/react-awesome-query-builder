@@ -2,13 +2,16 @@ import React, { ReactElement } from "react";
 import { mount, shallow, ReactWrapper, MountRendererProps } from "enzyme";
 import type { SuiteFunction, TestFunction, HookFunction } from "mocha"; // to fix TS warnings in VSCode about `describe`, `it`
 import sinon, {spy} from "sinon";
-import { expect } from "chai";
 const stringify = JSON.stringify;
 import serializeJs from "serialize-javascript";
 import mergeWith from "lodash/mergeWith";
 import omit from "lodash/omit";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
+import chai from "chai";
+import chaiSubsetInOrder from "chai-subset-in-order";
+const { expect } = chai;
+chai.use(chaiSubsetInOrder);
 
 import {
   Utils,
@@ -90,6 +93,7 @@ interface ExtectedExports {
   elasticSearch?: Object;
   elasticSearch7?: Object;
   logic?: JsonLogicTree | [JsonLogicTree, string[]];
+  tree?: JsonTree;
 }
 interface CheckExpects {
   expect_jlogic: (jlogics: Array<null | undefined | JsonLogicTree>, changeIndex?: number) => void;
@@ -263,6 +267,7 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
   if (valueFormat === "JsonLogic") {
     [tree, errors] = _loadFromJsonLogic(value, config);
   } else if (valueFormat === "SQL") {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     ({tree, errors} = SqlUtils.loadFromSql(value as string, config));
   } else if (valueFormat === "SpEL") {
     [tree, errors] = loadFromSpel(value as string, config);
@@ -628,9 +633,16 @@ const do_export_checks = async (config: Config, tree: ImmutableTree, expects?: E
       mongo: mongodbFormat(tree, config),
       logic: logic,
       elasticSearch: elasticSearchFormat(tree, config),
+      tree: getTree(tree, true),
     }).filter(([k, _]) => expects ? expects[k as keyof ExtectedExports] === "?" : false));
     console.log(getCurrentTestName(), stringify(correct, undefined, 2));
   } else {
+    if (expects["tree"] !== undefined) {
+      doIt("should load to tree correctly", () => {
+        expect(getTree(tree, true)).to.containSubsetInOrder(expects["tree"]);
+      });
+    }
+
     if (expects["query"] !== undefined) {
       doIt("should work to query string", () => {
         const res = queryString(tree, config);

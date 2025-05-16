@@ -166,6 +166,17 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
     convChildren = convFuncOp.children;
     operatorOptions = convFuncOp.operatorOptions;
   } else if (logic.operator) {
+    // Predict return type for function at RHS based on field type in LHS (and vice versa) (needed to distinguish between date and datetime)
+    const sideVals = (logic.children || []).filter(a => a.value).map(a => convertArg(a, conv, config, meta, logic));
+    const sideFields = (logic.children || []).filter(a => a.field).map(a => convertArg(a, conv, config, meta, logic));
+    const expectedSideTypes = [...new Set([...sideFields.map(f => f?.valueType), ...sideVals.map(v => v?._maybeValueType)].filter(v => !!v))];
+    const expectedSideType = expectedSideTypes.length === 1 ? expectedSideTypes[0] : undefined;
+    for (const child of logic.children || []) {
+      if (child.func && !child._type) {
+        child._type = expectedSideType;
+      }
+    }
+    // Convert
     convChildren = (logic.children || []).map(a => convertArg(a, conv, config, meta, logic));
     const isMultiselect = convChildren.filter(ch => ch?.valueType === "multiselect").length > 0;
     const isSelect = convChildren.filter(ch => ch?.valueType === "select").length > 0;
@@ -245,17 +256,25 @@ const convertArg = (logic: OutLogic | undefined, conv: Conv, config: Config, met
   if (logic?.valueType) {
     const sqlType = logic?.valueType;
     let valueType: string | undefined = SqlPrimitiveTypes[sqlType];
+    let _maybeValueType;
     if (!valueType) {
       meta.warnings.push(`Unexpected value type ${sqlType}`);
     }
     const value = logic.value; // todo: convert ?
     if (valueType === "text") {
       // fix issues with date/time values
+      if (value.match(/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}/)) {
+        _maybeValueType = "datetime";
+      }
+      if (value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        _maybeValueType = "date";
+      }
       valueType = undefined;
     }
     return {
       valueSrc: "value",
       valueType,
+      _maybeValueType,
       value,
     };
   } else if (logic?.field) {
@@ -403,12 +422,35 @@ const convertFunc = (
         funcKey = parsed.func;
         funcConfig = parsed.funcConfig;
         argsObj = parsed.args;
-        break;
+
+        // Special case to distinct date and datetime
+        let isOk = true;
+        if (funcConfig) {
+          const funcType = funcConfig!.returnType;
+          if (["date", "datetime"].includes(funcType)) {
+            if (logic?._type && ["date", "datetime"].includes(logic._type) && logic._type !== funcType) {
+              isOk = false;
+            }
+            const dateArgsKeys = Object.keys(funcConfig.args ?? []).filter(k => ["date", "datetime"].includes(funcConfig!.args[k].type));
+            for (const k of dateArgsKeys) {
+              const argConfig = funcConfig.args[k];
+              const expectedType = argConfig.type;
+              const realType = argsObj[k]?.valueType;
+              if (realType && realType != expectedType) {
+                isOk = false;
+              }
+            }
+          }
+        }
+        if (isOk) {
+          break;
+        }
       }
     }
     if (sqlFunc && sqlFunc === logic?.func) {
       funcKey = f;
       funcConfig = Utils.ConfigUtils.getFuncConfig(config, funcKey);
+      const funcType = funcConfig!.returnType;
       argsObj = {};
       let argIndex = 0;
       for (const argKey in funcConfig!.args) {
@@ -417,7 +459,19 @@ const convertFunc = (
         argsObj[argKey] = convertFuncArg(argLogic, argConfig, conv, config, meta, logic);
         argIndex++;
       }
-      break;
+      // Special case to distinct date and datetime for args of function
+      let isOk = true;
+      if (["date", "datetime"].includes(funcType)) {
+        if (parentLogic?.func && parentLogic?._type && ["date", "datetime"].includes(parentLogic._type)) {
+          const expectedFuncType = parentLogic._type;
+          if (expectedFuncType != funcType) {
+            isOk = false;
+          }
+        }
+      }
+      if (isOk) {
+        break;
+      }
     }
   }
 
