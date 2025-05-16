@@ -100,8 +100,8 @@ const operators = {
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => v, false, ...args); },
     jsonLogic2: "==",
     jsonLogicOps: ["==", "datetime==", "date=="],
-    jsonLogic: (field, op, val, _opDef, _opOpts, _fieldDef, expectedType) => {
-      if (["date", "datetime"].includes(expectedType)) {
+    jsonLogic: (field, op, val, _opDef, _opOpts, _fieldDef, expectedType, settings) => {
+      if (settings?.fixJsonLogicDateCompareOp && ["date", "datetime"].includes(expectedType)) {
         return { [`${expectedType}==`]: [field, val] };
       }
       return { "==": [field, val] };
@@ -126,8 +126,8 @@ const operators = {
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$ne", v => v, false, ...args); },
     jsonLogic2: "!=",
     jsonLogicOps: ["!=", "datetime!=", "date!="],
-    jsonLogic: (field, op, val, _opDef, _opOpts, _fieldDef, expectedType) => {
-      if (["date", "datetime"].includes(expectedType)) {
+    jsonLogic: (field, op, val, _opDef, _opOpts, _fieldDef, expectedType, settings) => {
+      if (settings?.fixJsonLogicDateCompareOp && ["date", "datetime"].includes(expectedType)) {
         return { [`${expectedType}!=`]: [field, val] };
       }
       return { "!=": [field, val] };

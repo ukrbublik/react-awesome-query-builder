@@ -596,6 +596,7 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
     operatorOptions,
     fieldDefinition,
     expectedType,
+    config.settings,
   ];
   let ruleQuery = fn.call(config.ctx, ...args);
 

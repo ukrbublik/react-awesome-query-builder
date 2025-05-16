@@ -156,6 +156,10 @@ export const with_number_and_string = (BasicConfig) => ({
   
 export const with_date_and_time = (BasicConfig) => ({
   ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    fixJsonLogicDateCompareOp: true,
+  },
   fields: {
     date: {
       label: "Date",
@@ -678,6 +682,10 @@ export const with_allow_any_src_for_all_ops = (BasicConfig) => ({
 
 export const with_all_types = (BasicConfig) => ({
   ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    fixJsonLogicDateCompareOp: true,
+  },
   fields: {
     num: {
       label: "Number",
@@ -886,6 +894,22 @@ export const with_reverse_operators = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     reverseOperatorsForNot: true,
+  }
+});
+
+export const without_fix_jl_date_compare = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    fixJsonLogicDateCompareOp: false,
+  }
+});
+
+export const with_fix_jl_date_compare = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    fixJsonLogicDateCompareOp: true,
   }
 });
 

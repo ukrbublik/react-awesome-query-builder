@@ -73,6 +73,26 @@ describe("query with subquery and datetime types", () => {
       }
     });
   });
+
+  describe("export to JL with fixJsonLogicDateCompareOp = false", () => {
+    export_checks([configs.with_date_and_time, configs.without_fix_jl_date_compare], inits.with_date_and_time, "JsonLogic", {
+      "logic": {
+        "or": [
+          {
+            "==": [ { "var": "datetime" },  "2020-05-18T21:50:01.000Z" ]
+          }, {
+            "and": [
+              {
+                "==": [ { "var": "date" },  "2020-05-18T00:00:00.000Z" ]
+              }, {
+                "==": [ { "var": "time" },  3000 ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
