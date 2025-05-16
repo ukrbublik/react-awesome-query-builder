@@ -97,6 +97,8 @@ const buildConv = (config) => {
         template = opConfig.jsonLogic(jlFieldMarker, opKey, jlArgsMarker, opConfig, new Immutable.Map({
           having: jlHavingMarker,
           groupField: jlRawFieldMarker,
+          // reduce: undefined,
+          // groupFieldFormatted: undefined,
         }));
       } catch(e) {
         console.warn(`Error while running JsonLogic template for op ${opKey}`, e);
