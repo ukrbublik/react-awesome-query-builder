@@ -4,7 +4,7 @@
     "module": "esnext",
     "jsx": "preserve",
     "lib": [
-      "es2020",
+      "es2027",
       "dom",
       "dom.iterable"
     ],
