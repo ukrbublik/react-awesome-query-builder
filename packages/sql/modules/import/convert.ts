@@ -166,7 +166,7 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
     convChildren = convFuncOp.children;
     operatorOptions = convFuncOp.operatorOptions;
   } else if (logic.operator) {
-    // Pre-convert children of type field or value
+    // Pre-convert children of type field or value (to determine expected type for other children of type function)
     const preConvChildren: Record<number, ValueObj | undefined> = Object.fromEntries(
       (logic.children || [])
         .map((a, i) => [i, a])
