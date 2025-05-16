@@ -234,7 +234,7 @@ describe("basic query", () => {
         logic: {
           "and": [
             {
-              "==": [
+              "datetime==": [
                 {
                   "var": "datetime"
                 },
@@ -251,7 +251,7 @@ describe("basic query", () => {
         logic: {
           "and": [
             {
-              "==": [
+              "datetime==": [
                 {
                   "var": "datetime"
                 },

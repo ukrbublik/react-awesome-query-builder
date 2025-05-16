@@ -225,7 +225,7 @@ describe("LHS func", () => {
         expect(allOptions3.length).to.equal(allOptions2.length);
         setRhsValue(qb, "2020-05-05");
         expect_jlogic([null,
-          { "and": [{ "==": [ { "now": [] }, "2020-05-05T00:00:00.000Z" ] }] }
+          { "and": [{ "datetime==": [ { "now": [] }, "2020-05-05T00:00:00.000Z" ] }] }
         ], 5);
   
         // select src = field
@@ -240,7 +240,7 @@ describe("LHS func", () => {
         selectField(qb, "datetime");
         // RHS should be preserved
         expect_jlogic([null,
-          { "and": [{ "==": [ { "var": "datetime" }, "2020-05-05T00:00:00.000Z" ] }] }
+          { "and": [{ "datetime==": [ { "var": "datetime" }, "2020-05-05T00:00:00.000Z" ] }] }
         ], 7);
       }, {
         ignoreLog: (errText) => {

@@ -279,6 +279,7 @@ export default (skin: string) => {
     keepInputOnChangeFieldSrc: true,
     reverseOperatorsForNot: true,
     canShortMongoQuery: true,
+    fixJsonLogicDateCompareOp: true,
     exportPreserveGroups: false,
     // canReorder: true,
     // canRegroup: true,

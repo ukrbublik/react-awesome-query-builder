@@ -105,7 +105,7 @@ describe("RHS func", () => {
         "logic": {
           "and": [
             {
-              "==": [
+              "datetime==": [
                 { "var": "datetime" },
                 "2005-11-12T11:11:12.000Z"
               ]

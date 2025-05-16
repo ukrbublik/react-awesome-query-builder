@@ -54,7 +54,7 @@ describe("antdesign widgets interactions", () => {
         .instance()
         .handleChange(moment("2020-05-05"));
       expect_jlogic([null,
-        { "and": [{ "==": [ { "var": "date" }, "2020-05-05T00:00:00.000Z" ] }] }
+        { "and": [{ "date==": [ { "var": "date" }, "2020-05-05T00:00:00.000Z" ] }] }
       ]);
     });
   });
@@ -184,7 +184,7 @@ describe("antdesign widgets interactions", () => {
         .instance()
         .handleChange(moment("2020-05-05 10:30"));
       expect_jlogic([null,
-        { "and": [{ "==": [ { "var": "datetime" }, "2020-05-05T10:30:00.000Z" ] }] }
+        { "and": [{ "datetime==": [ { "var": "datetime" }, "2020-05-05T10:30:00.000Z" ] }] }
       ]);
     });
   });

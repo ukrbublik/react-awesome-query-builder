@@ -183,7 +183,7 @@ describe("query with func", () => {
         "logic": {
           "and": [
             {
-              "==": [
+              "datetime==": [
                 { "var": "datetime" },
                 {
                   "datetime_add": [
@@ -258,7 +258,7 @@ describe("query with func", () => {
         "logic": {
           "and": [
             {
-              "==": [
+              "date==": [
                 { "var": "date" },
                 {
                   "date_add": [

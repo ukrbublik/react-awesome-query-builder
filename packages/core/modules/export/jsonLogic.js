@@ -185,12 +185,36 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
   // rule_group (issue #246)
   if (isRuleGroupArray) {
     const formattedField = formatField(meta, config, field, parentField);
+    let reduceQuery;
+    if (!isGroup0) {
+      // there is rule for count
+      const filter = !list.size
+        ? formattedField
+        : {
+          "filter": [
+            formattedField,
+            resultQuery
+          ]
+        };
+      reduceQuery = {
+        "reduce": [
+          filter,
+          { "+": [1, { var: "accumulator" }] },
+          0
+        ]
+      };
+    }
+    const formattedLhs = reduceQuery ?? formattedField;
+    const optionsMap = new Map({
+      having: resultQuery,
+      reduce: reduceQuery,
+      groupField: field,
+      groupFieldFormatted: formattedField,
+    });
     // if groupOperator defines its own jsonLogic function, then we should use it (issue #1241)
     if (typeof groupOperatorDef?.jsonLogic === "function") {
-      resultQuery = formatLogic(config, properties, formattedField, formattedValue, groupOperator, new Map({
-        having: resultQuery,
-        groupField: field,
-      }), fieldDefinition);
+      // we should use optionsMap here
+      resultQuery = formatLogic(config, properties, formattedLhs, formattedValue, groupOperator, optionsMap, fieldDefinition);
     } else {
       if (isGroup0) {
         // config.settings.groupOperators
@@ -202,23 +226,7 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
           ]
         };
       } else {
-        // there is rule for count
-        const filter = !list.size
-          ? formattedField
-          : {
-            "filter": [
-              formattedField,
-              resultQuery
-            ]
-          };
-        const count = {
-          "reduce": [
-            filter,
-            { "+": [1, { var: "accumulator" }] },
-            0
-          ]
-        };
-        resultQuery = formatLogic(config, properties, count, formattedValue, groupOperator, null, fieldDefinition);
+        resultQuery = formatLogic(config, properties, formattedLhs, formattedValue, groupOperator, null, fieldDefinition);
       }
     }
   }

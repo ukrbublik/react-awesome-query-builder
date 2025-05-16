@@ -32,7 +32,7 @@ describe("vanilla widgets interactions", () => {
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "2020-05-05" } });
       expect_jlogic([null,
-        { "and": [{ "==": [ { "var": "date" }, "2020-05-05T00:00:00.000Z" ] }] }
+        { "and": [{ "date==": [ { "var": "date" }, "2020-05-05T00:00:00.000Z" ] }] }
       ]);
     });
   });
@@ -43,7 +43,7 @@ describe("vanilla widgets interactions", () => {
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "2020-05-05T02:30" } });
       expect_jlogic([null,
-        { "and": [{ "==": [ { "var": "datetime" }, "2020-05-05T02:30:00.000Z" ] }] }
+        { "and": [{ "datetime==": [ { "var": "datetime" }, "2020-05-05T02:30:00.000Z" ] }] }
       ]);
     });
   });

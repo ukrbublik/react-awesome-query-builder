@@ -1178,6 +1178,7 @@ export interface BaseOperator {
   spelFormatOp?: SerializableType<SpelFormatOperator>;
   jsonLogic?: string | JsonLogicFormatOperator | JsonLogicFunction;
   jsonLogic2?: string;
+  jsonLogicOps?: string[];
   _jsonLogicIsExclamationOp?: boolean;
   elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType | JsonLogicFunction;
   valueSources?: Array<ValueSource>;
@@ -1492,6 +1493,7 @@ export interface LocaleSettings {
 export interface BehaviourSettings {
   reverseOperatorsForNot?: boolean;
   canShortMongoQuery?: boolean;
+  fixJsonLogicDateCompareOp?: boolean;
   defaultField?: AnyFieldValue;
   defaultOperator?: string;
   defaultConjunction?: string;

@@ -280,10 +280,10 @@ export const with_less = {
 
 export const with_date_and_time = {
   "or": [{
-    "==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]
+    "datetime==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]
   }, {
     "and": [{
-      "==": [ {  "var": "date" }, "2020-05-18T21:00:00.000Z" ]
+      "date==": [ {  "var": "date" }, "2020-05-18T21:00:00.000Z" ]
     }, {
       "==": [ { "var": "time" }, 3000 ]
     }]
@@ -293,7 +293,7 @@ export const with_date_and_time = {
 export const with_date_epoch = {
   "and": [
     {
-      "==": [ { "var": "datetime" }, "1736782768" ]
+      "datetime==": [ { "var": "datetime" }, "1736782768" ]
     }
   ]
 };
@@ -301,7 +301,7 @@ export const with_date_epoch = {
 export const with_date_epoch_ms = {
   "and": [
     {
-      "==": [ { "var": "datetime" }, "1736782768000" ]
+      "datetime==": [ { "var": "datetime" }, "1736782768000" ]
     }
   ]
 };
@@ -1181,7 +1181,7 @@ export const with_func_linear_regression = {
 
 export const with_func_relative_datetime = {
   "and": [ {
-    "==": [
+    "datetime==": [
       { "var": "datetime" },
       { "datetime_add": [ { "now": [] }, 2, "day" ] }
     ]
@@ -1190,7 +1190,7 @@ export const with_func_relative_datetime = {
 
 export const with_func_relative_date = {
   "and": [ {
-    "==": [
+    "date==": [
       { "var": "date" },
       { "date_add": [ { "today": [] }, 2, "day" ] }
     ]
@@ -1930,13 +1930,13 @@ export const sql_with_start_of_today_in_rhs = "datetime > DATE_FORMAT(NOW(), '%Y
 export const jl_with_date_funcs_in_lhs_and_rhs = {
   "and": [
     {
-      "==": [
+      "date==": [
         { "today": [] },
         { "date_add": [ { "today": [] }, 1, "day" ] }
       ]
     },
     {
-      "==": [
+      "datetime==": [
         { "now": [] },
         { "datetime_add": [ { "now": [] }, 2, "day" ] }
       ]
@@ -1947,13 +1947,13 @@ export const jl_with_date_funcs_in_lhs_and_rhs = {
 export const jl_with_now_funcs_in_lhs_and_rhs = {
   "and": [
     {
-      "==": [
+      "date==": [
         { "today": [] },
         { "today": [] },
       ]
     },
     {
-      "==": [
+      "datetime==": [
         { "now": [] },
         { "now": [] },
       ]
@@ -1964,7 +1964,7 @@ export const jl_with_now_funcs_in_lhs_and_rhs = {
 export const jl_with_date_func_in_lhs_and_value_in_rhs = {
   "and": [
     {
-      "==": [
+      "date==": [
         { "date_add": [
           { "today": [] },
           1,
@@ -1979,7 +1979,7 @@ export const jl_with_date_func_in_lhs_and_value_in_rhs = {
 export const jl_with_datetime_func_in_lhs_and_value_in_rhs = {
   "and": [
     {
-      "==": [
+      "datetime==": [
         { "datetime_add": [
           { "now": [] },
           2,
@@ -1994,13 +1994,13 @@ export const jl_with_datetime_func_in_lhs_and_value_in_rhs = {
 export const jl_with_field_in_lhs_and_date_func_in_rhs = {
   "and": [
     {
-      "==": [
+      "date==": [
         { "var": "date" },
         { "date_add": [ { "today": [] }, 1, "day" ] }
       ]
     },
     {
-      "==": [
+      "datetime==": [
         { "var": "datetime" },
         { "datetime_add": [ { "now": [] }, 2, "day" ] }
       ]
@@ -2011,13 +2011,13 @@ export const jl_with_field_in_lhs_and_date_func_in_rhs = {
 export const jl_with_field_in_lhs_and_date_func_in_rhs_2 = {
   "and": [
     {
-      "==": [
+      "date==": [
         { "var": "date" },
         { "date_add": [ { "var": "date" }, 3, "day" ] }
       ]
     },
     {
-      "==": [
+      "datetime==": [
         { "var": "datetime" },
         { "datetime_add": [ { "var": "datetime" }, 4, "day" ] }
       ]
