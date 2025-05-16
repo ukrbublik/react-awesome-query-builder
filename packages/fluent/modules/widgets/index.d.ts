@@ -1,7 +1,7 @@
 import { ElementType } from "react";
 import {
   FieldProps, ConjsProps, SwitchProps, ButtonProps, ButtonGroupProps, ProviderProps, ValueSourcesProps, ConfirmFunc,
-  BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, RangeSliderWidgetProps
+  BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, PriceWidgetProps
 } from "@react-awesome-query-builder/ui";
 
 export interface FluentUIWidgets {
@@ -24,6 +24,7 @@ export interface FluentUIWidgets {
   FluentUIMultiSelectWidget: ElementType<SelectWidgetProps>,
   FluentUISelectWidget: ElementType<SelectWidgetProps>,
   FluentUINumberWidget: ElementType<NumberWidgetProps>,
+  FluentUIPriceWidget: ElementType<PriceWidgetProps>;
   FluentUISliderWidget: ElementType<NumberWidgetProps>,
 }
 export declare const FluentUIWidgets: FluentUIWidgets;

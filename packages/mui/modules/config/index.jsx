@@ -39,6 +39,10 @@ const widgets = {
     ...BasicConfig.widgets.number,
     factory: (props, {RCE, W: {MuiNumberWidget}}) => RCE(MuiNumberWidget, props),
   },
+  price: {
+    ...BasicConfig.widgets.price,
+    factory: (props, { RCE, W: { MuiPriceWidget } }) => RCE(MuiPriceWidget, props),
+  },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
     factory: (props, {RCE, W: {MuiAutocompleteWidget, MuiMultiSelectWidget}}) => {

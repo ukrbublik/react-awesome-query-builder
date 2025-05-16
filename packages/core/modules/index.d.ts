@@ -924,6 +924,7 @@ export type DateTimeWidgetProps<C = Config> = RangeableWidgetProps<C, string> & 
 export type BooleanWidgetProps<C = Config> = BaseWidgetProps<C, boolean> & BooleanFieldSettings;
 export type NumberWidgetProps<C = Config> = RangeableWidgetProps<C, number> & NumberFieldSettings;
 export type RangeSliderWidgetProps<C = Config> = RangeableWidgetProps<C, number> & NumberFieldSettings;
+export type PriceWidgetProps<C = Config> = BaseWidgetProps<C, number> & PriceFieldSettings;
 export type SelectWidgetProps<C = Config> = BaseWidgetProps<C, string | number> & SelectFieldSettings;
 export type MultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & MultiSelectFieldSettings;
 export type TreeSelectWidgetProps<C = Config> = BaseWidgetProps<C, string | number> & TreeSelectFieldSettings;
@@ -1046,6 +1047,7 @@ export type DateTimeWidget<C = Config, WP = DateTimeWidgetProps<C>> = RangeableW
 export type BooleanWidget<C = Config, WP = BooleanWidgetProps<C>> = BaseWidget<C, WP> & BooleanFieldSettings;
 export type NumberWidget<C = Config, WP = NumberWidgetProps<C>> = RangeableWidget<C, WP> & NumberFieldSettings;
 export type RangeSliderWidget<C = Config, WP = RangeSliderWidgetProps<C>> = RangeableWidget<C, WP> & NumberFieldSettings;
+export type PriceWidget<C = Config, WP = PriceWidgetProps<C>> = BaseWidget<C, WP> & PriceFieldSettings;
 export type SelectWidget<C = Config, WP = SelectWidgetProps<C>> = BaseWidget<C, WP> & SelectFieldSettings;
 export type MultiSelectWidget<C = Config, WP = MultiSelectWidgetProps<C>> = BaseWidget<C, WP> & MultiSelectFieldSettings;
 export type TreeSelectWidget<C = Config, WP = TreeSelectWidgetProps<C>> = BaseWidget<C, WP> & TreeSelectFieldSettings;
@@ -1061,6 +1063,7 @@ export type TypedWidget<C = Config> =
   | BooleanWidget<C>
   | NumberWidget<C>
   | RangeSliderWidget<C>
+  | PriceWidget<C>
   | SelectWidget<C>
   | MultiSelectWidget<C>
   | TreeSelectWidget<C>
@@ -1282,6 +1285,18 @@ export interface NumberFieldSettings<V = number> extends BasicFieldSettings<V> {
   step?: number;
   marks?: {[mark: number]: RenderedReactElement};
 }
+export interface PriceFieldSettings<V = number> extends NumberFieldSettings<V> {
+  thousandsGroupStyle?: string;
+  thousandSeparator?: string;
+  decimalSeparator?: string;
+  decimalScale?: number;
+  prefix?: string;
+  suffix?: string;
+  allowLeadingZeros?: boolean;
+  fixedDecimalScale?: boolean;
+  allowNegative?: boolean;
+  //todo: add to NumberFieldSettings instead
+}
 export interface DateTimeFieldSettings<V = string> extends BasicFieldSettings<V> {
   timeFormat?: string;
   dateFormat?: string;
@@ -1322,6 +1337,7 @@ export interface CaseValueFieldSettings<V = any> extends BasicFieldSettings<V> {
 // tip: use RuleValue here, TS can't determine correct types in `validateValue`
 export type FieldSettings =
   NumberFieldSettings<RuleValue>
+  | PriceFieldSettings<RuleValue>
   | DateTimeFieldSettings<RuleValue>
   | SelectFieldSettings<RuleValue>
   | MultiSelectFieldSettings<RuleValue>
@@ -1407,6 +1423,7 @@ export type FieldConfigExt = Field & Type;
 export type FuncConfigExt = Func & Type;
 
 export type NumberField = SimpleField<NumberFieldSettings>;
+export type PriceField = SimpleField<PriceFieldSettings>;
 export type DateTimeField = SimpleField<DateTimeFieldSettings>;
 export type SelectField = SimpleField<SelectFieldSettings>;
 export type MultiSelectField = SimpleField<MultiSelectFieldSettings>;
@@ -1643,6 +1660,7 @@ export interface CoreWidgets<C = Config> extends Widgets<C> {
   textarea: TextWidget<C>;
   number: NumberWidget<C>;
   slider: NumberWidget<C>;
+  price: PriceWidget<C>;
   rangeslider: RangeSliderWidget<C>;
   select: SelectWidget<C>;
   multiselect: MultiSelectWidget<C>;

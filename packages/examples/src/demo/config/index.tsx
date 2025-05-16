@@ -13,6 +13,7 @@ import {
   TreeSelectWidget,
   Config,
   ValidateValue,
+  PriceFieldSettings,
 } from "@react-awesome-query-builder/ui";
 import moment from "moment";
 import ru_RU from "antd/es/locale/ru_RU";
@@ -108,7 +109,10 @@ export default (skin: string) => {
       maxRows: 3
     },
     slider: {
-      ...InitialConfig.widgets.slider
+      ...InitialConfig.widgets.slider,
+    },
+    price: {
+      ...InitialConfig.widgets.price,
     },
     rangeslider: {
       ...InitialConfig.widgets.rangeslider
@@ -463,6 +467,23 @@ export default (skin: string) => {
         max: 5
       },
       funcs: ["number.LINEAR_REGRESSION"],
+    },
+    price: {
+      label: "Price",
+      type: "number",
+      preferWidgets: ["price"],
+      fieldSettings: {
+        valuePlaceholder: "Enter your Price",
+        thousandSeparator: ",",
+        decimalSeparator: ".",
+        prefix: "$",
+        decimalScale: 3,
+        // allowLeadingZeros: true,
+        // fixedDecimalScale: true,
+        // allowNegative: true,
+        min: 20,
+        max: 30000,
+      },
     },
     slider: {
       label: "Slider",

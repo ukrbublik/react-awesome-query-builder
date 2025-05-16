@@ -1,7 +1,7 @@
 import { ElementType } from "react";
 import {
   FieldProps, ConjsProps, SwitchProps, ButtonProps, ButtonGroupProps, ProviderProps, ValueSourcesProps, ConfirmFunc,
-  BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, RangeSliderWidgetProps
+  BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, RangeSliderWidgetProps, PriceWidgetProps
 } from "@react-awesome-query-builder/ui";
 
 export interface MaterialWidgets {
@@ -27,6 +27,7 @@ export interface MaterialWidgets {
   MaterialMultiSelectWidget: ElementType<SelectWidgetProps>,
   MaterialSelectWidget: ElementType<SelectWidgetProps>,
   MaterialNumberWidget: ElementType<NumberWidgetProps>,
+  MaterialPriceWidget: ElementType<PriceWidgetProps>;
   MaterialSliderWidget: ElementType<NumberWidgetProps>,
   MaterialRangeWidget: ElementType<RangeSliderWidgetProps>,
   MaterialAutocompleteWidget: ElementType<SelectWidgetProps>,

@@ -39,6 +39,10 @@ const widgets = {
     ...CoreConfig.widgets.number,
     factory: (props, {RCE, W: {VanillaNumberWidget}}) => RCE(VanillaNumberWidget, props),
   },
+  price: {
+    ...CoreConfig.widgets.price,
+    factory: (props, {RCE, W: {VanillaPriceWidget}}) => RCE(VanillaPriceWidget, props),
+  },
   slider: {
     ...CoreConfig.widgets.slider,
     factory: (props, {RCE, W: {VanillaSliderWidget}}) => RCE(VanillaSliderWidget, props),

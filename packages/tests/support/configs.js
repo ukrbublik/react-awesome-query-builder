@@ -555,6 +555,7 @@ export const with_group_inside_struct = (BasicConfig) => ({
           subfields: {
             price: {
               type: "number",
+              preferWidgets: ["price"],
               valueSources: ["value"],
             },
             type: {
@@ -709,6 +710,18 @@ export const with_all_types = (BasicConfig) => ({
       label: "Number field",
       type: "number",
       valueSources: ["field"],
+    },
+    price: {
+      label: "Price",
+      type: "number",
+      preferWidgets: ["price"],
+      fieldSettings: {
+        prefix: "$",
+        allowNegative: false,
+        thousandSeparator: ",",
+        decimalSeparator: ".",
+        decimalScale: 3,
+      },
     },
     str: {
       label: "String",

@@ -857,6 +857,10 @@ export const with_treeselect = {
   "and": [{  "==": [ { "var": "selecttree" }, "2" ]  }]
 };
 
+export const with_price = {
+  "and": [{  ">": [ { "var": "price" }, 23.45 ]  }]
+};
+
 export const with_ops = {
   "and": [
     {

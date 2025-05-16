@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 
 import {ElementType, ReactElement, Factory} from "react";
+import { NumericFormat, NumericFormatProps } from "react-number-format";
 import {
   Conjunctions, Types, Fields, Funcs, CoreConfig, RuleValue, RuleValueI, 
   SimpleValue, OperatorOptionsI, FieldValueI, FieldSource, AsyncListValues,
@@ -52,6 +53,7 @@ import {
   DateTimeWidgetProps as _DateTimeWidgetProps,
   BooleanWidgetProps as _BooleanWidgetProps,
   NumberWidgetProps as _NumberWidgetProps,
+  PriceWidgetProps as _PriceWidgetProps,
   RangeSliderWidgetProps as _RangeSliderWidgetProps,
   SelectWidgetProps as _SelectWidgetProps,
   MultiSelectWidgetProps as _MultiSelectWidgetProps,
@@ -103,6 +105,7 @@ export type TextWidgetProps<C = Config> = _TextWidgetProps<C>;
 export type DateTimeWidgetProps<C = Config> = _DateTimeWidgetProps<C>;
 export type BooleanWidgetProps<C = Config> = _BooleanWidgetProps<C>;
 export type NumberWidgetProps<C = Config> = _NumberWidgetProps<C>;
+export type PriceWidgetProps<C = Config> = _PriceWidgetProps<C>;
 export type RangeSliderWidgetProps<C = Config> = _RangeSliderWidgetProps<C>;
 export type SelectWidgetProps<C = Config> = _SelectWidgetProps<C>;
 export type MultiSelectWidgetProps<C = Config> = _MultiSelectWidgetProps<C>;
@@ -385,6 +388,7 @@ interface VanillaWidgets {
   VanillaMultiSelectWidget: ElementType<SelectWidgetProps>;
   VanillaSelectWidget: ElementType<SelectWidgetProps>;
   VanillaNumberWidget: ElementType<NumberWidgetProps>;
+  VanillaPriceWidget: ElementType<PriceWidgetProps>;
   VanillaSliderWidget: ElementType<NumberWidgetProps>;
   
   // common
@@ -397,6 +401,12 @@ interface VanillaWidgets {
 /////////////////
 
 export interface Utils extends CoreUtils {
+  NumberFormat: {
+    getNumberFormatProps: (props: Record<string, any>, excludePropsNames?: string[]) => Record<string, any>;
+    NumericFormat: typeof NumericFormat;
+    numericFormatter: (val: number, numericFormatProps: NumericFormatProps) => string;
+    numericParser: (str: string, numericFormatProps: NumericFormatProps, lastStrValue?: string, lastNumValue?: number) => number | undefined;
+  }
   // ReactUtils: {
   //   useOnPropsChanged(obj: ReactElement): void;
   // }
