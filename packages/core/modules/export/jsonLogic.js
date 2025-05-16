@@ -101,6 +101,8 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
   let groupOperator = properties.get("operator");
   let groupOperatorDef = groupOperator && getOperatorConfig(config, groupOperator, field) || null;
   const formattedValue = formatItemValue(config, properties, meta, groupOperator, parentField);
+  // Tip: for demo app isGroup0 is true for "Results" and "Cars" with group op in "some", "all", "none"
+  // If isGroup0 is false, we should use "reduce"
   const isGroup0 = isRuleGroup && (!groupOperator || groupOperatorDef?.cardinality == 0);
   const isRuleGroupWithChildren = isRuleGroup && children?.size > 0;
   const isRuleGroupWithoutChildren = isRuleGroup && !children?.size;
@@ -171,16 +173,18 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
     });
   }
   
-  let resultQuery = {};
+  let filterQuery = {};
   if (preserveSingleRuleGroup)
-    resultQuery[conj] = list.toList().toJS();
+    filterQuery[conj] = list.toList().toJS();
   else
-    resultQuery = list.first();
-  
+    filterQuery = list.first();
+
   // reverse filter
   if (filterNot) {
-    resultQuery = { "!": resultQuery };
+    filterQuery = { "!": filterQuery };
   }
+
+  let resultQuery = filterQuery;
 
   // rule_group (issue #246)
   if (isRuleGroupArray) {
@@ -193,7 +197,7 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
         : {
           "filter": [
             formattedField,
-            resultQuery
+            filterQuery
           ]
         };
       reduceQuery = {
@@ -206,7 +210,7 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
     }
     const formattedLhs = reduceQuery ?? formattedField;
     const optionsMap = new Map({
-      having: resultQuery,
+      having: filterQuery,
       reduce: reduceQuery,
       groupField: field,
       groupFieldFormatted: formattedField,
@@ -222,7 +226,7 @@ const formatGroup = (item, config, meta, _not = false, isRoot = false, parentFie
         resultQuery = {
           [op]: [
             formattedField,
-            resultQuery
+            filterQuery
           ]
         };
       } else {

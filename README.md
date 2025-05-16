@@ -514,7 +514,14 @@ Wrapping in `div.query-builder-container` is necessary for correct drag-n-drop s
   #### `jsonLogicFormat`
   `Utils.Export.jsonLogicFormat (immutableValue, config) -> {logic, data, errors}`  
   Convert query value to [JsonLogic](http://jsonlogic.com) format.  
-  If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with null values ("template" data).
+  If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with null values ("template" data).  
+  **Note:** You can set `config.settings.fixJsonLogicDateCompareOp = true` to fix the comparison of dates with `==` and `!=` in JsonLogic by using custom ops `date==`, `date!=`, `datetime==`, `datetime!=`.  
+  **Note:** If you import custom version of `json-logic-js` please add [custom operators](/packages/core/modules/utils/jsonLogicUtils.js#L12) with:
+  ```js
+  import JL from "json-logic-js";
+  Utils.JsonLogicUtils.addRequiredJsonLogicOperations(JL);
+  // console.log(JL.apply({ "now": [] }));
+  ```
 
 ### Import utils
 

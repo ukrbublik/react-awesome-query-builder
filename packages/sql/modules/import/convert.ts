@@ -166,18 +166,25 @@ const convertOp = (logic: OutLogic, conv: Conv, config: Config, meta: Meta, pare
     convChildren = convFuncOp.children;
     operatorOptions = convFuncOp.operatorOptions;
   } else if (logic.operator) {
+    // Pre-convert children of type field or value (to determine expected type for other children of type function)
+    const preConvChildren: Record<number, ValueObj | undefined> = Object.fromEntries(
+      (logic.children || [])
+        .map((a, i) => [i, a])
+        .filter(([_i, a]) => ((a as OutLogic).value !== undefined || (a as OutLogic).field !== undefined))
+        .map(([i, a]) => [i, convertArg(a as OutLogic, conv, config, meta, logic)])
+    );
     // Predict return type for function at RHS based on field type in LHS (and vice versa) (needed to distinguish between date and datetime)
-    const sideVals = (logic.children || []).filter(a => a.value).map(a => convertArg(a, conv, config, meta, logic));
-    const sideFields = (logic.children || []).filter(a => a.field).map(a => convertArg(a, conv, config, meta, logic));
-    const expectedSideTypes = [...new Set([...sideFields.map(f => f?.valueType), ...sideVals.map(v => v?._maybeValueType)].filter(v => !!v))];
-    const expectedSideType = expectedSideTypes.length === 1 ? expectedSideTypes[0] : undefined;
+    const expectedTypes = [...new Set(
+      Object.values(preConvChildren).map(v => v?.valueType ?? v?._maybeValueType).filter(v => !!v)
+    )];
+    const expectedType = expectedTypes.length === 1 ? expectedTypes[0] : undefined;
     for (const child of logic.children || []) {
       if (child.func && !child._type) {
-        child._type = expectedSideType;
+        child._type = expectedType;
       }
     }
     // Convert
-    convChildren = (logic.children || []).map(a => convertArg(a, conv, config, meta, logic));
+    convChildren = (logic.children || []).map((a, i) => preConvChildren[i] ?? convertArg(a, conv, config, meta, logic)); 
     const isMultiselect = convChildren.filter(ch => ch?.valueType === "multiselect").length > 0;
     const isSelect = convChildren.filter(ch => ch?.valueType === "select").length > 0;
     if (opKeys?.length > 1) {

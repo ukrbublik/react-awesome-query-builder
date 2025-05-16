@@ -316,10 +316,10 @@ const formatRule = (item, config, meta, parentField = null) => {
   const {value: formattedField, valueSrc: _fieldSrc, valueType: fieldType} = formatLhs(meta, config, field, fieldSrc, parentField) ?? {};
   if (formattedField === undefined)
     return undefined;
-  
+
   // format expression
   let res = formatExpression(
-    meta, config, properties, formattedField, formattedValue, realOp, valueSrc, valueType, isRev
+    meta, config, properties, formattedField, formattedValue, realOp, valueSrc, valueType ?? fieldType, isRev
   );
   return res;
 };
