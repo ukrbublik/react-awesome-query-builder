@@ -10,9 +10,9 @@ const dateDimListValues = {
 };
 const dateDimDefault = "day";
 const datetimeDimListValues = {
-  // hour: "hour",
-  // minute: "minute",
-  // second: "second",
+  hour: "hour",
+  minute: "minute",
+  second: "second",
   ...dateDimListValues,
 };
 const datetimeDimDefault = "day";
