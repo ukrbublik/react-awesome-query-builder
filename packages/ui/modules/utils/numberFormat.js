@@ -58,9 +58,9 @@ const findChangeRange = (prevValue, newValue) => {
 
   //check what has been changed from last
   while (
-    prevValue[prevLength - 1 - j] === newValue[newLength - 1 - j] &&
-    newLength - j > i &&
-    prevLength - j > i
+    prevValue[prevLength - 1 - j] === newValue[newLength - 1 - j]
+    && newLength - j > i
+    && prevLength - j > i
   ) {
     j++;
   }

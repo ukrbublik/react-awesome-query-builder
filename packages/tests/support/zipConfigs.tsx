@@ -116,6 +116,7 @@ const operators: Record<string, Partial<Operator>> = {
       <strong key="to">to</strong>,
     ],
     // modify, change type from primitive to object
+    // @ts-ignore
     jsonLogic: { aaa: 1 },
     // delete
     labelForFormat: undefined,

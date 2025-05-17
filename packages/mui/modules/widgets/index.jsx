@@ -142,7 +142,7 @@ const themeToCssVars = (theme) => {
   };
 };
 
-export default {
+const MuiWidgets = {
   MuiTextWidget,
   MuiTextAreaWidget,
   MuiDateWidget,
@@ -172,3 +172,5 @@ export default {
   MuiProvider,
   themeToCssVars,
 };
+
+export default MuiWidgets;

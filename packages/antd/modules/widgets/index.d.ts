@@ -3,7 +3,6 @@ import {
   FieldProps, ConjsProps, SwitchProps, ButtonProps, ButtonGroupProps, ProviderProps, ValueSourcesProps, ConfirmFunc,
   BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, PriceWidgetProps, RangeSliderWidgetProps, TreeSelectWidgetProps
 } from "@react-awesome-query-builder/ui";
-import type { GlobalToken } from "antd";
 
 export interface AntdWidgets {
   // antd core widgets
@@ -15,7 +14,6 @@ export interface AntdWidgets {
   ButtonGroup: ElementType<ButtonGroupProps>,
   Conjs: ElementType<ConjsProps>,
   Switch: ElementType<SwitchProps>,
-  Provider: ElementType<ProviderProps>,
   ValueSources: ElementType<ValueSourcesProps>,
   confirm: ConfirmFunc,
 
@@ -35,7 +33,7 @@ export interface AntdWidgets {
   DateTimeWidget: ElementType<DateTimeWidgetProps>,
   BooleanWidget: ElementType<BooleanWidgetProps>,
 
-  themeToCssVars: (palette: GlobalToken, darkMode: boolean) => Record<string, string>,
+  Provider: ElementType<ProviderProps>,
 }
 
 export declare const AntdWidgets: AntdWidgets;

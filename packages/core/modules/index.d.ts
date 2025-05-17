@@ -1,5 +1,5 @@
 /* eslint-disable no-extra-semi */
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/no-empty-object-type */
 
 import {List as ImmList, Map as ImmMap, OrderedMap as ImmOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";
@@ -23,7 +23,9 @@ interface ReactAttributes {
   key?: ReactKey | null | undefined;
 }
 
-export type FactoryWithContext<P> = (props: ReactAttributes & P, ctx?: ConfigContext) => ReactElement<P>;
+export type FactoryFnWithoutPropsWithContext<F> = (this: ConfigContext, ctx: ConfigContext) => F;
+export type FactoryFnWithContext<P, F> = (this: ConfigContext, props: P, ctx?: ConfigContext) => F;
+export type FactoryWithContext<P> = (this: ConfigContext, props: ReactAttributes & P, ctx?: ConfigContext) => ReactElement<P>;
 export type RenderedReactElement = ReactElement | string;
 export type SerializedFunction = JsonLogicFunction | string;
 export type SerializableType<T, SER = false> = SER extends true ? T | SerializedFunction : T;
@@ -46,6 +48,7 @@ type PickDeprecated<T, K extends keyof T> = {
 };
 
 export type PartialPartial<T> = {
+  // eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
   [P in keyof T]?: T[P] extends Object ? Partial<T[P]> : T[P];
 };
 
@@ -70,15 +73,21 @@ export type AsyncListValues = Array<any>;
 // for export/import
 
 export type MongoValue = any;
-export type ElasticSearchQueryType = string;
+export type MongoQueryObject = Record<string, MongoValue>;
+
+export type ElasticQueryType = string;
+export type ElasticQueryObject = Record<string, any>;
+
+export type SqlOutLogic = Record<string, any>; // OutLogic in packages/sql/modules/import/types.ts
 
 export type JsonLogicResult = {
   logic?: JsonLogicTree;
-  data?: Object;
+  data?: Record<string, any>;
   errors?: Array<string>;
 }
-export type JsonLogicFunction = Object;
-export type JsonLogicTree = Object;
+type SingleKeyObject<T> = { [K in string]: T } & { length?: never };
+export type JsonLogicFunction = SingleKeyObject<Array<JsonLogicValue> | JsonLogicValue>;
+export type JsonLogicTree = JsonLogicFunction;
 export type JsonLogicValue = any;
 export type JsonLogicField = { "var": string };
 export interface SpelRawValue {
@@ -538,15 +547,15 @@ interface Export {
   /**
    * @deprecated
    */
-  queryBuilderFormat(tree: ImmutableTree, config: Config): Object | undefined;
+  queryBuilderFormat(tree: ImmutableTree, config: Config): Record<string, any> | undefined;
   queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean, isDebugMode?: boolean): string | undefined;
   sqlFormat(tree: ImmutableTree, config: Config): string | undefined;
   _sqlFormat(tree: ImmutableTree, config: Config): [string | undefined, Array<string>];
   spelFormat(tree: ImmutableTree, config: Config): string | undefined;
   _spelFormat(tree: ImmutableTree, config: Config): [string | undefined, Array<string>];
-  mongodbFormat(tree: ImmutableTree, config: Config): Object | undefined;
-  _mongodbFormat(tree: ImmutableTree, config: Config): [Object | undefined, Array<string>];
-  elasticSearchFormat(tree: ImmutableTree, config: Config, syntax?: "ES_6_SYNTAX" | "ES_7_SYNTAX"): Object | undefined;
+  mongodbFormat(tree: ImmutableTree, config: Config): MongoQueryObject | undefined;
+  _mongodbFormat(tree: ImmutableTree, config: Config): [MongoQueryObject | undefined, Array<string>];
+  elasticSearchFormat(tree: ImmutableTree, config: Config, syntax?: "ES_6_SYNTAX" | "ES_7_SYNTAX"): ElasticQueryObject | undefined;
 }
 interface Autocomplete {
   simulateAsyncFetch(all: ListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
@@ -570,7 +579,7 @@ interface ConfigUtils {
   getFieldWidgetConfig(config: Config, field: AnyFieldValue, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
   isJSX(jsx: any): boolean;
   isDirtyJSX(jsx: any): boolean;
-  cleanJSX(jsx: any): Object;
+  cleanJSX(jsx: any): any;
   applyJsonLogic: JsonLogicUtils["applyJsonLogic"];
   iterateFuncs(config: Config): Iterable<[funcPath: string, funcConfig: Func]>;
   iterateFields(config: Config): Iterable<[fieldPath: string, fieldConfig: Field, fieldKey: string]>;
@@ -673,8 +682,10 @@ type MixObject<T extends Record<string, any>> = {
   [P in Exclude<string, keyof T>]: any;
 } & MixSymbols<T>;
 type MixArray<T extends Array<any>> = (T /* & MixinSymbols<T> */);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 type _Opt<T> = T extends Function ? T : T extends Array<any> ? T : T extends Record<string, any> ? Partial<T> : T;
 type Opt<T> = _Opt<Exclude<T, undefined>>;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 type _MixType<T> = T extends Function ? T : T extends Array<any> ? MixArray<T> : T extends Record<string, any> ? MixObject<T> : Opt<T>;
 export type MixType<T> = _MixType<Opt<T>>;
 
@@ -712,11 +723,12 @@ interface OtherUtils {
   isJsonLogic(value: any): boolean;
   isJSX(jsx: any): boolean;
   isDirtyJSX(jsx: any): boolean;
-  cleanJSX(jsx: any): Object;
+  cleanJSX(jsx: any): any;
   escapeRegExp(str: string): string;
   //applyToJS(imm: any): any; // same as immutableToJs
   isImmutable(value: any): boolean;
   toImmutableList(path: string[]): ImmutablePath;
+  isTruthy<T>(value: T | false | null | undefined): value is T;
 }
 
 export interface Utils extends Import, Export,
@@ -989,9 +1001,9 @@ type SqlFormatValue =               (this: ConfigContext, val: RuleValue, fieldD
 type SpelFormatValue =              (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string | string[];
 type MongoFormatValue =             (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
 type JsonLogicFormatValue =         (this: ConfigContext, val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
-type ElasticSearchFormatValue =     (this: ConfigContext, queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: FieldPath, config: Config) => AnyObject | null;
+type ElasticSearchFormatValue =     (this: ConfigContext, queryType: ElasticQueryType, val: RuleValue, op: string, field: FieldPath, config: Config) => ElasticQueryObject | null;
 
-export type ValidateValue<V = RuleValue> = (this: ConfigContext, val: V, fieldSettings: FieldSettings, op: string, opDef: Operator, rightFieldDef?: Field) => boolean | string | { error: string | {key: string, args?: Object}, fixedValue?: V } | null;
+export type ValidateValue<V = RuleValue> = (this: ConfigContext, val: V, fieldSettings: FieldSettings, op: string, opDef: Operator, rightFieldDef?: Field) => boolean | string | { error: string | {key: string, args?: Record<string, any>}, fixedValue?: V } | null;
 
 export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   type: string;
@@ -1137,11 +1149,11 @@ export interface ConjsProps {
 
 // tip: for multiselect widget `vals` is always Array, for between/proximity op `vals` can be Array or ImmutableList (only for sql, simple string - TODO: onvert to [])
 type FormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[] | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, isForDisplay?: boolean, fieldDef?: Field) => string | undefined;
-type MongoFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: MongoValue | Array<MongoValue>, not?: boolean, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => Object | undefined;
+type MongoFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: MongoValue | Array<MongoValue>, not?: boolean, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => MongoQueryObject | undefined;
 type SqlFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[] | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string | undefined;
 type SpelFormatOperator = (this: ConfigContext, field: FieldPath, op: string, vals: string | string[], valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string | undefined;
 type JsonLogicFormatOperator = (this: ConfigContext, field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field, expectedType?: string, settings?: Settings) => JsonLogicTree | undefined;
-type ElasticSearchFormatQueryType = (this: ConfigContext, valueType: string) => ElasticSearchQueryType;
+type ElasticFormatQueryType = (this: ConfigContext, valueType: string) => ElasticQueryType;
 
 interface ProximityConfig {
   optionLabel: string;
@@ -1179,11 +1191,11 @@ export interface BaseOperator {
   spelOp?: string;
   spelOps?: string[];
   spelFormatOp?: SerializableType<SpelFormatOperator>;
-  jsonLogic?: string | JsonLogicFormatOperator | JsonLogicFunction;
+  jsonLogic?: string | JsonLogicFormatOperator;
   jsonLogic2?: string;
   jsonLogicOps?: string[];
   _jsonLogicIsExclamationOp?: boolean;
-  elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType | JsonLogicFunction;
+  elasticSearchQueryType?: ElasticQueryType | ElasticFormatQueryType;
   valueSources?: Array<ValueSource>;
   valueTypes?: Array<string>;
 }
@@ -1497,9 +1509,9 @@ export interface LocaleTranslations {
 export interface LocaleSettings extends LocaleTranslations {
   locale?: {
     moment?: string;
-    antd?: Object;
-    material?: Object;
-    mui?: Object;
+    antd?: Record<string, any>;
+    material?: Record<string, any>;
+    mui?: Record<string, any>;
   };
 }
 
@@ -1532,8 +1544,8 @@ export interface BehaviourSettings {
   immutableFieldsMode?: boolean;
   immutableOpsMode?: boolean;
   immutableValuesMode?: boolean;
-  maxNumberOfRules?: Number;
-  maxNumberOfCases?: Number;
+  maxNumberOfRules?: number;
+  maxNumberOfCases?: number;
   showErrorMessage?: boolean;
   convertableWidgets?: TypedMap<Array<string>>;
   exportPreserveGroups?: boolean;
@@ -1570,7 +1582,7 @@ export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettin
 /////////////////
 
 export type SqlFormatFunc        = (this: ConfigContext, formattedArgs: TypedMap<string>, sqlDialect?: SqlDialect) => string;
-export type SqlImportFunc        = (this: ConfigContext, sql: Object, wgtDef?: Widget, sqlDialect?: SqlDialect) => Record<string, RuleValue> | undefined; // can throw, should return {func?, args: {}} or {operator?, children: []}
+export type SqlImportFunc        = (this: ConfigContext, sql: SqlOutLogic, wgtDef?: Widget, sqlDialect?: SqlDialect) => Record<string, RuleValue> | undefined; // can throw, should return {func?, args: {}} or {operator?, children: []}
 export type FormatFunc           = (this: ConfigContext, formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
 export type MongoFormatFunc      = (this: ConfigContext, formattedArgs: TypedMap<MongoValue>) => MongoValue;
 export type JsonLogicFormatFunc  = (this: ConfigContext, formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
@@ -1591,7 +1603,7 @@ export interface Func extends Omit<BaseSimpleField, "type"> {
   spelFunc?: string;
   mongoFunc?: string;
   mongoArgsAsObject?: boolean;
-  jsonLogic?: string | JsonLogicFormatFunc | JsonLogicFunction;
+  jsonLogic?: string | JsonLogicFormatFunc;
   // Deprecated!
   // Calling methods on objects was remvoed in JsonLogic 2.x
   // https://github.com/jwadhams/json-logic-js/issues/86

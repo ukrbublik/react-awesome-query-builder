@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Utils } from "@react-awesome-query-builder/ui";
 import { expect } from "chai";
 // warning: don't put `export_checks` inside `it`
@@ -61,7 +62,7 @@ describe("OtherUtils", () => {
     //const $arrayMergeMode = Symbol.for("_arrayMergeMode");
 
     function withCanCreate<T>(o: T, v = true): T {
-      Object.assign(o as Object, {[$canCreate]: v});
+      Object.assign(o as object, {[$canCreate]: v});
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return o;
     }

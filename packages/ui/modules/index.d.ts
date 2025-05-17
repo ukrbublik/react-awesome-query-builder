@@ -13,8 +13,9 @@ import {
   ItemType,
   ItemProperties,
   ValueSource,
-  ConfigContext, FactoryWithContext, RenderedReactElement, SerializableType,
+  ConfigContext, FactoryWithContext, FactoryFnWithContext, FactoryFnWithoutPropsWithContext, RenderedReactElement, SerializableType,
   ConjsProps,
+  AsyncFetchListValuesFn,
 
   ImmutableList, ImmutableMap, ImmutableOMap,
   ImmutablePath,
@@ -68,6 +69,8 @@ import {
 } from "@react-awesome-query-builder/core";
 
 // re-export
+// Ignore "Multiple exports of name 'Utils'"
+// eslint-disable-next-line import/export
 export * from "@react-awesome-query-builder/core";
 
 import chroma from "chroma-js";
@@ -157,6 +160,8 @@ type Empty = null | undefined;
 
 export type Dispatch = (action: InputAction) => void;
 
+type DragStartFn = (nodeId: string, dom: HTMLDivElement, e: MouseEvent) => void;
+
 export interface BuilderProps {
   tree: ImmutableTree;
   config: Config;
@@ -178,7 +183,7 @@ export interface ItemProps {
   totalRulesCnt?: number;
   reordableNodesCnt?: number;
   parentReordableNodesCnt?: number;
-  onDragStart?: Function;
+  onDragStart?: DragStartFn;
   isParentLocked?: boolean;
   isDraggingTempo?: boolean;
 }
@@ -269,6 +274,7 @@ export interface ConfirmModalProps {
   cancelText?: string;
   title: string;
   okType?: string;
+  confirmFn?: MuiConfirmFunc;
 }
 
 export interface RuleErrorProps {
@@ -299,10 +305,10 @@ export interface RuleProps {
   reordableNodesCnt: number | Empty;
   totalRulesCnt: number | Empty;
   parentReordableNodesCnt: number | Empty;
-  onDragStart: Function | Empty;
-  handleDraggerMouseDown: Function | Empty;
-  removeSelf: Function | Empty;
-  confirmFn: Function | Empty;
+  onDragStart: DragStartFn | Empty;
+  handleDraggerMouseDown: (e: MouseEvent) => void | Empty;
+  removeSelf: () => void | Empty;
+  confirmFn: MuiConfirmFunc | Empty; // prop from <WithConfirmFn>
 
   //actions
   setField(field: FieldValueI): undefined;
@@ -326,9 +332,9 @@ export type ThemeMode = "light" | "dark";
 
 export interface ThemeSettings {
   theme?: {
-    material?: Object;
-    mui?: Object;
-    antd?: Object;
+    material?: Record<string, any>;
+    mui?: Record<string, any>;
+    antd?: Record<string, any>;
   };
   renderSize?: RenderSize;
   themeMode?: ThemeMode;
@@ -355,8 +361,8 @@ export interface RenderSettings {
   renderProvider?: SerializableType<FactoryWithContext<ProviderProps>>;
   renderValueSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
   renderFieldSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
-  renderConfirm?: SerializableType<ConfirmFunc>;
-  useConfirm?: SerializableType<(() => Function)>;
+  renderConfirm?: SerializableType<FactoryFnWithContext<ConfirmModalProps, ReturnType<ConfirmFunc>>>;
+  useConfirm?: SerializableType<FactoryFnWithoutPropsWithContext<MuiConfirmFunc>>;
   renderItem?: SerializableType<FactoryWithContext<ItemBuilderProps>>;
   renderBeforeWidget?: SerializableType<FactoryWithContext<RuleProps>>;
   renderAfterWidget?: SerializableType<FactoryWithContext<RuleProps>>;
@@ -378,7 +384,15 @@ export interface Settings extends CoreSettings, RenderSettings, ThemeSettings {
 // ReadyWidgets
 /////////////////
 
-export type ConfirmFunc = (opts: ConfirmModalProps) => void;
+interface MuiConfirmOptions {
+  // import { ConfirmOptions } from "material-ui-confirm";
+  description?: string;
+  title?: string;
+  confirmationText?: string;
+  cancellationText?: string;
+}
+export type MuiConfirmFunc = (props: MuiConfirmOptions) => Promise<void>;
+export type ConfirmFunc = (props: ConfirmModalProps) => void;
 
 interface VanillaWidgets {
   // core
@@ -432,13 +446,60 @@ export interface Utils extends CoreUtils {
   // }
 }
 
+// Ignore "Multiple exports of name 'Utils'"
+// eslint-disable-next-line import/export
 export declare const Utils: Utils;
 
-
 //////////////////
+
+export interface UseListValuesAutocompleteProps {
+  asyncFetch: AsyncFetchListValuesFn;
+  useLoadMore: boolean;
+  useAsyncSearch: boolean;
+  forceAsyncSearch: boolean;
+  fetchSelectedValuesOnInit: boolean;
+  // asyncListValues: selectedAsyncListValues;
+  // listValues: staticListValues;
+  allowCustomValues: boolean;
+  // value: selectedValue;
+  setValue: (value: any) => void;
+  placeholder: string;
+  config: any;
+  field: any;
+}
+export interface UseListValuesAutocompleteReturn {
+  open: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  onChange: (value: any) => void;
+  onInputChange: (value: string) => void;
+  inputValue: string;
+  options: any[];
+  isInitialLoading: boolean;
+  isLoading: boolean;
+  aPlaceholder: string;
+  extendOptions: any;
+  getOptionSelected: (option: any) => boolean;
+  getOptionDisabled: (option: any) => boolean;
+  getOptionIsCustom: (option: any) => boolean;
+  getOptionLabel: (option: any) => string;
+  selectedListValue: any;
+}
+export interface UseListValuesAutocompleteOptions {
+  multiple: boolean;
+  debounceTimeout?: number;
+  uif?: "antd" | "material" | "mui";
+  isFieldAutocomplete?: boolean;
+  dontFixOptionsOrder?: boolean;
+}
+
+export interface Hooks {
+  useListValuesAutocomplete: (props: UseListValuesAutocompleteProps, options: UseListValuesAutocompleteOptions) => UseListValuesAutocompleteReturn;
+}
 
 export declare const Query: Query;
 export declare const Builder: Builder;
 export declare const BasicConfig: BasicConfig;
 export declare const VanillaWidgets: VanillaWidgets;
+export declare const Hooks: Hooks;
 

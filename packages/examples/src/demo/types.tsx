@@ -31,7 +31,7 @@ declare global {
   interface Window {
     _initialSkin: string;
     _initFile: string;
-    _configChanges: Object;
+    _configChanges: Record<string, any>;
   }
 
   interface Console {
