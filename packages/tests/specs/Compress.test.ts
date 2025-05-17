@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { CoreConfig, Utils } from "@react-awesome-query-builder/core";
 import {
   Config, BasicConfig, Fields, Field,

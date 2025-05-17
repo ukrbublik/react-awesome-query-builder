@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import moment from "moment";
 import { expect } from "chai";
 import * as configs from "../support/configs";

@@ -150,26 +150,6 @@ module.exports = {
         },
 
         {
-            "files": ["packages/tests/**/*"],
-            "env": {
-                "mocha": true,
-                // "jasmine": true,
-            },
-            "settings": {
-                "import/core-modules": [
-                    "sinon",
-                    "chai",
-                    "mocha"
-                ],
-                // "import/resolver": {
-                //     "webpack": {
-                //         "config": "./webpack.config.js"
-                //     }
-                // },
-            },
-        },
-
-        {
             "files": ["packages/sandbox_simple/**/*"],
             "parser": "@babel/eslint-parser",
             "parserOptions": {
@@ -227,6 +207,29 @@ module.exports = {
                 "react/display-name": 0,
                 "react/prop-types": 0,
             }
+        },
+
+        {
+            "files": ["packages/tests/**/*"],
+            "env": {
+                "mocha": true,
+                // "jasmine": true,
+            },
+            "settings": {
+                "import/core-modules": [
+                    "sinon",
+                    "chai",
+                    "mocha"
+                ],
+                // "import/resolver": {
+                //     "webpack": {
+                //         "config": "./webpack.config.js"
+                //     }
+                // },
+            },
+            "rules": {
+                "@typescript-eslint/no-unused-expressions": 0,
+            },
         },
     ],
 }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Query, Builder, BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 import { AntdConfig } from "@react-awesome-query-builder/antd";
 import * as configs from "../support/configs";

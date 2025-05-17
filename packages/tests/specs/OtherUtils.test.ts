@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Utils } from "@react-awesome-query-builder/ui";
 import { expect } from "chai";
 // warning: don't put `export_checks` inside `it`
