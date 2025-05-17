@@ -25,7 +25,8 @@ export default class BooleanWidget extends PureComponent {
   };
 
   render() {
-    const {customProps, value,  labelYes, labelNo, readonly} = this.props;
+    const {customProps, value,  labelYes, labelNo, readonly, config} = this.props;
+    const {renderSize} = config.settings;
         
     return (
       <Switch
@@ -34,6 +35,7 @@ export default class BooleanWidget extends PureComponent {
         checked={value || null}
         onChange={this.handleChange}
         disabled={readonly}
+        size={renderSize}
         {...customProps}
       />
     );

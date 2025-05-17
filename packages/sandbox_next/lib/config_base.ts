@@ -15,7 +15,6 @@ import {
 //   Or use JsonLogic functions, see `validateValue` for `login` field (advanced usage, but doesn't change `ctx`).
 
 function createConfig(InitialConfig: CoreConfig): Config {
-
   const fields: Fields = {
     user: {
       label: "User",
@@ -418,4 +417,6 @@ function createConfig(InitialConfig: CoreConfig): Config {
   return config;
 }
 
-export default createConfig(CoreConfig);
+const createdConfig = createConfig(CoreConfig);
+
+export default createdConfig;

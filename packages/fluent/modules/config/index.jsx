@@ -1,5 +1,5 @@
 import React from "react";
-import FluentUIWidgets from "../widgets";
+import {default as FluentUIWidgets} from "../widgets";
 import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 
 

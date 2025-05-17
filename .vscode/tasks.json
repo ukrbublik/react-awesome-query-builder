@@ -192,7 +192,6 @@
 			"type": "npm",
 			"script": "lint-fix",
 			"group": "build",
-            "hide": true,
             "presentation": {
                 "reveal": "silent",
                 "panel": "dedicated",
@@ -203,6 +202,7 @@
                     "executable": "${workspaceFolder}/scripts/nvms.sh"
                 },
                 "statusbar": {
+                    "hide": true,
                     "running": {
                         "backgroundColor": "statusBarItem.errorBackground"
                     }
@@ -253,6 +253,29 @@
             }
 		},
 		{
+			"label": "test-debug",
+			"type": "npm",
+			"script": "test-debug",
+			"group": "test",
+			"isBackground": true,
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated",
+                "clear": true,
+            },
+            "options": {
+                "shell": {
+                    "executable": "${workspaceFolder}/scripts/nvms.sh"
+                },
+                "statusbar": {
+                    "label": "test-dbg",
+                    "running": {
+                        "backgroundColor": "statusBarItem.warningBackground"
+                    }
+                }
+            }
+		},
+		{
 			"label": "examples",
 			"type": "npm",
 			"script": "start",
@@ -267,6 +290,7 @@
                     "executable": "${workspaceFolder}/scripts/nvms.sh"
                 },
                 "statusbar": {
+                    "label": "playground",
                     "running": {
                         "backgroundColor": "statusBarItem.warningBackground"
                     }
@@ -288,6 +312,7 @@
                     "executable": "${workspaceFolder}/scripts/nvms.sh"
                 },
                 "statusbar": {
+                    "label": "demo-js",
                     "running": {
                         "backgroundColor": "statusBarItem.warningBackground"
                     }
@@ -309,6 +334,7 @@
                     "executable": "${workspaceFolder}/scripts/nvms.sh"
                 },
                 "statusbar": {
+                    "label": "demo-ts",
                     "running": {
                         "backgroundColor": "statusBarItem.warningBackground"
                     }
@@ -330,6 +356,7 @@
                     "executable": "${workspaceFolder}/scripts/nvms.sh"
                 },
                 "statusbar": {
+                    "label": "demo-next",
                     "running": {
                         "backgroundColor": "statusBarItem.warningBackground"
                     }
@@ -351,30 +378,9 @@
                     "executable": "${workspaceFolder}/scripts/nvms.sh"
                 },
                 "statusbar": {
+                    "hide" : true,
                     "running": {
                         "backgroundColor": "statusBarItem.errorBackground"
-                    }
-                }
-            }
-		},
-		{
-			"label": "test-debug",
-			"type": "npm",
-			"script": "test-debug",
-			"group": "test",
-			"isBackground": true,
-            "presentation": {
-                "reveal": "silent",
-                "panel": "dedicated",
-                "clear": true,
-            },
-            "options": {
-                "shell": {
-                    "executable": "${workspaceFolder}/scripts/nvms.sh"
-                },
-                "statusbar": {
-                    "running": {
-                        "backgroundColor": "statusBarItem.warningBackground"
                     }
                 }
             }

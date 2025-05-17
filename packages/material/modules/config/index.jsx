@@ -1,5 +1,5 @@
 import React from "react";
-import MaterialWidgets from "../widgets";
+import {default as MaterialWidgets} from "../widgets";
 import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 
 

@@ -9,6 +9,6 @@ const MomentDatePicker = (() => {
     // support ant 4.x
     return DatePicker;
   }
-})();
+})() as any as typeof DatePicker;
 
 export default MomentDatePicker;

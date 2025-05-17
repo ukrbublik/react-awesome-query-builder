@@ -7,7 +7,6 @@ import { importFromInitFile, initTreeWithValidation } from "../utils";
 import { initFiles } from "../init_data";
 
 const stringify = JSON.stringify;
-const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
 
 export const useInitFiles = (
@@ -54,7 +53,7 @@ export const useInitFiles = (
     return (
       <>
         { state.initErrors.length > 0 
-          && <pre style={preErrorStyle}>
+          && <pre className="qb-demo-error-pre">
             {stringify(state.initErrors, undefined, 2)}
           </pre> 
         }

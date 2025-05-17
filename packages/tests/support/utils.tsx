@@ -58,7 +58,13 @@ export const setCurrentTestTimeout = (ms: number) => {
 };
 
 export const getIt = (options?: DoOptions) => {
-  return (options?.insideIt ? ((name: string, func: Function) => { func(); }) : it) as (name: string, func: Function) => void;
+  if (options?.insideIt) {
+    return async (name: string, func: () => Promise<void> | void) => {
+      await func();
+    };
+  } else {
+    return it;
+  }
 };
 
 const ConsoleMethods = [
@@ -89,9 +95,9 @@ interface ExtectedExports {
   queryHuman?: string;
   sql?: string | [string, string[]];
   spel?: string;
-  mongo?: Object;
-  elasticSearch?: Object;
-  elasticSearch7?: Object;
+  mongo?: Record<string, any>;
+  elasticSearch?: Record<string, any>;
+  elasticSearch7?: Record<string, any>;
   logic?: JsonLogicTree | [JsonLogicTree, string[]];
   tree?: JsonTree;
 }
@@ -265,7 +271,7 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
 
   let tree: ImmutableTree | undefined;
   if (valueFormat === "JsonLogic") {
-    [tree, errors] = _loadFromJsonLogic(value, config);
+    [tree, errors] = _loadFromJsonLogic(value as JsonLogicTree, config);
   } else if (valueFormat === "SQL") {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     ({tree, errors} = SqlUtils.loadFromSql(value as string, config));
@@ -682,7 +688,7 @@ const do_export_checks = async (config: Config, tree: ImmutableTree, expects?: E
     if (expects["mongo"] !== undefined) {
       doIt("should work to MongoDb", () => {
         const [expectedRes, expectedExportErrors] = Array.isArray(expects["mongo"])
-          ? expects["mongo"] as [Object, string[]]
+          ? expects["mongo"] as [Record<string, any>, string[]]
           : [expects["mongo"], []];
         const [res, errors] = _mongodbFormat(tree, config);
         expect_objects_equal(res, expectedRes);
@@ -710,7 +716,7 @@ const do_export_checks = async (config: Config, tree: ImmutableTree, expects?: E
           ? expects["logic"]
           : [expects["logic"], []]) as [JsonLogicTree, string[]];
         const {logic, data, errors} = jsonLogicFormat(tree, config);
-        const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) as Object : undefined;
+        const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) as Record<string, any> : undefined;
         expect_objects_equal(safe_logic, expectedLogic);
         expect_objects_equal(errors, expectedExportErrors || []);
       });
@@ -876,6 +882,7 @@ export function sleep(delay: number, options?: SleepOptions) {
 const mergeCustomizerCleanJSX = (_objValue: any, srcValue: any) => {
   const { isDirtyJSX, cleanJSX } = Utils.ConfigUtils;
   if (isDirtyJSX(srcValue)) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return cleanJSX(srcValue);
   }
   return undefined;

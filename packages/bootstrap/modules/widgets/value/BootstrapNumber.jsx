@@ -3,6 +3,7 @@ import { Input } from "reactstrap";
 
 export default (props) => {
   const {value, setValue, config, readonly, min, max, step, placeholder} = props;
+  const darkMode = config.settings.themeMode === "dark";
   const onChange = e => {
     let val = e.target.value;
     if (val === "" || val === null)
@@ -23,6 +24,7 @@ export default (props) => {
       max={max}
       step={step}
       onChange={onChange}
+      className={darkMode ? "bg-dark text-light border-dark placeholder-light color-scheme-dark" : undefined}
     />
   );
 };

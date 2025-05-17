@@ -1,6 +1,8 @@
 # Changelog
 - 6.7.0
   - Added `price` widget based on `react-number-format` (PR #1206) (issue #1025)
+  - Theming improved (PR #1188) (issues #892 #970)
+  - Dropped `compact_styles.scss`, use class `.qb-compact` for RAQB container instead
 - 6.6.15
   - Fixed support of AntDesign 4.x DatePicker (PR #1239) (issue #1238)
   - Prevent potential prototype pollution in `OtherUtils.mergeIn` and `OtherUtils.setIn` (PR #1240)

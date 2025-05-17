@@ -147,6 +147,8 @@ const settings = {
   defaultSearchWidth: "100px",
   defaultMaxRows: 5,
   renderSize: "small",
+  compactMode: false,
+  // themeMode: "light",
   maxLabelsLength: 100,
 
   showLock: false,

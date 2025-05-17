@@ -13,8 +13,12 @@ import {
   ItemType,
   ItemProperties,
   ValueSource,
-  ConfigContext, FactoryWithContext, RenderedReactElement, SerializableType,
+  ConfigContext, FactoryWithContext, FactoryFnWithContext, FactoryFnWithoutPropsWithContext, RenderedReactElement, SerializableType,
   ConjsProps,
+  AsyncFetchListValuesFn,
+  ListOptionUi,
+  ListValues,
+  ListItem,
 
   ImmutableList, ImmutableMap, ImmutableOMap,
   ImmutablePath,
@@ -68,7 +72,11 @@ import {
 } from "@react-awesome-query-builder/core";
 
 // re-export
+// Ignore "Multiple exports of name 'Utils'"
+// eslint-disable-next-line import/export
 export * from "@react-awesome-query-builder/core";
+
+import chroma from "chroma-js";
 
 /////////////////
 // override <C> in types
@@ -155,6 +163,8 @@ type Empty = null | undefined;
 
 export type Dispatch = (action: InputAction) => void;
 
+type DragStartFn = (nodeId: string, dom: HTMLDivElement, e: MouseEvent) => void;
+
 export interface BuilderProps {
   tree: ImmutableTree;
   config: Config;
@@ -176,7 +186,7 @@ export interface ItemProps {
   totalRulesCnt?: number;
   reordableNodesCnt?: number;
   parentReordableNodesCnt?: number;
-  onDragStart?: Function;
+  onDragStart?: DragStartFn;
   isParentLocked?: boolean;
   isDraggingTempo?: boolean;
 }
@@ -267,6 +277,7 @@ export interface ConfirmModalProps {
   cancelText?: string;
   title: string;
   okType?: string;
+  confirmFn?: MuiConfirmFunc;
 }
 
 export interface RuleErrorProps {
@@ -297,10 +308,10 @@ export interface RuleProps {
   reordableNodesCnt: number | Empty;
   totalRulesCnt: number | Empty;
   parentReordableNodesCnt: number | Empty;
-  onDragStart: Function | Empty;
-  handleDraggerMouseDown: Function | Empty;
-  removeSelf: Function | Empty;
-  confirmFn: Function | Empty;
+  onDragStart: DragStartFn | Empty;
+  handleDraggerMouseDown: (e: MouseEvent) => void | Empty;
+  removeSelf: () => void | Empty;
+  confirmFn: MuiConfirmFunc | Empty; // prop from <WithConfirmFn>
 
   //actions
   setField(field: FieldValueI): undefined;
@@ -318,9 +329,28 @@ export interface RuleProps {
 /////////////////
 
 
-type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
-type AntdSize = "small" | "large" | "medium";
+export type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
+export type RenderSize = "small" | "large" | "medium";
+export type ThemeMode = "light" | "dark";
 
+export interface ThemeSettings {
+  theme?: {
+    material?: Record<string, any>;
+    mui?: Record<string, any>;
+    antd?: Record<string, any>;
+  };
+  renderSize?: RenderSize;
+  themeMode?: ThemeMode;
+  compactMode?: boolean;
+  dropdownPlacement?: AntdPosition;
+  groupActionsPosition?: AntdPosition;
+  defaultSliderWidth?: string;
+  defaultSelectWidth?: string;
+  defaultSearchWidth?: string;
+  defaultMaxRows?: number;
+  showLabels?: boolean;
+  maxLabelsLength?: number;
+}
 
 export interface RenderSettings {
   renderField?: SerializableType<FactoryWithContext<FieldProps>>;
@@ -334,16 +364,9 @@ export interface RenderSettings {
   renderProvider?: SerializableType<FactoryWithContext<ProviderProps>>;
   renderValueSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
   renderFieldSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
-  renderConfirm?: SerializableType<ConfirmFunc>;
-  useConfirm?: SerializableType<(() => Function)>;
-  renderSize?: AntdSize;
+  renderConfirm?: SerializableType<FactoryFnWithContext<ConfirmModalProps, ReturnType<ConfirmFunc>>>;
+  useConfirm?: SerializableType<FactoryFnWithoutPropsWithContext<MuiConfirmFunc>>;
   renderItem?: SerializableType<FactoryWithContext<ItemBuilderProps>>;
-  dropdownPlacement?: AntdPosition;
-  groupActionsPosition?: AntdPosition;
-  showLabels?: boolean;
-  maxLabelsLength?: number;
-  customFieldSelectProps?: AnyObject;
-  customOperatorSelectProps?: AnyObject;
   renderBeforeWidget?: SerializableType<FactoryWithContext<RuleProps>>;
   renderAfterWidget?: SerializableType<FactoryWithContext<RuleProps>>;
   renderBeforeActions?: SerializableType<FactoryWithContext<RuleProps>>;
@@ -352,20 +375,27 @@ export interface RenderSettings {
   renderAfterCaseValue?: SerializableType<FactoryWithContext<RuleProps>>;
   renderRuleError?: SerializableType<FactoryWithContext<RuleErrorProps>>;
   renderSwitchPrefix?: SerializableType<RenderedReactElement>;
-  defaultSliderWidth?: string;
-  defaultSelectWidth?: string;
-  defaultSearchWidth?: string;
-  defaultMaxRows?: number;
+
+  customFieldSelectProps?: AnyObject;
+  customOperatorSelectProps?: AnyObject;
 }
 
-export interface Settings extends CoreSettings, RenderSettings {
+export interface Settings extends CoreSettings, RenderSettings, ThemeSettings {
 }
 
 /////////////////
 // ReadyWidgets
 /////////////////
 
-export type ConfirmFunc = (opts: ConfirmModalProps) => void;
+interface MuiConfirmOptions {
+  // import { ConfirmOptions } from "material-ui-confirm";
+  description?: string;
+  title?: string;
+  confirmationText?: string;
+  cancellationText?: string;
+}
+export type MuiConfirmFunc = (props: MuiConfirmOptions) => Promise<void>;
+export type ConfirmFunc = (props: ConfirmModalProps) => void;
 
 interface VanillaWidgets {
   // core
@@ -400,25 +430,92 @@ interface VanillaWidgets {
 // extend Utils
 /////////////////
 
+export interface ColorUtils {
+  chroma: typeof chroma;
+  setOpacityForHex(hex: string, alpha: number): string;
+  generateCssVarsForLevels(isDark: boolean, cssVar: string, baseColor: string, baseDarkColor?: string, lightRatio?: number, darkRatio?: number, maxLevel?: number, minLevel?: number): Record<string, string>;
+}
+export interface NumberFormat {
+  getNumberFormatProps: (props: Record<string, any>, excludePropsNames?: string[]) => Record<string, any>;
+  NumericFormat: typeof NumericFormat;
+  numericFormatter: (val: number, numericFormatProps: NumericFormatProps) => string;
+  numericParser: (str: string, numericFormatProps: NumericFormatProps, lastStrValue?: string, lastNumValue?: number) => number | undefined;
+}
 export interface Utils extends CoreUtils {
-  NumberFormat: {
-    getNumberFormatProps: (props: Record<string, any>, excludePropsNames?: string[]) => Record<string, any>;
-    NumericFormat: typeof NumericFormat;
-    numericFormatter: (val: number, numericFormatProps: NumericFormatProps) => string;
-    numericParser: (str: string, numericFormatProps: NumericFormatProps, lastStrValue?: string, lastNumValue?: number) => number | undefined;
-  }
+  NumberFormat: NumberFormat;
+  ColorUtils: ColorUtils;
   // ReactUtils: {
   //   useOnPropsChanged(obj: ReactElement): void;
   // }
 }
 
+// Ignore "Multiple exports of name 'Utils'"
+// eslint-disable-next-line import/export
 export declare const Utils: Utils;
 
-
 //////////////////
+
+
+type AutocompleteChangeReason = "selectOption" | "removeOption" | "clear" | null;
+type AutocompleteInputChangeReason = "selectOption" | "removeOption" | "clear" | "blur" | "input" | "reset" | "my-reset" | null;
+export interface UseListValuesAutocompleteProps {
+  asyncFetch: AsyncFetchListValuesFn;
+  useLoadMore?: boolean;
+  useAsyncSearch?: boolean;
+  forceAsyncSearch?: boolean;
+  fetchSelectedValuesOnInit?: boolean;
+  asyncListValues?: ListValues; // selectedAsyncListValues
+  listValues: ListValues; // staticListValues
+  allowCustomValues?: boolean;
+  value?: string | number | string[] | number[]; // selectedValue (array for multiple=true)
+  setValue: (value: string | number | string[] | number[]) => void;
+  placeholder?: string;
+  config: Config;
+}
+export interface UseListValuesAutocompleteOptions {
+  multiple: boolean;
+  debounceTimeout?: number;
+  uif?: "antd" | "material" | "mui";
+  isFieldAutocomplete?: boolean;
+  dontFixOptionsOrder?: boolean;
+}
+export interface UseListValuesAutocompleteReturn {
+  open: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  onChange: (
+    // tip: null for mui
+    e: React.SyntheticEvent<HTMLInputElement> | null, 
+    // tip: string or string[] for mui
+    val: Empty | string | number | ListOptionUi | Array<string | number | ListOptionUi>,
+    // tip: ListOptionUi or ListOptionUi[] for mui, AutocompleteChangeReason for antd
+    option: AutocompleteChangeReason | ListOptionUi | ListOptionUi[],
+  ) => Promise<void>;
+  onInputChange: (
+    e: React.SyntheticEvent<HTMLInputElement> | null,
+    newInputValue: string,
+    eventType: AutocompleteInputChangeReason,
+  ) => Promise<void>;
+  inputValue: string;
+  options: ListOptionUi[];
+  isInitialLoading: boolean;
+  isLoading: boolean;
+  aPlaceholder: string;
+  extendOptions: (options: ListOptionUi[]) => ListOptionUi[];
+  getOptionSelected: (option: ListOptionUi, selectedValueOrOption: ListItem | null) => boolean;
+  getOptionDisabled: (valueOrOption: ListItem) => boolean;
+  getOptionIsCustom: (option: ListItem) => boolean;
+  getOptionLabel: (option: ListItem | null) => string | null;
+  selectedListValue: ListItem | null;
+}
+
+export interface Hooks {
+  useListValuesAutocomplete: (props: UseListValuesAutocompleteProps, options: UseListValuesAutocompleteOptions) => UseListValuesAutocompleteReturn;
+}
 
 export declare const Query: Query;
 export declare const Builder: Builder;
 export declare const BasicConfig: BasicConfig;
 export declare const VanillaWidgets: VanillaWidgets;
+export declare const Hooks: Hooks;
 

@@ -8,7 +8,8 @@ const { moment } = Utils;
 const xdpVersion = parseInt(xdpPackage?.version?.split(".")?.[0] ?? "0");
 
 export default (props) => {
-  const {value, setValue, use12Hours, readonly, placeholder, timeFormat, valueFormat, customProps} = props;
+  const {value, setValue, use12Hours, readonly, placeholder, timeFormat, valueFormat, customProps, config} = props;
+  const {renderSize} = config.settings;
 
   const formatSingleValue = (value) => {
     return value && value.isValid() ? value.format(valueFormat) : undefined;
@@ -23,7 +24,7 @@ export default (props) => {
 
   const renderInput = (params) => 
     <TextField 
-      size="small" 
+      size={renderSize}
       variant="standard"
       {...params}
     />;
@@ -34,7 +35,7 @@ export default (props) => {
     format: timeFormat,
     slotProps: {
       textField: {
-        size: "small",
+        size: renderSize,
         variant: "standard"
       },
       toolbar: {
@@ -57,6 +58,7 @@ export default (props) => {
         value={timeValue}
         onChange={handleChange}
         views={hasSeconds ? ["hours", "minutes", "seconds"] : ["hours", "minutes"]}
+        size={renderSize}
         {...pickerProps}
         {...customProps}
       />

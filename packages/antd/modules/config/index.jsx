@@ -1,6 +1,6 @@
 import React from "react";
 import en_US from "antd/es/locale/en_US";
-import AntdWidgets from "../widgets";
+import {default as AntdWidgets} from "../widgets";
 import { normalizeListValues } from "../utils/stuff";
 import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 

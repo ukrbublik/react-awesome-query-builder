@@ -590,14 +590,15 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
         + (fromII.depth || (fromII.type == "group" ? 1 : 0))
         - (closestRuleGroupLev || 0);
       const isForbiddenRuleGroupChange = isRuleGroupAffected && fromII.closestRuleGroupId != targetRuleGroupId;
-      const isForbiddenCaseChange = 
+      const isForbiddenCaseChange = (
         // can't move `case_group` anywhere but before/after anoter `case_group`
         fromII.type == "case_group" && !isLev1
         // only `case_group` can be placed under `switch_group`
         || fromII.type != "case_group" && toII.type == "case_group" && isBeforeAfter
         || fromII.type != "case_group" && toII.type == "switch_group"
         // can't move rule/group to another case
-        || !canRegroupCases && fromII.caseId != toII.caseId;
+        || !canRegroupCases && fromII.caseId != toII.caseId
+      );
       const isForbiddenStructChange = isForbiddenCaseChange || isForbiddenRuleGroupChange;
       const isLockedChange = toII.isLocked || fromII.isLocked || toParentII && toParentII.isLocked;
       

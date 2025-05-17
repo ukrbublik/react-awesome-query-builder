@@ -8,7 +8,7 @@
     "allowJs": true,
 
     "outDir": "ts_out",
-    // "noEmit": true,
+    // "noEmit": false,
 
     "strict": true,
     "alwaysStrict": true,

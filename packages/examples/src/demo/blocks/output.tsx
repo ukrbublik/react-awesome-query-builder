@@ -10,8 +10,6 @@ interface PropsForFormat {
 }
 
 const stringify = JSON.stringify;
-const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
-const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
 const JsonLogicOutput = memo(({tree, config}: PropsForFormat) => {
   const {logic, data: logicData, errors: logicErrors} = Utils.jsonLogicFormat(tree, config);
@@ -21,12 +19,12 @@ const JsonLogicOutput = memo(({tree, config}: PropsForFormat) => {
       <div>
         <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
         { (logicErrors?.length || 0) > 0 
-          && <pre style={preErrorStyle}>
+          && <pre className="qb-demo-error-pre">
             {stringify(logicErrors, undefined, 2)}
           </pre> 
         }
         { !!logic
-          && <pre style={preStyle}>
+          && <pre className="qb-demo-pre">
             {"// Rule"}:<br />
             {stringify(logic, undefined, 2)}
             <br />
@@ -49,11 +47,11 @@ const MongoOutput = memo(({tree, config}: PropsForFormat) => {
       <div>
         mongodbFormat: 
         { mongoErrors.length > 0 
-          && <pre style={preErrorStyle}>
+          && <pre className="qb-demo-error-pre">
             {stringify(mongoErrors, undefined, 2)}
           </pre> 
         }
-        <pre style={preStyle}>
+        <pre className="qb-demo-pre">
           {stringify(mongo, undefined, 2)}
         </pre>
       </div>
@@ -69,7 +67,7 @@ const EsOutput = memo(({tree, config}: PropsForFormat) => {
     <>
       <div>
         elasticSearchFormat: 
-        <pre style={preStyle}>
+        <pre className="qb-demo-pre">
           {stringify(elasticSearch, undefined, 2)}
         </pre>
       </div>
@@ -85,7 +83,7 @@ const TreeJsOutput = memo(({tree, config}: PropsForFormat) => {
     <>
       <div>
         Tree: 
-        <pre style={preStyle}>
+        <pre className="qb-demo-pre">
           {stringify(treeJs, undefined, 2)}
         </pre>
       </div>
@@ -102,11 +100,11 @@ const SpelOutput = memo(({tree, config}: PropsForFormat) => {
       <div>
         spelFormat: 
         { spelErrors.length > 0 
-          && <pre style={preErrorStyle}>
+          && <pre className="qb-demo-error-pre">
             {stringify(spelErrors, undefined, 2)}
           </pre> 
         }
-        <pre style={preStyle}>
+        <pre className="qb-demo-pre">
           {spel}
         </pre>
       </div>
@@ -123,11 +121,11 @@ const SqlOutput = memo(({tree, config}: PropsForFormat) => {
       <div>
         sqlFormat: 
         { sqlErrors.length > 0 
-          && <pre style={preErrorStyle}>
+          && <pre className="qb-demo-error-pre">
             {stringify(sqlErrors, undefined, 2)}
           </pre> 
         }
-        <pre style={preStyle}>
+        <pre className="qb-demo-pre">
           {sql}
         </pre>
       </div>
@@ -144,14 +142,14 @@ const StringsOutput = memo(({tree, config}: PropsForFormat) => {
     <>
       <div>
         stringFormat: 
-        <pre style={preStyle}>
+        <pre className="qb-demo-pre">
           {queryStr}
         </pre>
       </div>
       <hr/>
       <div>
         humanStringFormat: 
-        <pre style={preStyle}>
+        <pre className="qb-demo-pre">
           {humanQueryStr}
         </pre>
       </div>

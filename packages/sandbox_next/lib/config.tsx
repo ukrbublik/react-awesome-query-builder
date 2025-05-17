@@ -116,4 +116,7 @@ const mixinConfig = (baseConfig: Config): Config => {
   );
 };
 
-export default mixinConfig(pureServerConfig);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const mixedConfig = mixinConfig(pureServerConfig);
+
+export default mixedConfig;

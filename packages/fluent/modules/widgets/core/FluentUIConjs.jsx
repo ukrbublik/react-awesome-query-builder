@@ -1,5 +1,5 @@
 import React from "react";
-import { DefaultButton } from "@fluentui/react";
+import { DefaultButton, useTheme } from "@fluentui/react";
 
 const FluentUIConjs = (props) => {
   var id = props.id,
@@ -17,9 +17,11 @@ const FluentUIConjs = (props) => {
   var lessThenTwo = disabled;
   var forceShowConj = config.settings.forceShowConj;
   var showConj = forceShowConj || (conjsCount > 1 && !lessThenTwo);
+  const theme = useTheme();
+  const darkMode = config.settings.themeMode === "dark";
 
   const styleNot = {
-    backgroundColor: not ?  "#fed9cc" : "#ffffff"
+    backgroundColor: not ? (darkMode ? theme.palette.redDark : "#fed9cc") : undefined  
   };
 
   var renderOptions = function renderOptions() {
@@ -35,6 +37,7 @@ const FluentUIConjs = (props) => {
         <DefaultButton
           toggle={setConjunction}
           checked={checked}
+          primary={checked}
           key={id + postfix}
           id={id + postfix}
           value={key}

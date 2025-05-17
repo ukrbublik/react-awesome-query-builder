@@ -1,5 +1,5 @@
 import React from "react";
-import BootstrapWidgets from "../widgets";
+import {default as BootstrapWidgets} from "../widgets";
 import { BasicConfig } from "@react-awesome-query-builder/ui";
 
 

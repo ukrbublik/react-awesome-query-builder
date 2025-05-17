@@ -61,7 +61,7 @@ describe("OtherUtils", () => {
     //const $arrayMergeMode = Symbol.for("_arrayMergeMode");
 
     function withCanCreate<T>(o: T, v = true): T {
-      Object.assign(o as Object, {[$canCreate]: v});
+      Object.assign(o as object, {[$canCreate]: v});
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return o;
     }

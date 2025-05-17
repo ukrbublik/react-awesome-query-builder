@@ -31,10 +31,10 @@ import Switch from "./core/Switch";
 import ValueSources from "./core/ValueSources";
 import confirm from "./core/confirm";
 
-import { ConfigProvider } from "antd";
-const Provider = ({ config, children }) => <ConfigProvider locale={config.settings.locale.antd}>{children}</ConfigProvider>;
+// Provider
+import { Provider } from "./core/Provider";
 
-export default {
+const AntdWidgets = {
   DateWidget,
   DateTimeWidget,
   TimeWidget,
@@ -65,3 +65,5 @@ export default {
 
   Provider,
 };
+
+export default AntdWidgets;

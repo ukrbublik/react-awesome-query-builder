@@ -52,7 +52,7 @@ module.exports = {
         ],
         "import/parsers": {
             "@typescript-eslint/parser": [
-                ".ts", ".tsx"
+                ".ts", ".tsx", ".d.ts"
             ],
         },
         "import/resolver": {
@@ -68,9 +68,11 @@ module.exports = {
             "react" // for import `react` in `core/modules/index.d.ts`
         ],
         "import/ignore": [
-            /\.(scss|less|css)$/
+            "\.scss$",
+            "\.less$",
+            "\.css$",
         ],
-        "import/internal-regex": /^@react-awesome-query-builder/
+        "import/internal-regex": "^@react-awesome-query-builder"
     },
     "rules": {
         "indent": [
@@ -148,26 +150,6 @@ module.exports = {
         },
 
         {
-            "files": ["packages/tests/**/*"],
-            "env": {
-                "mocha": true,
-                // "jasmine": true,
-            },
-            "settings": {
-                "import/core-modules": [
-                    "sinon",
-                    "chai",
-                    "mocha"
-                ],
-                // "import/resolver": {
-                //     "webpack": {
-                //         "config": "./webpack.config.js"
-                //     }
-                // },
-            },
-        },
-
-        {
             "files": ["packages/sandbox_simple/**/*"],
             "parser": "@babel/eslint-parser",
             "parserOptions": {
@@ -189,7 +171,7 @@ module.exports = {
         },
 
         {
-            "files": ["**/*.ts", "**/*.tsx"],
+            "files": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
             "extends": [
                 "eslint:recommended",
                 "plugin:import/recommended",
@@ -225,6 +207,29 @@ module.exports = {
                 "react/display-name": 0,
                 "react/prop-types": 0,
             }
+        },
+
+        {
+            "files": ["packages/tests/**/*"],
+            "env": {
+                "mocha": true,
+                // "jasmine": true,
+            },
+            "settings": {
+                "import/core-modules": [
+                    "sinon",
+                    "chai",
+                    "mocha"
+                ],
+                // "import/resolver": {
+                //     "webpack": {
+                //         "config": "./webpack.config.js"
+                //     }
+                // },
+            },
+            "rules": {
+                "@typescript-eslint/no-unused-expressions": 0,
+            },
         },
     ],
 }
