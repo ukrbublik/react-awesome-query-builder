@@ -1191,11 +1191,11 @@ export interface BaseOperator {
   spelOp?: string;
   spelOps?: string[];
   spelFormatOp?: SerializableType<SpelFormatOperator>;
-  jsonLogic?: string | JsonLogicFormatOperator;
+  jsonLogic?: string | SerializableType<JsonLogicFormatOperator>;
   jsonLogic2?: string;
   jsonLogicOps?: string[];
   _jsonLogicIsExclamationOp?: boolean;
-  elasticSearchQueryType?: ElasticQueryType | ElasticFormatQueryType;
+  elasticSearchQueryType?: ElasticQueryType | SerializableType<ElasticFormatQueryType>;
   valueSources?: Array<ValueSource>;
   valueTypes?: Array<string>;
 }
@@ -1603,7 +1603,7 @@ export interface Func extends Omit<BaseSimpleField, "type"> {
   spelFunc?: string;
   mongoFunc?: string;
   mongoArgsAsObject?: boolean;
-  jsonLogic?: string | JsonLogicFormatFunc;
+  jsonLogic?: string | SerializableType<JsonLogicFormatFunc>;
   // Deprecated!
   // Calling methods on objects was remvoed in JsonLogic 2.x
   // https://github.com/jwadhams/json-logic-js/issues/86
