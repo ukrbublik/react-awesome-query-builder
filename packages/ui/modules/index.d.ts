@@ -16,6 +16,9 @@ import {
   ConfigContext, FactoryWithContext, FactoryFnWithContext, FactoryFnWithoutPropsWithContext, RenderedReactElement, SerializableType,
   ConjsProps,
   AsyncFetchListValuesFn,
+  ListOptionUi,
+  ListValues,
+  ListItem,
 
   ImmutableList, ImmutableMap, ImmutableOMap,
   ImmutablePath,
@@ -452,38 +455,22 @@ export declare const Utils: Utils;
 
 //////////////////
 
+
+type AutocompleteChangeReason = "selectOption" | "removeOption" | "clear" | null;
+type AutocompleteInputChangeReason = "selectOption" | "removeOption" | "clear" | "blur" | "input" | "reset" | "my-reset" | null;
 export interface UseListValuesAutocompleteProps {
   asyncFetch: AsyncFetchListValuesFn;
-  useLoadMore: boolean;
-  useAsyncSearch: boolean;
-  forceAsyncSearch: boolean;
-  fetchSelectedValuesOnInit: boolean;
-  // asyncListValues: selectedAsyncListValues;
-  // listValues: staticListValues;
-  allowCustomValues: boolean;
-  // value: selectedValue;
-  setValue: (value: any) => void;
-  placeholder: string;
-  config: any;
-  field: any;
-}
-export interface UseListValuesAutocompleteReturn {
-  open: boolean;
-  onOpen: () => void;
-  onClose: () => void;
-  onChange: (value: any) => void;
-  onInputChange: (value: string) => void;
-  inputValue: string;
-  options: any[];
-  isInitialLoading: boolean;
-  isLoading: boolean;
-  aPlaceholder: string;
-  extendOptions: any;
-  getOptionSelected: (option: any) => boolean;
-  getOptionDisabled: (option: any) => boolean;
-  getOptionIsCustom: (option: any) => boolean;
-  getOptionLabel: (option: any) => string;
-  selectedListValue: any;
+  useLoadMore?: boolean;
+  useAsyncSearch?: boolean;
+  forceAsyncSearch?: boolean;
+  fetchSelectedValuesOnInit?: boolean;
+  asyncListValues?: ListValues; // selectedAsyncListValues
+  listValues: ListValues; // staticListValues
+  allowCustomValues?: boolean;
+  value?: string | number | string[] | number[]; // selectedValue (array for multiple=true)
+  setValue: (value: string | number | string[] | number[]) => void;
+  placeholder?: string;
+  config: Config;
 }
 export interface UseListValuesAutocompleteOptions {
   multiple: boolean;
@@ -491,6 +478,35 @@ export interface UseListValuesAutocompleteOptions {
   uif?: "antd" | "material" | "mui";
   isFieldAutocomplete?: boolean;
   dontFixOptionsOrder?: boolean;
+}
+export interface UseListValuesAutocompleteReturn {
+  open: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  onChange: (
+    // tip: null for mui
+    e: React.SyntheticEvent<HTMLInputElement> | null, 
+    // tip: string or string[] for mui
+    val: Empty | string | number | ListOptionUi | Array<string | number | ListOptionUi>,
+    // tip: ListOptionUi or ListOptionUi[] for mui, AutocompleteChangeReason for antd
+    option: AutocompleteChangeReason | ListOptionUi | ListOptionUi[],
+  ) => Promise<void>;
+  onInputChange: (
+    e: React.SyntheticEvent<HTMLInputElement> | null,
+    newInputValue: string,
+    eventType: AutocompleteInputChangeReason,
+  ) => Promise<void>;
+  inputValue: string;
+  options: ListOptionUi[];
+  isInitialLoading: boolean;
+  isLoading: boolean;
+  aPlaceholder: string;
+  extendOptions: (options: ListOptionUi[]) => ListOptionUi[];
+  getOptionSelected: (option: ListOptionUi, selectedValueOrOption: ListItem | null) => boolean;
+  getOptionDisabled: (valueOrOption: ListItem) => boolean;
+  getOptionIsCustom: (option: ListItem) => boolean;
+  getOptionLabel: (option: ListItem | null) => string | null;
+  selectedListValue: ListItem | null;
 }
 
 export interface Hooks {
