@@ -52,7 +52,15 @@ const MuiProvider = ({config, children}) => {
   const theme = !canCreateTheme ? null : (
     isFullTheme(themeConfig)
       ? themeConfig
-      : createTheme(themeConfig ?? {
+      : createTheme(themeConfig ? {
+        ...themeConfig,
+        palette: {
+          ...themeConfig.palette,
+          ...(config.settings.themeMode ? {
+            mode: themeMode
+          } : {}),
+        }
+      } : {
         palette: {
           mode: themeMode,
         }

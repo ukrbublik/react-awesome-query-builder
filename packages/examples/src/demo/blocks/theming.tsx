@@ -17,15 +17,6 @@ export const useThemeing = (
     let newConfig: Config = clone(state.config);
     state.configChanges = merge(state.configChanges, {
       settings: {
-        theme: {
-          mui: {
-            palette: {
-              mode: themeMode
-            }
-          },
-          antd: {
-          }
-        },
         themeMode: themeMode,
       }
     });
