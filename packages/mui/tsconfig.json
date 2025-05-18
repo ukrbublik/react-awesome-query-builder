@@ -10,7 +10,7 @@
     ],
     "allowJs": true,
     "outDir": "ts_out",
-    "noEmit": true,
+    // "noEmit": true,
 
     "strict": true,
     "alwaysStrict": true,
