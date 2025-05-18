@@ -24,7 +24,7 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "exports": {
     ".": {
-      "types": "./modules/index.d.ts",
+      "types": "./types/index.d.ts",
       "import": "./esm/index.js",
       "require": "./cjs/index.js"
     },
@@ -34,14 +34,15 @@
   },
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
-  "types": "./modules/index.d.ts",
+  "types": "./types/index.d.ts",
   "scripts": {
     "build": "sh ./scripts/build-npm.sh",
-    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
+    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --ext .d.ts  ./modules/",
     "lint": "npm run eslint && npm run tsc",
-    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/",
+    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --ext .d.ts --fix  ./modules/",
     "prepare": "npm run build",
-    "tsc": "tsc -p . --noEmit"
+    "tsc": "tsc -p . --noEmit",
+    "tsc-emit-types": "tsc -p . --declaration --emitDeclarationOnly --allowJs false --declarationDir types"
   },
   "dependencies": {
     "@babel/runtime": "^7.27.0",
