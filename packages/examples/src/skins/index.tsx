@@ -3,12 +3,12 @@ import {
   Config, BasicConfig,
 } from "@react-awesome-query-builder/ui";
 
-const ImportUi = React.lazy(() => import("./ui"));
-const ImportAntd = React.lazy(() => import("./antd"));
-const ImportMui = React.lazy(() => import("./mui"));
-const ImportMaterial = React.lazy(() => import("./material"));
-const ImportBootstrap = React.lazy(() => import("./bootstrap"));
-const ImportFluent = React.lazy(() => import("./fluent"));
+const ImportUi = React.lazy(() => import("./lazyStyles/ui"));
+const ImportAntd = React.lazy(() => import("./lazyStyles/antd"));
+const ImportMui = React.lazy(() => import("./lazyStyles/mui"));
+const ImportMaterial = React.lazy(() => import("./lazyStyles/material"));
+const ImportBootstrap = React.lazy(() => import("./lazyStyles/bootstrap"));
+const ImportFluent = React.lazy(() => import("./lazyStyles/fluent"));
 
 import { AntdConfig } from "@react-awesome-query-builder/antd";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
