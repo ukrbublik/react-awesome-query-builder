@@ -172,6 +172,13 @@ $root_group: ".query-builder > .group-container > .group";
       opacity: 0.3;
     }
   }
+  .group--conjunctions {
+    border-radius: $conjunctions-radius;
+    overflow: hidden;
+  }
+  .group--header:hover .group--conjunctions {
+    overflow: visible;
+  }
 
   .group--children {
     padding-left: $item-offset-left;

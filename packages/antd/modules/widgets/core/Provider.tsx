@@ -10,6 +10,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   const ref = React.createRef<HTMLDivElement>();
   const darkMode = config.settings.themeMode === "dark";
   const compactMode = !!config.settings.compactMode;
+  const renderSize = config.settings.renderSize;
   const themeConfig = config.settings.theme?.antd;
   const localeConfig = config.settings.locale?.antd;
   const canCreateTheme = !!themeConfig || localeConfig || darkMode || compactMode;
@@ -21,27 +22,35 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   const customTheme = React.useMemo<Theme>(() => {
     return {
       // https://ant.design/docs/react/customize-theme
-      // todo: allow overrides
-      algorithm: algorithms
+      algorithm: algorithms,
+      token: {
+        //todo: allow overrides
+      }
     };
   }, [algorithms]);
 
-  React.useEffect(() => {
-    const cssVarsTarget = ref.current;
-    const cssVars = themeToCssVars(palette, darkMode);
-    for (const k in cssVars) {
-      if (cssVars[k] != undefined) {
-        cssVarsTarget?.style.setProperty(k, cssVars[k]);
-      }
-    }
-    return () => {
+  const UpdCssVars = () => {
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const theme = ConfigProvider.ConfigContext.Consumer._currentValue.theme as Theme;
+    React.useEffect(() => {
+      const cssVarsTarget = ref.current;
+      const cssVars = themeToCssVars(theme, palette, darkMode, renderSize);
       for (const k in cssVars) {
-        cssVarsTarget?.style.removeProperty(k);
+        if (cssVars[k] != undefined) {
+          cssVarsTarget?.style.setProperty(k, cssVars[k]);
+        }
       }
-    };
-  }, [darkMode, palette, ref]);
+      return () => {
+        for (const k in cssVars) {
+          cssVarsTarget?.style.removeProperty(k);
+        }
+      };
+    }, [theme, palette, darkMode, renderSize, ref]);
+    return <div style={{display: "none"}} />;
+  };
 
-  const base = (<div ref={ref} className={`qb-antd ${compactMode ? "qb-compact" : ""}`}>{children}</div>);
+  const base = (<div ref={ref} className={`qb-antd ${compactMode ? "qb-compact" : ""}`}><UpdCssVars />{children}</div>);
 
   // https://ant.design/components/config-provider
   const withTheme = canCreateTheme ? (

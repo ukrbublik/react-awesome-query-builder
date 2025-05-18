@@ -1,6 +1,7 @@
-import { Utils } from "@react-awesome-query-builder/ui";
+import { Utils, RenderSize } from "@react-awesome-query-builder/ui";
 import { theme as antdTheme, ConfigProviderProps } from "antd";
 
+type Theme = ConfigProviderProps["theme"];
 type Algorithm = typeof antdTheme["darkAlgorithm"] | typeof antdTheme["defaultAlgorithm"];
 type SeedToken = Parameters<typeof antdTheme["defaultAlgorithm"]>[0];
 type MapToken = ReturnType<typeof antdTheme["defaultAlgorithm"]>;
@@ -20,8 +21,24 @@ const buildPalette = (darkMode: boolean, compactMode: boolean) => {
   return { algorithms, palette };
 };
 
-const themeToCssVars = (palette: MapToken, darkMode: boolean) => {
+const themeToCssVars = (theme: Theme, palette: MapToken, darkMode: boolean, renderSize?: RenderSize) => {
+  logger.log("themeToCssVars - antd theme", theme);
   logger.log("themeToCssVars - antd palette", palette);
+
+  let sizedBorderRadius;
+  switch (renderSize) {
+  case "large":
+    sizedBorderRadius = theme?.token?.borderRadiusLG ?? theme?.token?.borderRadius ?? palette.borderRadiusLG;
+    break;
+  case "small": 
+    sizedBorderRadius = theme?.token?.borderRadiusSM ?? theme?.token?.borderRadius ?? palette.borderRadiusSM;
+    break;
+  case "medium":
+  default:
+    sizedBorderRadius = theme?.token?.borderRadius ?? palette.borderRadius;
+    break;
+  }
+
   return {
     "--main-background": palette.colorBgBase,
     "--rule-background": palette.colorBgElevated,
@@ -45,7 +62,8 @@ const themeToCssVars = (palette: MapToken, darkMode: boolean) => {
     "--main-text-color": palette.colorText,
     "--main-font-family": palette.fontFamily,
     "--main-font-size": palette.fontSize + "px",
-    "--item-radius": palette.borderRadius + "px",
+    "--item-radius": sizedBorderRadius + "px",
+    "--conjunctions-radius": sizedBorderRadius + "px",
 
     "--rule-border-left-hover": "2px",
     "--group-border-left-hover": "2px",
