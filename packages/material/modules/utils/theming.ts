@@ -1,5 +1,5 @@
-import { Utils, Config, MuiThemeOverride, MuiPaletteOverride } from "@react-awesome-query-builder/ui";
-import { ThemeProvider, createTheme, ThemeOptions, Theme } from "@material-ui/core/styles";
+import { Utils, Config } from "@react-awesome-query-builder/ui";
+import { createTheme, ThemeOptions, Theme } from "@material-ui/core/styles";
 
 const { setOpacityForHex, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
 const { logger } = Utils.OtherUtils;
