@@ -23,15 +23,7 @@ import BootstrapButtonGroup from "./core/BootstrapButtonGroup";
 import BootstrapConjs from "./core/BootstrapConjs";
 import BootstrapValueSources from "./core/BootstrapValueSources";
 import BootstrapConfirm from "./core/BootstrapConfirm";
-
-// provider
-const BootstrapProvider = ({config, children}) => {
-  const themeMode = config.settings.themeMode ?? "light";
-  const compactMode = config.settings.compactMode;
-
-  const base = (<div className={`qb-bootstrap ${compactMode ? "qb-compact" : ""} qb-${themeMode}`}>{children}</div>);
-  return base;
-};
+import { BootstrapProvider } from "./core/BootstrapProvider";
 
 export default {
   BootstrapTextWidget,
