@@ -8,8 +8,11 @@ type Theme = ConfigProviderProps["theme"];
 
 const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   const ref = React.createRef<HTMLDivElement>();
-  const darkMode = config?.settings.themeMode === "dark";
-  const compactMode = !!config?.settings.compactMode;
+  const darkMode = config.settings.themeMode === "dark";
+  const compactMode = !!config.settings.compactMode;
+  const themeConfig = config.settings.theme?.antd;
+  const localeConfig = config.settings.locale?.antd;
+  const canCreateTheme = !!themeConfig || localeConfig || darkMode || compactMode;
 
   const { algorithms, palette } = React.useMemo<ReturnType<typeof buildPalette>>(() => {
     return buildPalette(darkMode, compactMode);
@@ -41,15 +44,15 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   const base = (<div ref={ref} className={`qb-antd ${compactMode ? "qb-compact" : ""}`}>{children}</div>);
 
   // https://ant.design/components/config-provider
-  const withProviders = (
+  const withTheme = canCreateTheme ? (
     // @ts-ignore error TS2786: 'ConfigProvider' cannot be used as a JSX component. Its return type 'ReactNode | Promise<ReactNode>' is not a valid JSX element.
     <ConfigProvider
-      locale={config?.settings.locale?.antd as Locale | undefined}
+      locale={localeConfig as Locale | undefined}
       theme={customTheme}
     >{base}</ConfigProvider>
-  );
+  ) : base;
 
-  return withProviders;
+  return withTheme;
 };
 
 export {

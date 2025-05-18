@@ -19,6 +19,7 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "skipLibCheck": false,
+    "resolveJsonModule": true,
     
     "paths": {
       "@react-awesome-query-builder/core": ["../core/modules"],

@@ -228,7 +228,7 @@ export interface ButtonProps {
   renderIcon?: FactoryWithContext<IconProps>;
   onClick(): void;
   label: string;
-  config?: Config;
+  config: Config;
   readonly?: boolean;
 }
 
@@ -244,17 +244,17 @@ export interface SwitchProps {
   label: string;
   checkedLabel?: string;
   hideLabel?: boolean;
-  config?: Config;
+  config: Config;
 }
 
 export interface ButtonGroupProps {
   children: ReactElement;
-  config?: Config;
+  config: Config;
 }
 
 export interface ProviderProps {
   children: ReactElement;
-  config?: Config;
+  config: Config;
 }
 
 export type ValueSourceItem = {
@@ -263,7 +263,7 @@ export type ValueSourceItem = {
 type ValueSourcesItems = Array<[ValueSource, ValueSourceItem]>;
 
 export interface ValueSourcesProps {
-  config?: Config;
+  config: Config;
   valueSources: ValueSourcesItems;
   valueSrc?: ValueSource;
   setValueSrc(valueSrc: string): void;

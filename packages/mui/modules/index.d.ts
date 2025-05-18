@@ -1,5 +1,5 @@
 import {BasicConfig} from "@react-awesome-query-builder/ui";
-export {MuiWidgets} from "./widgets";
+export {default as MuiWidgets} from "./widgets";
 
 export declare const MuiConfig: BasicConfig;
 
