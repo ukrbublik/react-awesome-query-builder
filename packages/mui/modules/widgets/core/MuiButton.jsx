@@ -26,6 +26,7 @@ export default memo((props) => {
     type,
     readonly,
     renderSize,
+    config,
   };
   const icon = renderIcon?.(iconProps);
 

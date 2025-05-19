@@ -321,10 +321,12 @@ export class BasicGroup extends Component {
   }
 
   renderDrag() {
-    const { handleDraggerMouseDown } = this.props;
+    const { handleDraggerMouseDown, config, isLocked } = this.props;
     const Icon = this.Icon;
     const icon = <Icon
       type="drag"
+      readonly={isLocked}
+      config={config}
     />;
     return this.showDragIcon() && (<div 
       key="group-drag-icon"

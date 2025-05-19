@@ -20,10 +20,11 @@ const typeToColor = {
 };
 
 export default (props) => {
-  const {type, label, onClick, readonly, renderIcon} = props;
+  const {type, label, onClick, readonly, renderIcon, config,} = props;
   const iconProps = {
     type,
     readonly,
+    config,
   };
   const icon = renderIcon?.(iconProps);
 

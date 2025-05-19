@@ -301,11 +301,13 @@ class Rule extends Component {
   }
 
   renderDrag() {
-    const { handleDraggerMouseDown } = this.props;
+    const { handleDraggerMouseDown, config, isLocked } = this.props;
     const { showDragIcon } = this.meta;
     const Icon = this.Icon;
     const icon = <Icon
       type="drag"
+      config={config}
+      readonly={isLocked}
     />;
     return showDragIcon && (<div 
       key="rule-drag-icon"

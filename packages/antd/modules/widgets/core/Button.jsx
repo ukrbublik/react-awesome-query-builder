@@ -32,11 +32,12 @@ const dangerFor = {
 };
 
 export default (props) => {
-  const {type, onClick, label, readonly, config: {settings}, renderIcon} = props;
-  const {renderSize} = settings;
+  const {type, onClick, label, readonly, config, renderIcon} = props;
+  const {renderSize} = config.settings;
   const iconProps = {
     type,
     readonly,
+    config,
   };
   const icon = renderIcon?.(iconProps);
   const btnLabel = hideLabelsFor[type] ? "" : label;
