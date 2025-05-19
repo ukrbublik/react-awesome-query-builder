@@ -49,6 +49,7 @@ const DemoQueryBuilder: React.FC = () => {
     renderBocks: defaultRenderBlocks,
     initFile: defaultInitFile,
     themeMode: "auto",
+    isBodyDark: false,
     renderSize: "small",
     compactMode: false,
     configChanges: {},
@@ -68,7 +69,7 @@ const DemoQueryBuilder: React.FC = () => {
   const { renderInitFilesHeader, renderInitErrors } = useInitFiles(state, setState);
   const { renderSkinSelector } = useSkins(state, setState);
   const { renderBlocksSwitcher } = useBlocksSwitcher(state, setState);
-  const { renderThemeModeSelector, renderCompactModeSelector, renderSizeSelector } = useThemeing(state, setState);
+  const { renderThemeModeSelector, renderBodyIsDarkSelector, renderCompactModeSelector, renderSizeSelector } = useThemeing(state, setState);
 
 
   const renderBuilder = useCallback((bprops: BuilderProps) => {
@@ -117,6 +118,7 @@ const DemoQueryBuilder: React.FC = () => {
       <div>
         Theme: &nbsp;
         {renderSkinSelector()}
+        {renderBodyIsDarkSelector()}
         {renderThemeModeSelector()}
         {renderCompactModeSelector()}
         {renderSizeSelector()}

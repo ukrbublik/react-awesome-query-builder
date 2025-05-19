@@ -16,6 +16,7 @@ export interface DemoQueryBuilderState {
   sqlWarnings: Array<string>;
   initFile: string;
   themeMode: ThemeMode | "auto";
+  isBodyDark: boolean;
   renderSize: RenderSize;
   compactMode: boolean;
   configChanges: PartialPartial<Config>;

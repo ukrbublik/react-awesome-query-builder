@@ -1,7 +1,7 @@
 import React from "react";
 import { ProviderProps, Utils, Config } from "@react-awesome-query-builder/ui";
 import { BootstrapConfirmProvider } from "./BootstrapConfirm";
-import { themeToCssVars } from "../../utils/theming";
+import { generateDesignTokens } from "../../utils/theming";
 
 const BootstrapProvider: React.FC<ProviderProps> = ({config, children}) => {
   const ref = React.createRef<HTMLDivElement>();
@@ -11,7 +11,7 @@ const BootstrapProvider: React.FC<ProviderProps> = ({config, children}) => {
 
   React.useEffect(() => {
     const cssVarsTarget = ref.current;
-    const cssVars = themeToCssVars({}, config);
+    const cssVars = generateDesignTokens({}, config);
     for (const k in cssVars) {
       if (cssVars[k] != undefined) {
         cssVarsTarget?.style.setProperty(k, cssVars[k]);

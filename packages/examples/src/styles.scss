@@ -22,30 +22,30 @@ $inputs: select, input, button;
 
 body[data-theme="dark"] {
   background-color: rgb(15, 18, 20);
-  color: oklch(0.746477 0.0216 264.436);
+  color: #a6adbb;
   @each $input in $inputs {
     #root #{$input}:not(.query-builder #{$input}) {
       border-color: rgb(15, 18, 20);
       background-color: rgb(15, 18, 20);
-      color: oklch(0.746477 0.0216 264.436);
+      color: #a6adbb;
       outline: none;
     }
   }
   .qb-demo-pre {
     background-color: oklch(0.313815 0.021108 254.139);
-    color: oklch(0.746477 0.0216 264.436);
+    color: #a6adbb;
   }
   .qb-demo-error-pre {
     background-color: rgb(92, 54, 60);
-    color: oklch(0.746477 0.0216 264.436);
+    color: #a6adbb;
   }
   .qb-demo-warning-pre {
     background-color: rgb(113, 86, 64);
-    color: oklch(0.746477 0.0216 264.436);
+    color: #a6adbb;
   }
 }
 
 .query-builder {
   // overrides:
-  // --item-radius: 8px;
+  //--item-radius: 8px;
 }

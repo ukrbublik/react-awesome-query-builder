@@ -4,7 +4,7 @@ import { ThemeProvider, createTheme, useTheme } from "@material-ui/core/styles";
 import { ConfirmProvider } from "material-ui-confirm";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
-import { themeToCssVars, buildTheme } from "../../utils/theming";
+import { generateDesignTokens, buildTheme } from "../../utils/theming";
 
 
 const MaterialProvider: React.FC<ProviderProps> = ({config, children}) => {
@@ -19,7 +19,7 @@ const MaterialProvider: React.FC<ProviderProps> = ({config, children}) => {
     const theme = useTheme();
     React.useEffect(() => {
       const cssVarsTarget = ref.current;
-      const cssVars = themeToCssVars(theme, config);
+      const cssVars = generateDesignTokens(theme, config);
       for (const k in cssVars) {
         if (cssVars[k] != undefined) {
           cssVarsTarget?.style.setProperty(k, cssVars[k]);

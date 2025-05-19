@@ -11,9 +11,16 @@ export const useThemeing = (
   state: DemoQueryBuilderState,
   setState: Dispatch<SetStateAction<DemoQueryBuilderState>>,
 ) => {
+  const changeBodyIsDark = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isBodyDark = e.target.checked;
+    const themeMode = isBodyDark ? "dark" : "light";
+    document.body.setAttribute("data-theme", themeMode);
+    setState({...state, isBodyDark});
+  };
+    
   const changeThemeMode = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const themeMode = e.target.value as DemoQueryBuilderState["themeMode"];
-    document.body.setAttribute("data-theme", themeMode);
+    // document.body.setAttribute("data-theme", themeMode);
     let newConfig: Config = clone(state.config);
     state.configChanges = merge(state.configChanges, {
       settings: {
@@ -51,9 +58,19 @@ export const useThemeing = (
     setState({...state, config: newConfig, renderSize});
   };
 
+  const renderBodyIsDarkSelector = () => {
+    return (
+      <>
+        <input id="dark-page" type="checkbox" checked={state.isBodyDark} onChange={changeBodyIsDark} />
+        <label htmlFor="dark-page">dark page</label>
+      </>
+    );
+  };
+
   const renderThemeModeSelector = () => {
     return (
       <select value={state.themeMode} onChange={changeThemeMode}>
+        <option key="auto">auto</option>
         <option key="light">light</option>
         <option key="dark">dark</option>
       </select>
@@ -81,6 +98,7 @@ export const useThemeing = (
 
   return {
     renderThemeModeSelector,
+    renderBodyIsDarkSelector,
     renderCompactModeSelector,
     renderSizeSelector,
   };

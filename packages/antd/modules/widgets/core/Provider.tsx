@@ -1,7 +1,7 @@
 import React from "react";
 import { ProviderProps } from "@react-awesome-query-builder/ui";
 import { ConfigProvider, ConfigProviderProps, theme as antdTheme } from "antd";
-import { themeToCssVars, buildPalette } from "../../utils/theming";
+import { generateDesignTokens, buildPalette } from "../../utils/theming";
 
 type Locale = ConfigProviderProps["locale"];
 type ThemeConfig = ConfigProviderProps["theme"];
@@ -35,7 +35,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
 
     React.useEffect(() => {
       const cssVarsTarget = ref.current;
-      const cssVars = themeToCssVars(token, config);
+      const cssVars = generateDesignTokens(token, config);
       for (const k in cssVars) {
         if (cssVars[k] != undefined) {
           cssVarsTarget?.style.setProperty(k, cssVars[k]);

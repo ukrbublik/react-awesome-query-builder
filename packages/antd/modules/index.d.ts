@@ -1,6 +1,6 @@
 import {BasicConfig} from "@react-awesome-query-builder/ui";
 export {default as AntdWidgets} from "./widgets";
-export { buildPalette, themeToCssVars } from "./utils/theming";
+export { buildPalette, generateDesignTokens } from "./utils/theming";
 
 export declare const AntdConfig: BasicConfig;
 

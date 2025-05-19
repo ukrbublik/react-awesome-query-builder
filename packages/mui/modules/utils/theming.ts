@@ -36,8 +36,8 @@ const buildTheme = (config: Config): Theme | null => {
   );
 };
 
-const themeToCssVars = (theme: Theme, config: Config) => {
-  logger.log("themeToCssVars - MUI theme", theme);
+const generateDesignTokens = (theme: Theme, config: Config) => {
+  logger.log("generateDesignTokens - MUI theme", theme);
   const { palette, typography, shadows, shape } = theme;
   const darkMode = palette.mode === "dark";
 
@@ -80,5 +80,5 @@ const themeToCssVars = (theme: Theme, config: Config) => {
 
 export {
   buildTheme,
-  themeToCssVars,
+  generateDesignTokens,
 };
