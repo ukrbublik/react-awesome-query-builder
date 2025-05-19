@@ -372,6 +372,9 @@ export type AntdThemeOverride = Record<string, any>; // todo: override for antd
 export type FluentThemeOverride = Record<string, any>; // todo: override for fluent
 
 export interface DesignTokens {
+  // todo
+}
+export interface DesignSettings {
   highlightLeftBorderOnHover?: boolean;
   highlightShadowOnHover?: boolean;
 }
@@ -383,6 +386,7 @@ export interface ThemeSettings {
     antd?: AntdThemeOverride;
     fluent?: FluentThemeOverride;
   };
+  designSettings?: DesignSettings;
   designTokens?: DesignTokens;
   renderSize?: RenderSize;
   themeMode?: ThemeMode;

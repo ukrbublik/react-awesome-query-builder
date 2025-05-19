@@ -39,28 +39,28 @@ const buildTheme = (config: Config): Theme | null => {
 const themeToCssVars = (theme: Theme) => {
   logger.log("themeToCssVars - Material theme", theme);
   const { palette, typography, shadows, shape } = theme;
-  const isDark = palette.type === "dark";
+  const darkMode = palette.type === "dark";
   return {
     "--main-background": palette.background.paper,
-    "--rule-background": isDark ? palette.background.paper : palette.background.paper,
-    "--group-background": isDark ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
-    "--rulegroup-background": isDark ? setOpacityForHex(palette.grey[900], 0.3) : setOpacityForHex(palette.grey[400], 0.1),
-    "--rulegroupext-background": isDark ? setOpacityForHex(palette.grey[900], 0.3) : setOpacityForHex(palette.grey[400], 0.1),
-    "--switch-background": isDark ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[400], 0.1),
-    "--case-background": isDark ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
+    "--rule-background": darkMode ? palette.background.paper : palette.background.paper,
+    "--group-background": darkMode ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
+    "--rulegroup-background": darkMode ? setOpacityForHex(palette.grey[900], 0.3) : setOpacityForHex(palette.grey[400], 0.1),
+    "--rulegroupext-background": darkMode ? setOpacityForHex(palette.grey[900], 0.3) : setOpacityForHex(palette.grey[400], 0.1),
+    "--switch-background": darkMode ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[400], 0.1),
+    "--case-background": darkMode ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
 
-    ...generateCssVarsForLevels(isDark, "--group-background", palette.background.paper, undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(isDark, "--rulegroup-background", chroma(palette.background.paper).hex(), undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(isDark, "--rulegroupext-background", palette.background.paper, undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(isDark, "--switch-background", palette.background.paper, undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(isDark, "--case-background", palette.background.paper, undefined, 0.1, 0.01),
+    ...generateCssVarsForLevels(darkMode, "--group-background", palette.background.paper, undefined, 0.1, 0.01),
+    ...generateCssVarsForLevels(darkMode, "--rulegroup-background", chroma(palette.background.paper).hex(), undefined, 0.1, 0.01),
+    ...generateCssVarsForLevels(darkMode, "--rulegroupext-background", palette.background.paper, undefined, 0.1, 0.01),
+    ...generateCssVarsForLevels(darkMode, "--switch-background", palette.background.paper, undefined, 0.1, 0.01),
+    ...generateCssVarsForLevels(darkMode, "--case-background", palette.background.paper, undefined, 0.1, 0.01),
 
-    "--rule-border-color": isDark ? palette.action.selected : palette.action.selected,
-    "--group-border-color": isDark ? palette.action.selected : palette.action.selected,
-    "--rulegroup-border-color": isDark ? palette.action.selected : palette.action.selected,
-    "--rulegroupext-border-color": isDark ? palette.action.selected : palette.action.selected,
-    "--switch-border-color": isDark ? palette.action.selected : palette.action.selected,
-    "--case-border-color": isDark ? palette.action.selected : palette.action.selected,
+    "--rule-border-color": darkMode ? palette.action.selected : palette.action.selected,
+    "--group-border-color": darkMode ? palette.action.selected : palette.action.selected,
+    "--rulegroup-border-color": darkMode ? palette.action.selected : palette.action.selected,
+    "--rulegroupext-border-color": darkMode ? palette.action.selected : palette.action.selected,
+    "--switch-border-color": darkMode ? palette.action.selected : palette.action.selected,
+    "--case-border-color": darkMode ? palette.action.selected : palette.action.selected,
 
     "--treeline-color": palette.primary.main,
     "--treeline-switch-color": palette.secondary.main,

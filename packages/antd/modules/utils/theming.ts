@@ -27,8 +27,8 @@ const themeToCssVars = (token: GlobalToken, config: Config) => {
   logger.log("themeToCssVars - antd token", token);
   const darkMode = isDarkColor(token.colorBgBase);
   const renderSize = config.settings.renderSize;
-  const highlightLeftBorderOnHover = config.settings.designTokens?.highlightLeftBorderOnHover ?? true;
-  const highlightShadowOnHover = config.settings.designTokens?.highlightShadowOnHover ?? false;
+  const highlightLeftBorderOnHover = config.settings.designSettings?.highlightLeftBorderOnHover ?? true;
+  const highlightShadowOnHover = config.settings.designSettings?.highlightShadowOnHover ?? false;
 
   let sizedBorderRadius;
   switch (renderSize) {
