@@ -1,6 +1,7 @@
 # Contributing
 
-Feel free to open PRs to fix bugs, add new features, add new reusable types/widgets/operators (eg., regex operator/widget, IP type/widget etc.).  
+Feel free to open PRs to fix bugs, add new features, add new reusable types/widgets/operators (eg., regex operator/widget, IP type/widget etc.).
+Pull Requests are always welcomed :)
 
 * [Development](#development)
   * [Directory structure](#directory-structure) 
@@ -78,8 +79,6 @@ Useful scripts:
 - `pnpm clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
 - `pnpm smoke` - Run lint, test, build all packages and examples. Recommended before making PR
 
-Feel free to open PR to add new reusable types/widgets/operators (eg., regex operator for string, IP type & widget).  
-Pull Requests are always welcomed :)
 
 ### Other UI frameworks
 
