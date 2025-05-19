@@ -49,7 +49,7 @@ Or with VSCode:
     - [`rule`](/packages/ui/modules/components/rule) - Components representing building blocks of rule - field, operator, widget
     - [`widgets`](/packages/ui/modules/components/widgets) - Vanilla widgets - components to render list of fields, operators, values of different types
   - [`index.d.ts`](/packages/ui/modules/index.d.ts) - TS definitions
-- [`packages/ui/css`](/packages/ui/css) - Styles for query builder
+- [`packages/ui/styles`](/packages/ui/styles) - Styles for query builder
 - [`packages/antd`](/packages/antd) - Provides config with [Ant Design](https://ant.design/) widgets
 - [`packages/mui`](/packages/mui) - Provides config with [MUI](https://mui.com/) widgets
 - [`packages/material`](/packages/material) - Provides config with [Material-UI v4](https://v4.mui.com/) widgets
