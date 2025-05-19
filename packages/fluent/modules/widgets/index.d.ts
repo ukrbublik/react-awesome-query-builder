@@ -3,6 +3,7 @@ import {
   FieldProps, ConjsProps, SwitchProps, ButtonProps, ButtonGroupProps, ProviderProps, ValueSourcesProps, ConfirmFunc,
   BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, PriceWidgetProps
 } from "@react-awesome-query-builder/ui";
+import { ConfirmOptions } from "./core/FluentUIConfirm";
 
 export interface FluentUIWidgets {
   // core widgets
@@ -13,6 +14,7 @@ export interface FluentUIWidgets {
   FluentUIProvider: ElementType<ProviderProps>,
   FluentUIValueSources: ElementType<ValueSourcesProps>,
   FluentUIConfirm: ConfirmFunc,
+  FluentUIUseConfirm: () => (options?: ConfirmOptions) => Promise<void>;
 
   // core widgets
   FluentUIBooleanWidget: ElementType<BooleanWidgetProps>,

@@ -2,6 +2,7 @@ import React from "react";
 
 import { ProviderProps, Utils } from "@react-awesome-query-builder/ui";
 import { themeToCssVars, buildTheme } from "../../utils/theming";
+import { FluentUIConfirmProvider } from "./FluentUIConfirm";
 import { ThemeProvider, useTheme } from "@fluentui/react";
 
 const FluentUIProvider: React.FC<ProviderProps> = ({config, children}) => {
@@ -33,11 +34,17 @@ const FluentUIProvider: React.FC<ProviderProps> = ({config, children}) => {
 
   const base = (<div ref={ref} className={`qb-fluent ${compactMode ? "qb-compact" : ""} qb-${themeMode}`}><UpdCssVars />{children}</div>);
 
+  const withProviders = (
+    <FluentUIConfirmProvider>
+      {base}
+    </FluentUIConfirmProvider>
+  );
+
   const withTheme = theme ? (
     <ThemeProvider
       theme={theme}
-    >{base}</ThemeProvider>
-  ) : base;
+    >{withProviders}</ThemeProvider>
+  ) : withProviders;
 
   return withTheme;
 };

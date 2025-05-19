@@ -25,7 +25,7 @@ import FluentUIButton from "./core/FluentUIButton";
 import FluentUIButtonGroup from "./core/FluentUIButtonGroup";
 import FluentUIConjs from "./core/FluentUIConjs";
 import FluentUIValueSources from "./core/FluentUIValueSources";
-import FluentUIConfirm from "./core/FluentUIConfirm";
+import { FluentUIConfirm, FluentUIUseConfirm } from "./core/FluentUIConfirm";
 import { FluentUIProvider } from "./core/FluentUIProvider";
 
 export default {
@@ -49,6 +49,7 @@ export default {
   FluentUIConjs,
   FluentUIValueSources,
   FluentUIConfirm,
+  FluentUIUseConfirm,
 
   FluentUIProvider,
 };

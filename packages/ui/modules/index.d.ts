@@ -275,7 +275,7 @@ export interface ConfirmModalProps {
   onOk(): void;
   okText: string;
   cancelText?: string;
-  title: string;
+  title: string | null;
   okType?: string;
   confirmFn?: MuiConfirmFunc;
 }
@@ -454,7 +454,7 @@ export interface Settings extends CoreSettings, RenderSettings, ThemeSettings {
 interface MuiConfirmOptions {
   // import { ConfirmOptions } from "material-ui-confirm";
   description?: string;
-  title?: string;
+  title?: string | null;
   confirmationText?: string;
   cancellationText?: string;
 }

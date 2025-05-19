@@ -17,6 +17,7 @@ const settings = {
   renderFieldSources: (props, {RCE, W: {FluentUIValueSources}}) => RCE(FluentUIValueSources, props),
   renderProvider: (props, {RCE, W: {FluentUIProvider}}) => RCE(FluentUIProvider, props),
   renderConfirm: (props, {W: {FluentUIConfirm}}) => FluentUIConfirm(props),
+  useConfirm: ({W: {FluentUIUseConfirm}}) => FluentUIUseConfirm(),
 };
 
 

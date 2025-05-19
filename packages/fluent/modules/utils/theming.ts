@@ -1,5 +1,5 @@
 import { Utils, Config } from "@react-awesome-query-builder/ui";
-import { Theme, PartialTheme } from "@fluentui/react";
+import { Theme, PartialTheme, css } from "@fluentui/react";
 const { setOpacityForHex, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
 const { logger } = Utils.OtherUtils;
 
@@ -82,7 +82,7 @@ const themeToCssVars = (theme: Theme, config: Config) => {
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
   // todo: detect darkMode from theme (theme.palette?.themeDark color) (not config)
 
-  return {
+  let cssVars = {
     "--rule-background": semanticColors.cardStandoutBackground,
     "--group-background": semanticColors.menuItemBackgroundHovered,
     "--rulegroup-background": semanticColors.defaultStateBackground,
@@ -106,11 +106,24 @@ const themeToCssVars = (theme: Theme, config: Config) => {
     "--main-font-size": fonts.medium.fontSize,
     "--item-radius": effects.roundedCorner2,
     
-    "--rule-shadow-hover": effects.elevation4,
-    "--group-shadow-hover": effects.elevation4,
-    "--rulegroup-shadow-hover": effects.elevation4,
-    "--rulegroupext-shadow-hover": effects.elevation4,
+    // "--rule-shadow-hover": effects.elevation4,
+    // "--group-shadow-hover": effects.elevation4,
+    // "--rulegroup-shadow-hover": effects.elevation4,
+    // "--rulegroupext-shadow-hover": effects.elevation4,
   } as Record<string, string>;
+
+
+  if (useThickLeftBorderOnHoverItem) {
+    cssVars = {
+      ...cssVars,
+      "--rule-border-left-hover": "2px",
+      "--group-border-left-hover": "2px",
+      "--rulegroup-border-left-hover": "2px",
+      "--rulegroupext-border-left-hover": "2px",
+    };
+  }
+
+  return cssVars;
 };
 
 export {
