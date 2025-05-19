@@ -158,7 +158,6 @@ const compileMetaSettings = {
   renderIcon: { type: "rf" },
   renderButtonGroup: { type: "rf" },
   renderValueSources: { type: "rf" },
-  renderFieldSources: { type: "rf" },
   renderProvider: { type: "rf" },
   renderSwitch: { type: "rf" },
   renderSwitchPrefix: { type: "r" },

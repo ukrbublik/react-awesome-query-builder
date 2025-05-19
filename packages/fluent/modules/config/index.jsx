@@ -14,7 +14,6 @@ const settings = {
   renderIcon: (props, {RCE, W: {FluentUIIcon}}) => RCE(FluentUIIcon, props),
   renderButtonGroup: (props, {RCE, W: {FluentUIButtonGroup}}) => RCE(FluentUIButtonGroup, props),
   renderValueSources: (props, {RCE, W: {FluentUIValueSources}}) => RCE(FluentUIValueSources, props),
-  renderFieldSources: (props, {RCE, W: {FluentUIValueSources}}) => RCE(FluentUIValueSources, props),
   renderProvider: (props, {RCE, W: {FluentUIProvider}}) => RCE(FluentUIProvider, props),
   renderConfirm: (props, {W: {FluentUIConfirm}}) => FluentUIConfirm(props),
   useConfirm: ({W: {FluentUIUseConfirm}}) => FluentUIUseConfirm(),

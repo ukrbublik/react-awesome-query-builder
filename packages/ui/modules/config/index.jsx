@@ -130,7 +130,6 @@ const settings = {
   renderButtonGroup: (props, {RCE, W: {VanillaButtonGroup}}) => RCE(VanillaButtonGroup, props),
   renderProvider: (props, {RCE, W: {VanillaProvider}}) => RCE(VanillaProvider, props),
   renderValueSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),
-  renderFieldSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),
   renderConfirm: (props, {W: {vanillaConfirm}}) => vanillaConfirm(props),
   renderSwitchPrefix: "IF",
   renderBeforeCaseValue: (props, {RCE}) => RCE("span", {children: [" then "]}),

@@ -427,7 +427,6 @@ export interface RenderSettings {
   renderSwitch?: SerializableType<FactoryWithContext<SwitchProps>>;
   renderProvider?: SerializableType<FactoryWithContext<ProviderProps>>;
   renderValueSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
-  renderFieldSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
   renderConfirm?: SerializableType<FnWithContextAndProps<ConfirmModalProps, void>>;
   useConfirm?: SerializableType<FactoryFnWithoutPropsWithContext<ConfirmFunc>>;
   renderItem?: SerializableType<FactoryWithContext<ItemBuilderProps>>;

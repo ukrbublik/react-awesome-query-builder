@@ -24,7 +24,6 @@ const settings = {
   renderIcon: (props, {RCE, W: {Icon}}) => RCE(Icon, props),
   renderButtonGroup: (props, {RCE, W: {ButtonGroup}}) => RCE(ButtonGroup, props),
   renderValueSources: (props, {RCE, W: {ValueSources}}) => RCE(ValueSources, props),
-  renderFieldSources: (props, {RCE, W: {ValueSources}}) => RCE(ValueSources, props),
   renderProvider: (props, {RCE, W: {Provider}}) => RCE(Provider, props),
   useConfirm: ({W: {useConfirm}}) => useConfirm(),
   renderConfirm: (props, {W: {Confirm}}) => Confirm(props),
