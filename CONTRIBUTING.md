@@ -13,7 +13,7 @@ Feel free to open PRs to fix bugs, add new features, add new reusable types/widg
 
 We use [pnpm](https://pnpm.io/). Please [install pnpm](https://pnpm.io/installation):
 ```
-npm install -g pnpm
+npm install -g pnpm@8
 ```
 Clone this repo, install deps with `pnpm i`.
 
