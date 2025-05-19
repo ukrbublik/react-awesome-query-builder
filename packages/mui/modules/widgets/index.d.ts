@@ -13,10 +13,11 @@ export interface MuiWidgets {
   MuiSwitch: ElementType<SwitchProps>,
   MuiButton: ElementType<ButtonProps>,
   MuiButtonGroup: ElementType<ButtonGroupProps>,
-  MuiProvider: ElementType<ProviderProps>,
   MuiValueSources: ElementType<ValueSourcesProps>,
+  
+  MuiProvider: ElementType<ProviderProps>,
   MuiConfirm: ConfirmFunc,
-  MuiUseConfirm: () => (options?: ConfirmOptions) => Promise<void>,
+  MuiUseConfirm: () => ConfirmFunc,
 
   // material core widgets
   MuiBooleanWidget: ElementType<BooleanWidgetProps>,

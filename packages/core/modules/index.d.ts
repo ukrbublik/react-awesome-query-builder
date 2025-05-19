@@ -24,7 +24,7 @@ interface ReactAttributes {
 }
 
 export type FactoryFnWithoutPropsWithContext<F> = (this: ConfigContext, ctx: ConfigContext) => F;
-export type FactoryFnWithContext<P, F> = (this: ConfigContext, props: P, ctx?: ConfigContext) => F;
+export type FnWithContextAndProps<P, R = void> = (this: ConfigContext, props: P, ctx?: ConfigContext) => R;
 export type FactoryWithContext<P> = (this: ConfigContext, props: ReactAttributes & P, ctx?: ConfigContext) => ReactElement<P>;
 export type RenderedReactElement = ReactElement | string;
 export type SerializedFunction = JsonLogicFunction | string;

@@ -3,8 +3,6 @@ import { Dialog, DialogType, DialogFooter } from "@fluentui/react/lib/Dialog";
 import { PrimaryButton, DefaultButton } from "@fluentui/react/lib/Button";
 import { ConfirmModalProps } from "@react-awesome-query-builder/ui";
 
-export type ConfirmOptions = Omit<ConfirmModalProps, "onOk" | "confirmFn">;
-
 type ModalProps = { modalOpened?: boolean };
 type ModalComp = React.FC<ModalProps>;
 
@@ -53,47 +51,40 @@ export const useFluentUIConfirm = () => {
 export const FluentUIUseConfirm = () => {
   const { showModal, closeModal } = useFluentUIConfirm();
 
-  const confirmFn = (options: ConfirmOptions) => {
-    return new Promise<void>((resolve, reject) => {
-      const onOk = () => {
-        closeModal();
-        resolve();
-      };
-      const onCancel = () => {
-        closeModal();
-        reject(new Error("Cancelled"));
-      };
-      showModal(() => ({ modalOpened }: ModalProps = {}) => {
-        return (
-          <Dialog
-            hidden={modalOpened === undefined ? false : !modalOpened}
-            onDismiss={onCancel}
-            dialogContentProps={{
-              type: DialogType.normal,
-              title: options.title ?? "Are you sure?",
-              styles: {
-                title: { fontSize: "1.5rem" },
-                inner: { paddingBottom: 0, marginTop: "20px" },
-              },
-            }}
-          >
-            <DialogFooter>
-              <PrimaryButton onClick={onOk} text={options.okText} />
-              <DefaultButton onClick={onCancel} text={options.cancelText} />
-            </DialogFooter>
-          </Dialog>
-        );
-      });
+  const confirmFn = ({title, okText, cancelText, onOk}: ConfirmModalProps) => {
+    const onClickOk = () => {
+      closeModal();
+      onOk?.();
+    };
+    const onClickCancel = () => {
+      closeModal();
+    };
+    showModal(() => ({ modalOpened }: ModalProps = {}) => {
+      return (
+        <Dialog
+          hidden={modalOpened === undefined ? false : !modalOpened}
+          onDismiss={onClickCancel}
+          dialogContentProps={{
+            type: DialogType.normal,
+            title: title ?? "Are you sure?",
+            styles: {
+              title: { fontSize: "1.5rem" },
+              inner: { paddingBottom: 0, marginTop: "20px" },
+            },
+          }}
+        >
+          <DialogFooter>
+            <PrimaryButton onClick={onClickOk} text={okText} />
+            <DefaultButton onClick={onClickCancel} text={cancelText} />
+          </DialogFooter>
+        </Dialog>
+      );
     });
   };
 
   return confirmFn;
 };
 
-export const FluentUIConfirm = (props: ConfirmModalProps) => {
-  const {onOk, confirmFn, ...renderOptions} = props;
-  confirmFn?.(renderOptions)
-    .then(onOk)
-    .catch(() => {});
+export const FluentUIConfirm = ({confirmFn, ...renderOptions}: ConfirmModalProps) => {
+  confirmFn?.(renderOptions);
 };
-

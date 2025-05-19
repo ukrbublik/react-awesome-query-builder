@@ -29,7 +29,7 @@ import ButtonGroup from "./core/ButtonGroup";
 import Conjs from "./core/Conjs";
 import Switch from "./core/Switch";
 import ValueSources from "./core/ValueSources";
-import confirm from "./core/confirm";
+import { useConfirm, Confirm } from "./core/Confirm";
 
 // Provider
 import { Provider } from "./core/Provider";
@@ -61,8 +61,8 @@ const AntdWidgets = {
   Conjs,
   Switch,
   ValueSources,
-  confirm,
-
+  useConfirm,
+  Confirm,
   Provider,
 };
 

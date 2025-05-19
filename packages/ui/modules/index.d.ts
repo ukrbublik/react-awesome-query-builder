@@ -13,7 +13,7 @@ import {
   ItemType,
   ItemProperties,
   ValueSource,
-  ConfigContext, FactoryWithContext, FactoryFnWithContext, FactoryFnWithoutPropsWithContext, RenderedReactElement, SerializableType,
+  ConfigContext, FactoryWithContext, FnWithContextAndProps, FactoryFnWithoutPropsWithContext, RenderedReactElement, SerializableType,
   ConjsProps,
   AsyncFetchListValuesFn,
   ListOptionUi,
@@ -277,7 +277,7 @@ export interface ConfirmModalProps {
   cancelText?: string;
   title: string | null;
   okType?: string;
-  confirmFn?: MuiConfirmFunc;
+  confirmFn?: ConfirmFunc;
 }
 
 export interface RuleErrorProps {
@@ -311,7 +311,7 @@ export interface RuleProps {
   onDragStart: DragStartFn | Empty;
   handleDraggerMouseDown: (e: MouseEvent) => void | Empty;
   removeSelf: () => void | Empty;
-  confirmFn: MuiConfirmFunc | Empty; // prop from <WithConfirmFn>
+  confirmFn: ConfirmFunc | Empty; // prop from <WithConfirmFn>
 
   //actions
   setField(field: FieldValueI): undefined;
@@ -428,8 +428,8 @@ export interface RenderSettings {
   renderProvider?: SerializableType<FactoryWithContext<ProviderProps>>;
   renderValueSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
   renderFieldSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
-  renderConfirm?: SerializableType<FactoryFnWithContext<ConfirmModalProps, ReturnType<ConfirmFunc>>>;
-  useConfirm?: SerializableType<FactoryFnWithoutPropsWithContext<MuiConfirmFunc>>;
+  renderConfirm?: SerializableType<FnWithContextAndProps<ConfirmModalProps, void>>;
+  useConfirm?: SerializableType<FactoryFnWithoutPropsWithContext<ConfirmFunc>>;
   renderItem?: SerializableType<FactoryWithContext<ItemBuilderProps>>;
   renderBeforeWidget?: SerializableType<FactoryWithContext<RuleProps>>;
   renderAfterWidget?: SerializableType<FactoryWithContext<RuleProps>>;
@@ -451,14 +451,6 @@ export interface Settings extends CoreSettings, RenderSettings, ThemeSettings {
 // ReadyWidgets
 /////////////////
 
-interface MuiConfirmOptions {
-  // import { ConfirmOptions } from "material-ui-confirm";
-  description?: string;
-  title?: string | null;
-  confirmationText?: string;
-  cancellationText?: string;
-}
-export type MuiConfirmFunc = (props: MuiConfirmOptions) => Promise<void>;
 export type ConfirmFunc = (props: ConfirmModalProps) => void;
 
 interface VanillaWidgets {

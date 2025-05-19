@@ -1,6 +1,12 @@
 import { Modal } from "antd";
 const { confirm } = Modal;
 
-export default (options) => {
-  confirm(options);
+export const useConfirm = () => {
+  return (options) => {
+    confirm(options);
+  };
+};
+
+export const Confirm = ({confirmFn, ...renderOptions}) => {
+  confirmFn(renderOptions);
 };

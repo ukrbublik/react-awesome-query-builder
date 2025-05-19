@@ -1,5 +1,4 @@
 import React from "react";
-import { useConfirm } from "material-ui-confirm";
 
 // value widgets
 import MuiTextWidget from "./value/MuiText";
@@ -27,7 +26,7 @@ import MuiButtonGroup from "./core/MuiButtonGroup";
 import MuiConjs from "./core/MuiConjs";
 import MuiSwitch from "./core/MuiSwitch";
 import MuiValueSources from "./core/MuiValueSources";
-import MuiConfirm from "./core/MuiConfirm";
+import { MuiConfirm, MuiUseConfirm } from "./core/MuiConfirm";
 import { MuiProvider } from "./core/MuiProvider";
 
 
@@ -56,7 +55,7 @@ const MuiWidgets = {
   MuiSwitch,
   MuiValueSources,
   MuiConfirm,
-  MuiUseConfirm: useConfirm,
+  MuiUseConfirm,
 
   MuiProvider,
 };
