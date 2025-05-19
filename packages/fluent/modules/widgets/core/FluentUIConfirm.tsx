@@ -9,7 +9,7 @@ type ModalProps = { modalOpened?: boolean };
 type ModalComp = React.FC<ModalProps>;
 
 interface FluentUIConfirmContextOptions {
-  showModal: (modalFactory: () => ModalComp) => void;
+  showModal: (modal: () => ModalComp) => void;
   closeModal: () => void;
 }
 
@@ -19,18 +19,18 @@ const FluentUIConfirmContext = createContext<FluentUIConfirmContextOptions>({
 });
 
 export const FluentUIConfirmProvider = ({ children }: { children: React.ReactNode }) => {
-  const [Modal, setModalFactory] = React.useState<ModalComp | null>(null);
+  const [Modal, setModal] = React.useState<ModalComp | null>(null);
   const [modalOpened, setModalOpened] = React.useState<boolean>(false);
 
-  const showModal = (modalFactory: () => ModalComp) => {
+  const showModal = (modal: () => ModalComp) => {
     setModalOpened(true);
-    setModalFactory(modalFactory);
+    setModal(modal);
   };
 
   const closeModal = () => {
     setModalOpened(false);
     setTimeout(() => {
-      setModalFactory(null);
+      setModal(null);
     }, 300);
   };
 
