@@ -1,20 +1,29 @@
 $dark-main-text-color: white !default;
 $dark-rule-background: #53535359 !default;
+$dark-rule-border-color: transparent !default;
 $dark-rulegroup-border-color: #8f8f8fa3 !default;
 $dark-rulegroup-background: #8f8f8fa3 !default;
 $dark-rulegroupext-border-color: #8f8f8fa3 !default;
 $dark-rulegroupext-background: #8f8f8fa3 !default;
 $dark-group-border-color: #8f8f8fa3 !default;
 $dark-group-background: #3e3e3e78 !default;
+$dark-switch-background: #3e3e3e78 !default;
+$dark-switch-border-color: #8f8f8fa3 !default;
+$dark-case-background: #3e3e3e78 !default;
+$dark-case-border-color: #8f8f8fa3 !default;
 
 .qb-dark {
   --rule-background: #{$dark-rule-background};
+  --rule-border-color: #{$dark-rule-border-color};
   --rulegroup-background: #{$dark-rulegroup-background};
   --rulegroup-border-color: #{$dark-rulegroup-border-color};
   --rulegroupext-background: #{$dark-rulegroupext-background};
   --rulegroupext-border-color: #{$dark-rulegroupext-border-color};
   --group-border-color: #{$dark-group-border-color};
   --group-background: #{$dark-group-background};
+  --switch-border-color: #{$dark-switch-border-color};
+  --switch-background: #{$dark-switch-background};
+  --case-border-color: #{$dark-case-border-color};
+  --case-background: #{$dark-case-background};
   --main-text-color: #{$dark-main-text-color};
-  // todo: complete dark vals
 }
