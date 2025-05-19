@@ -1,11 +1,14 @@
-import { Utils, Config, MuiThemeOverride, MuiPaletteOverride } from "@react-awesome-query-builder/ui";
+import { Utils, Config } from "@react-awesome-query-builder/ui";
 import { createTheme, Theme, ThemeOptions } from "@mui/material/styles";
+import mergeWith from "lodash/mergeWith";
+import omit from "lodash/omit";
+//import pick from "lodash/pick";
 
 const { setOpacityForHex, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
 const { logger } = Utils.OtherUtils;
 
-const buildTheme = (config: Config): Theme | null => {
-  const themeMode = config.settings.themeMode ?? "light";
+const buildTheme = (config: Config, existingTheme?: Theme): Theme | null => {
+  const themeMode = config.settings.themeMode;
   // const compactMode = config.settings.compactMode;
   // const momentLocale = config.settings.locale?.moment;
   const themeConfig = config.settings.theme?.mui;
@@ -16,22 +19,30 @@ const buildTheme = (config: Config): Theme | null => {
     return null;
   }
   if (isFullTheme(themeConfig as Partial<Theme>)) {
-    return themeConfig as Theme;
+    return localeConfig ? createTheme(themeConfig, localeConfig) : themeConfig as Theme;
   }
-  const simpleTheme: ThemeOptions = {
+
+  const filteredExistingTheme = (themeMode && existingTheme && themeMode != existingTheme.palette.mode ? {
+    ...existingTheme,
     palette: {
-      mode: themeMode,
-    }
-  };
-  const themeOptions = themeConfig ? {
-    ...themeConfig,
-    palette: {
-      ...themeConfig.palette,
-      ...(config.settings.themeMode ? { mode: themeMode } : {}),
-    }
-  } : simpleTheme;
+      ...omit(
+        //pick(
+        existingTheme.palette, 
+        //  ["primary", "secondary", "error", "warning", "info", "success"]
+        //),
+        ["background", "text"]
+      ),
+    },
+  } : existingTheme) as Partial<Theme> | undefined;
+
+  const mergedThemeOptions: ThemeOptions = mergeWith({}, 
+    filteredExistingTheme ?? {}, 
+    themeConfig ?? {},
+    themeMode && { palette: { mode: themeMode } }
+  ) as ThemeOptions;
+
   return createTheme(
-    themeOptions,
+    mergedThemeOptions,
     localeConfig ?? {}
   );
 };

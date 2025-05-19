@@ -38,6 +38,11 @@ export const settings = {
   // todo: deprecated, remove this in favour of defaultConjunction
   defaultGroupConjunction: "AND",
 
+  //theme
+  designSettings: {
+    detectThemeLibrary: true,
+  },
+
   // localization
   locale: {
     moment: "en",

@@ -24,7 +24,7 @@ export const useThemeing = (
     let newConfig: Config = clone(state.config);
     state.configChanges = merge(state.configChanges, {
       settings: {
-        themeMode: themeMode === "auto" ? undefined : themeMode,
+        themeMode: themeMode === "auto" ? null : themeMode,
       }
     });
     window._configChanges = state.configChanges;

@@ -769,6 +769,9 @@ importers:
       '@mui/x-date-pickers':
         specifier: ^7.23.6
         version: 7.23.6(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@mui/material@6.3.1)(@mui/system@6.3.1)(@types/react@17.0.80)(moment@2.30.1)(react-dom@17.0.2)(react@17.0.2)
+      '@types/lodash':
+        specifier: ^4.14.170
+        version: 4.14.191
       '@types/react':
         specifier: ^17.0.39
         version: 17.0.80

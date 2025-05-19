@@ -1,6 +1,6 @@
 import React from "react";
 import { ProviderProps, Utils } from "@react-awesome-query-builder/ui";
-import { ThemeProvider, useTheme } from "@mui/material/styles";
+import { ThemeProvider, useTheme, extendTheme } from "@mui/material/styles";
 import { ConfirmProvider } from "material-ui-confirm";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"; // TODO: set moment to dayjs
@@ -16,7 +16,9 @@ const MuiProvider: React.FC<ProviderProps> = ({config, children}) => {
   const themeMode = config.settings.themeMode ?? "light";
   const compactMode = config.settings.compactMode;
   const momentLocale = config.settings.locale?.moment;
-  const theme = buildTheme(config);
+  const existingOuterTheme = useTheme();
+  const existingTheme = config.settings.designSettings?.detectThemeLibrary ? existingOuterTheme : undefined;
+  const theme = buildTheme(config, existingTheme);
 
   const locProviderProps = xdpVersion >= 6 ? {
     locale: momentLocale,
