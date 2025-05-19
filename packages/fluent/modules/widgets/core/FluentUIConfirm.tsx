@@ -6,10 +6,10 @@ import { ConfirmModalProps } from "@react-awesome-query-builder/ui";
 export type ConfirmOptions = Omit<ConfirmModalProps, "onOk" | "confirmFn">;
 
 type ModalProps = { modalOpened?: boolean };
-type ModalInstance = React.FC<ModalProps>;
+type ModalComp = React.FC<ModalProps>;
 
 interface FluentUIConfirmContextOptions {
-  showModal: (modalInstanceFn: () => ModalInstance) => void;
+  showModal: (modalFactory: () => ModalComp) => void;
   closeModal: () => void;
 }
 
@@ -19,18 +19,18 @@ const FluentUIConfirmContext = createContext<FluentUIConfirmContextOptions>({
 });
 
 export const FluentUIConfirmProvider = ({ children }: { children: React.ReactNode }) => {
-  const [Modal, setModal] = React.useState<ModalInstance | null>(null);
+  const [Modal, setModalFactory] = React.useState<ModalComp | null>(null);
   const [modalOpened, setModalOpened] = React.useState<boolean>(false);
 
-  const showModal = (modalInstanceFn: () => ModalInstance) => {
+  const showModal = (modalFactory: () => ModalComp) => {
     setModalOpened(true);
-    setModal(modalInstanceFn);
+    setModalFactory(modalFactory);
   };
 
   const closeModal = () => {
     setModalOpened(false);
     setTimeout(() => {
-      setModal(null);
+      setModalFactory(null);
     }, 300);
   };
 
@@ -63,10 +63,10 @@ export const FluentUIUseConfirm = () => {
         closeModal();
         reject(new Error("Cancelled"));
       };
-      showModal(() => ({ modalOpened }: ModalProps) => {
+      showModal(() => ({ modalOpened }: ModalProps = {}) => {
         return (
           <Dialog
-            hidden={!modalOpened}
+            hidden={modalOpened === undefined ? false : !modalOpened}
             onDismiss={onCancel}
             dialogContentProps={{
               type: DialogType.normal,
