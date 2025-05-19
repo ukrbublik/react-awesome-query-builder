@@ -5,7 +5,7 @@ import { ConfirmProvider } from "material-ui-confirm";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"; // TODO: set moment to dayjs
 import xdpPackage from "@mui/x-date-pickers/package.json"; // to determine version
-import { generateDesignTokens, buildTheme } from "../../utils/theming";
+import { generateCssVars, buildTheme } from "../../utils/theming";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 const xdpVersion = parseInt((xdpPackage.version as string)?.split(".")?.[0] ?? "0");
@@ -28,7 +28,7 @@ const MuiProvider: React.FC<ProviderProps> = ({config, children}) => {
     const theme = useTheme();
     React.useEffect(() => {
       const cssVarsTarget = ref.current;
-      const cssVars = generateDesignTokens(theme, config);
+      const cssVars = generateCssVars(theme, config);
       for (const k in cssVars) {
         if (cssVars[k] != undefined) {
           cssVarsTarget?.style.setProperty(k, cssVars[k]);

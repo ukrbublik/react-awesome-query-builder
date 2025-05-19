@@ -379,8 +379,8 @@ export interface DesignTokens {
 export interface DesignSettings {
   useThickLeftBorderOnHoverItem?: boolean;
   useShadowOnHoverItem?: boolean;
-  generateDesignTokensFromThemeLibrary?: boolean;
-  generateDesignTokens?: {
+  generateCssVarsFromThemeLibrary?: boolean;
+  generateCssVars?: {
     // todo: override with correct typings in dedicated packages
     material?: (theme: /*Theme*/ Record<string, any>, config: Config) => DesignTokens;
     mui?: (theme: /*Theme*/ Record<string, any>, config: Config) => DesignTokens;

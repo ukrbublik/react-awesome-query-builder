@@ -36,8 +36,8 @@ const buildTheme = (config: Config): Theme | null => {
   );
 };
 
-const generateDesignTokens = (theme: Theme, config: Config) => {
-  logger.log("generateDesignTokens - Material theme", theme);
+const generateCssVars = (theme: Theme, config: Config) => {
+  logger.log("generateCssVars - Material theme", theme);
   const { palette, typography, shadows, shape } = theme;
   const darkMode = palette.type === "dark";
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? true;
@@ -82,5 +82,5 @@ const generateDesignTokens = (theme: Theme, config: Config) => {
 
 export {
   buildTheme,
-  generateDesignTokens,
+  generateCssVars,
 };

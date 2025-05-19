@@ -23,8 +23,8 @@ const buildPalette = (darkMode: boolean, compactMode: boolean) => {
   return { algorithms, palette };
 };
 
-const generateDesignTokens = (token: GlobalToken, config: Config) => {
-  logger.log("generateDesignTokens - antd token", token);
+const generateCssVars = (token: GlobalToken, config: Config) => {
+  logger.log("generateCssVars - antd token", token);
   const darkMode = isDarkColor(token.colorBgBase);
   const renderSize = config.settings.renderSize;
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? true;
@@ -103,5 +103,5 @@ const generateDesignTokens = (token: GlobalToken, config: Config) => {
 
 export {
   buildPalette,
-  generateDesignTokens,
+  generateCssVars,
 };

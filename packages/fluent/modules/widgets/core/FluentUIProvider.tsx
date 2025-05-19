@@ -1,7 +1,7 @@
 import React from "react";
 
 import { ProviderProps, Utils } from "@react-awesome-query-builder/ui";
-import { generateDesignTokens, buildTheme } from "../../utils/theming";
+import { generateCssVars, buildTheme } from "../../utils/theming";
 import { FluentUIConfirmProvider } from "./FluentUIConfirm";
 import { ThemeProvider, useTheme } from "@fluentui/react";
 
@@ -17,7 +17,7 @@ const FluentUIProvider: React.FC<ProviderProps> = ({config, children}) => {
     const theme = useTheme();
     React.useEffect(() => {
       const cssVarsTarget = ref.current;
-      const cssVars = generateDesignTokens(theme, config);
+      const cssVars = generateCssVars(theme, config);
       for (const k in cssVars) {
         if (cssVars[k] != undefined) {
           cssVarsTarget?.style.setProperty(k, cssVars[k]);

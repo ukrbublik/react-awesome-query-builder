@@ -75,8 +75,8 @@ const buildTheme = (config: Config): PartialTheme | undefined => {
   return themeMode === "dark" ? darkTheme : (themeMode === "light" ? lightTheme : undefined);
 };
 
-const generateDesignTokens = (theme: Theme, config: Config) => {
-  logger.log("generateDesignTokens - Fluent theme", theme);
+const generateCssVars = (theme: Theme, config: Config) => {
+  logger.log("generateCssVars - Fluent theme", theme);
   const { fonts, effects, semanticColors } = theme;
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? true;
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
@@ -128,5 +128,5 @@ const generateDesignTokens = (theme: Theme, config: Config) => {
 
 export {
   buildTheme,
-  generateDesignTokens,
+  generateCssVars,
 };
