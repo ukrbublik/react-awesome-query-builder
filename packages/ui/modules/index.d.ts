@@ -333,12 +333,57 @@ export type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" |
 export type RenderSize = "small" | "large" | "medium";
 export type ThemeMode = "light" | "dark";
 
+//todo: override for each packages with real typed object
+export interface MuiPaletteColorOverride {
+  mode?: ThemeMode;
+  main: string;
+  // light?: string;
+  // dark?: string;
+  // contrastText?: string;
+}
+export interface MuiPaletteOverride {
+  mode?: ThemeMode;
+  primary?: MuiPaletteColorOverride;
+  // secondary?: MuiPaletteColorOverride;
+  // error?: MuiPaletteColorOverride;
+  // warning?: MuiPaletteColorOverride;
+  // info?: MuiPaletteColorOverride;
+  // success?: MuiPaletteColorOverride;
+  background?: {
+    default?: string;
+    paper?: string;
+  };
+  text?: {
+    primary: string;
+    secondary: string;
+    disabled: string;
+  }
+}
+export interface MuiTypographyOverride {
+  fontFamily?: React.CSSProperties["fontFamily"];
+  fontSize?: number;
+}
+export interface MuiThemeOverride {
+  palette?: MuiPaletteOverride;
+  typography?: MuiTypographyOverride;
+}
+export type MaterialThemeOverride = MuiThemeOverride;
+export type AntdThemeOverride = Record<string, any>; // todo: override for antd
+export type FluentThemeOverride = Record<string, any>; // todo: override for fluent
+
+export interface DesignTokens {
+  highlightLeftBorderOnHover?: boolean;
+  highlightShadowOnHover?: boolean;
+}
+
 export interface ThemeSettings {
   theme?: {
-    material?: Record<string, any>;
-    mui?: Record<string, any>;
-    antd?: Record<string, any>;
+    material?: MaterialThemeOverride;
+    mui?: MuiThemeOverride;
+    antd?: AntdThemeOverride;
+    fluent?: FluentThemeOverride;
   };
+  designTokens?: DesignTokens;
   renderSize?: RenderSize;
   themeMode?: ThemeMode;
   compactMode?: boolean;
@@ -434,6 +479,7 @@ export interface ColorUtils {
   chroma: typeof chroma;
   setOpacityForHex(hex: string, alpha: number): string;
   generateCssVarsForLevels(isDark: boolean, cssVar: string, baseColor: string, baseDarkColor?: string, lightRatio?: number, darkRatio?: number, maxLevel?: number, minLevel?: number): Record<string, string>;
+  isDarkColor(color: string): boolean;
 }
 export interface NumberFormat {
   getNumberFormatProps: (props: Record<string, any>, excludePropsNames?: string[]) => Record<string, any>;

@@ -1,10 +1,11 @@
 import React from "react";
 import { ProviderProps } from "@react-awesome-query-builder/ui";
-import { ConfigProvider, ConfigProviderProps } from "antd";
+import { ConfigProvider, ConfigProviderProps, theme as antdTheme } from "antd";
 import { themeToCssVars, buildPalette } from "../../utils/theming";
 
 type Locale = ConfigProviderProps["locale"];
-type Theme = ConfigProviderProps["theme"];
+type ThemeConfig = ConfigProviderProps["theme"];
+type Theme = ReturnType<typeof antdTheme.useToken>["theme"];
 
 const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   const ref = React.createRef<HTMLDivElement>();
@@ -19,7 +20,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
     return buildPalette(darkMode, compactMode);
   }, [darkMode, compactMode]);
 
-  const customTheme = React.useMemo<Theme>(() => {
+  const customThemeConfig = React.useMemo<ThemeConfig>(() => {
     return {
       // https://ant.design/docs/react/customize-theme
       algorithm: algorithms,
@@ -30,12 +31,11 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   }, [algorithms]);
 
   const UpdCssVars = () => {
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    const theme = ConfigProvider.ConfigContext.Consumer._currentValue.theme as Theme;
+    const { token, theme } = antdTheme.useToken();
+
     React.useEffect(() => {
       const cssVarsTarget = ref.current;
-      const cssVars = themeToCssVars(theme, palette, darkMode, renderSize);
+      const cssVars = themeToCssVars(token, config);
       for (const k in cssVars) {
         if (cssVars[k] != undefined) {
           cssVarsTarget?.style.setProperty(k, cssVars[k]);
@@ -46,7 +46,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
           cssVarsTarget?.style.removeProperty(k);
         }
       };
-    }, [theme, palette, darkMode, renderSize, ref]);
+    }, [palette, darkMode, renderSize, ref, theme.id]);
     return <div style={{display: "none"}} />;
   };
 
@@ -57,7 +57,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
     // @ts-ignore error TS2786: 'ConfigProvider' cannot be used as a JSX component. Its return type 'ReactNode | Promise<ReactNode>' is not a valid JSX element.
     <ConfigProvider
       locale={localeConfig as Locale | undefined}
-      theme={customTheme}
+      theme={customThemeConfig}
     >{base}</ConfigProvider>
   ) : base;
 
