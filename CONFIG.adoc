@@ -416,8 +416,10 @@ Theme settings:
 [cols="1m,1,3a",options="header",]
 |===
 |key |default |meaning
-|themeMode |`light` |`light` or `dark`
-|compactMode |false |
+|themeMode |undefined |`light` or `dark`. +
+ If <Query> is wrapped in theme provider component (eg. <ThemeProvider> for MUI, <ConfigProvider> for AntDesign) then will be detected automatically. +
+ Otherwise `false` by default
+|compactMode |false | Use compact styles (eg. smaller margins)
 |theme.material |{} |Options for https://v4.mui.com/customization/theming/[createTheme]
 |theme.mui |{} |Options for https://mui.com/material-ui/customization/theming/[createTheme]
 |renderSize |`small` |Size of components - `small`, `middle` or `large`

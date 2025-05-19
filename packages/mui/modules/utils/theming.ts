@@ -36,10 +36,11 @@ const buildTheme = (config: Config): Theme | null => {
   );
 };
 
-const themeToCssVars = (theme: Theme) => {
+const themeToCssVars = (theme: Theme, config: Config) => {
   logger.log("themeToCssVars - MUI theme", theme);
   const { palette, typography, shadows, shape } = theme;
   const darkMode = palette.mode === "dark";
+
   return {
     "--main-background": palette.background.paper,
     "--rule-background": darkMode ? palette.background.paper : palette.background.paper,

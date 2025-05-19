@@ -48,7 +48,7 @@ const DemoQueryBuilder: React.FC = () => {
     sqlWarnings: [] as Array<string>,
     renderBocks: defaultRenderBlocks,
     initFile: defaultInitFile,
-    themeMode: "light",
+    themeMode: "auto",
     renderSize: "small",
     compactMode: false,
     configChanges: {},

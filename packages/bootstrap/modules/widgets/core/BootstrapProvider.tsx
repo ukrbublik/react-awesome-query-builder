@@ -10,7 +10,7 @@ const BootstrapProvider: React.FC<ProviderProps> = ({config, children}) => {
 
   React.useEffect(() => {
     const cssVarsTarget = ref.current;
-    const cssVars = themeToCssVars(darkMode);
+    const cssVars = themeToCssVars({}, config);
     for (const k in cssVars) {
       if (cssVars[k] != undefined) {
         cssVarsTarget?.style.setProperty(k, cssVars[k]);

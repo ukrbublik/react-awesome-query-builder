@@ -36,10 +36,13 @@ const buildTheme = (config: Config): Theme | null => {
   );
 };
 
-const themeToCssVars = (theme: Theme) => {
+const themeToCssVars = (theme: Theme, config: Config) => {
   logger.log("themeToCssVars - Material theme", theme);
   const { palette, typography, shadows, shape } = theme;
   const darkMode = palette.type === "dark";
+  const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? true;
+  const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
+  
   return {
     "--main-background": palette.background.paper,
     "--rule-background": darkMode ? palette.background.paper : palette.background.paper,

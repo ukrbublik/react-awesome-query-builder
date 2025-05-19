@@ -27,8 +27,8 @@ const themeToCssVars = (token: GlobalToken, config: Config) => {
   logger.log("themeToCssVars - antd token", token);
   const darkMode = isDarkColor(token.colorBgBase);
   const renderSize = config.settings.renderSize;
-  const highlightLeftBorderOnHover = config.settings.designSettings?.highlightLeftBorderOnHover ?? true;
-  const highlightShadowOnHover = config.settings.designSettings?.highlightShadowOnHover ?? false;
+  const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? true;
+  const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
 
   let sizedBorderRadius;
   switch (renderSize) {
@@ -78,7 +78,7 @@ const themeToCssVars = (token: GlobalToken, config: Config) => {
     "--conjunctions-radius": sizedBorderRadius + "px",
   } as Record<string, string>;
 
-  if (highlightLeftBorderOnHover) {
+  if (useThickLeftBorderOnHoverItem) {
     cssVars = {
       ...cssVars,
       "--rule-border-left-hover": "2px",
@@ -88,7 +88,7 @@ const themeToCssVars = (token: GlobalToken, config: Config) => {
     };
   }
   
-  if(highlightShadowOnHover) {
+  if(useShadowOnHoverItem) {
     cssVars = {
       ...cssVars,
       "--rule-shadow-hover": token.boxShadowTertiary,

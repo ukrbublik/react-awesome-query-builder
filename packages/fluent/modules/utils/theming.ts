@@ -75,9 +75,13 @@ const buildTheme = (config: Config): PartialTheme | undefined => {
   return themeMode === "dark" ? darkTheme : (themeMode === "light" ? lightTheme : undefined);
 };
 
-const themeToCssVars = (theme: Theme, darkMode: boolean) => {
+const themeToCssVars = (theme: Theme, config: Config) => {
   logger.log("themeToCssVars - Fluent theme", theme);
   const { fonts, effects, semanticColors } = theme;
+  const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? true;
+  const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
+  // todo: detect darkMode from theme (theme.palette?.themeDark color) (not config)
+
   return {
     "--rule-background": semanticColors.cardStandoutBackground,
     "--group-background": semanticColors.menuItemBackgroundHovered,

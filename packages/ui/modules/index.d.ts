@@ -372,22 +372,37 @@ export type AntdThemeOverride = Record<string, any>; // todo: override for antd
 export type FluentThemeOverride = Record<string, any>; // todo: override for fluent
 
 export interface DesignTokens {
-  // todo
+  // todo: complete
+  // todo: remove prefixed "--"
+  "--main-background"?: string;
 }
 export interface DesignSettings {
-  highlightLeftBorderOnHover?: boolean;
-  highlightShadowOnHover?: boolean;
+  useThickLeftBorderOnHoverItem?: boolean;
+  useShadowOnHoverItem?: boolean;
+  generateDesignTokensFromThemeLibrary?: boolean;
+  generateDesignTokens?: {
+    // todo: use correct typings in dedicated packages
+    material?: (theme: /*Theme*/ Record<string, any>, config: Config) => DesignTokens;
+    mui?: (theme: /*Theme*/ Record<string, any>, config: Config) => DesignTokens;
+    antd?: (token: /*GlobalToken*/ Record<string, any>, config: Config) => DesignTokens;
+    fluent?: (theme: /*Theme*/ Record<string, any>, config: Config) => DesignTokens;
+    bootstrap?: (_ununsed: any, config: Config) => DesignTokens;
+  }
 }
 
 export interface ThemeSettings {
   theme?: {
+    // todo: use correct typings in dedicated packages
     material?: MaterialThemeOverride;
     mui?: MuiThemeOverride;
     antd?: AntdThemeOverride;
     fluent?: FluentThemeOverride;
   };
   designSettings?: DesignSettings;
-  designTokens?: DesignTokens;
+  designTokens?: {
+    light?: DesignTokens;
+    dark?: DesignTokens;
+  };
   renderSize?: RenderSize;
   themeMode?: ThemeMode;
   compactMode?: boolean;
