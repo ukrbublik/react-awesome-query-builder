@@ -381,7 +381,7 @@ export interface DesignSettings {
   useShadowOnHoverItem?: boolean;
   generateDesignTokensFromThemeLibrary?: boolean;
   generateDesignTokens?: {
-    // todo: use correct typings in dedicated packages
+    // todo: override with correct typings in dedicated packages
     material?: (theme: /*Theme*/ Record<string, any>, config: Config) => DesignTokens;
     mui?: (theme: /*Theme*/ Record<string, any>, config: Config) => DesignTokens;
     antd?: (token: /*GlobalToken*/ Record<string, any>, config: Config) => DesignTokens;
