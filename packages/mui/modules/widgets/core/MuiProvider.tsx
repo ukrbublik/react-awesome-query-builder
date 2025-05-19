@@ -16,8 +16,10 @@ const MuiProvider: React.FC<ProviderProps> = ({config, children}) => {
   const themeMode = config.settings.themeMode ?? "light";
   const compactMode = config.settings.compactMode;
   const momentLocale = config.settings.locale?.moment;
+
   const existingOuterTheme = useTheme();
   const existingTheme = config.settings.designSettings?.detectThemeLibrary ? existingOuterTheme : undefined;
+
   const theme = buildTheme(config, existingTheme);
 
   const locProviderProps = xdpVersion >= 6 ? {

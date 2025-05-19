@@ -355,9 +355,9 @@ export interface DesignSettings {
 
 export interface ThemeSettings {
   theme?: {
-    material?: Record<string, any>; // 
+    material?: Record<string, any>; // ThemeOptions from "@material-ui/core/styles"
     mui?: Record<string, any>; // ThemeOptions from "@mui/material/styles";
-    antd?: Record<string, any>; //
+    antd?: Record<string, any>; // ConfigProviderProps["theme"] from "antd"
     fluent?: Record<string, any>; //
   };
   designSettings?: DesignSettings;

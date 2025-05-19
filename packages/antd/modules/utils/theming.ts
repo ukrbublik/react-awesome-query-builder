@@ -10,17 +10,18 @@ type MapToken = ReturnType<typeof antdTheme["defaultAlgorithm"]>;
 const { logger, isTruthy } = Utils.OtherUtils;
 const { setOpacityForHex, generateCssVarsForLevels, chroma, isDarkColor } = Utils.ColorUtils;
 
-const buildPalette = (darkMode: boolean, compactMode: boolean) => {
-  const algorithms: Algorithm[] = [
+const buildAlgorithms = (darkMode: boolean, compactMode: boolean) => {
+  const shouldUseAlgorithms = darkMode || compactMode;
+  const algorithms: Algorithm[] = shouldUseAlgorithms ? [
     darkMode && antdTheme.darkAlgorithm,
     compactMode && antdTheme.compactAlgorithm,
-    !compactMode && !darkMode && antdTheme.defaultAlgorithm,
-  ].filter(isTruthy);
-  const palette = algorithms.reduce(
-    (tkns, algo, i) => i === 0 ? algo(tkns) : algo({} as SeedToken, tkns as MapToken),
-    antdTheme.defaultSeed
-  ) as MapToken;
-  return { algorithms, palette };
+    (!compactMode && !darkMode && antdTheme.defaultAlgorithm),
+  ].filter(isTruthy): [];
+  // const palette = algorithms.reduce(
+  //   (tkns, algo, i) => i === 0 ? algo(tkns) : algo({} as SeedToken, tkns as MapToken),
+  //   antdTheme.defaultSeed
+  // ) as MapToken;
+  return { algorithms };
 };
 
 const generateCssVars = (token: GlobalToken, config: Config) => {
@@ -102,6 +103,6 @@ const generateCssVars = (token: GlobalToken, config: Config) => {
 };
 
 export {
-  buildPalette,
+  buildAlgorithms,
   generateCssVars,
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import { ProviderProps } from "@react-awesome-query-builder/ui";
 import { ConfigProvider, ConfigProviderProps, theme as antdTheme } from "antd";
-import { generateCssVars, buildPalette } from "../../utils/theming";
+import { generateCssVars, buildAlgorithms } from "../../utils/theming";
 
 type Locale = ConfigProviderProps["locale"];
 type ThemeConfig = ConfigProviderProps["theme"];
@@ -16,19 +16,21 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   const localeConfig = config.settings.locale?.antd;
   const canCreateTheme = !!themeConfig || localeConfig || darkMode || compactMode;
 
-  const { algorithms, palette } = React.useMemo<ReturnType<typeof buildPalette>>(() => {
-    return buildPalette(darkMode, compactMode);
+  // Seems like AntDesign can merge themes so no need to get outer theme
+  // const { token: existingOuterToken } = antdTheme.useToken();
+  // const existingToken = config.settings.designSettings?.detectThemeLibrary ? existingOuterToken : undefined;
+
+  const { algorithms } = React.useMemo<ReturnType<typeof buildAlgorithms>>(() => {
+    return buildAlgorithms(darkMode, compactMode);
   }, [darkMode, compactMode]);
 
   const customThemeConfig = React.useMemo<ThemeConfig>(() => {
     return {
       // https://ant.design/docs/react/customize-theme
-      algorithm: algorithms,
-      token: {
-        //todo: allow overrides
-      }
+      ...(algorithms.length ? { algorithm: algorithms } : {}),
+      ...(themeConfig ?? {}),
     };
-  }, [algorithms]);
+  }, [algorithms, themeConfig]);
 
   const UpdCssVars = () => {
     const { token, theme } = antdTheme.useToken();
@@ -46,7 +48,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
           cssVarsTarget?.style.removeProperty(k);
         }
       };
-    }, [palette, darkMode, renderSize, ref, theme.id]);
+    }, [darkMode, renderSize, ref, theme.id]);
     return <div style={{display: "none"}} />;
   };
 

@@ -8,9 +8,21 @@ const generateCssVars = (_: any, config: Config) => {
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
   const darkMode = config.settings?.themeMode === "dark";
 
-  return {
-    // todo bootrstrap generateCssVars
-  } as Record<string, string>;
+  let cssVars: Record<string, string> = {
+    // any vars we get generate ?
+  };
+
+  if (useThickLeftBorderOnHoverItem) {
+    cssVars = {
+      ...cssVars,
+      "--rule-border-left-hover": "2px",
+      "--group-border-left-hover": "2px",
+      "--rulegroup-border-left-hover": "2px",
+      "--rulegroupext-border-left-hover": "2px",
+    };
+  }
+
+  return cssVars;
 };
 
 export {
