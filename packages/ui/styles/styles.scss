@@ -782,6 +782,9 @@ $root_group: ".query-builder > .group-container > .group";
     .group-or-rule:not(.qb-draggable, .qb-placeholder) > .group--header:not(:hover),
     .rule_group:not(:hover) {
       .group--conjunctions {
+        #{$active} {
+          border-right: 0; // fix only for MUI
+        }
         #{$inactive} {
           width: 0;
           min-width: 0;

@@ -333,44 +333,6 @@ export type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" |
 export type RenderSize = "small" | "large" | "medium";
 export type ThemeMode = "light" | "dark";
 
-//todo: override for each packages with real typed object
-export interface MuiPaletteColorOverride {
-  mode?: ThemeMode;
-  main: string;
-  // light?: string;
-  // dark?: string;
-  // contrastText?: string;
-}
-export interface MuiPaletteOverride {
-  mode?: ThemeMode;
-  primary?: MuiPaletteColorOverride;
-  // secondary?: MuiPaletteColorOverride;
-  // error?: MuiPaletteColorOverride;
-  // warning?: MuiPaletteColorOverride;
-  // info?: MuiPaletteColorOverride;
-  // success?: MuiPaletteColorOverride;
-  background?: {
-    default?: string;
-    paper?: string;
-  };
-  text?: {
-    primary: string;
-    secondary: string;
-    disabled: string;
-  }
-}
-export interface MuiTypographyOverride {
-  fontFamily?: React.CSSProperties["fontFamily"];
-  fontSize?: number;
-}
-export interface MuiThemeOverride {
-  palette?: MuiPaletteOverride;
-  typography?: MuiTypographyOverride;
-}
-export type MaterialThemeOverride = MuiThemeOverride;
-export type AntdThemeOverride = Record<string, any>; // todo: override for antd
-export type FluentThemeOverride = Record<string, any>; // todo: override for fluent
-
 export interface DesignTokens {
   // todo: complete
   // todo: remove prefixed "--"
@@ -393,11 +355,10 @@ export interface DesignSettings {
 
 export interface ThemeSettings {
   theme?: {
-    // todo: use correct typings in dedicated packages
-    material?: MaterialThemeOverride;
-    mui?: MuiThemeOverride;
-    antd?: AntdThemeOverride;
-    fluent?: FluentThemeOverride;
+    material?: Record<string, any>; // 
+    mui?: Record<string, any>; // ThemeOptions from "@mui/material/styles";
+    antd?: Record<string, any>; //
+    fluent?: Record<string, any>; //
   };
   designSettings?: DesignSettings;
   designTokens?: {
