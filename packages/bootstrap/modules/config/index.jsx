@@ -16,6 +16,7 @@ const settings = {
   renderValueSources: (props, {RCE, W: {BootstrapValueSources}}) => RCE(BootstrapValueSources, props),
   renderProvider: (props, {RCE, W: {BootstrapProvider}}) => RCE(BootstrapProvider, props),
   renderConfirm: (props, {W: {BootstrapConfirm}}) => BootstrapConfirm(props),
+  useConfirm: ({W: {BootstrapUseConfirm}}) => BootstrapUseConfirm(),
 };
 
 

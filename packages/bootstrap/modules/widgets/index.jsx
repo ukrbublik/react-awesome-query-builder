@@ -22,7 +22,7 @@ import BootstrapButton from "./core/BootstrapButton";
 import BootstrapButtonGroup from "./core/BootstrapButtonGroup";
 import BootstrapConjs from "./core/BootstrapConjs";
 import BootstrapValueSources from "./core/BootstrapValueSources";
-import BootstrapConfirm from "./core/BootstrapConfirm";
+import { BootstrapConfirm, BootstrapUseConfirm } from "./core/BootstrapConfirm";
 import { BootstrapProvider } from "./core/BootstrapProvider";
 
 export default {
@@ -45,7 +45,8 @@ export default {
   BootstrapButtonGroup,
   BootstrapConjs,
   BootstrapValueSources,
-  BootstrapConfirm,
 
+  BootstrapConfirm,
+  BootstrapUseConfirm,
   BootstrapProvider,
 };

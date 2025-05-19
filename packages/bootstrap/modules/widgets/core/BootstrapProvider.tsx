@@ -1,5 +1,6 @@
 import React from "react";
 import { ProviderProps, Utils, Config } from "@react-awesome-query-builder/ui";
+import { BootstrapConfirmProvider } from "./BootstrapConfirm";
 import { themeToCssVars } from "../../utils/theming";
 
 const BootstrapProvider: React.FC<ProviderProps> = ({config, children}) => {
@@ -24,7 +25,14 @@ const BootstrapProvider: React.FC<ProviderProps> = ({config, children}) => {
   }, [darkMode, ref]);
 
   const base = (<div ref={ref} className={`qb-bootstrap ${compactMode ? "qb-compact" : ""} qb-${themeMode}`}>{children}</div>);
-  return base;
+  
+  const withProviders = (
+    <BootstrapConfirmProvider>
+      {base}
+    </BootstrapConfirmProvider>
+  );
+
+  return withProviders;
 };
 
 export {
