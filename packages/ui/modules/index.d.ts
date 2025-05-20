@@ -452,7 +452,7 @@ export interface ColorUtils {
   setOpacityForHex(hex: string, alpha: number): string;
   generateCssVarsForLevels(isDark: boolean, cssVar: string, baseColor: string, baseDarkColor?: string, lightRatio?: number, darkRatio?: number, maxLevel?: number, minLevel?: number): Record<string, string>;
   isDarkColor(color?: string): boolean;
-  isColor: (color: any): boolean;
+  isColor(color: any): boolean;
 }
 export interface NumberFormat {
   getNumberFormatProps: (props: Record<string, any>, excludePropsNames?: string[]) => Record<string, any>;
