@@ -776,7 +776,8 @@ $root_group: ".query-builder > .group-container > .group";
 @mixin display_conjs_only_for_hovered_group($inactive, $active) {
   @if $inactive {
     #{$inactive} {
-      transition: 0.3s;
+      transition-duration: 0.3s;
+      transition-property: width, min-width, padding-left, padding-right, margin, overflow, opacity, border-width;
     }
     .group-or-rule:not(.qb-draggable, .qb-placeholder) > .group--header:hover .group--header,
     .group-or-rule:not(.qb-draggable, .qb-placeholder) > .group--header:not(:hover),

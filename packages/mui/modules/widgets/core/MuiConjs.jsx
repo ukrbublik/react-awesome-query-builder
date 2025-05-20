@@ -18,7 +18,12 @@ const Conj = React.memo(({
     <Button 
       key={id+postfix} 
       id={id+postfix} 
-      color={checked ? "primary" : "inherit"} 
+      color={"primary"} 
+      disableElevation
+      variant={checked ? "contained" : "outlined"}
+      sx={{
+        backgroundColor: checked ? "primary.main" : "background.paper",
+      }}
       value={conjKey} 
       onClick={onClick} 
       disabled={readonly || disabled}
@@ -64,7 +69,12 @@ const Conjs = React.memo(({
         size={renderSize}
         key={id}
         id={id + "__not"}
-        color={not ? "error" : "inherit"} 
+        color={"error"} 
+        disableElevation
+        variant={not ? "contained" : "outlined"}
+        sx={{
+          backgroundColor: not ? "error.main" : "background.paper",
+        }}
         onClick={onNotClick} 
         disabled={readonly}
       >
@@ -77,9 +87,11 @@ const Conjs = React.memo(({
     <FormControl>
       <ButtonGroup 
         disableElevation 
-        variant="contained" 
         size={renderSize}
         disabled={readonly}
+        sx={{
+          marginLeft: "1px"
+        }}
       >
         {showNot && renderNot()}
         {showConj && renderOptions()}

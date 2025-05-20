@@ -1,4 +1,5 @@
 // https://mui.com/material-ui/customization/theming/
+// https://mui.com/material-ui/customization/palette/
 
 import { Utils, Config } from "@react-awesome-query-builder/ui";
 import { createTheme, Theme, ThemeOptions, PaletteOptions } from "@mui/material/styles";
