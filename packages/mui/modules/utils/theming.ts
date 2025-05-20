@@ -1,11 +1,26 @@
+// https://mui.com/material-ui/customization/theming/
+
 import { Utils, Config } from "@react-awesome-query-builder/ui";
-import { createTheme, Theme, ThemeOptions } from "@mui/material/styles";
+import { createTheme, Theme, ThemeOptions, PaletteOptions } from "@mui/material/styles";
 import mergeWith from "lodash/mergeWith";
 import omit from "lodash/omit";
-//import pick from "lodash/pick";
+import pick from "lodash/pick";
 
 const { setOpacityForHex, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
 const { logger } = Utils.OtherUtils;
+
+const filterBasicTheme = (theme: Theme) => {
+  const filteredPalette: PaletteOptions = omit(theme.palette, [
+    "background", "text"
+  ]);
+  // filteredPalette = pick(filteredPalette, [
+  //   "primary", "secondary", "error", "warning", "info", "success"
+  // ]);
+  return {
+    ...theme,
+    palette: filteredPalette,
+  } as ThemeOptions;
+};
 
 const buildTheme = (config: Config, existingTheme?: Theme): Theme | null => {
   const themeMode = config.settings.themeMode;
@@ -13,33 +28,32 @@ const buildTheme = (config: Config, existingTheme?: Theme): Theme | null => {
   // const momentLocale = config.settings.locale?.moment;
   const themeConfig = config.settings.theme?.mui as ThemeOptions | undefined;
   const localeConfig = config.settings.locale?.mui;
-  const isFullTheme = (t?: Partial<Theme>) => !!t?.shadows;
+  const isFullTheme = (t?: Partial<Theme>) => !!t?.shadows && !!t?.palette?.mode;
+  const existingThemeMode = existingTheme?.palette.mode;
   const canCreateTheme = !!themeConfig || themeMode || localeConfig;
   if (!canCreateTheme) {
     return null;
   }
+
+  let mergedThemeOptions: ThemeOptions | undefined = undefined;
   if (isFullTheme(themeConfig as Partial<Theme>)) {
-    return localeConfig ? createTheme(themeConfig, localeConfig) : themeConfig as Theme;
+    // override existing theme completely
+    mergedThemeOptions = themeConfig;
+  } else {
+    // merge with existing theme
+    const filteredExistingTheme = (
+      themeMode && existingTheme && themeMode != existingThemeMode!
+        ? filterBasicTheme(existingTheme)
+        : existingTheme
+    ) as ThemeOptions | undefined;
+
+    mergedThemeOptions = mergeWith({}, 
+      filteredExistingTheme ?? {}, 
+      themeConfig ?? {},
+      themeMode && { palette: { mode: themeMode } }
+    ) as ThemeOptions;
   }
 
-  const filteredExistingTheme = (themeMode && existingTheme && themeMode != existingTheme.palette.mode ? {
-    ...existingTheme,
-    palette: {
-      ...omit(
-        //pick(
-        existingTheme.palette, 
-        //  ["primary", "secondary", "error", "warning", "info", "success"]
-        //),
-        ["background", "text"]
-      ),
-    },
-  } : existingTheme) as Partial<Theme> | undefined;
-
-  const mergedThemeOptions: ThemeOptions = mergeWith({}, 
-    filteredExistingTheme ?? {}, 
-    themeConfig ?? {},
-    themeMode && { palette: { mode: themeMode } }
-  ) as ThemeOptions;
 
   return createTheme(
     mergedThemeOptions,

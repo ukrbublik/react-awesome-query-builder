@@ -451,7 +451,7 @@ export interface ColorUtils {
   chroma: typeof chroma;
   setOpacityForHex(hex: string, alpha: number): string;
   generateCssVarsForLevels(isDark: boolean, cssVar: string, baseColor: string, baseDarkColor?: string, lightRatio?: number, darkRatio?: number, maxLevel?: number, minLevel?: number): Record<string, string>;
-  isDarkColor(color: string): boolean;
+  isDarkColor(color?: string): boolean;
   isColor: (color: any): boolean;
 }
 export interface NumberFormat {

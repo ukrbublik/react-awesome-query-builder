@@ -1,6 +1,6 @@
 import React from "react";
 import { ProviderProps, Utils } from "@react-awesome-query-builder/ui";
-import { ThemeProvider, useTheme, extendTheme } from "@mui/material/styles";
+import { ThemeProvider, useTheme, extendTheme, Theme } from "@mui/material/styles";
 import { ConfirmProvider } from "material-ui-confirm";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"; // TODO: set moment to dayjs
@@ -20,13 +20,15 @@ const MuiProvider: React.FC<ProviderProps> = ({config, children}) => {
   const existingOuterTheme = useTheme();
   const existingTheme = config.settings.designSettings?.canInheritThemeFromOuterProvider ? existingOuterTheme : undefined;
 
-  const mergedTheme = buildTheme(config, existingTheme);
+  const mergedTheme = React.useMemo<Theme | null>(() => {
+    return buildTheme(config, existingTheme);
+  }, [config, existingTheme]);
 
-  const locProviderProps = xdpVersion >= 6 ? {
+  const locProviderProps = momentLocale ? (xdpVersion >= 6 ? {
     locale: momentLocale,
   } : {
     adapterLocale: momentLocale,
-  };
+  }) : {};
 
   const UpdCssVars = () => {
     const theme = useTheme();

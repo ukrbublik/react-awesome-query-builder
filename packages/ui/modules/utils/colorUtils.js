@@ -13,6 +13,8 @@ export const generateCssVarsForLevels = (isDark, cssVar, baseColor, baseDarkColo
 };
 
 export const isDarkColor = (color) => {
+  if (!color)
+    return false;
   // const lightness = chroma(color).get("lab.l");
   // return lightness < 70;
   const luminance = chroma(color).luminance();

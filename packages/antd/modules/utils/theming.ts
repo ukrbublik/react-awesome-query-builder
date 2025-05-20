@@ -1,3 +1,5 @@
+// https://ant.design/docs/react/customize-theme
+
 import { Utils, RenderSize, Config, ThemeMode } from "@react-awesome-query-builder/ui";
 import { theme as antdTheme, ConfigProviderProps, GlobalToken } from "antd";
 import omitBy from "lodash/omitBy";
@@ -74,7 +76,6 @@ const filterTokens = (token: GlobalToken) => {
 };
 
 export const mergeThemes = (themeMode: ThemeMode | undefined, _existingTheme: Theme, existingToken: GlobalToken | undefined, themeConfig: ThemeConfig | undefined, algorithms: Algorithm[]) => {
-  // https://ant.design/docs/react/customize-theme
   const tokenThemeMode = detectTokenThemeMode(existingToken);
   const canInheritToken = !themeMode || !existingToken || themeMode == tokenThemeMode;
   const filteredExistingToken = existingToken ? filterTokens(existingToken) : undefined;

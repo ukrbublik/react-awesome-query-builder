@@ -1,4 +1,6 @@
-import { Utils, Config } from "@react-awesome-query-builder/ui";
+// https://developer.microsoft.com/en-us/fluentui#/controls/web/themeprovider
+
+import { Utils, Config, ThemeMode } from "@react-awesome-query-builder/ui";
 import { Theme, PartialTheme, css, createTheme, mergeThemes } from "@fluentui/react";
 import mergeWith from "lodash/mergeWith";
 import omit from "lodash/omit";
@@ -7,7 +9,6 @@ import omit from "lodash/omit";
 const { setOpacityForHex, generateCssVarsForLevels, chroma, isDarkColor } = Utils.ColorUtils;
 const { logger, isTruthy } = Utils.OtherUtils;
 
-// https://developer.microsoft.com/en-us/fluentui#/controls/web/themeprovider
 const darkTheme: PartialTheme = {
   // https://github.com/microsoft/fluentui/issues/9795#issuecomment-511882323
   palette: {
@@ -37,11 +38,34 @@ const darkTheme: PartialTheme = {
   }
 };
 
+const detectThemeMode = (theme?: Theme): ThemeMode | undefined => {
+  if (!theme) {
+    return undefined;
+  }
+  return isDarkColor(theme.semanticColors.inputBackground) ? "dark" : "light";
+};
+
+const filterBasicTheme = (theme: PartialTheme): PartialTheme => {
+  return {
+    ...theme,
+    palette: {
+      ...omit(
+        theme.palette,
+        [
+          "themePrimary", "themeSecondary", "themeTertiary",
+          "themeLighterAlt", "themeLighter", "themeLight",
+          "themeDarkAlt", "themeDark", "themeDarker",
+        ]
+      ),
+    }
+  };
+};
 
 const buildTheme = (config: Config, existingTheme?: Theme): PartialTheme | undefined => {
   const themeMode = config.settings.themeMode;
   const darkMode = themeMode === "dark";
   const themeConfig = config.settings.theme?.fluent as PartialTheme | undefined;
+  const existingThemeMode = detectThemeMode(existingTheme);
 
   const canCreateTheme = !!themeConfig || darkMode;
   if (!canCreateTheme) {
@@ -54,18 +78,9 @@ const buildTheme = (config: Config, existingTheme?: Theme): PartialTheme | undef
     ...omit(existingTheme, ["id"]),
   } : undefined as Theme | undefined;
 
-  // todo: don't use themeForMode if existingTheme is already dark (check with isDarkColor)
-  const filteredThemeForMode = themeForMode && existingTheme ? {
-    ...themeForMode,
-    palette: {
-      ...omit(
-        themeForMode.palette,
-        [
-          "themePrimary", "themeSecondary", "themeTertiary", "themeLighterAlt", "themeLighter", "themeLight", "themeDarkAlt", "themeDark", "themeDarker",
-        ]
-      ),
-    }
-  } : undefined as Theme | undefined;
+  const filteredThemeForMode = themeForMode && existingThemeMode && existingThemeMode != themeMode
+    ? filterBasicTheme(themeForMode)
+    : undefined;
 
   const themesToMerge = [
     filteredExistingTheme,
@@ -76,6 +91,14 @@ const buildTheme = (config: Config, existingTheme?: Theme): PartialTheme | undef
   const mergedTheme = themesToMerge.reduce((acc: Theme | undefined, theme: Theme | PartialTheme) => {
     return acc ? mergeThemes(acc as Theme, theme) : theme as Theme;
   }, undefined) as Theme;
+
+  logger.log("buildTheme - fluent", {
+    filteredExistingTheme,
+    filteredThemeForMode,
+    existingThemeMode,
+    themeConfig,
+    mergedTheme,
+  });
 
   return mergedTheme;
 };
