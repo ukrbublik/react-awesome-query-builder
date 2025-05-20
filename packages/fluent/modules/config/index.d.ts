@@ -4,10 +4,10 @@ import { Theme, PartialTheme } from "@fluentui/react";
 type BasicTheme = Settings["theme"];
 type BasicFluentTheme = NonNullable<NonNullable<BasicTheme>["fluent"]>;
 interface FluentTheme extends BasicFluentTheme {
-  fluent: PartialTheme; // Theme | PartialTheme
+  fluent?: PartialTheme; // Theme | PartialTheme
 }
 interface FluentSettings extends Settings {
-  theme: FluentTheme;
+  theme?: FluentTheme;
 }
 export interface FluentUIConfig extends BasicConfig {
   settings: FluentSettings;

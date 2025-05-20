@@ -7,10 +7,10 @@ type ThemeConfig = ConfigProviderProps["theme"];
 type BasicTheme = Settings["theme"];
 type BasicAntdTheme = NonNullable<NonNullable<BasicTheme>["antd"]>;
 interface AntdTheme extends BasicAntdTheme {
-  antd: ThemeConfig;
+  antd?: ThemeConfig;
 }
 interface AntdSettings extends Settings {
-  theme: AntdTheme;
+  theme?: AntdTheme;
 }
 export interface AntdConfig extends BasicConfig {
   settings: AntdSettings;
