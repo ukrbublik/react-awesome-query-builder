@@ -151,6 +151,9 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.27.0
         version: 7.27.0(@babel/core@7.26.10)
+      '@types/lodash':
+        specifier: ^4.14.170
+        version: 4.14.191
       '@types/react':
         specifier: ^17.0.39
         version: 17.0.80

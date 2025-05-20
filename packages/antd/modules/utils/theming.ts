@@ -1,5 +1,7 @@
-import { Utils, RenderSize, Config } from "@react-awesome-query-builder/ui";
+import { Utils, RenderSize, Config, ThemeMode } from "@react-awesome-query-builder/ui";
 import { theme as antdTheme, ConfigProviderProps, GlobalToken } from "antd";
+import omitBy from "lodash/omitBy";
+import pickBy from "lodash/pickBy";
 
 type Algorithm = typeof antdTheme["darkAlgorithm"] | typeof antdTheme["defaultAlgorithm"];
 type ThemeConfig = ConfigProviderProps["theme"];
@@ -8,7 +10,7 @@ type SeedToken = Parameters<typeof antdTheme["defaultAlgorithm"]>[0];
 type MapToken = ReturnType<typeof antdTheme["defaultAlgorithm"]>;
 
 const { logger, isTruthy } = Utils.OtherUtils;
-const { setOpacityForHex, generateCssVarsForLevels, chroma, isDarkColor } = Utils.ColorUtils;
+const { setOpacityForHex, generateCssVarsForLevels, chroma, isDarkColor, isColor } = Utils.ColorUtils;
 
 const buildAlgorithms = (darkMode: boolean, compactMode: boolean) => {
   const shouldUseAlgorithms = darkMode || compactMode;
@@ -22,6 +24,76 @@ const buildAlgorithms = (darkMode: boolean, compactMode: boolean) => {
   //   antdTheme.defaultSeed
   // ) as MapToken;
   return { algorithms };
+};
+
+const detectTokenThemeMode = (token: GlobalToken | undefined): ThemeMode | undefined => {
+  if (!token) {
+    return undefined;
+  }
+  return isDarkColor(token.colorBgBase) ? "dark" : "light";
+};
+
+// // Not accurate!
+// const filterOutColorTokens = (token: GlobalToken) => {
+//   return omitBy(token, (_tokenValue: string, tokenName: keyof GlobalToken) => {
+//     return tokenName.startsWith("colorText")
+//       || tokenName.startsWith("colorBg")
+//       || tokenName.startsWith("colorFill")
+//       || tokenName.startsWith("colorBorder")
+//       || tokenName as string === "_tokenKey"
+//     ;
+//   }) as GlobalToken;
+// };
+
+const filterBasicTokens = (token: GlobalToken) => {
+  return pickBy(token, (tokenValue: string | number | boolean, tokenName: keyof GlobalToken) => {
+    return (
+      // preserve primary color!
+      tokenName === "colorPrimary"
+      // seed color tokens - seems fine to reuse
+      || [
+        "colorInfo",
+        "colorSuccess",
+        "colorWarning",
+        "colorError",
+        "colorLink",
+      ].includes(tokenName)
+      // non-color tokens
+      || tokenName.startsWith("boxShadow")
+      || tokenName.startsWith("font")
+      || tokenName.startsWith("lineType")
+      || tokenName.startsWith("motion")
+      || typeof tokenValue !== "string"
+    );
+  }) as GlobalToken;
+};
+
+
+const filterTokens = (token: GlobalToken) => {
+  // return filterOutColorTokens(token);
+  return filterBasicTokens(token);
+};
+
+export const mergeThemes = (themeMode: ThemeMode | undefined, _existingTheme: Theme, existingToken: GlobalToken | undefined, themeConfig: ThemeConfig | undefined, algorithms: Algorithm[]) => {
+  // https://ant.design/docs/react/customize-theme
+  const tokenThemeMode = detectTokenThemeMode(existingToken);
+  const canInheritToken = !themeMode || !existingToken || themeMode == tokenThemeMode;
+  const filteredExistingToken = existingToken ? filterTokens(existingToken) : undefined;
+  const mergedTheme: ThemeConfig = {
+    ...(algorithms.length ? { algorithm: algorithms } : {}),
+    ...(existingToken ? { token: filteredExistingToken } : {}),
+    inherit: canInheritToken,
+    ...(themeConfig ? themeConfig : {}),
+  };
+  logger.log("mergeThemes - antd", {
+    canInheritToken,
+    themeMode,
+    existingToken,
+    filteredExistingToken,
+    themeConfig,
+    mergedTheme,
+  });
+  return mergedTheme;
 };
 
 const generateCssVars = (token: GlobalToken, config: Config) => {

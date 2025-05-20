@@ -24,7 +24,7 @@ export const useThemeing = (
     let newConfig: Config = clone(state.config);
     state.configChanges = merge(state.configChanges, {
       settings: {
-        themeMode: themeMode === "auto" ? null : themeMode,
+        themeMode: themeMode === "" ? null : themeMode,
       }
     });
     window._configChanges = state.configChanges;
@@ -70,7 +70,7 @@ export const useThemeing = (
   const renderThemeModeSelector = () => {
     return (
       <select value={state.themeMode} onChange={changeThemeMode}>
-        <option key="auto">auto</option>
+        <option key=""></option>
         <option key="light">light</option>
         <option key="dark">dark</option>
       </select>

@@ -48,7 +48,7 @@ const DemoQueryBuilder: React.FC = () => {
     sqlWarnings: [] as Array<string>,
     renderBocks: defaultRenderBlocks,
     initFile: defaultInitFile,
-    themeMode: "auto",
+    themeMode: "",
     isBodyDark: false,
     renderSize: "small",
     compactMode: false,
@@ -113,15 +113,17 @@ const DemoQueryBuilder: React.FC = () => {
     });
   };
 
+
   return (
     <div>
       <div>
         Theme: &nbsp;
         {renderSkinSelector()}
-        {renderBodyIsDarkSelector()}
         {renderThemeModeSelector()}
         {renderCompactModeSelector()}
         {renderSizeSelector()}
+        {" "}
+        {renderBodyIsDarkSelector()}
       </div>
       <div>
         Settings: &nbsp;

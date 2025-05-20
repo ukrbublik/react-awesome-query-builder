@@ -1,7 +1,7 @@
 import React from "react";
 import { ProviderProps } from "@react-awesome-query-builder/ui";
 import { ConfigProvider, ConfigProviderProps, theme as antdTheme } from "antd";
-import { generateCssVars, buildAlgorithms } from "../../utils/theming";
+import { generateCssVars, buildAlgorithms, mergeThemes } from "../../utils/theming";
 
 type Locale = ConfigProviderProps["locale"];
 type ThemeConfig = ConfigProviderProps["theme"];
@@ -9,28 +9,24 @@ type Theme = ReturnType<typeof antdTheme.useToken>["theme"];
 
 const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   const ref = React.createRef<HTMLDivElement>();
-  const darkMode = config.settings.themeMode === "dark";
+  const themeMode = config.settings.themeMode;
+  const darkMode = themeMode === "dark";
   const compactMode = !!config.settings.compactMode;
   const renderSize = config.settings.renderSize;
   const themeConfig = config.settings.theme?.antd as ThemeConfig | undefined;
   const localeConfig = config.settings.locale?.antd;
   const canCreateTheme = !!themeConfig || localeConfig || darkMode || compactMode;
 
-  // Seems like AntDesign can merge themes so no need to get outer theme
-  // const { token: existingOuterToken } = antdTheme.useToken();
-  // const existingToken = config.settings.designSettings?.detectThemeLibrary ? existingOuterToken : undefined;
+  const { token: existingOuterToken, theme: existingTheme } = antdTheme.useToken();
+  const existingToken = config.settings.designSettings?.detectThemeLibrary ? existingOuterToken : undefined;
 
   const { algorithms } = React.useMemo<ReturnType<typeof buildAlgorithms>>(() => {
     return buildAlgorithms(darkMode, compactMode);
   }, [darkMode, compactMode]);
 
   const customThemeConfig = React.useMemo<ThemeConfig>(() => {
-    return {
-      // https://ant.design/docs/react/customize-theme
-      ...(algorithms.length ? { algorithm: algorithms } : {}),
-      ...(themeConfig ?? {}),
-    };
-  }, [algorithms, themeConfig]);
+    return mergeThemes(themeMode, existingTheme, existingToken, themeConfig, algorithms);
+  }, [algorithms, themeConfig, existingTheme.id, themeMode]);
 
   const UpdCssVars = () => {
     const { token, theme } = antdTheme.useToken();

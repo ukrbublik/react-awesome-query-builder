@@ -19,6 +19,15 @@ export const isDarkColor = (color) => {
   return luminance < 0.5;
 };
 
+export const isColor = (color) => {
+  try {
+    chroma(color);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export {
   chroma,
 };
