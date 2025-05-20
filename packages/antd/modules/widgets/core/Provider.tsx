@@ -15,7 +15,8 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   const renderSize = config.settings.renderSize;
   const themeConfig = config.settings.theme?.antd as ThemeConfig | undefined;
   const localeConfig = config.settings.locale?.antd;
-  const canCreateTheme = !!themeConfig || localeConfig || darkMode || compactMode;
+  const canCreateAlgorithms = darkMode || compactMode;
+  const canCreateTheme = !!themeConfig || localeConfig || canCreateAlgorithms;
 
   const { token: existingOuterToken, theme: existingTheme } = antdTheme.useToken();
   const existingToken = config.settings.designSettings?.canInheritThemeFromOuterProvider ? existingOuterToken : undefined;
@@ -25,8 +26,8 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   }, [darkMode, compactMode]);
 
   const customThemeConfig = React.useMemo<ThemeConfig>(() => {
-    return mergeThemes(themeMode, existingTheme, existingToken, themeConfig, algorithms);
-  }, [algorithms, themeConfig, existingTheme.id, themeMode]);
+    return canCreateTheme ? mergeThemes(themeMode, existingTheme, existingToken, themeConfig, algorithms) : undefined;
+  }, [algorithms, themeConfig, existingTheme.id, themeMode, canCreateTheme]);
 
   const UpdCssVars = () => {
     const { token, theme } = antdTheme.useToken();
@@ -44,7 +45,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
           cssVarsTarget?.style.removeProperty(k);
         }
       };
-    }, [darkMode, renderSize, ref, theme.id, config]);
+    }, [themeMode, renderSize, ref, theme.id, config]);
     return <div style={{display: "none"}} />;
   };
 

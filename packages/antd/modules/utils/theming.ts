@@ -13,12 +13,11 @@ const { logger, isTruthy } = Utils.OtherUtils;
 const { setOpacityForHex, generateCssVarsForLevels, chroma, isDarkColor, isColor } = Utils.ColorUtils;
 
 const buildAlgorithms = (darkMode: boolean, compactMode: boolean) => {
-  const shouldUseAlgorithms = darkMode || compactMode;
-  const algorithms: Algorithm[] = shouldUseAlgorithms ? [
+  const algorithms: Algorithm[] = [
     darkMode && antdTheme.darkAlgorithm,
     compactMode && antdTheme.compactAlgorithm,
-    (!compactMode && !darkMode && antdTheme.defaultAlgorithm),
-  ].filter(isTruthy): [];
+    // (!compactMode && !darkMode && antdTheme.defaultAlgorithm),
+  ].filter(isTruthy);
   // const palette = algorithms.reduce(
   //   (tkns, algo, i) => i === 0 ? algo(tkns) : algo({} as SeedToken, tkns as MapToken),
   //   antdTheme.defaultSeed

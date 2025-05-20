@@ -14,7 +14,7 @@ const buildTheme = (config: Config, existingTheme?: Theme): Theme | null => {
   const themeConfig = config.settings.theme?.mui as ThemeOptions | undefined;
   const localeConfig = config.settings.locale?.mui;
   const isFullTheme = (t?: Partial<Theme>) => !!t?.shadows;
-  const canCreateTheme = !!themeConfig || config.settings.themeMode || localeConfig;
+  const canCreateTheme = !!themeConfig || themeMode || localeConfig;
   if (!canCreateTheme) {
     return null;
   }

@@ -20,7 +20,7 @@ const MuiProvider: React.FC<ProviderProps> = ({config, children}) => {
   const existingOuterTheme = useTheme();
   const existingTheme = config.settings.designSettings?.canInheritThemeFromOuterProvider ? existingOuterTheme : undefined;
 
-  const theme = buildTheme(config, existingTheme);
+  const mergedTheme = buildTheme(config, existingTheme);
 
   const locProviderProps = xdpVersion >= 6 ? {
     locale: momentLocale,
@@ -57,8 +57,8 @@ const MuiProvider: React.FC<ProviderProps> = ({config, children}) => {
     </LocalizationProvider>
   );
 
-  const withTheme = theme ? (
-    <ThemeProvider theme={theme}>
+  const withTheme = mergedTheme ? (
+    <ThemeProvider theme={mergedTheme}>
       {withProviders}
     </ThemeProvider>
   ) : withProviders;
