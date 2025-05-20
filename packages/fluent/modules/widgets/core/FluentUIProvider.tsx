@@ -11,7 +11,10 @@ const FluentUIProvider: React.FC<ProviderProps> = ({config, children}) => {
   const themeMode = config.settings.themeMode ?? "light";
   const darkMode = themeMode === "dark";
   const compactMode = config.settings.compactMode;
-  const theme = buildTheme(config);
+
+  const existingOuterTheme = useTheme();
+  const existingTheme = config.settings.designSettings?.detectThemeLibrary ? existingOuterTheme : undefined;
+  const theme = buildTheme(config, existingTheme);
 
   const UpdCssVars = () => {
     const theme = useTheme();
@@ -28,7 +31,7 @@ const FluentUIProvider: React.FC<ProviderProps> = ({config, children}) => {
           cssVarsTarget?.style.removeProperty(k);
         }
       };
-    }, [theme, darkMode]);
+    }, [theme, darkMode, config]);
     return <div style={{display: "none"}} />;
   };
 

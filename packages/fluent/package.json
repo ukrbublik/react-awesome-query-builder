@@ -46,7 +46,8 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.27.0",
-    "@react-awesome-query-builder/ui": "workspace:^"
+    "@react-awesome-query-builder/ui": "workspace:^",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@babel/cli": "^7.27.0",
@@ -63,6 +64,7 @@
     "@fluentui/font-icons-mdl2": "^8.5.39",
     "@fluentui/react": "^8.118.3",
     "@fluentui/react-icons": "^2.0.240",
+    "@types/lodash": "^4.14.170",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
     "react": "^17.0.2",

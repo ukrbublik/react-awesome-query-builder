@@ -4,7 +4,7 @@ const { setOpacityForHex, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
 const { logger } = Utils.OtherUtils;
 
 const generateCssVars = (_: any, config: Config) => {
-  const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? true;
+  const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
   const darkMode = config.settings?.themeMode === "dark";
 

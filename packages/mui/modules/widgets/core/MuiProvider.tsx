@@ -43,7 +43,7 @@ const MuiProvider: React.FC<ProviderProps> = ({config, children}) => {
           cssVarsTarget?.style.removeProperty(k);
         }
       };
-    }, [theme]);
+    }, [theme, config]);
     return <div style={{display: "none"}} />;
   };
 

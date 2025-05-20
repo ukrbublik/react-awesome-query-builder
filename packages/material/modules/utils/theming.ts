@@ -8,7 +8,7 @@ const buildTheme = (config: Config): Theme | null => {
   const themeMode = config.settings.themeMode ?? "light";
   // const compactMode = config.settings.compactMode;
   // const momentLocale = config.settings.locale?.moment;
-  const themeConfig = config.settings.theme?.material;
+  const themeConfig = config.settings.theme?.material as ThemeOptions | undefined;
   const localeConfig = config.settings.locale?.material;
   const isFullTheme = (t?: Partial<Theme>) => !!t?.shadows;
   const canCreateTheme = !!themeConfig || config.settings.themeMode || localeConfig;
@@ -40,7 +40,7 @@ const generateCssVars = (theme: Theme, config: Config) => {
   logger.log("generateCssVars - Material theme", theme);
   const { palette, typography, shadows, shape } = theme;
   const darkMode = palette.type === "dark";
-  const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? true;
+  const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
   
   return {

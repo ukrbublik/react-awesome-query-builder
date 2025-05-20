@@ -12,7 +12,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   const darkMode = config.settings.themeMode === "dark";
   const compactMode = !!config.settings.compactMode;
   const renderSize = config.settings.renderSize;
-  const themeConfig = config.settings.theme?.antd;
+  const themeConfig = config.settings.theme?.antd as ThemeConfig | undefined;
   const localeConfig = config.settings.locale?.antd;
   const canCreateTheme = !!themeConfig || localeConfig || darkMode || compactMode;
 
@@ -48,7 +48,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
           cssVarsTarget?.style.removeProperty(k);
         }
       };
-    }, [darkMode, renderSize, ref, theme.id]);
+    }, [darkMode, renderSize, ref, theme.id, config]);
     return <div style={{display: "none"}} />;
   };
 

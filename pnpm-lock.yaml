@@ -562,6 +562,9 @@ importers:
       '@react-awesome-query-builder/ui':
         specifier: workspace:^
         version: link:../ui
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
     devDependencies:
       '@babel/cli':
         specifier: ^7.27.0
@@ -602,6 +605,9 @@ importers:
       '@fluentui/react-icons':
         specifier: ^2.0.240
         version: 2.0.240(react@17.0.2)
+      '@types/lodash':
+        specifier: ^4.14.170
+        version: 4.14.191
       '@types/react':
         specifier: ^17.0.39
         version: 17.0.80

@@ -11,7 +11,7 @@ const buildTheme = (config: Config, existingTheme?: Theme): Theme | null => {
   const themeMode = config.settings.themeMode;
   // const compactMode = config.settings.compactMode;
   // const momentLocale = config.settings.locale?.moment;
-  const themeConfig = config.settings.theme?.mui;
+  const themeConfig = config.settings.theme?.mui as ThemeOptions | undefined;
   const localeConfig = config.settings.locale?.mui;
   const isFullTheme = (t?: Partial<Theme>) => !!t?.shadows;
   const canCreateTheme = !!themeConfig || config.settings.themeMode || localeConfig;

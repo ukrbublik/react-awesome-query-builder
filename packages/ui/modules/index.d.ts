@@ -358,7 +358,7 @@ export interface ThemeSettings {
     material?: Record<string, any>; // ThemeOptions from "@material-ui/core/styles"
     mui?: Record<string, any>; // ThemeOptions from "@mui/material/styles";
     antd?: Record<string, any>; // ConfigProviderProps["theme"] from "antd"
-    fluent?: Record<string, any>; //
+    fluent?: Record<string, any>; // PartialTheme from "@fluentui/react";
   };
   designSettings?: DesignSettings;
   designTokens?: {

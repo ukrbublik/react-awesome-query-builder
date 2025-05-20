@@ -1,9 +1,9 @@
 import { Utils, RenderSize, Config } from "@react-awesome-query-builder/ui";
 import { theme as antdTheme, ConfigProviderProps, GlobalToken } from "antd";
 
+type Algorithm = typeof antdTheme["darkAlgorithm"] | typeof antdTheme["defaultAlgorithm"];
 type ThemeConfig = ConfigProviderProps["theme"];
 type Theme = ReturnType<typeof antdTheme.useToken>["theme"];
-type Algorithm = typeof antdTheme["darkAlgorithm"] | typeof antdTheme["defaultAlgorithm"];
 type SeedToken = Parameters<typeof antdTheme["defaultAlgorithm"]>[0];
 type MapToken = ReturnType<typeof antdTheme["defaultAlgorithm"]>;
 
@@ -28,7 +28,7 @@ const generateCssVars = (token: GlobalToken, config: Config) => {
   logger.log("generateCssVars - antd token", token);
   const darkMode = isDarkColor(token.colorBgBase);
   const renderSize = config.settings.renderSize;
-  const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? true;
+  const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
 
   let sizedBorderRadius;
