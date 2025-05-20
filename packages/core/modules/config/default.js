@@ -40,7 +40,7 @@ export const settings = {
 
   //theme
   designSettings: {
-    detectThemeLibrary: true,
+    canInheritThemeFromOuterProvider: true,
   },
 
   // localization

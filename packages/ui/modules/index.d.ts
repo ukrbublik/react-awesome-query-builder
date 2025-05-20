@@ -339,7 +339,7 @@ export interface DesignTokens {
   "--main-background"?: string;
 }
 export interface DesignSettings {
-  detectThemeLibrary?: boolean;
+  canInheritThemeFromOuterProvider?: boolean;
   useThickLeftBorderOnHoverItem?: boolean;
   useShadowOnHoverItem?: boolean;
   generateCssVarsFromThemeLibrary?: boolean;

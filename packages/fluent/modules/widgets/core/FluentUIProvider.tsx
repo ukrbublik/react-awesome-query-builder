@@ -13,7 +13,7 @@ const FluentUIProvider: React.FC<ProviderProps> = ({config, children}) => {
   const compactMode = config.settings.compactMode;
 
   const existingOuterTheme = useTheme();
-  const existingTheme = config.settings.designSettings?.detectThemeLibrary ? existingOuterTheme : undefined;
+  const existingTheme = config.settings.designSettings?.canInheritThemeFromOuterProvider ? existingOuterTheme : undefined;
   const theme = buildTheme(config, existingTheme);
 
   const UpdCssVars = () => {

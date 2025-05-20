@@ -18,7 +18,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   const canCreateTheme = !!themeConfig || localeConfig || darkMode || compactMode;
 
   const { token: existingOuterToken, theme: existingTheme } = antdTheme.useToken();
-  const existingToken = config.settings.designSettings?.detectThemeLibrary ? existingOuterToken : undefined;
+  const existingToken = config.settings.designSettings?.canInheritThemeFromOuterProvider ? existingOuterToken : undefined;
 
   const { algorithms } = React.useMemo<ReturnType<typeof buildAlgorithms>>(() => {
     return buildAlgorithms(darkMode, compactMode);
