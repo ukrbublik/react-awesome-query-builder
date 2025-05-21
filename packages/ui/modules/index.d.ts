@@ -335,7 +335,6 @@ export interface CssVarsBorderColors {
   "--rulegroupext-border-color"?: string;
   "--switch-border-color"?: string;
   "--case-border-color"?: string;
-  // with error
   "--rule-with-error-border-color"?: string;
   "--group-with-error-border-color"?: string;
   /*
@@ -488,10 +487,6 @@ export interface ThemeSettings {
     fluent?: Record<string, any>; // PartialTheme from "@fluentui/react";
   };
   designSettings?: DesignSettings;
-  cssVars?: {
-    light?: CssVars;
-    dark?: CssVars;
-  };
   renderSize?: RenderSize;
   themeMode?: ThemeMode;
   compactMode?: boolean;

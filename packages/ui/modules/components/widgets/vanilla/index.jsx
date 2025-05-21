@@ -24,12 +24,4 @@ export {default as VanillaButtonGroup} from "./core/VanillaButtonGroup";
 export {default as VanillaValueSources} from "./core/VanillaValueSources";
 export {default as VanillaSwitch} from "./core/VanillaSwitch";
 export {default as vanillaConfirm} from "./core/vanillaConfirm";
-
-// provider
-export const VanillaProvider = ({config, children}) => {
-  const themeMode = config.settings.themeMode ?? "light";
-  const compactMode = config.settings.compactMode;
-
-  const base = (<div className={`${compactMode ? "qb-compact" : ""} qb-${themeMode}`}>{children}</div>);
-  return base;
-};
+export { VanillaProvider } from "./core/VanillaProvider";

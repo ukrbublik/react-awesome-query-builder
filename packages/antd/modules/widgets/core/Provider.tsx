@@ -1,18 +1,17 @@
 import React from "react";
 import { ProviderProps } from "@react-awesome-query-builder/ui";
 import { ConfigProvider, ConfigProviderProps, theme as antdTheme } from "antd";
-import { generateCssVars, buildAlgorithms, mergeThemes } from "../../utils/theming";
+import { CssVarsProvider } from "./CssVarsProvider";
+import { buildAlgorithms, mergeThemes } from "../../utils/theming";
 
 type Locale = ConfigProviderProps["locale"];
 type ThemeConfig = ConfigProviderProps["theme"];
 type Theme = ReturnType<typeof antdTheme.useToken>["theme"];
 
 const Provider: React.FC<ProviderProps> = ({ config, children }) => {
-  const ref = React.createRef<HTMLDivElement>();
   const themeMode = config.settings.themeMode;
   const darkMode = themeMode === "dark";
   const compactMode = !!config.settings.compactMode;
-  const renderSize = config.settings.renderSize;
   const themeConfig = config.settings.theme?.antd as ThemeConfig | undefined;
   const localeConfig = config.settings.locale?.antd;
   const canCreateAlgorithms = darkMode || compactMode;
@@ -29,27 +28,11 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
     return canCreateTheme ? mergeThemes(themeMode, existingTheme, existingToken, themeConfig, algorithms) : undefined;
   }, [algorithms, themeConfig, existingTheme.id, themeMode, canCreateTheme]);
 
-  const UpdCssVars = () => {
-    const { token, theme } = antdTheme.useToken();
-
-    React.useEffect(() => {
-      const cssVarsTarget = ref.current;
-      const cssVars = generateCssVars(token, config) as Record<string, string>;
-      for (const k in cssVars) {
-        if (cssVars[k] != undefined) {
-          cssVarsTarget?.style.setProperty(k, cssVars[k]);
-        }
-      }
-      return () => {
-        for (const k in cssVars) {
-          cssVarsTarget?.style.removeProperty(k);
-        }
-      };
-    }, [themeMode, renderSize, ref, theme.id, config]);
-    return <div style={{display: "none"}} />;
-  };
-
-  const base = (<div ref={ref} className={`qb-antd ${compactMode ? "qb-compact" : ""}`}><UpdCssVars />{children}</div>);
+  const withCssVarsProvider = (
+    <CssVarsProvider config={config}>
+      {children}
+    </CssVarsProvider>
+  );
 
   // https://ant.design/components/config-provider
   const withTheme = canCreateTheme ? (
@@ -57,8 +40,8 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
     <ConfigProvider
       locale={localeConfig as Locale | undefined}
       theme={customThemeConfig}
-    >{base}</ConfigProvider>
-  ) : base;
+    >{withCssVarsProvider}</ConfigProvider>
+  ) : withCssVarsProvider;
 
   return withTheme;
 };

@@ -1,51 +1,34 @@
 import React from "react";
 import { ProviderProps, Utils } from "@react-awesome-query-builder/ui";
-import { ThemeProvider, createTheme, useTheme } from "@material-ui/core/styles";
+import { ThemeProvider, useTheme, Theme } from "@material-ui/core/styles";
 import { ConfirmProvider } from "material-ui-confirm";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
-import { generateCssVars, buildTheme } from "../../utils/theming";
+import { CssVarsProvider } from "./CssVarsProvider";
+import { buildTheme } from "../../utils/theming";
 
 
 const MaterialProvider: React.FC<ProviderProps> = ({config, children}) => {
-  const ref = React.createRef<HTMLDivElement>();
-
-  const themeMode = config.settings.themeMode ?? "light";
-  const compactMode = config.settings.compactMode;
   // const momentLocale = config.settings.locale?.moment;
-  const theme = buildTheme(config);
+  const existingOuterTheme = useTheme();
+  const existingTheme = config.settings.designSettings?.canInheritThemeFromOuterProvider ? existingOuterTheme : undefined;
 
-  const UpdCssVars = () => {
-    const theme = useTheme();
-    React.useEffect(() => {
-      const cssVarsTarget = ref.current;
-      const cssVars = generateCssVars(theme, config) as Record<string, string>;
-      for (const k in cssVars) {
-        if (cssVars[k] != undefined) {
-          cssVarsTarget?.style.setProperty(k, cssVars[k]);
-        }
-      }
-      return () => {
-        for (const k in cssVars) {
-          cssVarsTarget?.style.removeProperty(k);
-        }
-      };
-    }, [theme]);
-    return <div style={{display: "none"}} />;
-  };
-
-  const base = (<div ref={ref} className={`qb-material qb-${themeMode} ${compactMode ? "qb-compact" : ""}`}><UpdCssVars />{children}</div>);
+  const mergedTheme = React.useMemo<Theme | null>(() => {
+    return buildTheme(config, existingTheme);
+  }, [config, existingTheme]);
 
   const withProviders = (
     <MuiPickersUtilsProvider utils={MomentUtils}>
       <ConfirmProvider>
-        {base}
+        <CssVarsProvider config={config}>
+          {children}
+        </CssVarsProvider>
       </ConfirmProvider>
     </MuiPickersUtilsProvider>
   );
 
-  const withTheme = theme ? (
-    <ThemeProvider theme={theme}>
+  const withTheme = mergedTheme ? (
+    <ThemeProvider theme={mergedTheme}>
       {withProviders}
     </ThemeProvider>
   ) : withProviders;

@@ -56,7 +56,6 @@ const buildTheme = (config: Config, existingTheme?: Theme): Theme | null => {
     ) as ThemeOptions;
   }
 
-
   return createTheme(
     mergedThemeOptions,
     localeConfig ?? {}

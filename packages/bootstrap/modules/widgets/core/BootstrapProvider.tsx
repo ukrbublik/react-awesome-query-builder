@@ -1,37 +1,16 @@
 import React from "react";
 import { ProviderProps, Utils, Config } from "@react-awesome-query-builder/ui";
 import { BootstrapConfirmProvider } from "./BootstrapConfirm";
-import { generateCssVars } from "../../utils/theming";
+import { CssVarsProvider } from "./CssVarsProvider";
 
 const BootstrapProvider: React.FC<ProviderProps> = ({config, children}) => {
-  const ref = React.createRef<HTMLDivElement>();
-  const themeMode = config.settings.themeMode ?? "light";
-  const darkMode = themeMode === "dark";
-  const compactMode = config.settings.compactMode;
-
-  React.useEffect(() => {
-    const cssVarsTarget = ref.current;
-    const cssVars = generateCssVars({}, config) as Record<string, string>;
-    for (const k in cssVars) {
-      if (cssVars[k] != undefined) {
-        cssVarsTarget?.style.setProperty(k, cssVars[k]);
-      }
-    }
-    return () => {
-      for (const k in cssVars) {
-        cssVarsTarget?.style.removeProperty(k);
-      }
-    };
-  }, [darkMode, ref]);
-
-  const base = (<div ref={ref} className={`qb-bootstrap ${compactMode ? "qb-compact" : ""} qb-${themeMode}`}>{children}</div>);
-  
   const withProviders = (
     <BootstrapConfirmProvider>
-      {base}
+      <CssVarsProvider config={config}>
+        {children}
+      </CssVarsProvider>
     </BootstrapConfirmProvider>
   );
-
   return withProviders;
 };
 
