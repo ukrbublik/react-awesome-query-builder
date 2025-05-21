@@ -2,69 +2,69 @@
 @import './vars_compact.scss';
 @import './vars_dark.scss';
 
-// borders
-$rule-border: var(--rule-border, $default-rule-border);
-$rule-border-left-hover: var(--rule-border-left-hover, $rule-border);
-$switch-border: var(--switch-border, $default-switch-border);
-$group-border: var(--group-border, $default-group-border);
-$group-border-left-hover: var(--group-border-left-hover, $group-border);
-$case-border: var(--case-border, $default-case-border);
-$rulegroup-border: var(--rulegroup-border, $default-rulegroup-border);
-$rulegroup-border-left-hover: var(--rulegroup-border-left-hover, $rulegroup-border);
-$rulegroupext-border: var(--rulegroupext-border, $default-rulegroupext-border);
-$rulegroupext-border-left-hover: var(--rulegroupext-border-left-hover, $rulegroupext-border);
-$item-radius: var(--item-radius, $default-item-radius);
-$conjunctions-radius: var(--conjunctions-radius, $item-radius);
-// shadows
-$rule-shadow-hover: var(--rule-shadow-hover, $default-rule-shadow-hover);
-$group-shadow-hover: var(--group-shadow-hover, $default-group-shadow-hover);
-$rulegroup-shadow-hover: var(--rulegroup-shadow-hover, $default-rulegroup-shadow-hover);
-$rulegroupext-shadow-hover: var(--rulegroupext-shadow-hover, $default-rulegroupext-shadow-hover);
-// treeline
-$treeline-radius: var(--treeline-radius, $default-treeline-radius);
-$treeline-thick: var(--treeline-thick, $default-treeline-thick);
-$treeline-switch-thick: var(--treeline-switch-thick, $default-treeline-switch-thick);
-$treeline-rulegroup-thick: var(--treeline-rulegroup-thick, $default-treeline-rulegroup-thick);
-$treeline-rulegroupext-thick: var(--treeline-rulegroup-thick, $default-treeline-rulegroup-thick);
-// colors
+// border colors
+$rule-border-color: var(--rule-border-color, $default-rule-border-color);
+$group-border-color: var(--group-border-color, $default-group-border-color);
+$rulegroup-border-color: var(--rulegroup-border-color, $default-rulegroup-border-color);
+$rulegroupext-border-color: var(--rulegroupext-border-color, $default-rulegroupext-border-color);
+$switch-border-color: var(--switch-border-color, $default-switch-border-color);
+$case-border-color: var(--case-border-color, $default-case-border-color);
+$locked-border-color: var(--locked-border-color, $default-locked-border-color);
+$placeholder-border-color: var(--placeholder-border-color, $default-placeholder-border-color);
+$rule-with-error-border-color: var(--rule-with-error-border-color, $default-rule-with-error-border-color);
+$group-with-error-border-color: var(--group-with-error-border-color, $default-group-with-error-border-color);
+
+// bg colors
+$main-background: var(--main-background, $default-main-background); // background for .query-builder
+$rule-background: var(--rule-background, $default-rule-background);
+$group-background: var(--group-background, $default-group-background);
+$rulegroup-background: var(--rulegroup-background, $default-rulegroup-background);
+$rulegroupext-background: var(--rulegroupext-background, $default-rulegroupext-background);
+$switch-background: var(--switch-background, $default-switch-background);
+$case-background: var(--case-background, $default-case-background);
+
+// treeline colors
 $treeline-color: var(--treeline-color, $default-treeline-color);
 $treeline-rulegroup-color: var(--treeline-rulegroup-color, $treeline-color);
 $treeline-rulegroupext-color: var(--treeline-rulegroupext-color, $treeline-color);
 $treeline-switch-color: var(--treeline-switch-color, $treeline-color);
 $treeline-disabled-color: var(--treeline-disabled-color, $default-treeline-disabled-color);
-$switch-background: var(--switch-background, $default-switch-background);
-$switch-border-color: var(--switch-border-color, $default-switch-border-color);
-$case-background: var(--case-background, $default-case-background);
-$case-border-color: var(--case-border-color, $default-case-border-color);
-$group-background: var(--group-background, $default-group-background);
-$group-border-color: var(--group-border-color, $default-group-border-color);
-$group-with-error-border-color: var(--group-with-error-border-color, $default-group-with-error-border-color);
-$rule-background: var(--rule-background, $default-rule-background);
-$rule-border-color: var(--rule-border-color, $default-rule-border-color);
-$rule-with-error-border-color: var(--rule-with-error-border-color, $default-rule-with-error-border-color);
+
+// other colors
 $rule-error-color: var(--rule-error-color, $default-rule-error-color);
-$rulegroup-background: var(--rulegroup-background, $default-rulegroup-background);
-$rulegroupext-background: var(--rulegroupext-background, $default-rulegroupext-background);
-$rulegroup-border-color: var(--rulegroup-border-color, $default-rulegroup-border-color);
-$rulegroupext-border-color: var(--rulegroupext-border-color, $default-rulegroupext-border-color);
-$placeholder-border-color: var(--placeholder-border-color, $default-placeholder-border-color);
-$locked-border-color: var(--locked-border-color, $default-locked-border-color);
 $custom-select-option-color: var(--custom-select-option-color, $default-custom-select-option-color);
-// colors for complex nesting
-$rule-in-rulegroup-background: var(--rule-in-rulegroup-background, $rule-background);
-$rulegroup-in-rulegroup-background: var(--rulegroup-in-rulegroup-background, $rulegroup-background);
-$rulegroupext-in-rulegroup-background: var(--rulegroupext-in-rulegroup-background, $rulegroupext-background);
-$rule-in-rulegroup-border-color: var(--rule-in-rulegroup-border-color, $rule-border-color);
-$rulegroup-in-rulegroup-border-color: var(--rulegroup-in-rulegroup-border-color, $rulegroup-border-color);
-$rulegroupext-in-rulegroup-border-color: var(--rulegroupext-in-rulegroup-border-color, $rulegroupext-border-color);
-$rule-in-rulegroupext-background: var(--rule-in-rulegroupext-background, $rule-background);
-$group-in-rulegroupext-background: var(--group-in-rulegroupext-background, $rulegroupext-background);
-$rulegroupext-in-rulegroupext-background: var(--rulegroupext-in-rulegroupext-background, $rulegroupext-background);
-$rulegroup-in-rulegroupext-background: var(--rulegroup-in-rulegroupext-background, $rulegroup-background);
-$rule-in-rulegroupext-border-color: var(--rule-in-rulegroupext-border-color, $rule-border-color);
-$group-in-rulegroupext-border-color: var(--group-in-rulegroupext-border-color, $default-group-in-rulegroupext-border-color);
-$rulegroupext-in-rulegroupext-border-color: var(--rulegroupext-in-rulegroupext-border-color, $rulegroupext-border-color);
-$rulegroup-in-rulegroupext-border-color: var(--rulegroup-in-rulegroupext-border-color, $rulegroup-border-color);
+
+// border widths
+$rule-border-width: var(--rule-border-width, $default-rule-border-width);
+$group-border-width: var(--group-border-width, $default-group-border-width);
+$rulegroup-border-width: var(--rulegroup-border-width, $default-rulegroup-border-width);
+$rulegroupext-border-width: var(--rulegroupext-border-width, $default-rulegroupext-border-width);
+$switch-border-width: var(--switch-border-width, $default-switch-border-width);
+$case-border-width: var(--case-border-width, $default-case-border-width);
+
+// left border widths on :hover
+$rule-border-left-width-hover: var(--rule-border-left-width-hover, $rule-border-width);
+$group-border-left-width-hover: var(--group-border-left-width-hover, $group-border-width);
+$rulegroup-border-left-width-hover: var(--rulegroup-border-left-width-hover, $rulegroup-border-width);
+$rulegroupext-border-left-width-hover: var(--rulegroupext-border-left-width-hover, $rulegroupext-border-width);
+
+// shadows on :hover
+$rule-shadow-hover: var(--rule-shadow-hover, $default-rule-shadow-hover);
+$group-shadow-hover: var(--group-shadow-hover, $default-group-shadow-hover);
+$rulegroup-shadow-hover: var(--rulegroup-shadow-hover, $default-rulegroup-shadow-hover);
+$rulegroupext-shadow-hover: var(--rulegroupext-shadow-hover, $default-rulegroupext-shadow-hover);
+
+// radius
+$item-radius: var(--item-radius, $default-item-radius);
+$conjunctions-radius: var(--conjunctions-radius, $item-radius);
+$treeline-radius: var(--treeline-radius, $default-treeline-radius);
+
+// treeline thickness
+$treeline-thick: var(--treeline-thick, $default-treeline-thick);
+$treeline-switch-thick: var(--treeline-switch-thick, $default-treeline-switch-thick);
+$treeline-rulegroup-thick: var(--treeline-rulegroup-thick, $default-treeline-rulegroup-thick);
+$treeline-rulegroupext-thick: var(--treeline-rulegroup-thick, $default-treeline-rulegroup-thick);
+
 // offsets
 $treeline-offset-from-conjs: var(--treeline-offset-from-conjs, $default-treeline-offset-from-conjs);
 $treeline-offset-from-switch: var(--treeline-offset-from-switch, $default-treeline-offset-from-switch);
@@ -79,17 +79,32 @@ $drag-offset-right: var(--drag-offset-right, $default-drag-offset-right);
 $group-actions-offset-left: var(--group-actions-offset-left, $default-group-actions-offset-left);
 $group-drag-offset-left: var(--group-drag-offset-left, $default-group-drag-offset-left);
 $rule-group-actions-offset-left: var(--rule-group-actions-offset-left, $default-rule-group-actions-offset-left);
+$multiline-distance: 2px; // should be revisited
+$main-margin: var(--main-margin, $default-main-margin); // margin for .query-builder
+
 // fonts
 $main-font-family: var(--main-font-family, $default-main-font-family);
 $main-font-size: var(--main-font-size, $default-main-font-size);
 $main-text-color: var(--main-text-color, $default-main-text-color);
-// main
-$main-margin: var(--main-margin, $default-main-margin);
-$main-background: var(--main-background, $default-main-background);
-
-// other
-$multiline-distance: 2px;
 
 
+// [Advanced] colors for complex nesting
+$rule-in-rulegroup-background: var(--rule-in-rulegroup-background, $rule-background);
+$rulegroup-in-rulegroup-background: var(--rulegroup-in-rulegroup-background, $rulegroup-background);
+$rulegroupext-in-rulegroup-background: var(--rulegroupext-in-rulegroup-background, $rulegroupext-background);
+$rule-in-rulegroup-border-color: var(--rule-in-rulegroup-border-color, $rule-border-color);
+$rulegroup-in-rulegroup-border-color: var(--rulegroup-in-rulegroup-border-color, $rulegroup-border-color);
+$rulegroupext-in-rulegroup-border-color: var(--rulegroupext-in-rulegroup-border-color, $rulegroupext-border-color);
+$rule-in-rulegroupext-background: var(--rule-in-rulegroupext-background, $rule-background);
+$group-in-rulegroupext-background: var(--group-in-rulegroupext-background, $rulegroupext-background);
+$rulegroupext-in-rulegroupext-background: var(--rulegroupext-in-rulegroupext-background, $rulegroupext-background);
+$rulegroup-in-rulegroupext-background: var(--rulegroup-in-rulegroupext-background, $rulegroup-background);
+$rule-in-rulegroupext-border-color: var(--rule-in-rulegroupext-border-color, $rule-border-color);
+$group-in-rulegroupext-border-color: var(--group-in-rulegroupext-border-color, $default-group-in-rulegroupext-border-color);
+$rulegroupext-in-rulegroupext-border-color: var(--rulegroupext-in-rulegroupext-border-color, $rulegroupext-border-color);
+$rulegroup-in-rulegroupext-border-color: var(--rulegroup-in-rulegroupext-border-color, $rulegroup-border-color);
+
+
+// [Static] vars for generating borders in loop
 $minLevel: 0;
 $maxLevel: 20;

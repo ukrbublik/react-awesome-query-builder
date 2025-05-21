@@ -2,7 +2,7 @@
 // https://mui.com/material-ui/customization/palette/
 // https://mui.com/material-ui/customization/default-theme/
 
-import { Utils, Config } from "@react-awesome-query-builder/ui";
+import { Utils, Config, CssVars } from "@react-awesome-query-builder/ui";
 import { createTheme, Theme, ThemeOptions, PaletteOptions } from "@mui/material/styles";
 import mergeWith from "lodash/mergeWith";
 import omit from "lodash/omit";
@@ -63,14 +63,14 @@ const buildTheme = (config: Config, existingTheme?: Theme): Theme | null => {
   );
 };
 
-const generateCssVars = (theme: Theme, config: Config) => {
+const generateCssVars = (theme: Theme, config: Config): CssVars => {
   logger.log("generateCssVars - MUI theme", theme);
   const { palette, typography, shadows, shape } = theme;
   const darkMode = palette.mode === "dark";
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
 
-  let cssVars: Record<string, string> = {
+  let cssVars: CssVars = {
     "--main-background": palette.background.paper,
     "--rule-background": darkMode ? palette.background.paper : palette.background.paper,
     "--group-background": darkMode ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
@@ -104,10 +104,10 @@ const generateCssVars = (theme: Theme, config: Config) => {
   if (useThickLeftBorderOnHoverItem) {
     cssVars = {
       ...cssVars,
-      "--rule-border-left-hover": "2px",
-      "--group-border-left-hover": "2px",
-      "--rulegroup-border-left-hover": "2px",
-      "--rulegroupext-border-left-hover": "2px",
+      "--rule-border-left-width-hover": "2px",
+      "--group-border-left-width-hover": "2px",
+      "--rulegroup-border-left-width-hover": "2px",
+      "--rulegroupext-border-left-width-hover": "2px",
     };
   }
   

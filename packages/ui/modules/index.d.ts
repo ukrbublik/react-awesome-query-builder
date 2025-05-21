@@ -325,19 +325,120 @@ export interface RuleProps {
 }
 
 /////////////////
-// Settings
+// CssVars
 /////////////////
 
-
-export type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
-export type RenderSize = "small" | "large" | "medium";
-export type ThemeMode = "light" | "dark";
-
-export interface DesignTokens {
-  // todo: complete
-  // todo: remove prefixed "--"
-  "--main-background"?: string;
+export interface CssVarsBorderColors {
+  "--rule-border-color"?: string;
+  "--group-border-color"?: string;
+  "--rulegroup-border-color"?: string;
+  "--rulegroupext-border-color"?: string;
+  "--switch-border-color"?: string;
+  "--case-border-color"?: string;
+  // with error
+  "--rule-with-error-border-color"?: string;
+  "--group-with-error-border-color"?: string;
+  /*
+   * Border color of placeholder for item that it's being dragged
+   */
+  "--placeholder-border-color"?: string;
+  /*
+   * Border color for locked item
+   */
+  "--locked-border-color"?: string;
+  /*
+   * [Advanced] Border color for group inside rule-group
+   */
+  "--group-in-rulegroupext-border-color"?: string;
 }
+export interface CssVarsBgColors {
+  // background for .query-builder
+  "--main-background"?: string;
+  "--rule-background"?: string;
+  "--group-background"?: string;
+  "--rulegroup-background"?: string;
+  "--rulegroupext-background"?: string;
+  "--switch-background"?: string;
+  "--case-background"?: string;
+}
+export interface CssVarsTreelineColors {
+  "--treeline-color"?: string;
+  "--treeline-rulegroup-color"?: string;
+  "--treeline-rulegroupext-color"?: string;
+  "--treeline-switch-color"?: string;
+  "--treeline-disabled-color"?: string;
+}
+export interface CssVarsOtherColors {
+  "--rule-error-color"?: string;
+  "--custom-select-option-color"?: string;
+}
+export interface CssVarsBorderWidths {
+  // example: "1px"
+  "--rule-border-width"?: string;
+  "--group-border-width"?: string;
+  "--rulegroup-border-width"?: string;
+  "--rulegroupext-border-width"?: string;
+  "--switch-border-width"?: string;
+  "--case-border-width"?: string;
+}
+export interface CssVarsBorderWidthsOnHover {
+  "--rule-border-left-width-hover"?: string;
+  "--group-border-left-width-hover"?: string;
+  "--rulegroup-border-left-width-hover"?: string;
+  "--rulegroupext-border-left-width-hover"?: string;
+}
+export interface CssVarsShadowOnHover {
+  "--rule-shadow-hover"?: string;
+  "--group-shadow-hover"?: string;
+  "--rulegroup-shadow-hover"?: string;
+  "--rulegroupext-shadow-hover"?: string;
+}
+export interface CssVarsRadiuses {
+  // example: "5px"
+  "--item-radius"?: string;
+  "--conjunctions-radius"?: string;
+  "--treeline-radius"?: string;
+}
+export interface CssVarsTreeline {
+  // example: "2px"
+  "--treeline-thick"?: string;
+  "--treeline-switch-thick"?: string;
+  "--treeline-rulegroup-thick"?: string;
+  "--treeline-rulegroupext-thick"?: string;
+}
+export interface CssVarsOffsets {
+  // example: "20px"
+  "--treeline-offset-from-conjs"?: string;
+  "--treeline-offset-from-switch"?: string;
+  "--item-offset"?: string;
+  "--item-offset-left"?: string;
+  "--rulegroup-offset"?: string;
+  "--rulegroup-offset-left"?: string;
+  "--rule-padding"?: string;
+  "--rule-parts-distance"?: string;
+  "--seps-offset-bottom"?: string;
+  "--drag-offset-right"?: string;
+  "--group-actions-offset-left"?: string;
+  "--group-drag-offset-left"?: string;
+  "--rule-group-actions-offset-left"?: string;
+  "--main-margin"?: string; // margin for .query-builder
+}
+export interface CssVarsFonts {
+  // Default: "'Helvetica Neue', Helvetica, Arial, sans-serif"
+  "--main-font-family"?: string;
+  // Default: "14px"
+  "--main-font-size"?: string;
+  // Default: "initial"
+  "--main-text-color"?: string;
+}
+
+export interface CssVarsColors extends CssVarsBgColors, CssVarsBorderColors, CssVarsTreelineColors, CssVarsOtherColors {}
+export interface CssVarsSizes extends CssVarsBorderWidths, CssVarsRadiuses, CssVarsTreeline, CssVarsOffsets {}
+export interface CssVarsExtra extends CssVarsBorderWidthsOnHover, CssVarsShadowOnHover {}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface CssVars extends CssVarsColors, CssVarsSizes, CssVarsFonts, CssVarsExtra {}
+
 export interface DesignSettings {
   canInheritThemeFromOuterProvider?: boolean;
   useThickLeftBorderOnHoverItem?: boolean;
@@ -345,13 +446,21 @@ export interface DesignSettings {
   generateCssVarsFromThemeLibrary?: boolean;
   generateCssVars?: {
     // todo: override with correct typings in dedicated packages
-    material?: (theme: /*Theme*/ Record<string, any>, config: Config) => DesignTokens;
-    mui?: (theme: /*Theme*/ Record<string, any>, config: Config) => DesignTokens;
-    antd?: (token: /*GlobalToken*/ Record<string, any>, config: Config) => DesignTokens;
-    fluent?: (theme: /*Theme*/ Record<string, any>, config: Config) => DesignTokens;
-    bootstrap?: (_ununsed: any, config: Config) => DesignTokens;
+    material?: (theme: /*Theme*/ Record<string, any>, config: Config) => CssVars;
+    mui?: (theme: /*Theme*/ Record<string, any>, config: Config) => CssVars;
+    antd?: (token: /*GlobalToken*/ Record<string, any>, config: Config) => CssVars;
+    fluent?: (theme: /*Theme*/ Record<string, any>, config: Config) => CssVars;
+    bootstrap?: (_ununsed: any, config: Config) => CssVars;
   }
 }
+
+/////////////////
+// Settings
+/////////////////
+
+export type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
+export type RenderSize = "small" | "large" | "medium";
+export type ThemeMode = "light" | "dark";
 
 export interface ThemeSettings {
   theme?: {
@@ -361,9 +470,9 @@ export interface ThemeSettings {
     fluent?: Record<string, any>; // PartialTheme from "@fluentui/react";
   };
   designSettings?: DesignSettings;
-  designTokens?: {
-    light?: DesignTokens;
-    dark?: DesignTokens;
+  cssVars?: {
+    light?: CssVars;
+    dark?: CssVars;
   };
   renderSize?: RenderSize;
   themeMode?: ThemeMode;

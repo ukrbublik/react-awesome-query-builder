@@ -1,45 +1,53 @@
-// borders
-$default-rule-border: 1px !default;
-$default-group-border: 1px !default;
-$default-switch-border: 1px !default;
-$default-case-border: 2px !default;
-$default-rulegroup-border: 1px !default;
-$default-rulegroupext-border: 1px !default;
-$default-item-radius: 5px !default;
-// shadows
+// border colors
+$default-rule-border-color: transparent !default;
+$default-group-border-color: #DCC896 !default;
+$default-rulegroup-border-color: #f5e4b5 !default;
+$default-switch-border-color: #DCC896 !default;
+$default-case-border-color: #DCC896 !default;
+$default-rulegroupext-border-color: #f5e4b5 !default;
+$default-locked-border-color: red !default;
+$default-placeholder-border-color: gray !default;
+$default-rule-with-error-border-color: #e0a1a1 !default;
+$default-group-with-error-border-color: #e0a1a1 !default;
+// bg colors
+$default-main-background: none; // background for .query-builder
+$default-rule-background: white !default;
+$default-rulegroup-background: rgba(255, 252, 242, 0.5) !default;
+$default-rulegroupext-background: rgba(255, 252, 242, 0.5) !default;
+$default-group-background: rgba(250, 240, 210, 0.5) !default;
+$default-switch-background: rgba(250, 240, 210, 0.5) !default;
+$default-case-background: rgba(250, 240, 210, 0.5) !default;
+// treeline colors
+$default-treeline-color: #ccc !default;
+$default-treeline-disabled-color: rgba(128, 128, 128, 0.1) !default;
+// other colors
+$default-rule-error-color: red !default;
+$default-custom-select-option-color: lightcoral !default;
+
+// border widths
+$default-rule-border-width: 1px !default;
+$default-group-border-width: 1px !default;
+$default-switch-border-width: 1px !default;
+$default-case-border-width: 2px !default;
+$default-rulegroup-border-width: 1px !default;
+$default-rulegroupext-border-width: 1px !default;
+
+// shadows on :hover
 $default-rule-shadow-hover: none !default;
 $default-group-shadow-hover: none !default;
 $default-rulegroup-shadow-hover: none !default;
 $default-rulegroupext-shadow-hover: none !default;
-// treeline
+
+// radius
+$default-item-radius: 5px !default;
 $default-treeline-radius: 4px !default;
+
+// treeline thickness
 $default-treeline-thick: 2px !default;
 $default-treeline-switch-thick: 3px !default;
 $default-treeline-rulegroup-thick: 1px !default;
 $default-treeline-rulegroupext-thick: 1px !default;
-// colors
-$default-treeline-color: #ccc !default;
-$default-treeline-disabled-color: rgba(128, 128, 128, 0.1) !default;
-$default-switch-background: rgba(250, 240, 210, 0.5) !default;
-$default-switch-border-color: #DCC896 !default;
-$default-case-background: rgba(250, 240, 210, 0.5) !default;
-$default-case-border-color: #DCC896 !default;
-$default-group-background: rgba(250, 240, 210, 0.5) !default;
-$default-group-border-color: #DCC896 !default;
-$default-group-with-error-border-color: #e0a1a1 !default;
-$default-rule-background: white !default;
-$default-rule-border-color: transparent !default;
-$default-rule-with-error-border-color: #e0a1a1 !default;
-$default-rule-error-color: red !default;
-$default-rulegroup-background: rgba(255, 252, 242, 0.5) !default;
-$default-rulegroupext-background: rgba(255, 252, 242, 0.5) !default;
-$default-rulegroup-border-color: #f5e4b5 !default;
-$default-rulegroupext-border-color: #f5e4b5 !default;
-$default-placeholder-border-color: gray !default;
-$default-locked-border-color: red !default;
-$default-custom-select-option-color: lightcoral !default;
-// colors for complex nesting
-$default-group-in-rulegroupext-border-color: transparent !default;
+
 // offsets
 $default-treeline-offset-from-conjs: 20px !default;
 $default-treeline-offset-from-switch: 20px !default;
@@ -54,10 +62,12 @@ $default-drag-offset-right: 8px !default;
 $default-group-actions-offset-left: 10px !default;
 $default-group-drag-offset-left: 10px !default;
 $default-rule-group-actions-offset-left: 10px !default;
+$default-main-margin: 0px !default; // margin for .query-builder
+
 // fonts
-$default-main-font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !default;;
+$default-main-font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !default;
 $default-main-font-size: 14px !default;
 $default-main-text-color: initial !default;
-// main
-$default-main-margin: 0px;
-$default-main-background: none;
+
+// [Advanced] colors for complex nesting
+$default-group-in-rulegroupext-border-color: transparent !default;

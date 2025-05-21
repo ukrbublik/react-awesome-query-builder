@@ -16,19 +16,19 @@
 
 
 
-@mixin fix_paddings_for_hovered_group($item-offset-left, $treeline-thick, $border-left, $border-left-hover) {
+@mixin fix_paddings_for_hovered_group($item-offset-left, $treeline-thick, $border-left-width, $border-left-width-hover) {
   & > .group--header,
   & > .group--footer,
   & > .group--field--count--rule {
-    padding-left: calc($item-offset-left / 2 - $treeline-thick - $border-left-hover + $border-left);
+    padding-left: calc($item-offset-left / 2 - $treeline-thick - $border-left-width-hover + $border-left-width);
   }
   & > .group--children {
-    padding-left: calc($item-offset-left - $border-left-hover + $border-left);
+    padding-left: calc($item-offset-left - $border-left-width-hover + $border-left-width);
   }
 }
 
-@mixin fix_padding_for_hovered($padding, $border-left, $border-left-hover) {
-  padding-left: calc($padding - ($border-left-hover - $border-left));
+@mixin fix_padding_for_hovered($padding, $border-left-width, $border-left-width-hover) {
+  padding-left: calc($padding - ($border-left-width-hover - $border-left-width));
 }
 
 @mixin line_position_for_header($treeline-offset-from-conjs, $item-offset-left, $treeline-thick, $treeline-color) {
@@ -42,9 +42,9 @@
   }
 }
 
-@mixin fix_line_position_for_hovered_header($item-offset-left, $treeline-thick, $border-left, $border-left-hover) {
+@mixin fix_line_position_for_hovered_header($item-offset-left, $treeline-thick, $border-left-width, $border-left-width-hover) {
   &::before {
-    left: calc(+1 * ($item-offset-left / 2 - $treeline-thick / 2) - ($border-left-hover - $border-left));
+    left: calc(+1 * ($item-offset-left / 2 - $treeline-thick / 2) - ($border-left-width-hover - $border-left-width));
   }
 }
 
@@ -57,7 +57,7 @@
 
 @mixin hide_conjs_for_group(
   $item-offset, $treeline-thick, $treeline-radius,
-  $rule-border, $group-border, $rulegroup-border, $rulegroupext-border
+  $rule-border-width, $group-border-width, $rulegroup-border-width, $rulegroupext-border-width
 ) {
   & > .group-or-rule-container:first-child {
     & > .group-or-rule {
@@ -70,48 +70,48 @@
       }
       &::after {
         top: calc(50% - $treeline-thick / 2);
-        height: calc(50% + $treeline-thick / 2 + $item-offset + $rule-border);
+        height: calc(50% + $treeline-thick / 2 + $item-offset + $rule-border-width);
       }
     }
     & > .simple_group {
       &::after {
-        height: calc(50% + $treeline-thick / 2 + $item-offset + $group-border);
+        height: calc(50% + $treeline-thick / 2 + $item-offset + $group-border-width);
       }
     }
     & > .rule_group {
       &::after {
-        height: calc(50% + $treeline-thick / 2 + $item-offset + $rulegroup-border);
+        height: calc(50% + $treeline-thick / 2 + $item-offset + $rulegroup-border-width);
       }
     }
     & > .rule_group_ext {
       &::after {
-        height: calc(50% + $treeline-thick / 2 + $item-offset + $rulegroupext-border);
+        height: calc(50% + $treeline-thick / 2 + $item-offset + $rulegroupext-border-width);
       }
     }
   }
 }
 
-@mixin line_position_for_item($item-border-left, $item-border-left-hover, $item-border, $item-offset-left, $item-offset, $treeline-thick) {
+@mixin line_position_for_item($item-border-left-width, $item-border-left-width-hover, $item-border-width, $item-offset-left, $item-offset, $treeline-thick) {
   &::before {
     border-width: 0 0 $treeline-thick $treeline-thick;
-    top: calc(-1 * $item-border);
-    height: calc(50% + $treeline-thick / 2 + $item-border);
+    top: calc(-1 * $item-border-width);
+    height: calc(50% + $treeline-thick / 2 + $item-border-width);
   }
 
   &::after {
     border-width: 0 0 0 $treeline-thick;
     top: calc(50% + $treeline-thick / 2);
-    height: calc(50% - $treeline-thick / 2 + $item-offset + $item-border);
+    height: calc(50% - $treeline-thick / 2 + $item-offset + $item-border-width);
   }
 
   &::before, &::after {
-    left: calc(-1 * ($item-offset-left / 2 + $treeline-thick / 2 + $item-border-left));
+    left: calc(-1 * ($item-offset-left / 2 + $treeline-thick / 2 + $item-border-left-width));
     width: calc($item-offset-left / 2 + $treeline-thick / 2);
   }
 
   &:hover {
     &::before, &::after {
-      left: calc(-1 * ($item-offset-left / 2 + $treeline-thick / 2 + $item-border-left-hover));
+      left: calc(-1 * ($item-offset-left / 2 + $treeline-thick / 2 + $item-border-left-width-hover));
     }
   }
 }
@@ -119,8 +119,8 @@
 @mixin line_positions_for_group(
   $item-offset-left, $item-offset,
   $treeline-thick, $treeline-radius, $treeline-color,
-  $rule-border, $group-border, $rulegroup-border, $rulegroupext-border,
-  $rule-border-left-hover, $group-border-left-hover, $rulegroup-border-left-hover, $rulegroupext-border-left-hover
+  $rule-border-width, $group-border-width, $rulegroup-border-width, $rulegroupext-border-width,
+  $rule-border-left-width-hover, $group-border-left-width-hover, $rulegroup-border-left-width-hover, $rulegroupext-border-left-width-hover
 ) {
   & > .group-or-rule-container:last-child {
     & > .group-or-rule {
@@ -136,19 +136,19 @@
       }
     }
     & > .rule {
-      @include line_position_for_item($rule-border, $rule-border-left-hover, $rule-border, $item-offset-left, $item-offset, $treeline-thick);
+      @include line_position_for_item($rule-border-width, $rule-border-left-width-hover, $rule-border-width, $item-offset-left, $item-offset, $treeline-thick);
     }
     & > .simple_group {
-      @include line_position_for_item($group-border, $group-border-left-hover, $group-border, $item-offset-left, $item-offset, $treeline-thick);
+      @include line_position_for_item($group-border-width, $group-border-left-width-hover, $group-border-width, $item-offset-left, $item-offset, $treeline-thick);
     }
     & > .rule_group {
-      @include line_position_for_item($rulegroup-border, $rulegroup-border-left-hover, $rulegroup-border, $item-offset-left, $item-offset, $treeline-thick);
+      @include line_position_for_item($rulegroup-border-width, $rulegroup-border-left-width-hover, $rulegroup-border-width, $item-offset-left, $item-offset, $treeline-thick);
     }
     & > .rule_group_ext {
-      @include line_position_for_item($rulegroupext-border, $rulegroupext-border-left-hover, $rulegroupext-border, $item-offset-left, $item-offset, $treeline-thick);
+      @include line_position_for_item($rulegroupext-border-width, $rulegroupext-border-left-width-hover, $rulegroupext-border-width, $item-offset-left, $item-offset, $treeline-thick);
     }
     & > .case_group {
-      @include line_position_for_item($case-border, $case-border, $case-border, $item-offset-left, $item-offset, $treeline-switch-thick);
+      @include line_position_for_item($case-border-width, $case-border-width, $case-border-width, $item-offset-left, $item-offset, $treeline-switch-thick);
     }
   }
 }

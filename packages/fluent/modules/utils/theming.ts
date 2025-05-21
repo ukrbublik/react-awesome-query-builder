@@ -1,6 +1,6 @@
 // https://developer.microsoft.com/en-us/fluentui#/controls/web/themeprovider
 
-import { Utils, Config, ThemeMode } from "@react-awesome-query-builder/ui";
+import { Utils, Config, ThemeMode, CssVars } from "@react-awesome-query-builder/ui";
 import { Theme, PartialTheme, css, createTheme, mergeThemes } from "@fluentui/react";
 import mergeWith from "lodash/mergeWith";
 import omit from "lodash/omit";
@@ -110,7 +110,7 @@ const generateCssVars = (theme: Theme, config: Config) => {
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
 
-  let cssVars = {
+  let cssVars: CssVars = {
     "--rule-background": semanticColors.cardStandoutBackground,
     "--group-background": semanticColors.menuItemBackgroundHovered,
     "--rulegroup-background": semanticColors.defaultStateBackground,
@@ -147,10 +147,10 @@ const generateCssVars = (theme: Theme, config: Config) => {
   if (useThickLeftBorderOnHoverItem) {
     cssVars = {
       ...cssVars,
-      "--rule-border-left-hover": "2px",
-      "--group-border-left-hover": "2px",
-      "--rulegroup-border-left-hover": "2px",
-      "--rulegroupext-border-left-hover": "2px",
+      "--rule-border-left-width-hover": "2px",
+      "--group-border-left-width-hover": "2px",
+      "--rulegroup-border-left-width-hover": "2px",
+      "--rulegroupext-border-left-width-hover": "2px",
     };
   }
 

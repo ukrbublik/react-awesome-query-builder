@@ -1,4 +1,4 @@
-import { Utils, Config } from "@react-awesome-query-builder/ui";
+import { Utils, Config, CssVars } from "@react-awesome-query-builder/ui";
 import { createTheme, ThemeOptions, Theme } from "@material-ui/core/styles";
 
 const { setOpacityForHex, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
@@ -43,7 +43,7 @@ const generateCssVars = (theme: Theme, config: Config) => {
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
   
-  return {
+  let cssVars: CssVars = {
     "--main-background": palette.background.paper,
     "--rule-background": darkMode ? palette.background.paper : palette.background.paper,
     "--group-background": darkMode ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
@@ -72,12 +72,29 @@ const generateCssVars = (theme: Theme, config: Config) => {
     "--main-font-family": typography.fontFamily,
     "--main-font-size": typography.fontSize + "px",
     "--item-radius": shape.borderRadius + "px",
+  };
 
-    "--rule-shadow-hover": shadows[1],
-    "--group-shadow-hover": shadows[1],
-    "--rulegroup-shadow-hover": shadows[1],
-    "--rulegroupext-shadow-hover": shadows[1],
-  } as Record<string, string>;
+  if (useThickLeftBorderOnHoverItem) {
+    cssVars = {
+      ...cssVars,
+      "--rule-border-left-width-hover": "2px",
+      "--group-border-left-width-hover": "2px",
+      "--rulegroup-border-left-width-hover": "2px",
+      "--rulegroupext-border-left-width-hover": "2px",
+    };
+  }
+  
+  if(useShadowOnHoverItem) {
+    cssVars = {
+      ...cssVars,
+      "--rule-shadow-hover": shadows[2],
+      "--group-shadow-hover": shadows[2],
+      "--rulegroup-shadow-hover": shadows[2],
+      "--rulegroupext-shadow-hover": shadows[2],
+    };
+  }
+
+  return cssVars;
 };
 
 export {

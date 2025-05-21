@@ -1,6 +1,6 @@
 // https://ant.design/docs/react/customize-theme
 
-import { Utils, RenderSize, Config, ThemeMode } from "@react-awesome-query-builder/ui";
+import { Utils, RenderSize, Config, ThemeMode, CssVars } from "@react-awesome-query-builder/ui";
 import { theme as antdTheme, ConfigProviderProps, GlobalToken } from "antd";
 import omitBy from "lodash/omitBy";
 import pickBy from "lodash/pickBy";
@@ -117,7 +117,7 @@ const generateCssVars = (token: GlobalToken, config: Config) => {
     break;
   }
 
-  let cssVars = {
+  let cssVars: CssVars = {
     "--main-background": token.colorBgBase,
     "--rule-background": token.colorBgElevated,
     "--group-background": darkMode ? token.colorBgMask : token.colorFillQuaternary,
@@ -154,10 +154,10 @@ const generateCssVars = (token: GlobalToken, config: Config) => {
   if (useThickLeftBorderOnHoverItem) {
     cssVars = {
       ...cssVars,
-      "--rule-border-left-hover": "2px",
-      "--group-border-left-hover": "2px",
-      "--rulegroup-border-left-hover": "2px",
-      "--rulegroupext-border-left-hover": "2px",
+      "--rule-border-left-width-hover": "2px",
+      "--group-border-left-width-hover": "2px",
+      "--rulegroup-border-left-width-hover": "2px",
+      "--rulegroupext-border-left-width-hover": "2px",
     };
   }
   
