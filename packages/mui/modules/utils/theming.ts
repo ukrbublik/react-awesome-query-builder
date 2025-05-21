@@ -1,5 +1,6 @@
 // https://mui.com/material-ui/customization/theming/
 // https://mui.com/material-ui/customization/palette/
+// https://mui.com/material-ui/customization/default-theme/
 
 import { Utils, Config } from "@react-awesome-query-builder/ui";
 import { createTheme, Theme, ThemeOptions, PaletteOptions } from "@mui/material/styles";
@@ -66,8 +67,10 @@ const generateCssVars = (theme: Theme, config: Config) => {
   logger.log("generateCssVars - MUI theme", theme);
   const { palette, typography, shadows, shape } = theme;
   const darkMode = palette.mode === "dark";
+  const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
+  const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
 
-  return {
+  let cssVars: Record<string, string> = {
     "--main-background": palette.background.paper,
     "--rule-background": darkMode ? palette.background.paper : palette.background.paper,
     "--group-background": darkMode ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
@@ -82,26 +85,43 @@ const generateCssVars = (theme: Theme, config: Config) => {
     ...generateCssVarsForLevels(darkMode, "--switch-background", palette.background.paper, undefined, 0.1, 0.01),
     ...generateCssVarsForLevels(darkMode, "--case-background", palette.background.paper, undefined, 0.1, 0.01),
 
-    "--rule-border-color": darkMode ? palette.action.selected : palette.action.selected,
-    "--group-border-color": darkMode ? palette.action.selected : palette.action.selected,
-    "--rulegroup-border-color": darkMode ? palette.action.selected : palette.action.selected,
-    "--rulegroupext-border-color": darkMode ? palette.action.selected : palette.action.selected,
-    "--switch-border-color": darkMode ? palette.action.selected : palette.action.selected,
-    "--case-border-color": darkMode ? palette.action.selected : palette.action.selected,
+    "--rule-border-color": darkMode ? palette.divider : palette.divider,
+    "--group-border-color": darkMode ? palette.divider : palette.divider,
+    "--rulegroup-border-color": darkMode ? palette.divider : palette.divider,
+    "--rulegroupext-border-color": darkMode ? palette.divider : palette.divider,
+    "--switch-border-color": darkMode ? palette.divider : palette.divider,
+    "--case-border-color": darkMode ? palette.divider : palette.divider,
 
     "--treeline-color": palette.primary.main,
     "--treeline-switch-color": palette.secondary.main,
 
     "--main-text-color": palette.text.secondary,
-    "--main-font-family": typography.fontFamily,
+    "--main-font-family": typography.fontFamily!,
     "--main-font-size": typography.fontSize + "px",
     "--item-radius": shape.borderRadius + "px",
+  };
 
-    // "--rule-shadow-hover": shadows[1],
-    // "--group-shadow-hover": shadows[1],
-    // "--rulegroup-shadow-hover": shadows[1],
-    // "--rulegroupext-shadow-hover": shadows[1],
-  } as Record<string, string>;
+  if (useThickLeftBorderOnHoverItem) {
+    cssVars = {
+      ...cssVars,
+      "--rule-border-left-hover": "2px",
+      "--group-border-left-hover": "2px",
+      "--rulegroup-border-left-hover": "2px",
+      "--rulegroupext-border-left-hover": "2px",
+    };
+  }
+  
+  if(useShadowOnHoverItem) {
+    cssVars = {
+      ...cssVars,
+      "--rule-shadow-hover": shadows[2],
+      "--group-shadow-hover": shadows[2],
+      "--rulegroup-shadow-hover": shadows[2],
+      "--rulegroupext-shadow-hover": shadows[2],
+    };
+  }
+
+  return cssVars;
 };
 
 export {
