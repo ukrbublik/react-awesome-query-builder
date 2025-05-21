@@ -34,7 +34,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
 
     React.useEffect(() => {
       const cssVarsTarget = ref.current;
-      const cssVars = generateCssVars(token, config);
+      const cssVars = generateCssVars(token, config) as Record<string, string>;
       for (const k in cssVars) {
         if (cssVars[k] != undefined) {
           cssVarsTarget?.style.setProperty(k, cssVars[k]);

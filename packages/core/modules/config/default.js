@@ -41,6 +41,8 @@ export const settings = {
   //theme
   designSettings: {
     canInheritThemeFromOuterProvider: true,
+    useThickLeftBorderOnHoverItem: false,
+    useShadowOnHoverItem: false,
   },
 
   // localization

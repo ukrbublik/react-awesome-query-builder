@@ -19,7 +19,7 @@ const MaterialProvider: React.FC<ProviderProps> = ({config, children}) => {
     const theme = useTheme();
     React.useEffect(() => {
       const cssVarsTarget = ref.current;
-      const cssVars = generateCssVars(theme, config);
+      const cssVars = generateCssVars(theme, config) as Record<string, string>;
       for (const k in cssVars) {
         if (cssVars[k] != undefined) {
           cssVarsTarget?.style.setProperty(k, cssVars[k]);

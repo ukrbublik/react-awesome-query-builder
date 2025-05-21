@@ -11,7 +11,7 @@ const BootstrapProvider: React.FC<ProviderProps> = ({config, children}) => {
 
   React.useEffect(() => {
     const cssVarsTarget = ref.current;
-    const cssVars = generateCssVars({}, config);
+    const cssVars = generateCssVars({}, config) as Record<string, string>;
     for (const k in cssVars) {
       if (cssVars[k] != undefined) {
         cssVarsTarget?.style.setProperty(k, cssVars[k]);

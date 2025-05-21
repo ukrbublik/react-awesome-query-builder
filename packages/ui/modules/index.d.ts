@@ -432,6 +432,24 @@ export interface CssVarsFonts {
   "--main-text-color"?: string;
 }
 
+// For advanced usage, not including in CssVars for now
+export interface CssVarsColorsForNesting {
+  "--rule-in-rulegroup-background"?: string;
+  "--rulegroup-in-rulegroup-background"?: string;
+  "--rulegroupext-in-rulegroup-background"?: string;
+  "--rule-in-rulegroup-border-color"?: string;
+  "--rulegroup-in-rulegroup-border-color"?: string;
+  "--rulegroupext-in-rulegroup-border-color"?: string;
+  "--rule-in-rulegroupext-background"?: string;
+  "--group-in-rulegroupext-background"?: string;
+  "--rulegroupext-in-rulegroupext-background"?: string;
+  "--rulegroup-in-rulegroupext-background"?: string;
+  "--rule-in-rulegroupext-border-color"?: string;
+  "--group-in-rulegroupext-border-color"?: string; // defined in CssVarsBorderColors
+  "--rulegroupext-in-rulegroupext-border-color"?: string;
+  "--rulegroup-in-rulegroupext-border-color"?: string;
+}
+
 export interface CssVarsColors extends CssVarsBgColors, CssVarsBorderColors, CssVarsTreelineColors, CssVarsOtherColors {}
 export interface CssVarsSizes extends CssVarsBorderWidths, CssVarsRadiuses, CssVarsTreeline, CssVarsOffsets {}
 export interface CssVarsExtra extends CssVarsBorderWidthsOnHover, CssVarsShadowOnHover {}
