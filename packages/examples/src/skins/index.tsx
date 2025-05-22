@@ -2,6 +2,7 @@ import React from "react";
 
 import { skinToImport } from "./lazyStyles";
 import { skinToConfig } from "./configs";
+import { LazyStyleModule } from "./lazyStyles/utils";
 
 const ImportSkinStyles: React.FC<{skin: string}> = ({
   skin
@@ -13,4 +14,5 @@ const ImportSkinStyles: React.FC<{skin: string}> = ({
 export {
   ImportSkinStyles,
   skinToConfig,
+  LazyStyleModule,
 };

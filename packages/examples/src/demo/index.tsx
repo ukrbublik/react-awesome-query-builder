@@ -16,7 +16,7 @@ import { initTreeWithValidation, dispatchHmrUpdate, useHmrUpdate } from "./utils
 import type { DemoQueryBuilderState, DemoQueryBuilderMemo } from "./types";
 import { emptyTree } from "./init_data";
 import { defaultInitFile, initialSkin, validationTranslateOptions, defaultRenderBlocks } from "./options";
-import type { LazyStyleModule } from "../skins/lazyStyles/utils";
+import type { LazyStyleModule } from "../skins";
 import "./i18n";
 
 // @ts-ignore
