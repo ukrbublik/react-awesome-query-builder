@@ -135,6 +135,16 @@ const compileMetaSettings = {
     antd: { type: "f", args: [], invokeWith: [], ignore: "jl" },
   },
 
+  designSettings: {
+    generateCssVars: {
+      antd: { type: "f", args: ["theme", "config"] },
+      mui: { type: "f", args: ["theme", "config"] },
+      material: { type: "f", args: ["theme", "config"] },
+      fluent: { type: "f", args: ["theme", "config"] },
+      bootstrap: { type: "f", args: ["theme", "config"] },
+    },
+  },
+
   caseValueField: compileMetaField,
 
   canCompareFieldWithField: { type: "f", args: ["leftField", "leftFieldConfig", "rightField", "rightFieldConfig", "op"] },
