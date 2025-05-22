@@ -118,19 +118,20 @@ const generateCssVars = (token: GlobalToken, config: Config) => {
   }
 
   let cssVars: CssVars = {
-    "--main-background": token.colorBgBase,
-    "--rule-background": token.colorBgElevated,
-    "--group-background": darkMode ? token.colorBgMask : token.colorFillQuaternary,
-    "--rulegroup-background": darkMode ? token.colorBgSpotlight : token.colorBgLayout,
-    "--rulegroupext-background": darkMode ? token.colorBgSpotlight : token.colorBgLayout,
-    "--switch-background": darkMode ? token.colorBgMask : token.colorFillQuaternary,
-    "--case-background": darkMode ? token.colorBgMask : token.colorFillQuaternary,
+    "--main-background": token.colorBgContainer,
 
-    ...generateCssVarsForLevels(darkMode, "--group-background", token.colorBgContainer, undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(darkMode, "--rulegroup-background", chroma(token.colorBgContainer).hex(), undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(darkMode, "--rulegroupext-background", token.colorBgContainer, undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(darkMode, "--switch-background", token.colorBgContainer, undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(darkMode, "--case-background", token.colorBgContainer, undefined, 0.1, 0.01),
+    "--rule-background": token.colorBgElevated,
+    // "--group-background": darkMode ? token.colorBgMask : token.colorBgLayout,
+    // "--rulegroup-background": darkMode ? token.colorBgSpotlight : token.colorBgLayout,
+    // "--rulegroupext-background": darkMode ? token.colorBgSpotlight : token.colorBgLayout,
+    // "--switch-background": darkMode ? token.colorBgMask : token.colorFillQuaternary,
+    // "--case-background": darkMode ? token.colorBgMask : token.colorFillTertiary,
+    // level-based background colors
+    ...generateCssVarsForLevels(darkMode, "--group-background", token.colorBgContainer),
+    ...generateCssVarsForLevels(darkMode, "--rulegroup-background", token.colorBgContainer),
+    ...generateCssVarsForLevels(darkMode, "--rulegroupext-background", token.colorBgContainer),
+    ...generateCssVarsForLevels(darkMode, "--switch-background", token.colorBgContainer),
+    ...generateCssVarsForLevels(darkMode, "--case-background", token.colorBgContainer),
 
     "--rule-border-color": token.colorBorderSecondary,
     "--group-border-color": token.colorBorder,

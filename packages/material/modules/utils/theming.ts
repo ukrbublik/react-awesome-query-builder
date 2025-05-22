@@ -80,7 +80,7 @@ const generateCssVars = (theme: Theme, config: Config) => {
     ...generateCssVarsForLevels(darkMode, "--switch-background", palette.background.paper),
     ...generateCssVarsForLevels(darkMode, "--case-background", palette.background.paper),
     
-    "--rule-border-color": darkMode ? palette.divider : palette.divider,
+    "--rule-border-color": darkMode ? palette.divider : chroma(palette.divider).brighten(3).hex(),
     "--group-border-color": darkMode ? palette.divider : palette.divider,
     "--rulegroup-border-color": darkMode ? palette.divider : palette.divider,
     "--rulegroupext-border-color": darkMode ? palette.divider : palette.divider,
