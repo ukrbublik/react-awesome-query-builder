@@ -6,7 +6,7 @@ import {
 } from "@react-awesome-query-builder/ui";
 import throttle from "lodash/throttle";
 import merge from "lodash/merge";
-import ImportSkinStyles from "../skins";
+import { ImportSkinStyles } from "../skins";
 import loadConfig from "./config";
 import {
   useActions, useValidation, useBenchmark, useOutput, useInput, useInitFiles, useConfigChange, useSkins, useBlocksSwitcher,
@@ -49,6 +49,7 @@ const DemoQueryBuilder: React.FC = () => {
     renderBocks: defaultRenderBlocks,
     initFile: defaultInitFile,
     themeMode: "",
+    useOldDesign: false,
     isBodyDark: false,
     renderSize: "small",
     compactMode: false,
@@ -70,13 +71,12 @@ const DemoQueryBuilder: React.FC = () => {
   const { renderInitFilesHeader, renderInitErrors } = useInitFiles(state, setState);
   const { renderSkinSelector } = useSkins(state, setState);
   const { renderBlocksSwitcher } = useBlocksSwitcher(state, setState);
-  const { renderThemeModeSelector, renderBodyIsDarkSelector, renderCompactModeSelector, renderSizeSelector } = useThemeing(state, setState);
-
+  const { renderThemeModeSelector, renderBodyIsDarkSelector, renderUseOldDesignSelector, renderCompactModeSelector, renderLiteModeSelector, renderSizeSelector } = useThemeing(state, setState);
 
   const renderBuilder = useCallback((bprops: BuilderProps) => {
     return (
       <div className="query-builder-container" style={{padding: "10px"}}>
-        <div className="query-builder qb-lite">
+        <div className="query-builder">
           <Builder {...bprops} />
         </div>
       </div>
@@ -114,6 +114,15 @@ const DemoQueryBuilder: React.FC = () => {
     });
   };
 
+  const builder = state.renderBocks.queryBuilder && (
+    <Query
+      {...state.config}
+      value={state.tree}
+      onInit={onChange}
+      onChange={onChange}
+      renderBuilder={renderBuilder}
+    />
+  );
 
   return (
     <div>
@@ -121,10 +130,13 @@ const DemoQueryBuilder: React.FC = () => {
         Theme: &nbsp;
         {renderSkinSelector()}
         {renderThemeModeSelector()}
-        {renderCompactModeSelector()}
+        {renderLiteModeSelector()}
         {renderSizeSelector()}
+        {renderCompactModeSelector()}
         {" "}
         {renderBodyIsDarkSelector()}
+        {" "}
+        {renderUseOldDesignSelector()}
       </div>
       <div>
         Settings: &nbsp;
@@ -154,13 +166,7 @@ const DemoQueryBuilder: React.FC = () => {
 
       <ImportSkinStyles skin={state.skin} />
 
-      {state.renderBocks.queryBuilder && <Query
-        {...state.config}
-        value={state.tree}
-        onInit={onChange}
-        onChange={onChange}
-        renderBuilder={renderBuilder}
-      />}
+      {builder}
 
       <div className="query-builder-result">
         <div>
