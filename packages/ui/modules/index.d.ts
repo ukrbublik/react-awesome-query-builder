@@ -13,7 +13,7 @@ import {
   ItemType,
   ItemProperties,
   ValueSource,
-  ConfigContext, FactoryWithContext, FnWithContextAndProps, FactoryFnWithoutPropsWithContext, RenderedReactElement, SerializableType,
+  FactoryWithContext, FnWithContextAndProps, FactoryFnWithoutPropsWithContext, RenderedReactElement, SerializableType,
   ConjsProps,
   AsyncFetchListValuesFn,
   ListOptionUi,
@@ -26,6 +26,8 @@ import {
 
   // to extend
   Config as CoreConfigType,
+  ConfigContext as CoreConfigContext,
+  ConfigContextUtils as CoreConfigContextUtils,
   Settings as CoreSettings,
   Utils as CoreUtils,
   // to override <C>
@@ -131,6 +133,15 @@ export type ConfigMixinExt<C extends Config = Config> = _ConfigMixinExt<C>;
 /////////////////
 // extend config
 /////////////////
+
+export interface ConfigContextUtils extends CoreConfigContextUtils {
+  ColorUtils: ColorUtils;
+}
+
+export interface ConfigContext extends CoreConfigContext {
+  //utils: ConfigContextUtils;
+  a: number;
+}
 
 export interface Config extends CoreConfigType {
   settings: Settings;
@@ -456,11 +467,11 @@ export interface DesignSettings {
   generateCssVarsFromThemeLibrary?: boolean;
   generateCssVars?: {
     // todo: override with correct typings in dedicated packages
-    material?: (theme: /*Theme*/ any, config: Config) => CssVars;
-    mui?: (theme: /*Theme*/ any, config: Config) => CssVars;
-    antd?: (token: /*GlobalToken*/ any, config: Config) => CssVars;
-    fluent?: (theme: /*Theme*/ any, config: Config) => CssVars;
-    bootstrap?: (_ununsed: any, config: Config) => CssVars;
+    material?: (this: ConfigContext, theme: /*Theme*/ any, config: Config) => CssVars;
+    mui?: (this: ConfigContext, theme: /*Theme*/ any, config: Config) => CssVars;
+    antd?: (this: ConfigContext, token: /*GlobalToken*/ any, config: Config) => CssVars;
+    fluent?: (this: ConfigContext, theme: /*Theme*/ any, config: Config) => CssVars;
+    bootstrap?: (this: ConfigContext, _ununsed: any, config: Config) => CssVars;
   }
 }
 

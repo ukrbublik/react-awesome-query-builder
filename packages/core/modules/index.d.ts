@@ -101,7 +101,7 @@ export interface SpelRawValue {
   cls: string[];
 }
 
-export type ConfigContextUtils = {
+export interface ConfigContextUtils {
   SqlString: ExportUtils["SqlString"];
   sqlEmptyValue: ExportUtils["sqlEmptyValue"];
   spelFixList: SpelUtils["spelFixList"];
@@ -114,15 +114,15 @@ export type ConfigContextUtils = {
   escapeRegExp: OtherUtils["escapeRegExp"];
 
   getTitleInListValues: ListUtils["getTitleInListValues"];
-};
+}
 
-export type ConfigContext = {
+export interface ConfigContext {
   utils: ConfigContextUtils;
   W: TypedMap<ElementType<any>>;
   O: TypedMap<ElementType<any>>;
   components?: TypedMap<ElementType<any>>;
   [key: string]: any;
-};
+}
 
 export type FlatItemPosition = {
   caseNo: number | null;
