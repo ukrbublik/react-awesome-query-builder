@@ -92,19 +92,19 @@ const buildTheme = (config: Config, existingTheme?: Theme): PartialTheme | undef
     return acc ? mergeThemes(acc as Theme, theme) : theme as Theme;
   }, undefined) as Theme;
 
-  logger.log("buildTheme - fluent", {
-    filteredExistingTheme,
-    filteredThemeForMode,
-    existingThemeMode,
-    themeConfig,
-    mergedTheme,
-  });
+  // logger.log("buildTheme - fluent", {
+  //   filteredExistingTheme,
+  //   filteredThemeForMode,
+  //   existingThemeMode,
+  //   themeConfig,
+  //   mergedTheme,
+  // });
 
   return mergedTheme;
 };
 
 const generateCssVars = (theme: Theme, config: Config) => {
-  logger.log("generateCssVars - Fluent theme", theme);
+  // logger.log("generateCssVars - Fluent theme", theme);
   const { fonts, effects, semanticColors } = theme;
   const darkMode = isDarkColor(semanticColors.bodyBackground) ?? isDarkColor(semanticColors.inputBackground) ?? false;
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;

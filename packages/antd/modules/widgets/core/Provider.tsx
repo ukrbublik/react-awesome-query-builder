@@ -6,7 +6,6 @@ import { buildAlgorithms, mergeThemes } from "../../utils/theming";
 
 type Locale = ConfigProviderProps["locale"];
 type ThemeConfig = ConfigProviderProps["theme"];
-type Theme = ReturnType<typeof antdTheme.useToken>["theme"];
 
 const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   const themeMode = config.settings.themeMode;
@@ -25,7 +24,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   }, [darkMode, compactMode]);
 
   const customThemeConfig = React.useMemo<ThemeConfig>(() => {
-    return canCreateTheme ? mergeThemes(themeMode, existingTheme, existingToken, themeConfig, algorithms) : undefined;
+    return canCreateTheme ? mergeThemes(themeMode, existingToken, themeConfig, algorithms) : undefined;
   }, [algorithms, themeConfig, existingTheme.id, themeMode, canCreateTheme]);
 
   const withCssVarsProvider = (

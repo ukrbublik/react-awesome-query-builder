@@ -7,9 +7,9 @@ import pickBy from "lodash/pickBy";
 
 type Algorithm = typeof antdTheme["darkAlgorithm"] | typeof antdTheme["defaultAlgorithm"];
 type ThemeConfig = ConfigProviderProps["theme"];
-type Theme = ReturnType<typeof antdTheme.useToken>["theme"];
-type SeedToken = Parameters<typeof antdTheme["defaultAlgorithm"]>[0];
-type MapToken = ReturnType<typeof antdTheme["defaultAlgorithm"]>;
+// type Theme = ReturnType<typeof antdTheme.useToken>["theme"];
+// type SeedToken = Parameters<typeof antdTheme["defaultAlgorithm"]>[0];
+// type MapToken = ReturnType<typeof antdTheme["defaultAlgorithm"]>;
 
 const { logger, isTruthy } = Utils.OtherUtils;
 const { setColorOpacity, generateCssVarsForLevels, chroma, isDarkColor, isColor } = Utils.ColorUtils;
@@ -75,7 +75,7 @@ const filterTokens = (token: GlobalToken) => {
   return filterBasicTokens(token);
 };
 
-export const mergeThemes = (themeMode: ThemeMode | undefined, _existingTheme: Theme, existingToken: GlobalToken | undefined, themeConfig: ThemeConfig | undefined, algorithms: Algorithm[]) => {
+export const mergeThemes = (themeMode: ThemeMode | undefined, existingToken: GlobalToken | undefined, themeConfig: ThemeConfig | undefined, algorithms: Algorithm[]) => {
   const tokenThemeMode = detectTokenThemeMode(existingToken);
   const canInheritToken = !themeMode || !existingToken || themeMode == tokenThemeMode;
   const filteredExistingToken = existingToken ? filterTokens(existingToken) : undefined;
@@ -85,19 +85,19 @@ export const mergeThemes = (themeMode: ThemeMode | undefined, _existingTheme: Th
     inherit: canInheritToken,
     ...(themeConfig ? themeConfig : {}),
   };
-  logger.log("mergeThemes - antd", {
-    canInheritToken,
-    themeMode,
-    existingToken,
-    filteredExistingToken,
-    themeConfig,
-    mergedTheme,
-  });
+  // logger.log("mergeThemes - antd", {
+  //   canInheritToken,
+  //   themeMode,
+  //   existingToken,
+  //   filteredExistingToken,
+  //   themeConfig,
+  //   mergedTheme,
+  // });
   return mergedTheme;
 };
 
 const generateCssVars = (token: GlobalToken, config: Config) => {
-  logger.log("generateCssVars - antd token", token);
+  // logger.log("generateCssVars - antd token", token);
   const darkMode = isDarkColor(token.colorBgBase)!;
   const renderSize = config.settings.renderSize;
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;

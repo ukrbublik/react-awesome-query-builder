@@ -63,7 +63,7 @@ const buildTheme = (config: Config, existingTheme?: Theme): Theme | null => {
 };
 
 const generateCssVars = (theme: Theme, config: Config) => {
-  logger.log("generateCssVars - Material theme", theme);
+  // logger.log("generateCssVars - Material theme", theme);
   const { palette, typography, shadows, shape } = theme;
   const darkMode = palette.type === "dark";
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
