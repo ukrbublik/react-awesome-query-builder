@@ -1,0 +1,1665 @@
+.qb-compact {
+  --item-offset-left: 10px;
+  --item-offset: 5px;
+  --rulegroup-offset-left: 10px;
+  --rulegroup-offset: 5px;
+  --rule-padding: 5px;
+  --rule-parts-distance: 5px;
+  --drag-offset-right: 5px;
+  --rule-group-actions-offset-left: 5px;
+}
+
+.qb-dark {
+  --rule-background: rgba(83, 83, 83, 0.3490196078);
+  --rule-border-color: transparent;
+  --rulegroup-background: rgba(143, 143, 143, 0.6392156863);
+  --rulegroup-border-color: rgba(143, 143, 143, 0.6392156863);
+  --rulegroupext-background: rgba(143, 143, 143, 0.6392156863);
+  --rulegroupext-border-color: rgba(143, 143, 143, 0.6392156863);
+  --group-border-color: rgba(143, 143, 143, 0.6392156863);
+  --group-background: rgba(62, 62, 62, 0.4705882353);
+  --switch-border-color: rgba(143, 143, 143, 0.6392156863);
+  --switch-background: rgba(62, 62, 62, 0.4705882353);
+  --case-border-color: rgba(143, 143, 143, 0.6392156863);
+  --case-background: rgba(62, 62, 62, 0.4705882353);
+  --main-text-color: white;
+}
+
+/******************************************************************************/
+
+/** TREE LINES ****************************************************************/
+
+/******************************************************************************/
+
+.query-builder .qb-drag-handler, .query-builder .qb-draggable, .query-builder {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.query-builder .rule--header:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.query-builder {
+  overflow: hidden;
+  font-family: var(--main-font-family, "Helvetica Neue", Helvetica, Arial, sans-serif);
+  font-size: var(--main-font-size, 14px);
+  color: var(--main-text-color, initial);
+  line-height: 1.25;
+  margin: var(--main-margin, 0px);
+  background: var(--main-background, none);
+  border-radius: var(--item-radius, 5px);
+  /******************************************************************************/
+  /** RULE **********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** GROUP *********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** RULE_GROUP *********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** RULE_GROUP_EXT *********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** CASE_GROUP ****************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** DRAG **********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** RULE ITEMS ****************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** FUNC **********************************************************************/
+  /******************************************************************************/
+  /******************************************************************************/
+  /** Shrink textarea ***********************************************************/
+  /******************************************************************************/
+}
+
+.query-builder .group-or-rule {
+  border-radius: var(--item-radius, 5px);
+  position: relative;
+}
+
+.query-builder .group-or-rule-container {
+  margin-top: var(--item-offset, 10px);
+  margin-bottom: var(--item-offset, 10px);
+  padding-right: var(--item-offset, 10px);
+}
+
+.query-builder .group-or-rule-container:first-child {
+  margin-top: 0px;
+}
+
+.query-builder .group-or-rule-container:last-child {
+  margin-bottom: 0px;
+}
+
+.query-builder > .group-or-rule-container {
+  padding-right: 0px;
+}
+
+.query-builder .locked {
+  border-color: var(--locked-border-color, red) !important;
+  border-style: dashed !important;
+}
+
+.query-builder .rule {
+  flex: 1;
+  display: flex;
+  background-color: var(--rule-background, white);
+  border: var(--rule-border-width, 1px) solid var(--rule-border-color, transparent);
+  padding: var(--rule-padding, 10px);
+}
+
+.query-builder .rule:hover {
+  box-shadow: var(--rule-shadow-hover, none);
+  border-left-width: var(--rule-border-left-width-hover, var(--rule-border-width, 1px));
+  padding-left: calc(var(--rule-padding, 10px) - (var(--rule-border-left-width-hover, var(--rule-border-width, 1px)) - var(--rule-border-width, 1px)));
+}
+
+.query-builder .rule--header {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+}
+
+.query-builder .qb-drag-handler.rule--drag-handler {
+  display: flex;
+  align-items: center;
+  margin-right: var(--drag-offset-right, 8px);
+}
+
+.query-builder .rule--body {
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.query-builder .rule--body--wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.query-builder .rule--error {
+  color: var(--rule-error-color, red);
+  margin-top: 5px;
+}
+
+.query-builder .rule-with-error > .rule {
+  border-color: var(--rule-with-error-border-color, #e0a1a1);
+}
+
+.query-builder .simple_group {
+  background: var(--group-background, rgba(250, 240, 210, 0.5));
+  border: var(--group-border-width, 1px) solid var(--group-border-color, #DCC896);
+}
+
+.query-builder .simple_group.level-0 {
+  background: var(--group-background-0, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-1 {
+  background: var(--group-background-1, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-2 {
+  background: var(--group-background-2, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-3 {
+  background: var(--group-background-3, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-4 {
+  background: var(--group-background-4, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-5 {
+  background: var(--group-background-5, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-6 {
+  background: var(--group-background-6, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-7 {
+  background: var(--group-background-7, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-8 {
+  background: var(--group-background-8, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-9 {
+  background: var(--group-background-9, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-10 {
+  background: var(--group-background-10, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-11 {
+  background: var(--group-background-11, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-12 {
+  background: var(--group-background-12, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-13 {
+  background: var(--group-background-13, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-14 {
+  background: var(--group-background-14, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-15 {
+  background: var(--group-background-15, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-16 {
+  background: var(--group-background-16, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-17 {
+  background: var(--group-background-17, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-18 {
+  background: var(--group-background-18, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-19 {
+  background: var(--group-background-19, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group.level-20 {
+  background: var(--group-background-20, var(--group-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .simple_group:hover {
+  box-shadow: var(--group-shadow-hover, none);
+  border-left-width: var(--group-border-left-width-hover, var(--group-border-width, 1px));
+}
+
+.query-builder .simple_group:hover > .group--header, .query-builder .simple_group:hover > .group--footer, .query-builder .simple_group:hover > .group--field--count--rule {
+  padding-left: calc(var(--item-offset-left, 24px) / 2 - var(--treeline-thick, 2px) - var(--group-border-left-width-hover, var(--group-border-width, 1px)) + var(--group-border-width, 1px));
+}
+
+.query-builder .simple_group:hover > .group--children {
+  padding-left: calc(var(--item-offset-left, 24px) - var(--group-border-left-width-hover, var(--group-border-width, 1px)) + var(--group-border-width, 1px));
+}
+
+.query-builder > .group-container > .simple_group:hover {
+  box-shadow: none;
+  border-left-width: var(--group-border-width, 1px);
+}
+
+.query-builder > .group-container > .simple_group:hover > .group--header, .query-builder > .group-container > .simple_group:hover > .group--footer, .query-builder > .group-container > .simple_group:hover > .group--field--count--rule {
+  padding-left: calc(var(--item-offset-left, 24px) / 2 - var(--treeline-thick, 2px) - var(--group-border-width, 1px) + var(--group-border-width, 1px));
+}
+
+.query-builder > .group-container > .simple_group:hover > .group--children {
+  padding-left: calc(var(--item-offset-left, 24px) - var(--group-border-width, 1px) + var(--group-border-width, 1px));
+}
+
+.query-builder .group--header,
+.query-builder .group--footer {
+  display: flex;
+  align-items: stretch;
+  padding-left: calc(var(--item-offset-left, 24px) / 2 - var(--treeline-thick, 2px));
+  padding-right: var(--item-offset, 10px);
+  margin-top: var(--item-offset, 10px);
+  margin-bottom: var(--item-offset, 10px);
+}
+
+.query-builder .qb-drag-handler.group--drag-handler {
+  margin-right: var(--drag-offset-right, 8px);
+  margin-top: 3px;
+  position: relative;
+  align-self: center;
+}
+
+.query-builder .group--conjunctions .qb-drag-handler.group--drag-handler {
+  margin-left: var(--group-drag-offset-left, 10px);
+}
+
+.query-builder .group--conjunctions {
+  flex-shrink: 0;
+  display: flex;
+}
+
+.query-builder .group--conjunctions.hide--conj {
+  opacity: 0.3;
+}
+
+.query-builder .group--conjunctions {
+  border-radius: var(--conjunctions-radius, var(--item-radius, 5px));
+  overflow: hidden;
+}
+
+.query-builder .group--header:hover .group--conjunctions {
+  overflow: visible;
+}
+
+.query-builder .group--children {
+  padding-left: var(--item-offset-left, 24px);
+  margin-top: var(--item-offset, 10px);
+  margin-bottom: var(--item-offset, 10px);
+}
+
+.query-builder .group-with-error > .group {
+  border-color: var(--group-with-error-border-color, #e0a1a1);
+}
+
+.query-builder .group--actions {
+  align-self: center;
+  margin-left: var(--group-actions-offset-left, 10px);
+  flex: 1;
+  display: flex;
+}
+
+.query-builder .group--actions--tl, .query-builder .group--actions--bl {
+  justify-content: flex-start;
+}
+
+.query-builder .group--actions--tl {
+  margin-left: calc(var(--group-actions-offset-left, 10px) * 2);
+}
+
+.query-builder .group--actions--tc, .query-builder .group--actions--bc {
+  justify-content: center;
+}
+
+.query-builder .group--actions--tr, .query-builder .group--actions--br {
+  justify-content: flex-end;
+}
+
+.query-builder .rule_group {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: var(--rule-padding, 10px);
+  background: var(--rulegroup-background, rgba(255, 252, 242, 0.5));
+  border: var(--rulegroup-border-width, 1px) solid var(--rulegroup-border-color, #f5e4b5);
+}
+
+.query-builder .rule_group.level-0 {
+  background: var(--rulegroup-background-0, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-1 {
+  background: var(--rulegroup-background-1, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-2 {
+  background: var(--rulegroup-background-2, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-3 {
+  background: var(--rulegroup-background-3, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-4 {
+  background: var(--rulegroup-background-4, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-5 {
+  background: var(--rulegroup-background-5, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-6 {
+  background: var(--rulegroup-background-6, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-7 {
+  background: var(--rulegroup-background-7, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-8 {
+  background: var(--rulegroup-background-8, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-9 {
+  background: var(--rulegroup-background-9, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-10 {
+  background: var(--rulegroup-background-10, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-11 {
+  background: var(--rulegroup-background-11, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-12 {
+  background: var(--rulegroup-background-12, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-13 {
+  background: var(--rulegroup-background-13, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-14 {
+  background: var(--rulegroup-background-14, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-15 {
+  background: var(--rulegroup-background-15, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-16 {
+  background: var(--rulegroup-background-16, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-17 {
+  background: var(--rulegroup-background-17, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-18 {
+  background: var(--rulegroup-background-18, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-19 {
+  background: var(--rulegroup-background-19, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group.level-20 {
+  background: var(--rulegroup-background-20, var(--rulegroup-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group:hover {
+  box-shadow: var(--rulegroup-shadow-hover, none);
+  border-left-width: var(--rulegroup-border-left-width-hover, var(--rulegroup-border-width, 1px));
+  padding-left: calc(var(--rule-padding, 10px) - (var(--rulegroup-border-left-width-hover, var(--rulegroup-border-width, 1px)) - var(--rulegroup-border-width, 1px)));
+}
+
+.query-builder .rule_group > .group--field {
+  margin-top: var(--item-offset, 10px);
+  margin-bottom: var(--item-offset, 10px);
+  align-self: center;
+}
+
+.query-builder .rule_group > .group--actions {
+  margin-left: var(--rule-group-actions-offset-left, 10px);
+  align-self: center;
+  flex: 0;
+}
+
+.query-builder .rule_group > .rule_group--children {
+  flex: 1;
+  margin-top: var(--rulegroup-offset, 5px);
+  margin-bottom: var(--rulegroup-offset, 5px);
+  padding-left: var(--rulegroup-offset-left, 18px);
+}
+
+.query-builder .rule_group > .rule_group--children > .group-or-rule-container {
+  margin-bottom: var(--rulegroup-offset, 5px);
+  margin-top: var(--rulegroup-offset, 5px);
+  padding-right: var(--rulegroup-offset, 5px);
+}
+
+.query-builder .rule_group > .rule_group--children.one--child {
+  padding-left: calc(var(--rulegroup-offset-left, 18px) / 2);
+}
+
+.query-builder .rule_group--error {
+  color: var(--rule-error-color, red);
+  margin-left: 5px;
+  margin-top: 5px;
+  width: 100%;
+}
+
+.query-builder .rule_group .rule {
+  border-color: var(--rule-in-rulegroup-border-color, var(--rule-border-color, transparent));
+}
+
+.query-builder .rule_group .rule_group {
+  border-color: var(--rulegroup-in-rulegroup-border-color, var(--rulegroup-border-color, #f5e4b5));
+}
+
+.query-builder .rule_group .rule_group_ext {
+  border-color: var(--rulegroupext-in-rulegroup-border-color, var(--rulegroupext-border-color, #f5e4b5));
+}
+
+.query-builder .rule_group_ext {
+  background: var(--rulegroupext-background, rgba(255, 252, 242, 0.5));
+  border: var(--rulegroupext-border-width, 1px) solid var(--rulegroupext-border-color, #f5e4b5);
+}
+
+.query-builder .rule_group_ext.level-0 {
+  background: var(--rulegroupext-background-0, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-1 {
+  background: var(--rulegroupext-background-1, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-2 {
+  background: var(--rulegroupext-background-2, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-3 {
+  background: var(--rulegroupext-background-3, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-4 {
+  background: var(--rulegroupext-background-4, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-5 {
+  background: var(--rulegroupext-background-5, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-6 {
+  background: var(--rulegroupext-background-6, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-7 {
+  background: var(--rulegroupext-background-7, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-8 {
+  background: var(--rulegroupext-background-8, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-9 {
+  background: var(--rulegroupext-background-9, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-10 {
+  background: var(--rulegroupext-background-10, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-11 {
+  background: var(--rulegroupext-background-11, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-12 {
+  background: var(--rulegroupext-background-12, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-13 {
+  background: var(--rulegroupext-background-13, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-14 {
+  background: var(--rulegroupext-background-14, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-15 {
+  background: var(--rulegroupext-background-15, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-16 {
+  background: var(--rulegroupext-background-16, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-17 {
+  background: var(--rulegroupext-background-17, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-18 {
+  background: var(--rulegroupext-background-18, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-19 {
+  background: var(--rulegroupext-background-19, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext.level-20 {
+  background: var(--rulegroupext-background-20, var(--rulegroupext-background, rgba(255, 252, 242, 0.5)));
+}
+
+.query-builder .rule_group_ext:hover {
+  box-shadow: var(--rulegroupext-shadow-hover, none);
+  border-left-width: var(--rulegroupext-border-left-width-hover, var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .rule_group_ext:hover > .group--header, .query-builder .rule_group_ext:hover > .group--footer, .query-builder .rule_group_ext:hover > .group--field--count--rule {
+  padding-left: calc(var(--item-offset-left, 24px) / 2 - var(--treeline-thick, 2px) - var(--rulegroupext-border-left-width-hover, var(--rulegroupext-border-width, 1px)) + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .rule_group_ext:hover > .group--children {
+  padding-left: calc(var(--item-offset-left, 24px) - var(--rulegroupext-border-left-width-hover, var(--rulegroupext-border-width, 1px)) + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .rule_group_ext .group--field--count--rule {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+  padding-left: calc(var(--item-offset-left, 24px) / 2 - var(--treeline-thick, 2px));
+  padding-right: var(--item-offset, 10px);
+  margin-top: var(--item-offset, 10px);
+  margin-bottom: var(--item-offset, 10px);
+}
+
+.query-builder .rule_group_ext .rule {
+  border-color: var(--rule-in-rulegroupext-border-color, var(--rule-border-color, transparent));
+}
+
+.query-builder .rule_group_ext .simple_group {
+  border-color: var(--group-in-rulegroupext-border-color, transparent);
+}
+
+.query-builder .rule_group_ext .rule_group_ext {
+  border-color: var(--rulegroupext-in-rulegroupext-border-color, var(--rulegroupext-border-color, #f5e4b5));
+}
+
+.query-builder .rule_group_ext .rule_group {
+  border-color: var(--rulegroup-in-rulegroupext-border-color, var(--rulegroup-border-color, #f5e4b5));
+}
+
+.query-builder .switch_group {
+  background: var(--switch-background, rgba(250, 240, 210, 0.5));
+  border: var(--switch-border-width, 1px) solid var(--switch-border-color, #DCC896);
+}
+
+.query-builder .switch_group.level-0 {
+  background: var(--switch-background-0, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-1 {
+  background: var(--switch-background-1, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-2 {
+  background: var(--switch-background-2, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-3 {
+  background: var(--switch-background-3, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-4 {
+  background: var(--switch-background-4, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-5 {
+  background: var(--switch-background-5, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-6 {
+  background: var(--switch-background-6, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-7 {
+  background: var(--switch-background-7, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-8 {
+  background: var(--switch-background-8, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-9 {
+  background: var(--switch-background-9, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-10 {
+  background: var(--switch-background-10, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-11 {
+  background: var(--switch-background-11, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-12 {
+  background: var(--switch-background-12, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-13 {
+  background: var(--switch-background-13, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-14 {
+  background: var(--switch-background-14, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-15 {
+  background: var(--switch-background-15, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-16 {
+  background: var(--switch-background-16, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-17 {
+  background: var(--switch-background-17, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-18 {
+  background: var(--switch-background-18, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-19 {
+  background: var(--switch-background-19, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .switch_group.level-20 {
+  background: var(--switch-background-20, var(--switch-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group {
+  background: var(--case-background, rgba(250, 240, 210, 0.5));
+  border: var(--case-border-width, 2px) solid var(--case-border-color, #DCC896);
+}
+
+.query-builder .case_group.level-0 {
+  background: var(--case-background-0, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-1 {
+  background: var(--case-background-1, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-2 {
+  background: var(--case-background-2, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-3 {
+  background: var(--case-background-3, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-4 {
+  background: var(--case-background-4, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-5 {
+  background: var(--case-background-5, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-6 {
+  background: var(--case-background-6, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-7 {
+  background: var(--case-background-7, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-8 {
+  background: var(--case-background-8, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-9 {
+  background: var(--case-background-9, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-10 {
+  background: var(--case-background-10, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-11 {
+  background: var(--case-background-11, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-12 {
+  background: var(--case-background-12, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-13 {
+  background: var(--case-background-13, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-14 {
+  background: var(--case-background-14, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-15 {
+  background: var(--case-background-15, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-16 {
+  background: var(--case-background-16, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-17 {
+  background: var(--case-background-17, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-18 {
+  background: var(--case-background-18, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-19 {
+  background: var(--case-background-19, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group.level-20 {
+  background: var(--case-background-20, var(--case-background, rgba(250, 240, 210, 0.5)));
+}
+
+.query-builder .case_group .case_group--body {
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--item-offset, 10px);
+  margin-bottom: var(--item-offset, 10px);
+}
+
+.query-builder .case_group .case_group--body .case_group--children {
+  flex: auto;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.query-builder .case_group .case_group--value {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: var(--item-offset, 10px);
+  margin-right: var(--item-offset, 10px);
+}
+
+.query-builder.qb-dragging {
+  cursor: -webkit-grabbing !important;
+  cursor: grabbing !important;
+}
+
+.query-builder.qb-dragging button {
+  pointer-events: none;
+}
+
+.query-builder .qb-draggable {
+  pointer-events: none;
+  position: absolute;
+  opacity: 0.7;
+  z-index: 1000;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.query-builder .qb-drag-handler {
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+}
+
+.query-builder .qb-placeholder {
+  border-color: var(--placeholder-border-color, gray) !important;
+  border-style: dashed !important;
+}
+
+.query-builder .qb-draggable::before, .query-builder .qb-draggable::after {
+  display: none;
+}
+
+.query-builder .group--header:not(.no--children):not(.hide--conjs) {
+  position: relative;
+}
+
+.query-builder .group--header:not(.no--children):not(.hide--conjs)::before {
+  z-index: 0;
+  content: "";
+  position: absolute;
+  border-color: var(--treeline-color, #ccc);
+  border-style: solid;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.query-builder .group--header:not(.no--children):not(.hide--conjs).hide--line::before {
+  border-color: var(--treeline-disabled-color, rgba(128, 128, 128, 0.1)) !important;
+}
+
+.query-builder .group--children > .group-or-rule-container > .group-or-rule::before, .query-builder .group--children > .group-or-rule-container > .group-or-rule::after {
+  content: "";
+  position: absolute;
+  border-color: var(--treeline-color, #ccc);
+  border-style: solid;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.query-builder .group--children > .group-or-rule-container:last-child > .group-or-rule::after {
+  display: none;
+}
+
+.query-builder .group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::before {
+  display: none;
+}
+
+.query-builder .group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  border-radius: var(--treeline-radius, 4px) 0 0 0;
+  border-width: var(--treeline-thick, 2px) 0 0 var(--treeline-thick, 2px);
+}
+
+.query-builder .group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  top: calc(50% - var(--treeline-thick, 2px) / 2);
+  height: calc(50% + var(--treeline-thick, 2px) / 2 + var(--item-offset, 10px) + var(--rule-border-width, 1px));
+}
+
+.query-builder .group--children.hide--conjs > .group-or-rule-container:first-child > .simple_group::after {
+  height: calc(50% + var(--treeline-thick, 2px) / 2 + var(--item-offset, 10px) + var(--group-border-width, 1px));
+}
+
+.query-builder .group--children.hide--conjs > .group-or-rule-container:first-child > .rule_group::after {
+  height: calc(50% + var(--treeline-thick, 2px) / 2 + var(--item-offset, 10px) + var(--rulegroup-border-width, 1px));
+}
+
+.query-builder .group--children.hide--conjs > .group-or-rule-container:first-child > .rule_group_ext::after {
+  height: calc(50% + var(--treeline-thick, 2px) / 2 + var(--item-offset, 10px) + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .group--children.hide--line > .group-or-rule-container > .group-or-rule::before, .query-builder .group--children.hide--line > .group-or-rule-container > .group-or-rule::after {
+  border-color: var(--treeline-disabled-color, rgba(128, 128, 128, 0.1)) !important;
+}
+
+.query-builder .group--children > .group-or-rule-container:last-child > .group-or-rule::before {
+  border-radius: 0 0 0 var(--treeline-radius, 4px);
+}
+
+.query-builder .group--children > .group-or-rule-container > .group-or-rule::before, .query-builder .group--children > .group-or-rule-container > .group-or-rule::after {
+  border-color: var(--treeline-color, #ccc);
+}
+
+.query-builder .group--children > .group-or-rule-container > .rule::before {
+  border-width: 0 0 var(--treeline-thick, 2px) var(--treeline-thick, 2px);
+  top: calc(-1 * var(--rule-border-width, 1px));
+  height: calc(50% + var(--treeline-thick, 2px) / 2 + var(--rule-border-width, 1px));
+}
+
+.query-builder .group--children > .group-or-rule-container > .rule::after {
+  border-width: 0 0 0 var(--treeline-thick, 2px);
+  top: calc(50% + var(--treeline-thick, 2px) / 2);
+  height: calc(50% - var(--treeline-thick, 2px) / 2 + var(--item-offset, 10px) + var(--rule-border-width, 1px));
+}
+
+.query-builder .group--children > .group-or-rule-container > .rule::before, .query-builder .group--children > .group-or-rule-container > .rule::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2 + var(--rule-border-width, 1px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2);
+}
+
+.query-builder .group--children > .group-or-rule-container > .rule:hover::before, .query-builder .group--children > .group-or-rule-container > .rule:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2 + var(--rule-border-left-width-hover, var(--rule-border-width, 1px))));
+}
+
+.query-builder .group--children > .group-or-rule-container > .simple_group::before {
+  border-width: 0 0 var(--treeline-thick, 2px) var(--treeline-thick, 2px);
+  top: calc(-1 * var(--group-border-width, 1px));
+  height: calc(50% + var(--treeline-thick, 2px) / 2 + var(--group-border-width, 1px));
+}
+
+.query-builder .group--children > .group-or-rule-container > .simple_group::after {
+  border-width: 0 0 0 var(--treeline-thick, 2px);
+  top: calc(50% + var(--treeline-thick, 2px) / 2);
+  height: calc(50% - var(--treeline-thick, 2px) / 2 + var(--item-offset, 10px) + var(--group-border-width, 1px));
+}
+
+.query-builder .group--children > .group-or-rule-container > .simple_group::before, .query-builder .group--children > .group-or-rule-container > .simple_group::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2 + var(--group-border-width, 1px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2);
+}
+
+.query-builder .group--children > .group-or-rule-container > .simple_group:hover::before, .query-builder .group--children > .group-or-rule-container > .simple_group:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2 + var(--group-border-left-width-hover, var(--group-border-width, 1px))));
+}
+
+.query-builder .group--children > .group-or-rule-container > .rule_group::before {
+  border-width: 0 0 var(--treeline-thick, 2px) var(--treeline-thick, 2px);
+  top: calc(-1 * var(--rulegroup-border-width, 1px));
+  height: calc(50% + var(--treeline-thick, 2px) / 2 + var(--rulegroup-border-width, 1px));
+}
+
+.query-builder .group--children > .group-or-rule-container > .rule_group::after {
+  border-width: 0 0 0 var(--treeline-thick, 2px);
+  top: calc(50% + var(--treeline-thick, 2px) / 2);
+  height: calc(50% - var(--treeline-thick, 2px) / 2 + var(--item-offset, 10px) + var(--rulegroup-border-width, 1px));
+}
+
+.query-builder .group--children > .group-or-rule-container > .rule_group::before, .query-builder .group--children > .group-or-rule-container > .rule_group::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2 + var(--rulegroup-border-width, 1px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2);
+}
+
+.query-builder .group--children > .group-or-rule-container > .rule_group:hover::before, .query-builder .group--children > .group-or-rule-container > .rule_group:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2 + var(--rulegroup-border-left-width-hover, var(--rulegroup-border-width, 1px))));
+}
+
+.query-builder .group--children > .group-or-rule-container > .rule_group_ext::before {
+  border-width: 0 0 var(--treeline-thick, 2px) var(--treeline-thick, 2px);
+  top: calc(-1 * var(--rulegroupext-border-width, 1px));
+  height: calc(50% + var(--treeline-thick, 2px) / 2 + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .group--children > .group-or-rule-container > .rule_group_ext::after {
+  border-width: 0 0 0 var(--treeline-thick, 2px);
+  top: calc(50% + var(--treeline-thick, 2px) / 2);
+  height: calc(50% - var(--treeline-thick, 2px) / 2 + var(--item-offset, 10px) + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .group--children > .group-or-rule-container > .rule_group_ext::before, .query-builder .group--children > .group-or-rule-container > .rule_group_ext::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2 + var(--rulegroupext-border-width, 1px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2);
+}
+
+.query-builder .group--children > .group-or-rule-container > .rule_group_ext:hover::before, .query-builder .group--children > .group-or-rule-container > .rule_group_ext:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2 + var(--rulegroupext-border-left-width-hover, var(--rulegroupext-border-width, 1px))));
+}
+
+.query-builder .group--children > .group-or-rule-container > .case_group::before {
+  border-width: 0 0 var(--treeline-switch-thick, 3px) var(--treeline-switch-thick, 3px);
+  top: calc(-1 * var(--case-border-width, 2px));
+  height: calc(50% + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px));
+}
+
+.query-builder .group--children > .group-or-rule-container > .case_group::after {
+  border-width: 0 0 0 var(--treeline-switch-thick, 3px);
+  top: calc(50% + var(--treeline-switch-thick, 3px) / 2);
+  height: calc(50% - var(--treeline-switch-thick, 3px) / 2 + var(--item-offset, 10px) + var(--case-border-width, 2px));
+}
+
+.query-builder .group--children > .group-or-rule-container > .case_group::before, .query-builder .group--children > .group-or-rule-container > .case_group::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2);
+}
+
+.query-builder .group--children > .group-or-rule-container > .case_group:hover::before, .query-builder .group--children > .group-or-rule-container > .case_group:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px)));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container:last-child > .group-or-rule::before {
+  border-radius: 0 0 0 var(--treeline-radius, 4px);
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .group-or-rule::before, .query-builder .rule_group--children > .group-or-rule-container > .group-or-rule::after {
+  border-color: var(--treeline-rulegroup-color, var(--treeline-color, #ccc));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .rule::before {
+  border-width: 0 0 var(--treeline-rulegroup-thick, 1px) var(--treeline-rulegroup-thick, 1px);
+  top: calc(-1 * var(--rule-border-width, 1px));
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rule-border-width, 1px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .rule::after {
+  border-width: 0 0 0 var(--treeline-rulegroup-thick, 1px);
+  top: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2);
+  height: calc(50% - var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-offset, 5px) + var(--rule-border-width, 1px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .rule::before, .query-builder .rule_group--children > .group-or-rule-container > .rule::after {
+  left: calc(-1 * (var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rule-border-width, 1px)));
+  width: calc(var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2);
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .rule:hover::before, .query-builder .rule_group--children > .group-or-rule-container > .rule:hover::after {
+  left: calc(-1 * (var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rule-border-left-width-hover, var(--rule-border-width, 1px))));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .simple_group::before {
+  border-width: 0 0 var(--treeline-rulegroup-thick, 1px) var(--treeline-rulegroup-thick, 1px);
+  top: calc(-1 * var(--group-border-width, 1px));
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--group-border-width, 1px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .simple_group::after {
+  border-width: 0 0 0 var(--treeline-rulegroup-thick, 1px);
+  top: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2);
+  height: calc(50% - var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-offset, 5px) + var(--group-border-width, 1px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .simple_group::before, .query-builder .rule_group--children > .group-or-rule-container > .simple_group::after {
+  left: calc(-1 * (var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--group-border-width, 1px)));
+  width: calc(var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2);
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .simple_group:hover::before, .query-builder .rule_group--children > .group-or-rule-container > .simple_group:hover::after {
+  left: calc(-1 * (var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--group-border-left-width-hover, var(--group-border-width, 1px))));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group::before {
+  border-width: 0 0 var(--treeline-rulegroup-thick, 1px) var(--treeline-rulegroup-thick, 1px);
+  top: calc(-1 * var(--rulegroup-border-width, 1px));
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-border-width, 1px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group::after {
+  border-width: 0 0 0 var(--treeline-rulegroup-thick, 1px);
+  top: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2);
+  height: calc(50% - var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-offset, 5px) + var(--rulegroup-border-width, 1px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group::before, .query-builder .rule_group--children > .group-or-rule-container > .rule_group::after {
+  left: calc(-1 * (var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-border-width, 1px)));
+  width: calc(var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2);
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group:hover::before, .query-builder .rule_group--children > .group-or-rule-container > .rule_group:hover::after {
+  left: calc(-1 * (var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-border-left-width-hover, var(--rulegroup-border-width, 1px))));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group_ext::before {
+  border-width: 0 0 var(--treeline-rulegroup-thick, 1px) var(--treeline-rulegroup-thick, 1px);
+  top: calc(-1 * var(--rulegroupext-border-width, 1px));
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group_ext::after {
+  border-width: 0 0 0 var(--treeline-rulegroup-thick, 1px);
+  top: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2);
+  height: calc(50% - var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-offset, 5px) + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group_ext::before, .query-builder .rule_group--children > .group-or-rule-container > .rule_group_ext::after {
+  left: calc(-1 * (var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroupext-border-width, 1px)));
+  width: calc(var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2);
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .rule_group_ext:hover::before, .query-builder .rule_group--children > .group-or-rule-container > .rule_group_ext:hover::after {
+  left: calc(-1 * (var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroupext-border-left-width-hover, var(--rulegroupext-border-width, 1px))));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .case_group::before {
+  border-width: 0 0 var(--treeline-switch-thick, 3px) var(--treeline-switch-thick, 3px);
+  top: calc(-1 * var(--case-border-width, 2px));
+  height: calc(50% + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .case_group::after {
+  border-width: 0 0 0 var(--treeline-switch-thick, 3px);
+  top: calc(50% + var(--treeline-switch-thick, 3px) / 2);
+  height: calc(50% - var(--treeline-switch-thick, 3px) / 2 + var(--rulegroup-offset, 5px) + var(--case-border-width, 2px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .case_group::before, .query-builder .rule_group--children > .group-or-rule-container > .case_group::after {
+  left: calc(-1 * (var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px)));
+  width: calc(var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-switch-thick, 3px) / 2);
+}
+
+.query-builder .rule_group--children > .group-or-rule-container > .case_group:hover::before, .query-builder .rule_group--children > .group-or-rule-container > .case_group:hover::after {
+  left: calc(-1 * (var(--rulegroup-offset-left, 18px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px)));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container:first-child > .group-or-rule::before, .query-builder .rule_group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::before {
+  display: none;
+}
+
+.query-builder .rule_group--children > .group-or-rule-container:first-child > .group-or-rule::after, .query-builder .rule_group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  border-radius: var(--treeline-radius, 4px) 0 0 0;
+  border-width: var(--treeline-rulegroup-thick, 1px) 0 0 var(--treeline-rulegroup-thick, 1px);
+}
+
+.query-builder .rule_group--children > .group-or-rule-container:first-child > .group-or-rule::after, .query-builder .rule_group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  top: calc(50% - var(--treeline-rulegroup-thick, 1px) / 2);
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-offset, 5px) + var(--rule-border-width, 1px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container:first-child > .simple_group::after, .query-builder .rule_group--children.hide--conjs > .group-or-rule-container:first-child > .simple_group::after {
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-offset, 5px) + var(--group-border-width, 1px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container:first-child > .rule_group::after, .query-builder .rule_group--children.hide--conjs > .group-or-rule-container:first-child > .rule_group::after {
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-offset, 5px) + var(--rulegroup-border-width, 1px));
+}
+
+.query-builder .rule_group--children > .group-or-rule-container:first-child > .rule_group_ext::after, .query-builder .rule_group--children.hide--conjs > .group-or-rule-container:first-child > .rule_group_ext::after {
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-offset, 5px) + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container:last-child > .group-or-rule::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container:last-child > .group-or-rule::before {
+  border-radius: 0 0 0 var(--treeline-radius, 4px);
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .group-or-rule::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .group-or-rule::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .group-or-rule::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .group-or-rule::after {
+  border-color: var(--treeline-rulegroupext-color, var(--treeline-color, #ccc));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule::before {
+  border-width: 0 0 var(--treeline-rulegroup-thick, 1px) var(--treeline-rulegroup-thick, 1px);
+  top: calc(-1 * var(--rule-border-width, 1px));
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rule-border-width, 1px));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule::after {
+  border-width: 0 0 0 var(--treeline-rulegroup-thick, 1px);
+  top: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2);
+  height: calc(50% - var(--treeline-rulegroup-thick, 1px) / 2 + var(--item-offset, 10px) + var(--rule-border-width, 1px));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .rule::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rule-border-width, 1px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2);
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule:hover::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .rule:hover::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule:hover::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rule-border-left-width-hover, var(--rule-border-width, 1px))));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .simple_group::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .simple_group::before {
+  border-width: 0 0 var(--treeline-rulegroup-thick, 1px) var(--treeline-rulegroup-thick, 1px);
+  top: calc(-1 * var(--group-border-width, 1px));
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--group-border-width, 1px));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .simple_group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .simple_group::after {
+  border-width: 0 0 0 var(--treeline-rulegroup-thick, 1px);
+  top: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2);
+  height: calc(50% - var(--treeline-rulegroup-thick, 1px) / 2 + var(--item-offset, 10px) + var(--group-border-width, 1px));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .simple_group::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .simple_group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .simple_group::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .simple_group::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--group-border-width, 1px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2);
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .simple_group:hover::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .simple_group:hover::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .simple_group:hover::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .simple_group:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--group-border-left-width-hover, var(--group-border-width, 1px))));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group::before {
+  border-width: 0 0 var(--treeline-rulegroup-thick, 1px) var(--treeline-rulegroup-thick, 1px);
+  top: calc(-1 * var(--rulegroup-border-width, 1px));
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-border-width, 1px));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group::after {
+  border-width: 0 0 0 var(--treeline-rulegroup-thick, 1px);
+  top: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2);
+  height: calc(50% - var(--treeline-rulegroup-thick, 1px) / 2 + var(--item-offset, 10px) + var(--rulegroup-border-width, 1px));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-border-width, 1px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2);
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group:hover::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group:hover::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group:hover::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroup-border-left-width-hover, var(--rulegroup-border-width, 1px))));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group_ext::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group_ext::before {
+  border-width: 0 0 var(--treeline-rulegroup-thick, 1px) var(--treeline-rulegroup-thick, 1px);
+  top: calc(-1 * var(--rulegroupext-border-width, 1px));
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group_ext::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group_ext::after {
+  border-width: 0 0 0 var(--treeline-rulegroup-thick, 1px);
+  top: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2);
+  height: calc(50% - var(--treeline-rulegroup-thick, 1px) / 2 + var(--item-offset, 10px) + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group_ext::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group_ext::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group_ext::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group_ext::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroupext-border-width, 1px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2);
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group_ext:hover::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .rule_group_ext:hover::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group_ext:hover::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .rule_group_ext:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2 + var(--rulegroupext-border-left-width-hover, var(--rulegroupext-border-width, 1px))));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .case_group::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .case_group::before {
+  border-width: 0 0 var(--treeline-switch-thick, 3px) var(--treeline-switch-thick, 3px);
+  top: calc(-1 * var(--case-border-width, 2px));
+  height: calc(50% + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .case_group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .case_group::after {
+  border-width: 0 0 0 var(--treeline-switch-thick, 3px);
+  top: calc(50% + var(--treeline-switch-thick, 3px) / 2);
+  height: calc(50% - var(--treeline-switch-thick, 3px) / 2 + var(--item-offset, 10px) + var(--case-border-width, 2px));
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .case_group::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .case_group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .case_group::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .case_group::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2);
+}
+
+.query-builder .rule_group_ext--children > .group-or-rule-container > .case_group:hover::before, .query-builder .rule_group_ext--children > .group-or-rule-container > .case_group:hover::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .case_group:hover::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children) > .group-or-rule-container > .case_group:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px)));
+}
+
+.query-builder .rule_group_ext--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::before,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children).hide--conjs > .group-or-rule-container:first-child > .group-or-rule::before {
+  display: none;
+}
+
+.query-builder .rule_group_ext--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children).hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  border-radius: var(--treeline-radius, 4px) 0 0 0;
+  border-width: var(--treeline-rulegroup-thick, 1px) 0 0 var(--treeline-rulegroup-thick, 1px);
+}
+
+.query-builder .rule_group_ext--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children).hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  top: calc(50% - var(--treeline-rulegroup-thick, 1px) / 2);
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--item-offset, 10px) + var(--rule-border-width, 1px));
+}
+
+.query-builder .rule_group_ext--children.hide--conjs > .group-or-rule-container:first-child > .simple_group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children).hide--conjs > .group-or-rule-container:first-child > .simple_group::after {
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--item-offset, 10px) + var(--group-border-width, 1px));
+}
+
+.query-builder .rule_group_ext--children.hide--conjs > .group-or-rule-container:first-child > .rule_group::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children).hide--conjs > .group-or-rule-container:first-child > .rule_group::after {
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--item-offset, 10px) + var(--rulegroup-border-width, 1px));
+}
+
+.query-builder .rule_group_ext--children.hide--conjs > .group-or-rule-container:first-child > .rule_group_ext::after,
+.query-builder .rule_group_ext--children .group--children:not(.rule_group--children).hide--conjs > .group-or-rule-container:first-child > .rule_group_ext::after {
+  height: calc(50% + var(--treeline-rulegroup-thick, 1px) / 2 + var(--item-offset, 10px) + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container:last-child > .group-or-rule::before {
+  border-radius: 0 0 0 var(--treeline-radius, 4px);
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .group-or-rule::before, .query-builder .switch_group--children > .group-or-rule-container > .group-or-rule::after {
+  border-color: var(--treeline-switch-color, var(--treeline-color, #ccc));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .rule::before {
+  border-width: 0 0 var(--treeline-switch-thick, 3px) var(--treeline-switch-thick, 3px);
+  top: calc(-1 * var(--rule-border-width, 1px));
+  height: calc(50% + var(--treeline-switch-thick, 3px) / 2 + var(--rule-border-width, 1px));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .rule::after {
+  border-width: 0 0 0 var(--treeline-switch-thick, 3px);
+  top: calc(50% + var(--treeline-switch-thick, 3px) / 2);
+  height: calc(50% - var(--treeline-switch-thick, 3px) / 2 + var(--item-offset, 10px) + var(--rule-border-width, 1px));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .rule::before, .query-builder .switch_group--children > .group-or-rule-container > .rule::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--rule-border-width, 1px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2);
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .rule:hover::before, .query-builder .switch_group--children > .group-or-rule-container > .rule:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--rule-border-left-width-hover, var(--rule-border-width, 1px))));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .simple_group::before {
+  border-width: 0 0 var(--treeline-switch-thick, 3px) var(--treeline-switch-thick, 3px);
+  top: calc(-1 * var(--case-border-width, 2px));
+  height: calc(50% + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .simple_group::after {
+  border-width: 0 0 0 var(--treeline-switch-thick, 3px);
+  top: calc(50% + var(--treeline-switch-thick, 3px) / 2);
+  height: calc(50% - var(--treeline-switch-thick, 3px) / 2 + var(--item-offset, 10px) + var(--case-border-width, 2px));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .simple_group::before, .query-builder .switch_group--children > .group-or-rule-container > .simple_group::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2);
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .simple_group:hover::before, .query-builder .switch_group--children > .group-or-rule-container > .simple_group:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px)));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group::before {
+  border-width: 0 0 var(--treeline-switch-thick, 3px) var(--treeline-switch-thick, 3px);
+  top: calc(-1 * var(--rulegroup-border-width, 1px));
+  height: calc(50% + var(--treeline-switch-thick, 3px) / 2 + var(--rulegroup-border-width, 1px));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group::after {
+  border-width: 0 0 0 var(--treeline-switch-thick, 3px);
+  top: calc(50% + var(--treeline-switch-thick, 3px) / 2);
+  height: calc(50% - var(--treeline-switch-thick, 3px) / 2 + var(--item-offset, 10px) + var(--rulegroup-border-width, 1px));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group::before, .query-builder .switch_group--children > .group-or-rule-container > .rule_group::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--rulegroup-border-width, 1px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2);
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group:hover::before, .query-builder .switch_group--children > .group-or-rule-container > .rule_group:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--rulegroup-border-left-width-hover, var(--rulegroup-border-width, 1px))));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group_ext::before {
+  border-width: 0 0 var(--treeline-switch-thick, 3px) var(--treeline-switch-thick, 3px);
+  top: calc(-1 * var(--rulegroupext-border-width, 1px));
+  height: calc(50% + var(--treeline-switch-thick, 3px) / 2 + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group_ext::after {
+  border-width: 0 0 0 var(--treeline-switch-thick, 3px);
+  top: calc(50% + var(--treeline-switch-thick, 3px) / 2);
+  height: calc(50% - var(--treeline-switch-thick, 3px) / 2 + var(--item-offset, 10px) + var(--rulegroupext-border-width, 1px));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group_ext::before, .query-builder .switch_group--children > .group-or-rule-container > .rule_group_ext::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--rulegroupext-border-width, 1px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2);
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .rule_group_ext:hover::before, .query-builder .switch_group--children > .group-or-rule-container > .rule_group_ext:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--rulegroupext-border-left-width-hover, var(--rulegroupext-border-width, 1px))));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .case_group::before {
+  border-width: 0 0 var(--treeline-switch-thick, 3px) var(--treeline-switch-thick, 3px);
+  top: calc(-1 * var(--case-border-width, 2px));
+  height: calc(50% + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .case_group::after {
+  border-width: 0 0 0 var(--treeline-switch-thick, 3px);
+  top: calc(50% + var(--treeline-switch-thick, 3px) / 2);
+  height: calc(50% - var(--treeline-switch-thick, 3px) / 2 + var(--item-offset, 10px) + var(--case-border-width, 2px));
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .case_group::before, .query-builder .switch_group--children > .group-or-rule-container > .case_group::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px)));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2);
+}
+
+.query-builder .switch_group--children > .group-or-rule-container > .case_group:hover::before, .query-builder .switch_group--children > .group-or-rule-container > .case_group:hover::after {
+  left: calc(-1 * (var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2 + var(--case-border-width, 2px)));
+}
+
+.query-builder .group--header:not(.no--children):not(.hide--conjs)::before {
+  border-color: var(--treeline-color, #ccc);
+  border-width: 0 0 0 var(--treeline-thick, 2px);
+  top: calc(var(--treeline-offset-from-conjs, 20px));
+  height: calc(100% + var(--item-offset, 10px) - var(--treeline-offset-from-conjs, 20px));
+  left: calc(1 * (var(--item-offset-left, 24px) / 2 - var(--treeline-thick, 2px) / 2));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-thick, 2px) / 2);
+}
+
+.query-builder .simple_group:hover:not(.query-builder > .group-container > .group) > .group--header:not(.no--children):not(.hide--conjs)::before {
+  left: calc(1 * (var(--item-offset-left, 24px) / 2 - var(--treeline-thick, 2px) / 2) - (var(--group-border-left-width-hover, var(--group-border-width, 1px)) - var(--group-border-width, 1px)));
+}
+
+.query-builder .rule_group_ext > .group--header:not(.no--children):not(.hide--conjs)::before,
+.query-builder .rule_group_ext .simple_group > .group--header:not(.no--children):not(.hide--conjs)::before {
+  border-color: var(--treeline-rulegroupext-color, var(--treeline-color, #ccc));
+  border-width: 0 0 0 var(--treeline-rulegroup-thick, 1px);
+  top: calc(var(--treeline-offset-from-conjs, 20px));
+  height: calc(100% + var(--item-offset, 10px) - var(--treeline-offset-from-conjs, 20px));
+  left: calc(1 * (var(--item-offset-left, 24px) / 2 - var(--treeline-rulegroup-thick, 1px) / 2));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-rulegroup-thick, 1px) / 2);
+}
+
+.query-builder .rule_group_ext:hover > .group--header:not(.no--children):not(.hide--conjs)::before {
+  left: calc(1 * (var(--item-offset-left, 24px) / 2 - var(--treeline-rulegroup-thick, 1px) / 2) - (var(--rulegroupext-border-left-width-hover, var(--rulegroupext-border-width, 1px)) - var(--rulegroupext-border-width, 1px)));
+}
+
+.query-builder .switch_group > .group--header:not(.no--children):not(.hide--conjs)::before {
+  border-color: var(--treeline-switch-color, var(--treeline-color, #ccc));
+  border-width: 0 0 0 var(--treeline-switch-thick, 3px);
+  top: calc(var(--treeline-offset-from-switch, 20px));
+  height: calc(100% + var(--item-offset, 10px) - var(--treeline-offset-from-switch, 20px));
+  left: calc(1 * (var(--item-offset-left, 24px) / 2 - var(--treeline-switch-thick, 3px) / 2));
+  width: calc(var(--item-offset-left, 24px) / 2 + var(--treeline-switch-thick, 3px) / 2);
+}
+
+.query-builder .rule--field, .query-builder .rule--fieldsrc, .query-builder .group--field, .query-builder .rule--operator, .query-builder .rule--value, .query-builder .rule--operator-options, .query-builder .rule--widget, .query-builder .widget--widget, .query-builder .widget--valuesrc, .query-builder .widget--sep, .query-builder .operator--options--sep, .query-builder .rule--before-widget, .query-builder .rule--after-widget {
+  display: inline-block;
+}
+
+.query-builder .widget--sep, .query-builder .operator--options--sep, .query-builder .rule--func--bracket-before, .query-builder .rule--func--bracket-after, .query-builder .rule--func--arg-sep {
+  vertical-align: bottom;
+  align-self: flex-end;
+  margin-bottom: var(--seps-offset-bottom, 3px);
+}
+
+.query-builder .rule--func--arg-sep {
+  margin-bottom: calc(var(--seps-offset-bottom, 3px) - 5px);
+}
+
+.query-builder .widget--sep {
+  margin-left: var(--rule-parts-distance, 10px);
+  margin-right: var(--rule-parts-distance, 10px);
+}
+
+.query-builder .widget--sep.widget--sep-first {
+  margin-right: var(--rule-parts-distance, 10px);
+  margin-left: 0;
+}
+
+.query-builder .rule--operator {
+  margin-left: calc(var(--rule-parts-distance, 10px) * 2);
+  margin-right: calc(var(--rule-parts-distance, 10px) * 2);
+}
+
+.query-builder .operator--options--sep {
+  margin-right: var(--rule-parts-distance, 10px);
+}
+
+.query-builder .rule--func--arg-sep {
+  margin-left: 3px;
+  margin-right: 6px;
+}
+
+.query-builder .rule--func--bracket-after {
+  margin-left: calc(var(--rule-parts-distance, 10px) / 2);
+  margin-right: 2px;
+}
+
+.query-builder .rule--func--bracket-before {
+  margin-left: calc(var(--rule-parts-distance, 10px) / 2);
+  margin-right: calc(var(--rule-parts-distance, 10px) / 2);
+}
+
+.query-builder .widget--valuesrc {
+  vertical-align: top;
+}
+
+.query-builder .rule--fieldsrc {
+  vertical-align: top;
+}
+
+.query-builder .operator--options {
+  display: flex;
+}
+
+.query-builder .rule--operator-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.query-builder .rule--operator-text-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.query-builder div.tooltip-inner {
+  max-width: 500px;
+}
+
+.query-builder .rule--label {
+  display: block;
+  font-weight: bold;
+}
+
+.query-builder .rule--func--wrapper, .query-builder .rule--func, .query-builder .rule--func--args, .query-builder .rule--func--arg, .query-builder .rule--func--arg-value, .query-builder .rule--func--bracket-before, .query-builder .rule--func--bracket-after, .query-builder .rule--func--arg-sep, .query-builder .rule--func--arg-label, .query-builder .rule--func--arg-label-sep {
+  display: inline-block;
+}
+
+.query-builder .rule--func--wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.query-builder .rule--func--args {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.query-builder .rule--func--arg {
+  display: flex;
+}
+
+.query-builder .rule--field-wrapper,
+.query-builder .rule--field--func,
+.query-builder .rule--func--wrapper,
+.query-builder .rule--func--args,
+.query-builder .rule--func--arg,
+.query-builder .rule--func--arg-value,
+.query-builder .rule--func--arg-value > .rule--widget,
+.query-builder .widget--func {
+  display: contents;
+}
+
+.query-builder .rule--func, .query-builder .widget--widget {
+  margin-bottom: 2px;
+}
+
+.query-builder .rule--body--wrapper {
+  margin-bottom: -2px;
+}
+
+.query-builder .rule_group_ext > .group--header .group--conjunctions {
+  margin-bottom: 2px;
+}
+
+.query-builder .rule--body.can--shrink--value .rule--value {
+  flex: 1;
+}
+
+.query-builder .rule--body.can--shrink--value .rule--value > .rule--widget {
+  width: 100%;
+  display: flex;
+}
+
+.query-builder .rule--body.can--shrink--value .rule--value > .rule--widget .widget--widget {
+  flex: 1;
+}
+
+/******************************************************************************/
+
+/** Minimalism ****************************************************************/
+
+/******************************************************************************/
+
+.qb-lite .group--drag-handler, .qb-lite .group--actions {
+  transition: opacity 0.2s;
+}
+
+.qb-lite .group--header:hover .group--header .group--drag-handler, .qb-lite .group--header:hover .group--header .group--actions,
+.qb-lite .group--header:not(:hover) .group--drag-handler,
+.qb-lite .group--header:not(:hover) .group--actions,
+.qb-lite .rule_group:not(:hover) .group--drag-handler,
+.qb-lite .rule_group:not(:hover) .group--actions,
+.qb-lite .group--field--count--rule:not(:hover) .group--drag-handler,
+.qb-lite .group--field--count--rule:not(:hover) .group--actions {
+  opacity: 0;
+}
+
+.qb-lite .rule--fieldsrc, .qb-lite .widget--valuesrc, .qb-lite .rule--drag-handler, .qb-lite .rule--header {
+  transition: opacity 0.2s;
+}
+
+.qb-lite .rule:hover .rule .rule--fieldsrc, .qb-lite .rule:hover .rule .widget--valuesrc, .qb-lite .rule:hover .rule .rule--drag-handler, .qb-lite .rule:hover .rule .rule--header,
+.qb-lite .rule:not(:hover) .rule--fieldsrc,
+.qb-lite .rule:not(:hover) .widget--valuesrc,
+.qb-lite .rule:not(:hover) .rule--drag-handler,
+.qb-lite .rule:not(:hover) .rule--header {
+  opacity: 0;
+}
+
+.qb-lite.qb-dragging .rule--fieldsrc, .qb-lite.qb-dragging .widget--valuesrc, .qb-lite.qb-dragging .rule--drag-handler, .qb-lite.qb-dragging .rule--header, .qb-lite.qb-dragging .group--drag-handler, .qb-lite.qb-dragging .group--actions {
+  opacity: 0 !important;
+}

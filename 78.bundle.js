@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunk_react_awesome_query_builder_examples=self.webpackChunk_react_awesome_query_builder_examples||[]).push([[78],{5078:(e,u,n)=>{n.r(u),n.d(u,{default:()=>t});var r=n(67308),s=n(60712);const t=function(){return(0,r.useEffect)((function(){return s.A.use(),function(){s.A.unuse()}}),[]),null}}}]);
+//# sourceMappingURL=78.bundle.js.map
