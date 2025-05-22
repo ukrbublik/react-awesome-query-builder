@@ -109,10 +109,10 @@ const generateCssVars = (theme: Theme, config: Config): CssVars => {
   if(useShadowOnHoverItem) {
     cssVars = {
       ...cssVars,
-      "--rule-shadow-hover": shadows[2],
-      "--group-shadow-hover": shadows[2],
-      "--rulegroup-shadow-hover": shadows[2],
-      "--rulegroupext-shadow-hover": shadows[2],
+      "--rule-shadow-hover": shadows[1],
+      "--group-shadow-hover": shadows[1],
+      "--rulegroup-shadow-hover": shadows[1],
+      "--rulegroupext-shadow-hover": shadows[1],
     };
   }
 
