@@ -99,20 +99,20 @@ const generateCssVars = (theme: Theme, config: Config) => {
   if (useThickLeftBorderOnHoverItem) {
     cssVars = {
       ...cssVars,
-      "--rule-border-left-width-hover": "2px",
-      "--group-border-left-width-hover": "2px",
-      "--rulegroup-border-left-width-hover": "2px",
-      "--rulegroupext-border-left-width-hover": "2px",
+      "--rule-border-left-width-hover": "3px",
+      "--group-border-left-width-hover": "3px",
+      "--rulegroup-border-left-width-hover": "3px",
+      "--rulegroupext-border-left-width-hover": "3px",
     };
   }
   
   if(useShadowOnHoverItem) {
     cssVars = {
       ...cssVars,
-      "--rule-shadow-hover": shadows[2],
-      "--group-shadow-hover": shadows[2],
-      "--rulegroup-shadow-hover": shadows[2],
-      "--rulegroupext-shadow-hover": shadows[2],
+      "--rule-shadow-hover": shadows[1],
+      "--group-shadow-hover": shadows[1],
+      "--rulegroup-shadow-hover": shadows[1],
+      "--rulegroupext-shadow-hover": shadows[1],
     };
   }
 

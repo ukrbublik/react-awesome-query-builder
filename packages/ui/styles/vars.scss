@@ -93,7 +93,7 @@ $rule-in-rulegroup-border-color: var(--rule-in-rulegroup-border-color, $rule-bor
 $rulegroup-in-rulegroup-border-color: var(--rulegroup-in-rulegroup-border-color, $rulegroup-border-color);
 $rulegroupext-in-rulegroup-border-color: var(--rulegroupext-in-rulegroup-border-color, $rulegroupext-border-color);
 $rule-in-rulegroupext-border-color: var(--rule-in-rulegroupext-border-color, $rule-border-color);
-$group-in-rulegroupext-border-color: var(--group-in-rulegroupext-border-color, $default-group-in-rulegroupext-border-color);
+$group-in-rulegroupext-border-color: var(--group-in-rulegroupext-border-color, $default-group-in-rulegroupext-border-color /* $group-border-color */);
 $rulegroupext-in-rulegroupext-border-color: var(--rulegroupext-in-rulegroupext-border-color, $rulegroupext-border-color);
 $rulegroup-in-rulegroupext-border-color: var(--rulegroup-in-rulegroupext-border-color, $rulegroup-border-color);
 // using backgrounds for complex nesting will break level-based backgrounds

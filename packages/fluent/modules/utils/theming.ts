@@ -106,7 +106,7 @@ const buildTheme = (config: Config, existingTheme?: Theme): PartialTheme | undef
 const generateCssVars = (theme: Theme, config: Config) => {
   logger.log("generateCssVars - Fluent theme", theme);
   const { fonts, effects, semanticColors } = theme;
-  const darkMode = isDarkColor(semanticColors.bodyBackground) ?? isDarkColor(semanticColors.inputBackground);
+  const darkMode = isDarkColor(semanticColors.bodyBackground) ?? isDarkColor(semanticColors.inputBackground) ?? false;
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
 

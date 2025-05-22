@@ -456,10 +456,10 @@ export interface DesignSettings {
   generateCssVarsFromThemeLibrary?: boolean;
   generateCssVars?: {
     // todo: override with correct typings in dedicated packages
-    material?: (theme: /*Theme*/ Record<string, any>, config: Config) => CssVars;
-    mui?: (theme: /*Theme*/ Record<string, any>, config: Config) => CssVars;
-    antd?: (token: /*GlobalToken*/ Record<string, any>, config: Config) => CssVars;
-    fluent?: (theme: /*Theme*/ Record<string, any>, config: Config) => CssVars;
+    material?: (theme: /*Theme*/ any, config: Config) => CssVars;
+    mui?: (theme: /*Theme*/ any, config: Config) => CssVars;
+    antd?: (token: /*GlobalToken*/ any, config: Config) => CssVars;
+    fluent?: (theme: /*Theme*/ any, config: Config) => CssVars;
     bootstrap?: (_ununsed: any, config: Config) => CssVars;
   }
 }
