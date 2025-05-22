@@ -1,6 +1,7 @@
 import React from "react";
-import {default as FluentUIWidgets} from "../widgets";
 import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
+import { generateCssVars } from "../utils/theming";
+import {default as FluentUIWidgets} from "../widgets";
 
 
 const settings = {
@@ -17,6 +18,14 @@ const settings = {
   renderProvider: (props, {RCE, W: {FluentUIProvider}}) => RCE(FluentUIProvider, props),
   renderConfirm: (props, {W: {FluentUIConfirm}}) => FluentUIConfirm(props),
   useConfirm: ({W: {FluentUIUseConfirm}}) => FluentUIUseConfirm(),
+
+  designSettings: {
+    ...(BasicConfig.settings.designSettings ?? {}),
+    generateCssVars: {
+      ...(BasicConfig.settings.designSettings.generateCssVars ?? {}),
+      fluent: generateCssVars,
+    }
+  }
 };
 
 
@@ -79,6 +88,7 @@ const ctx = {
     ...BasicConfig.ctx.W,
     ...FluentUIWidgets,
   },
+  generateCssVars,
 };
 
 

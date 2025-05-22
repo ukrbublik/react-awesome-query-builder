@@ -1,9 +1,9 @@
 import React from "react";
+import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 import en_US from "antd/es/locale/en_US";
 import {default as AntdWidgets} from "../widgets";
 import { normalizeListValues } from "../utils/stuff";
-import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
-
+import { generateCssVars } from "../utils/theming";
 
 
 const settings = {
@@ -36,6 +36,14 @@ const settings = {
 
   removeInvalidMultiSelectValuesOnLoad: false, // can be removed manually in UI
   normalizeListValues: function(...args) { return this.utils.normalizeListValues.call(null, ...args); },
+
+  designSettings: {
+    ...(BasicConfig.settings.designSettings ?? {}),
+    generateCssVars: {
+      ...(BasicConfig.settings.designSettings.generateCssVars ?? {}),
+      antd: generateCssVars,
+    }
+  }
 };
 
 
@@ -123,6 +131,7 @@ const ctx = {
     ...BasicConfig.ctx.W,
     ...AntdWidgets,
   },
+  generateCssVars,
 };
 
 let config = {

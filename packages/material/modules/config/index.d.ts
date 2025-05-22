@@ -1,5 +1,5 @@
 import { BasicConfig, Settings, DesignSettings } from "@react-awesome-query-builder/ui";
-import { ThemeOptions } from "@material-ui/core/styles";
+import { Theme, ThemeOptions } from "@material-ui/core/styles";
 import { generateCssVars } from "../utils/theming";
 
 type SettingsTheme = NonNullable<Settings["theme"]>;

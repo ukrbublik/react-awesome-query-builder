@@ -1,6 +1,6 @@
 import React from "react";
 import { Config } from "@react-awesome-query-builder/ui";
-import { generateCssVars } from "../../utils/theming";
+import { generateCssVars as defaultGenerateCssVars } from "../../utils/theming";
 
 interface CssVarsProviderProps {
   config: Config;
@@ -14,7 +14,8 @@ const CssVarsProvider: React.FC<CssVarsProviderProps> = ({ children, config }) =
 
   React.useEffect(() => {
     const cssVarsTarget = ref.current;
-    const cssVars = generateCssVars({}, config) as Record<string, string>;
+    const generateCssVars = config.settings.designSettings?.generateCssVars?.bootstrap ?? defaultGenerateCssVars;
+    const cssVars = generateCssVars.call(config.ctx, {}, config) as Record<string, string>;
     for (const k in cssVars) {
       if (cssVars[k] != undefined) {
         cssVarsTarget?.style.setProperty(k, cssVars[k]);
