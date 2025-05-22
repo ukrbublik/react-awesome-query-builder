@@ -1,6 +1,6 @@
 import {BasicConfig} from "@react-awesome-query-builder/ui";
 export {FluentUIWidgets} from "./widgets";
-export { buildTheme, generateCssVars } from "./utils/theming";
+export { generateCssVars } from "./utils/theming";
 
 import type { FluentUIConfig as FluentUIConfigType} from "./config";
 export declare const FluentUIConfig: FluentUIConfigType;

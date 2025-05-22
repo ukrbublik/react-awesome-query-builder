@@ -1,6 +1,6 @@
 import {BasicConfig} from "@react-awesome-query-builder/ui";
 export {default as MuiWidgets} from "./widgets";
-export { buildTheme, generateCssVars } from "./utils/theming";
+export { generateCssVars } from "./utils/theming";
 
 import type { MuiConfig as MuiConfigType} from "./config";
 export declare const MuiConfig: MuiConfigType;
