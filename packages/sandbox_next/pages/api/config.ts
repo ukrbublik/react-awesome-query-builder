@@ -17,6 +17,7 @@ export type GetConfigQuery = {
 export interface PostConfigBody {
   zipConfig: ZipConfig;
 }
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface PostConfigResult {
 }
 export interface GetConfigResult {

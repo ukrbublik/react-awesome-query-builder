@@ -411,12 +411,48 @@ canRegroup: false,
 ----
 
 
+Theme settings:
+
+[cols="1m,1,3a",options="header",]
+|===
+|key |default |meaning
+|themeMode |undefined |`light` or `dark`. +
+ If <Query> is wrapped in theme provider component (eg. `<ThemeProvider>` for MUI, `<ConfigProvider>` for AntDesign) then will be detected automatically (doesn't work for `reactstrap`). +
+ Otherwise `light` by default
+|compactMode |false | Use compact styles (eg. smaller margins)
+|liteMode |true | Hide some elements (butons "Add", "Delete", drag icon, select source arrow, inactive conjunctions buttons). Show only on hover. +
+ Same as adding class `.qb-lite` to `.query-builder`
+|theme.material |{} |Options for https://v4.mui.com/customization/theming/[createTheme]
+|theme.mui |{} |Options for https://mui.com/material-ui/customization/theming/[createTheme]
+|theme.antd |{} |Options for https://ant.design/docs/react/customize-theme[ConfigProvider]
+|theme.fluent |{} |Options for https://developer.microsoft.com/en-us/fluentui#/controls/web/themeprovider[ThemeProvider]
+|designSettings.canInheritThemeFromOuterProvider |true |If <Query> is wrapped in theme provider component (eg. `<ThemeProvider>` for MUI) and `settings.theme.mui` is also provided then merge themes.
+|designSettings.generateCssVarsFromThemeLibrary |true |Adopt <Query> styling to used UI framework theme (MUI/AntDesign etc.). +
+ Use false if you don't want a new behaviour and want to use static styles like in versions < 6.7.0
+|designSettings.useThickLeftBorderOnHoverItem |false |Fancy effect for hovering on rule/group
+|designSettings.useShadowOnHoverItem |false |Fancy effect for hovering on rule/group
+|generateCssVars.* | |If you want to override generation of css vars for RAQB using UI framework's theme, use your own function. +
+ `generateCssVars` is an object with keys `mui`, `antd`, `fluent`, `material`. Value - function `(theme, config) => Object` +
+ Example of overriding: `generateCssVars.mui = (theme, config) => ({ "--group-background": theme.palette.background.paper })` +
+ Example of extending: `generateCssVars.mui = (theme, config) => ({ ...config.ctx.generateCssVars(theme, config), "--group-background": theme.palette.grey["200"] })`
+|renderSize |`small` |Size of components - `small`, `middle` or `large`
+|dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
+|groupActionsPosition |`topRight` |You can change the position of the group actions to the following: +
+ `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight`
+|defaultSliderWidth |`200px` |Width for `slider`
+|defaultSelectWidth |`200px` |Width for `select`
+|defaultSearchWidth |`100px` |Width for search in autocomplete inputs
+|defaultMaxRows |5 | Max rows for `textarea` widget
+|maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
+|showLabels |false |Show labels above all fields?
+|===
+
+
 Render settings:
 
 [cols="1m,1,3a",options="header",]
 |===
 |key |default |meaning
-|renderSize |`small` |Size of AntDesign components - `small` or `large`
 |renderField |`(props) => <FieldSelect {...props} />` |Render fields list +
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `FieldTreeSelect`
 |renderOperator |`(props) => <FieldSelect {...props} />` |Render operators list +
@@ -425,13 +461,8 @@ Render settings:
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
 |renderConjs, renderButton, renderIcon, renderButtonGroup, renderSwitch, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework ({renderConjs}[example])
 |renderItem | |Able to {renderItem}[customize] render behavior for rule/group items.
-|showLabels |false |Show labels above all fields?
-|maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
-|dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
 |customFieldSelectProps |`{}` |You can pass props to the field select widget. Example: `{showSearch: true}`
 |customOperatorSelectProps |`{}` |You can pass props to the operator select widget. Example: `{showSearch: true}`
-|groupActionsPosition |`topRight` |You can change the position of the group actions to the following: +
- `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight`
 |renderBeforeWidget | | 
 |renderAfterWidget | | 
 |renderBeforeActions | | 
@@ -439,23 +470,14 @@ Render settings:
 |renderSwitchPrefix |`IF` | For ternary mode - render on top of all confitions
 |renderBeforeCaseValue |`<span>then</span>` | For ternary mode - render before case value (except default case), after case condition tree
 |renderAfterCaseValue | | For ternary mode - render after case value (except default case)
-|defaultSliderWidth |`200px` |Width for `slider`
-|defaultSelectWidth |`200px` |Width for `select`
-|defaultSearchWidth |`100px` |Width for search in autocomplete inputs
-|defaultMaxRows |5 | Max rows for `textarea` widget
 |===
+
 
 Other settings:
 
 [cols="1m,1,3a",options="header",]
 |===
 |key |default |meaning
-|locale.moment |`en` |Locale (string or array of strings) used for https://momentjs.com/docs/#/i18n/[moment]
-|locale.antd |`en_US` |Locale object used for https://ant.design/docs/react/i18n[AntDesign] widgets
-|locale.material |`enUS` |Locale object used for https://v4.mui.com/getting-started/installation/[MaterialUI v4] widgets
-|locale.mui |`enUS` |Locale object used for https://mui.com/material-ui/guides/localization/[MUI] widgets
-|theme.material |{} |Options for https://v4.mui.com/customization/theming/[createTheme]
-|theme.mui |{} |Options for https://mui.com/material-ui/customization/theming/[createTheme]
 |formatReverse | |Function for formatting query string, used to format rule with reverse operator which haven't `formatOp`. +
   `(string q, string operator, string reversedOp, Object operatorDefinition, Object revOperatorDefinition, bool isForDisplay) => string` +
   `q` - already formatted rule for opposite operator (which have `formatOp`) +
@@ -480,7 +502,20 @@ Other settings:
 |sqlDialect | |Affects import/export to SQL. Possible values: `BigQuery`, `PostgreSQL`, `MySQL`.
 |===
 
-Localization:
+
+Localization settings:
+
+[cols="1m,1,3a",options="header",]
+|===
+|key |default |meaning
+|locale.moment |`en` |Locale (string or array of strings) used for https://momentjs.com/docs/#/i18n/[moment]
+|locale.antd |`en_US` |Locale object used for https://ant.design/docs/react/i18n[AntDesign] widgets
+|locale.material |`enUS` |Locale object used for https://v4.mui.com/getting-started/installation/[MaterialUI v4] widgets
+|locale.mui |`enUS` |Locale object used for https://mui.com/material-ui/guides/localization/[MUI] widgets
+|===
+
+
+Localization strings:
 
 [cols="1m,1a",options="header",]
 |===

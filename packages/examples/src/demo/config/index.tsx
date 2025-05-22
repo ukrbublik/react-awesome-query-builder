@@ -13,13 +13,12 @@ import {
   TreeSelectWidget,
   Config,
   ValidateValue,
-  PriceFieldSettings,
 } from "@react-awesome-query-builder/ui";
+import { AntdWidgets } from "@react-awesome-query-builder/antd";
 import moment from "moment";
 import ru_RU from "antd/es/locale/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
 import { ruRU as muiRuRU } from "@mui/material/locale";
-import { AntdWidgets } from "@react-awesome-query-builder/antd";
 import { skinToConfig } from "../../skins";
 
 const {
@@ -238,6 +237,52 @@ export default (skin: string) => {
     ...InitialConfig.settings,
     ...localeSettings,
 
+    theme: {
+      // material: {
+      //   palette: {
+      //     primary: {
+      //       main: "rgb(255, 51, 51)",
+      //     },
+      //   },
+      // },
+      // mui: {
+      //   palette: {
+      //     primary: {
+      //       main: "rgb(255, 87, 51)",
+      //     },
+      //   },
+      // },
+      // antd: {
+      //   token: {
+      //     colorPrimary: "rgb(255, 51, 51)",
+      //   }
+      // },
+      // fluent: {
+      //   palette: {
+      //     themePrimary: "rgb(255, 51, 51)",
+      //   },
+      // },
+    },
+
+    designSettings: {
+      ...InitialConfig.settings.designSettings,
+      useThickLeftBorderOnHoverItem: true,
+      useShadowOnHoverItem: false,
+      generateCssVarsFromThemeLibrary: true, // false to use design like in < 6.7
+      generateCssVars: {
+        // example of overriding
+        mui: function (theme, config) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          return {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            ...(config.ctx.generateCssVars?.(theme, config) ?? {}),
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            "--item-offset": "8px",
+          };
+        },
+      }
+    },
+
     defaultSliderWidth: "200px",
     defaultSelectWidth: "200px",
     defaultSearchWidth: "100px",
@@ -378,7 +423,7 @@ export default (skin: string) => {
       }
     },
     results: {
-      label: "Results",
+      label: "Results (group)",
       type: "!group",
       subfields: {
         product: {
@@ -395,15 +440,43 @@ export default (skin: string) => {
             max: 100,
           },
           valueSources: ["value"],
-        }
+        },
+        interviewer: {
+          type: "!group",
+          mode: "struct",
+          subfields: {
+            level: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["jun", "mid", "sen"],
+              } as SelectFieldSettings,
+              valueSources: ["value"],
+            },
+          }
+        },
+        questions: {
+          type: "!group",
+          mode: "array",
+          conjunctions: ["AND", "OR"],
+          showNot: false,
+          initialEmptyWhere: true,
+          defaultOperator: "equal",
+
+          subfields: {
+            answered: {
+              type: "boolean",
+              valueSources: ["value"],
+            },
+          }
+        },
       }
     },
     cars: {
-      label: "Cars",
+      label: "Cars (list)",
       type: "!group",
       mode: "array",
       conjunctions: ["AND", "OR"],
-      showNot: true,
+      showNot: false,
       operators: [
         // w/ operand - count
         "equal",
@@ -449,6 +522,38 @@ export default (skin: string) => {
         model: {
           type: "text",
           valueSources: ["value"],
+        },
+        class: {
+          type: "!group",
+          mode: "struct",
+          subfields: {
+            type: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["sedan", "hatchback", "minivan"],
+              } as SelectFieldSettings,
+              valueSources: ["value"],
+            },
+          }
+        },
+        items: {
+          type: "!group",
+          mode: "array",
+          conjunctions: ["AND", "OR"],
+          showNot: false,
+          defaultOperator: "greater_or_equal",
+          initialEmptyWhere: true,
+          subfields: {
+            color: {
+              type: "select",
+              listValues: [
+                { value: "yellow", title: "Yellow" },
+                { value: "green", title: "Green" },
+                { value: "orange", title: "Orange" }
+              ],
+              valueSources: ["value"],
+            },
+          }
         },
       }
     },

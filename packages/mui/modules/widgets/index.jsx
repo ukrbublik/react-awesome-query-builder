@@ -1,11 +1,4 @@
 import React from "react";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { ConfirmProvider, useConfirm } from "material-ui-confirm";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"; // TODO: set moment to dayjs
-import xdpPackage from "@mui/x-date-pickers/package.json"; // to determine version
-
-const xdpVersion = parseInt(xdpPackage?.version?.split(".")?.[0] ?? "0");
 
 // value widgets
 import MuiTextWidget from "./value/MuiText";
@@ -33,49 +26,11 @@ import MuiButtonGroup from "./core/MuiButtonGroup";
 import MuiConjs from "./core/MuiConjs";
 import MuiSwitch from "./core/MuiSwitch";
 import MuiValueSources from "./core/MuiValueSources";
-import MuiConfirm from "./core/MuiConfirm";
-
-// provider
-const MuiProvider = ({config, children}) => {
-  const settingsTheme = config.settings.theme || {};
-  const settingsLocale = config.settings.locale || {};
-  const momentLocale = settingsLocale.moment;
-  const themeConfig = settingsTheme.mui;
-  const locale = settingsLocale.mui;
-  const theme = createTheme(themeConfig, locale, { 
-    palette: {
-      // neutral: {
-      //   main: "#64748B",
-      //   contrastText: "#fff"
-      // },
-    }
-  });
-
-  const locProviderProps = xdpVersion >= 6 ? {
-    locale: momentLocale,
-  } : {
-    adapterLocale: momentLocale,
-  };
-
-  const base = (<div className="mui">{children}</div>);
-  const withProviders = (
-    <LocalizationProvider dateAdapter={AdapterMoment} {...locProviderProps} >
-      <ConfirmProvider>
-        {base}
-      </ConfirmProvider>
-    </LocalizationProvider>
-  );
-  const withTheme = theme ? (
-    <ThemeProvider theme={theme}>
-      {withProviders}
-    </ThemeProvider>
-  ) : withProviders;
-
-  return withTheme;
-};
+import { MuiConfirm, MuiUseConfirm } from "./core/MuiConfirm";
+import { MuiProvider } from "./core/MuiProvider";
 
 
-export default {
+const MuiWidgets = {
   MuiTextWidget,
   MuiTextAreaWidget,
   MuiDateWidget,
@@ -100,7 +55,9 @@ export default {
   MuiSwitch,
   MuiValueSources,
   MuiConfirm,
-  MuiUseConfirm: useConfirm,
+  MuiUseConfirm,
 
   MuiProvider,
 };
+
+export default MuiWidgets;

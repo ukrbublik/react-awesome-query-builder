@@ -1,3 +1,5 @@
+import React from "react";
+
 // value widgets
 import BootstrapTextWidget from "./value/BootstrapText";
 import BootstrapTextAreaWidget from "./value/BootstrapTextArea";
@@ -20,10 +22,8 @@ import BootstrapButton from "./core/BootstrapButton";
 import BootstrapButtonGroup from "./core/BootstrapButtonGroup";
 import BootstrapConjs from "./core/BootstrapConjs";
 import BootstrapValueSources from "./core/BootstrapValueSources";
-import BootstrapConfirm from "./core/BootstrapConfirm";
-
-// provider
-const BootstrapProvider = ({ config, children }) => children;
+import { BootstrapConfirm, BootstrapUseConfirm } from "./core/BootstrapConfirm";
+import { BootstrapProvider } from "./core/BootstrapProvider";
 
 export default {
   BootstrapTextWidget,
@@ -45,7 +45,8 @@ export default {
   BootstrapButtonGroup,
   BootstrapConjs,
   BootstrapValueSources,
-  BootstrapConfirm,
 
+  BootstrapConfirm,
+  BootstrapUseConfirm,
   BootstrapProvider,
 };

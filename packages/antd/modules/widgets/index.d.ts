@@ -14,9 +14,7 @@ export interface AntdWidgets {
   ButtonGroup: ElementType<ButtonGroupProps>,
   Conjs: ElementType<ConjsProps>,
   Switch: ElementType<SwitchProps>,
-  Provider: ElementType<ProviderProps>,
   ValueSources: ElementType<ValueSourcesProps>,
-  confirm: ConfirmFunc,
 
   // antd value widgets
   TextWidget: ElementType<TextWidgetProps>,
@@ -33,6 +31,10 @@ export interface AntdWidgets {
   TimeWidget: ElementType<DateTimeWidgetProps>,
   DateTimeWidget: ElementType<DateTimeWidgetProps>,
   BooleanWidget: ElementType<BooleanWidgetProps>,
+
+  Confirm: ConfirmFunc,
+  useConfirm: () => ConfirmFunc,
+  Provider: ElementType<ProviderProps>,
 }
 
 export declare const AntdWidgets: AntdWidgets;

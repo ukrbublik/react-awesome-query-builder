@@ -1,4 +1,4 @@
-$custom-select-option-color: lightcoral !default;
+@import '@react-awesome-query-builder/ui/css/vars.scss';
 
 /* don't trigger tooltips during drag-n-drop */
 body.qb-dragging {
@@ -9,6 +9,16 @@ body.qb-dragging {
   /* v5 */
   .ant-popover {
     display: none;
+  }
+}
+
+.query-builder {
+  .group--conjunctions > .ant-btn-group {
+    border-radius: $conjunctions-radius;
+    overflow: hidden;
+  }
+  .group--header:hover .group--conjunctions > .ant-btn-group {
+    overflow: visible;
   }
 }
 
@@ -24,7 +34,7 @@ body.qb-dragging {
       margin-bottom: 4px !important;
       margin-top: 4px;
     }
-    .ant-slider.ant-slider-with-marks {
+    .ant-slider.ant-slider-horizontal.ant-slider-with-marks {
       margin-bottom: 10px !important;
       margin-left: 10px;
       margin-top: 4px;
@@ -33,6 +43,10 @@ body.qb-dragging {
       visibility: visible !important;
     }
   }
+}
+
+.qb-compact {
+  /* todo */
 }
 
 /* tree v4 ? */
@@ -59,6 +73,7 @@ body.qb-dragging {
 
 .query-builder {
   .widget--valuesrc, .rule--fieldsrc {
+    vertical-align: middle;
     .anticon {
       height: 100%;
       svg {
@@ -81,5 +96,12 @@ body.qb-dragging {
     margin-left: 3px;
     margin-right: 3px;
     margin-bottom: 4px;
+  }
+  .rule--widget--BOOLEAN {
+    height: 100%;
+    display: flex;
+    .widget--widget {
+      align-self: center;
+    }
   }
 }

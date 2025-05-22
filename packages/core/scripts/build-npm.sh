@@ -1,11 +1,22 @@
 rm -rf ./lib # old name
 rm -rf ./cjs
 rm -rf ./esm
+rm -rf ./types
 
-babel -d ./cjs ./modules
-ESM=1 babel -d ./esm ./modules
 
-# rsync -ma --include '*/' --include '*.d.ts' --exclude '*' ./modules/ ./cjs/
-# rsync -ma --include '*/' --include '*.d.ts' --exclude '*' ./modules/ ./esm/
-find modules/ -type f -name "*.d.ts" | cut -d'/' -f2- | xargs -I{} cp modules/{} cjs/{}
-find modules/ -type f -name "*.d.ts" | cut -d'/' -f2- | xargs -I{} cp modules/{} esm/{}
+# types
+npm run tsc-emit-types
+
+# cjs
+babel --extensions ".ts,.js" -d ./cjs ./modules
+find cjs/ -type f -name "*.d.js" | xargs -I{} rm {}
+
+# esm
+ESM=1 babel --extensions ".ts,.js" -d ./esm ./modules
+find esm/ -type f -name "*.d.js" | xargs -I{} rm {}
+
+# copy .d.ts files from /types and /modules to /cjs, /esm, /types
+find modules/ -type d -mindepth 0 -print | cut -d'/' -f2- | xargs -I{} mkdir -p types/{}
+find modules/ -type f -name "*.d.ts" | cut -d'/' -f2- | xargs -I{} cp modules/{} types/{}
+find types/ -type f -name "*.d.ts" | cut -d'/' -f2- | xargs -I{} cp types/{} cjs/{}
+find types/ -type f -name "*.d.ts" | cut -d'/' -f2- | xargs -I{} cp types/{} esm/{}

@@ -1,6 +1,7 @@
 import React from "react";
-import BootstrapWidgets from "../widgets";
 import { BasicConfig } from "@react-awesome-query-builder/ui";
+import {default as BootstrapWidgets} from "../widgets";
+import { generateCssVars } from "../utils/theming";
 
 
 const settings = {
@@ -14,9 +15,9 @@ const settings = {
   renderIcon: (props, {RCE, W: {BootstrapIcon}}) => RCE(BootstrapIcon, props),
   renderButtonGroup: (props, {RCE, W: {BootstrapButtonGroup}}) => RCE(BootstrapButtonGroup, props),
   renderValueSources: (props, {RCE, W: {BootstrapValueSources}}) => RCE(BootstrapValueSources, props),
-  renderFieldSources: (props, {RCE, W: {BootstrapValueSources}}) => RCE(BootstrapValueSources, props),
   renderProvider: (props, {RCE, W: {BootstrapProvider}}) => RCE(BootstrapProvider, props),
   renderConfirm: (props, {W: {BootstrapConfirm}}) => BootstrapConfirm(props),
+  useConfirm: ({W: {BootstrapUseConfirm}}) => BootstrapUseConfirm(),
 };
 
 
@@ -79,6 +80,7 @@ const ctx = {
     ...BasicConfig.ctx.W,
     ...BootstrapWidgets,
   },
+  generateCssVars,
 };
 
 let config = {

@@ -2,6 +2,7 @@ import React from "react";
 import * as Widgets from "../components/widgets";
 import * as CustomOperators from "../components/operators";
 import { CoreConfig, Utils } from "@react-awesome-query-builder/core";
+import * as ColorUtils from "../utils/colorUtils";
 
 
 //----------------------------  conjunctions
@@ -130,7 +131,6 @@ const settings = {
   renderButtonGroup: (props, {RCE, W: {VanillaButtonGroup}}) => RCE(VanillaButtonGroup, props),
   renderProvider: (props, {RCE, W: {VanillaProvider}}) => RCE(VanillaProvider, props),
   renderValueSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),
-  renderFieldSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),
   renderConfirm: (props, {W: {vanillaConfirm}}) => vanillaConfirm(props),
   renderSwitchPrefix: "IF",
   renderBeforeCaseValue: (props, {RCE}) => RCE("span", {children: [" then "]}),
@@ -142,11 +142,21 @@ const settings = {
     // showSearch: false
   },
 
+  //theme
+  designSettings: {
+    canInheritThemeFromOuterProvider: true,
+    useThickLeftBorderOnHoverItem: false,
+    useShadowOnHoverItem: false,
+    generateCssVarsFromThemeLibrary: true, // false to use design like in < 6.7
+  },
+  themeMode: undefined,
+  liteMode: true,
+  compactMode: false,
+  renderSize: "small",
   defaultSliderWidth: "200px",
   defaultSelectWidth: "200px",
   defaultSearchWidth: "100px",
   defaultMaxRows: 5,
-  renderSize: "small",
   maxLabelsLength: 100,
 
   showLock: false,
@@ -167,6 +177,10 @@ const ctx = {
     ...CustomOperators
   },
   RCE: (C, P) => React.createElement(C, P),
+  utils: {
+    ...CoreConfig.ctx.utils,
+    ColorUtils,
+  }
 };
 
 //----------------------------

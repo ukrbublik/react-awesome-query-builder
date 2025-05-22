@@ -29,12 +29,12 @@ import ButtonGroup from "./core/ButtonGroup";
 import Conjs from "./core/Conjs";
 import Switch from "./core/Switch";
 import ValueSources from "./core/ValueSources";
-import confirm from "./core/confirm";
+import { useConfirm, Confirm } from "./core/Confirm";
 
-import { ConfigProvider } from "antd";
-const Provider = ({ config, children }) => <ConfigProvider locale={config.settings.locale.antd}>{children}</ConfigProvider>;
+// Provider
+import { Provider } from "./core/Provider";
 
-export default {
+const AntdWidgets = {
   DateWidget,
   DateTimeWidget,
   TimeWidget,
@@ -61,7 +61,9 @@ export default {
   Conjs,
   Switch,
   ValueSources,
-  confirm,
-
+  useConfirm,
+  Confirm,
   Provider,
 };
+
+export default AntdWidgets;

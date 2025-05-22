@@ -27,7 +27,8 @@ const ValueSource = React.memo(({ valueSrc, srcKey, handleChange, info }) => {
   );
 });
 
-const ValueSources = React.memo(({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
+const ValueSources = React.memo(({ valueSources, valueSrc, title, setValueSrc, readonly, config}) => {
+  const {renderSize} = config.settings;
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleOpen = useCallback((event) => {
@@ -63,11 +64,12 @@ const ValueSources = React.memo(({ valueSources, valueSrc, title, setValueSrc, r
 
   return (
     <div>
-      <IconButton size="small" onClick={toggleOpenClose}>
+      <IconButton size={renderSize} onClick={toggleOpenClose}>
         <ExpandMoreSharpIcon />
       </IconButton>
 
       <Menu
+        size={renderSize}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}

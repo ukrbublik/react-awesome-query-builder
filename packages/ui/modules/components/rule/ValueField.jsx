@@ -174,7 +174,9 @@ export default class ValueField extends Component {
           items: this.buildOptions(parentFieldPath, config, field.subfields, fullFieldPath, {
             label,
             tooltip,
-          })
+          }),
+          grouplabel: optGroup?.label,
+          group: optGroup,
         };
       } else {
         return {

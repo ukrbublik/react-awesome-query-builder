@@ -1,9 +1,9 @@
 import React from "react";
-import en_US from "antd/es/locale/en_US";
-import AntdWidgets from "../widgets";
-import { normalizeListValues } from "../utils/stuff";
 import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
-
+import en_US from "antd/es/locale/en_US";
+import {default as AntdWidgets} from "../widgets";
+import { normalizeListValues } from "../utils/stuff";
+import { generateCssVars } from "../utils/theming";
 
 
 const settings = {
@@ -24,9 +24,9 @@ const settings = {
   renderIcon: (props, {RCE, W: {Icon}}) => RCE(Icon, props),
   renderButtonGroup: (props, {RCE, W: {ButtonGroup}}) => RCE(ButtonGroup, props),
   renderValueSources: (props, {RCE, W: {ValueSources}}) => RCE(ValueSources, props),
-  renderFieldSources: (props, {RCE, W: {ValueSources}}) => RCE(ValueSources, props),
   renderProvider: (props, {RCE, W: {Provider}}) => RCE(Provider, props),
-  renderConfirm: (props, {W: {confirm}}) => confirm(props),
+  useConfirm: ({W: {useConfirm}}) => useConfirm(),
+  renderConfirm: (props, {W: {Confirm}}) => Confirm(props),
 
   // localization
   locale: {
@@ -123,6 +123,7 @@ const ctx = {
     ...BasicConfig.ctx.W,
     ...AntdWidgets,
   },
+  generateCssVars,
 };
 
 let config = {

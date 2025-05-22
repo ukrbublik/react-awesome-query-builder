@@ -1,3 +1,5 @@
+@import '@react-awesome-query-builder/ui/css/vars.scss';
+
 .query-builder {
   .svg-inline--fa {
     pointer-events: none;
@@ -7,5 +9,21 @@
   }
   .rule--drag-handler .svg-inline--fa {
     margin-left: 6px;
+  }
+
+  // for date/time native inputs
+  .color-scheme-dark {
+    color-scheme: dark;
+  }
+  // for text native input
+  .placeholder-light::placeholder {
+    color: rgb(153, 153, 153);
+  }
+}
+
+.query-builder {
+  .group--conjunctions > .btn-group {
+    border-radius: $conjunctions-radius;
+    overflow: hidden;
   }
 }

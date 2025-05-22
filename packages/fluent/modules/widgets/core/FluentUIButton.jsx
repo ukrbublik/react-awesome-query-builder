@@ -14,7 +14,7 @@ const useAction = {
 };
 
 const FluentUIButton = (props) => {
-  const { type, label, onClick, readonly, renderIcon } = props;
+  const { type, label, onClick, readonly, renderIcon, config } = props;
 
   let renderBtn;
   if (!label || hideLabelsFor[type]) {
@@ -69,6 +69,7 @@ const FluentUIButton = (props) => {
   const iconProps = {
     type,
     readonly,
+    config,
     renderBtn,
     renderDefaultButton,
   };

@@ -1,6 +1,7 @@
 import React from "react";
-import MuiWidgets from "../widgets";
 import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
+import { default as MuiWidgets } from "../widgets";
+import { generateCssVars } from "../utils/theming";
 
 
 const settings = {
@@ -19,7 +20,6 @@ const settings = {
   renderIcon: (props, {RCE, W: {MuiIcon}}) => RCE(MuiIcon, props),
   renderButtonGroup: (props, {RCE, W: {MuiButtonGroup}}) => RCE(MuiButtonGroup, props),
   renderValueSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
-  renderFieldSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
   renderProvider: (props, {RCE, W: {MuiProvider}}) => RCE(MuiProvider, props),
   renderConfirm: (props, {W: {MuiConfirm}}) => MuiConfirm(props),
   useConfirm: ({W: {MuiUseConfirm}}) => MuiUseConfirm(),
@@ -95,6 +95,7 @@ const ctx = {
     ...BasicConfig.ctx.W,
     ...MuiWidgets,
   },
+  generateCssVars,
 };
 
 

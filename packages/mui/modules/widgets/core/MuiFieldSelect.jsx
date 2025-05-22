@@ -7,8 +7,9 @@ import Tooltip from "@mui/material/Tooltip";
 
 export default ({
   items, setField, selectedKey, readonly, placeholder, errorText,
-  selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel,
+  selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, config,
 }) => {
+  const {renderSize} = config.settings;
   const [open, setOpen] = useState(false);
 
   const onOpen = useCallback(() => {
@@ -94,7 +95,7 @@ export default ({
       value={hasValue ? selectedKey : ""}
       disabled={readonly}
       renderValue={renderValue}
-      size="small"
+      size={renderSize}
       open={open}
       onOpen={onOpen}
       onClose={onClose}

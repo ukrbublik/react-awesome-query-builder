@@ -13,6 +13,7 @@ export interface FluentUIWidgets {
   FluentUIProvider: ElementType<ProviderProps>,
   FluentUIValueSources: ElementType<ValueSourcesProps>,
   FluentUIConfirm: ConfirmFunc,
+  FluentUIUseConfirm: () => ConfirmFunc,
 
   // core widgets
   FluentUIBooleanWidget: ElementType<BooleanWidgetProps>,

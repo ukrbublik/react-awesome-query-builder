@@ -131,6 +131,18 @@ const compileMetaField = {
 const compileMetaSettings = {
   locale: {
     mui: { type: "f", args: [], invokeWith: [], ignore: "jl" },
+    material: { type: "f", args: [], invokeWith: [], ignore: "jl" },
+    antd: { type: "f", args: [], invokeWith: [], ignore: "jl" },
+  },
+
+  designSettings: {
+    generateCssVars: {
+      antd: { type: "f", args: ["theme", "config"] },
+      mui: { type: "f", args: ["theme", "config"] },
+      material: { type: "f", args: ["theme", "config"] },
+      fluent: { type: "f", args: ["theme", "config"] },
+      bootstrap: { type: "f", args: ["theme", "config"] },
+    },
   },
 
   caseValueField: compileMetaField,
@@ -156,7 +168,6 @@ const compileMetaSettings = {
   renderIcon: { type: "rf" },
   renderButtonGroup: { type: "rf" },
   renderValueSources: { type: "rf" },
-  renderFieldSources: { type: "rf" },
   renderProvider: { type: "rf" },
   renderSwitch: { type: "rf" },
   renderSwitchPrefix: { type: "r" },

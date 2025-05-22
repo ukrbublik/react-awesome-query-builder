@@ -13,8 +13,12 @@ import {
   ItemType,
   ItemProperties,
   ValueSource,
-  ConfigContext, FactoryWithContext, RenderedReactElement, SerializableType,
+  FactoryWithContext, FnWithContextAndProps, FactoryFnWithoutPropsWithContext, RenderedReactElement, SerializableType,
   ConjsProps,
+  AsyncFetchListValuesFn,
+  ListOptionUi,
+  ListValues,
+  ListItem,
 
   ImmutableList, ImmutableMap, ImmutableOMap,
   ImmutablePath,
@@ -22,6 +26,8 @@ import {
 
   // to extend
   Config as CoreConfigType,
+  ConfigContext as CoreConfigContext,
+  ConfigContextUtils as CoreConfigContextUtils,
   Settings as CoreSettings,
   Utils as CoreUtils,
   // to override <C>
@@ -68,36 +74,40 @@ import {
 } from "@react-awesome-query-builder/core";
 
 // re-export
+// Ignore "Multiple exports of name 'Utils'"
+// eslint-disable-next-line import/export
 export * from "@react-awesome-query-builder/core";
+
+import chroma from "chroma-js";
 
 /////////////////
 // override <C> in types
 /////////////////
 
-export type OperatorProximity<C = Config> = _OperatorProximity<C>;
-export type Operator<C = Config> = _Operator<C>;
-export type Operators<C = Config> = _Operators<C>;
+export type OperatorProximity<C = Config, CTX = ConfigContext> = _OperatorProximity<C, CTX>;
+export type Operator<C = Config, CTX = ConfigContext> = _Operator<C, CTX>;
+export type Operators<C = Config, CTX = ConfigContext> = _Operators<C, CTX>;
 export type FieldProps<C = Config> = _FieldProps<C>;
-export type Widget<C = Config> = _Widget<C>;
-export type Widgets<C = Config> = _Widgets<C>;
-export type BaseWidget<C = Config> = _BaseWidget<C>;
-export type RangeableWidget<C = Config> = _RangeableWidget<C>;
-export type TypedWidget<C = Config> = _TypedWidget<C>;
-export type TextWidget<C = Config> = _TextWidget<C>;
-export type NumberWidget<C = Config> = _NumberWidget<C>;
-export type RangeSliderWidget<C = Config> = _RangeSliderWidget<C>;
-export type DateTimeWidget<C = Config> = _DateTimeWidget<C>;
-export type TreeSelectWidget<C = Config> = _TreeSelectWidget<C>;
-export type TreeMultiSelectWidget<C = Config> = _TreeMultiSelectWidget<C>;
-export type SelectWidget<C = Config> = _SelectWidget<C>;
-export type MultiSelectWidget<C = Config> = _MultiSelectWidget<C>;
-export type BooleanWidget<C = Config> = _BooleanWidget<C>;
-export type FieldWidget<C = Config> = _FieldWidget<C>;
-export type FuncWidget<C = Config> = _FuncWidget<C>;
+export type Widget<C = Config, CTX = ConfigContext> = _Widget<C, CTX>;
+export type Widgets<C = Config, CTX = ConfigContext> = _Widgets<C, CTX>;
+export type BaseWidget<C = Config, CTX = ConfigContext> = _BaseWidget<C, CTX>;
+export type RangeableWidget<C = Config, CTX = ConfigContext> = _RangeableWidget<C, CTX>;
+export type TypedWidget<C = Config, CTX = ConfigContext> = _TypedWidget<C, CTX>;
+export type TextWidget<C = Config, CTX = ConfigContext> = _TextWidget<C, CTX>;
+export type NumberWidget<C = Config, CTX = ConfigContext> = _NumberWidget<C, CTX>;
+export type RangeSliderWidget<C = Config, CTX = ConfigContext> = _RangeSliderWidget<C, CTX>;
+export type DateTimeWidget<C = Config, CTX = ConfigContext> = _DateTimeWidget<C, CTX>;
+export type TreeSelectWidget<C = Config, CTX = ConfigContext> = _TreeSelectWidget<C, CTX>;
+export type TreeMultiSelectWidget<C = Config, CTX = ConfigContext> = _TreeMultiSelectWidget<C, CTX>;
+export type SelectWidget<C = Config, CTX = ConfigContext> = _SelectWidget<C, CTX>;
+export type MultiSelectWidget<C = Config, CTX = ConfigContext> = _MultiSelectWidget<C, CTX>;
+export type BooleanWidget<C = Config, CTX = ConfigContext> = _BooleanWidget<C, CTX>;
+export type FieldWidget<C = Config, CTX = ConfigContext> = _FieldWidget<C, CTX>;
+export type FuncWidget<C = Config, CTX = ConfigContext> = _FuncWidget<C, CTX>;
 /**
  * @deprecated
  */
-export type CaseValueWidget<C = Config> = _CaseValueWidget<C>;
+export type CaseValueWidget<C = Config, CTX = ConfigContext> = _CaseValueWidget<C, CTX>;
 export type ProximityProps<C = Config> = _ProximityProps<C>;
 export type ProximityOptions<C = Config> = _ProximityOptions<C>;
 export type WidgetProps<C = Config> = _WidgetProps<C>;
@@ -115,25 +125,36 @@ export type TreeMultiSelectWidgetProps<C = Config> = _TreeMultiSelectWidgetProps
  * @deprecated
  */
 export type CaseValueWidgetProps<C = Config> = _CaseValueWidgetProps<C>;
-export type CoreOperators<C = Config> = _CoreOperators<C>;
-export type CoreWidgets<C = Config> = _CoreWidgets<C>;
-export type ConfigMixin<C extends Config = Config> = _ConfigMixin<C>;
-export type ConfigMixinExt<C extends Config = Config> = _ConfigMixinExt<C>;
+export type CoreOperators<C = Config, CTX = ConfigContext> = _CoreOperators<C, CTX>;
+export type CoreWidgets<C = Config, CTX = ConfigContext> = _CoreWidgets<C, CTX>;
+export type ConfigMixin<C = Config, CTX = ConfigContext, S = Settings> = _ConfigMixin<C, CTX, S>;
+export type ConfigMixinExt<C = Config> = _ConfigMixinExt<C>;
 
 /////////////////
 // extend config
 /////////////////
 
+export interface ConfigContextUtils extends CoreConfigContextUtils {
+  ColorUtils?: ColorUtils;
+}
+
+export interface ConfigContext extends CoreConfigContext {
+  utils: ConfigContextUtils;
+  generateCssVars?: (theme: any, config: Config) => CssVars;
+}
+
 export interface Config extends CoreConfigType {
   settings: Settings;
   operators: Operators;
   widgets: Widgets;
+  ctx: ConfigContext;
 }
 
 export interface BasicConfig extends CoreConfig {
   settings: Settings;
-  operators: CoreOperators<Config>;
-  widgets: CoreWidgets<Config>;
+  operators: CoreOperators<Config, ConfigContext>;
+  widgets: CoreWidgets<Config, ConfigContext>;
+  ctx: ConfigContext;
 }
 
 
@@ -154,6 +175,8 @@ type Empty = null | undefined;
 /////////////////
 
 export type Dispatch = (action: InputAction) => void;
+
+type DragStartFn = (nodeId: string, dom: HTMLDivElement, e: MouseEvent) => void;
 
 export interface BuilderProps {
   tree: ImmutableTree;
@@ -176,7 +199,7 @@ export interface ItemProps {
   totalRulesCnt?: number;
   reordableNodesCnt?: number;
   parentReordableNodesCnt?: number;
-  onDragStart?: Function;
+  onDragStart?: DragStartFn;
   isParentLocked?: boolean;
   isDraggingTempo?: boolean;
 }
@@ -218,7 +241,7 @@ export interface ButtonProps {
   renderIcon?: FactoryWithContext<IconProps>;
   onClick(): void;
   label: string;
-  config?: Config;
+  config: Config;
   readonly?: boolean;
 }
 
@@ -234,17 +257,17 @@ export interface SwitchProps {
   label: string;
   checkedLabel?: string;
   hideLabel?: boolean;
-  config?: Config;
+  config: Config;
 }
 
 export interface ButtonGroupProps {
   children: ReactElement;
-  config?: Config;
+  config: Config;
 }
 
 export interface ProviderProps {
   children: ReactElement;
-  config?: Config;
+  config: Config;
 }
 
 export type ValueSourceItem = {
@@ -253,7 +276,7 @@ export type ValueSourceItem = {
 type ValueSourcesItems = Array<[ValueSource, ValueSourceItem]>;
 
 export interface ValueSourcesProps {
-  config?: Config;
+  config: Config;
   valueSources: ValueSourcesItems;
   valueSrc?: ValueSource;
   setValueSrc(valueSrc: string): void;
@@ -265,8 +288,9 @@ export interface ConfirmModalProps {
   onOk(): void;
   okText: string;
   cancelText?: string;
-  title: string;
+  title: string | null;
   okType?: string;
+  confirmFn?: ConfirmFunc;
 }
 
 export interface RuleErrorProps {
@@ -297,10 +321,10 @@ export interface RuleProps {
   reordableNodesCnt: number | Empty;
   totalRulesCnt: number | Empty;
   parentReordableNodesCnt: number | Empty;
-  onDragStart: Function | Empty;
-  handleDraggerMouseDown: Function | Empty;
-  removeSelf: Function | Empty;
-  confirmFn: Function | Empty;
+  onDragStart: DragStartFn | Empty;
+  handleDraggerMouseDown: (e: MouseEvent) => void | Empty;
+  removeSelf: () => void | Empty;
+  confirmFn: ConfirmFunc | Empty; // prop from <WithConfirmFn>
 
   //actions
   setField(field: FieldValueI): undefined;
@@ -314,13 +338,173 @@ export interface RuleProps {
 }
 
 /////////////////
+// CssVars
+/////////////////
+
+export interface CssVarsBorderColors {
+  "--rule-border-color"?: string;
+  "--group-border-color"?: string;
+  "--rulegroup-border-color"?: string;
+  "--rulegroupext-border-color"?: string;
+  "--switch-border-color"?: string;
+  "--case-border-color"?: string;
+  "--rule-with-error-border-color"?: string;
+  "--group-with-error-border-color"?: string;
+  /*
+   * Border color of placeholder for item that it's being dragged
+   */
+  "--placeholder-border-color"?: string;
+  /*
+   * Border color for locked item
+   */
+  "--locked-border-color"?: string;
+  /*
+   * [Advanced] Border color for group inside rule-group
+   */
+  "--group-in-rulegroupext-border-color"?: string;
+}
+export interface CssVarsBgColors {
+  // background for .query-builder
+  "--main-background"?: string;
+  "--rule-background"?: string;
+  "--group-background"?: string;
+  "--rulegroup-background"?: string;
+  "--rulegroupext-background"?: string;
+  "--switch-background"?: string;
+  "--case-background"?: string;
+}
+export interface CssVarsTreelineColors {
+  "--treeline-color"?: string;
+  "--treeline-rulegroup-color"?: string;
+  "--treeline-rulegroupext-color"?: string;
+  "--treeline-switch-color"?: string;
+  "--treeline-disabled-color"?: string;
+}
+export interface CssVarsOtherColors {
+  "--rule-error-color"?: string;
+  "--custom-select-option-color"?: string;
+}
+export interface CssVarsBorderWidths {
+  // example: "1px"
+  "--rule-border-width"?: string;
+  "--group-border-width"?: string;
+  "--rulegroup-border-width"?: string;
+  "--rulegroupext-border-width"?: string;
+  "--switch-border-width"?: string;
+  "--case-border-width"?: string;
+}
+export interface CssVarsBorderWidthsOnHover {
+  "--rule-border-left-width-hover"?: string;
+  "--group-border-left-width-hover"?: string;
+  "--rulegroup-border-left-width-hover"?: string;
+  "--rulegroupext-border-left-width-hover"?: string;
+}
+export interface CssVarsShadowOnHover {
+  "--rule-shadow-hover"?: string;
+  "--group-shadow-hover"?: string;
+  "--rulegroup-shadow-hover"?: string;
+  "--rulegroupext-shadow-hover"?: string;
+}
+export interface CssVarsRadiuses {
+  // example: "5px"
+  "--item-radius"?: string;
+  "--conjunctions-radius"?: string;
+  "--treeline-radius"?: string;
+}
+export interface CssVarsTreeline {
+  // example: "2px"
+  "--treeline-thick"?: string;
+  "--treeline-switch-thick"?: string;
+  "--treeline-rulegroup-thick"?: string;
+  "--treeline-rulegroupext-thick"?: string;
+}
+export interface CssVarsOffsets {
+  // example: "20px"
+  "--treeline-offset-from-conjs"?: string;
+  "--treeline-offset-from-switch"?: string;
+  "--item-offset"?: string;
+  "--item-offset-left"?: string;
+  "--rulegroup-offset"?: string;
+  "--rulegroup-offset-left"?: string;
+  "--rule-padding"?: string;
+  "--rule-parts-distance"?: string;
+  "--seps-offset-bottom"?: string;
+  "--drag-offset-right"?: string;
+  "--group-actions-offset-left"?: string;
+  "--group-drag-offset-left"?: string;
+  "--rule-group-actions-offset-left"?: string;
+  "--main-margin"?: string; // margin for .query-builder
+}
+export interface CssVarsFonts {
+  // Default: "'Helvetica Neue', Helvetica, Arial, sans-serif"
+  "--main-font-family"?: string;
+  // Default: "14px"
+  "--main-font-size"?: string;
+  // Default: "initial"
+  "--main-text-color"?: string;
+}
+
+// For advanced usage, not including in CssVars for now
+export interface CssVarsColorsForNesting {
+  "--rule-in-rulegroup-border-color"?: string;
+  "--rulegroup-in-rulegroup-border-color"?: string;
+  "--rulegroupext-in-rulegroup-border-color"?: string;
+  "--rule-in-rulegroupext-border-color"?: string;
+  "--group-in-rulegroupext-border-color"?: string; // defined in CssVarsBorderColors
+  "--rulegroupext-in-rulegroupext-border-color"?: string;
+  "--rulegroup-in-rulegroupext-border-color"?: string;
+}
+
+export interface CssVarsColors extends CssVarsBgColors, CssVarsBorderColors, CssVarsTreelineColors, CssVarsOtherColors {}
+export interface CssVarsSizes extends CssVarsBorderWidths, CssVarsRadiuses, CssVarsTreeline, CssVarsOffsets {}
+export interface CssVarsExtra extends CssVarsBorderWidthsOnHover, CssVarsShadowOnHover {}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface CssVars extends CssVarsColors, CssVarsSizes, CssVarsFonts, CssVarsExtra {}
+
+export interface DesignSettings {
+  canInheritThemeFromOuterProvider?: boolean;
+  useThickLeftBorderOnHoverItem?: boolean;
+  useShadowOnHoverItem?: boolean;
+  generateCssVarsFromThemeLibrary?: boolean;
+  generateCssVars?: {
+    material?: (this: ConfigContext, theme: /*Theme*/ any, config: Config) => CssVars;
+    mui?: (this: ConfigContext, theme: /*Theme*/ any, config: Config) => CssVars;
+    antd?: (this: ConfigContext, token: /*GlobalToken*/ any, config: Config) => CssVars;
+    fluent?: (this: ConfigContext, theme: /*Theme*/ any, config: Config) => CssVars;
+    bootstrap?: (this: ConfigContext, _ununsed: any, config: Config) => CssVars;
+  }
+}
+
+/////////////////
 // Settings
 /////////////////
 
+export type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
+export type RenderSize = "small" | "large" | "medium";
+export type ThemeMode = "light" | "dark";
 
-type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
-type AntdSize = "small" | "large" | "medium";
-
+export interface ThemeSettings {
+  theme?: {
+    material?: Record<string, any>; // ThemeOptions from "@material-ui/core/styles"
+    mui?: Record<string, any>; // ThemeOptions from "@mui/material/styles";
+    antd?: Record<string, any>; // ConfigProviderProps["theme"] from "antd"
+    fluent?: Record<string, any>; // PartialTheme from "@fluentui/react";
+  };
+  designSettings?: DesignSettings;
+  renderSize?: RenderSize;
+  themeMode?: ThemeMode;
+  liteMode?: boolean;
+  compactMode?: boolean;
+  dropdownPlacement?: AntdPosition;
+  groupActionsPosition?: AntdPosition;
+  defaultSliderWidth?: string;
+  defaultSelectWidth?: string;
+  defaultSearchWidth?: string;
+  defaultMaxRows?: number;
+  showLabels?: boolean;
+  maxLabelsLength?: number;
+}
 
 export interface RenderSettings {
   renderField?: SerializableType<FactoryWithContext<FieldProps>>;
@@ -333,17 +517,9 @@ export interface RenderSettings {
   renderSwitch?: SerializableType<FactoryWithContext<SwitchProps>>;
   renderProvider?: SerializableType<FactoryWithContext<ProviderProps>>;
   renderValueSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
-  renderFieldSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
-  renderConfirm?: SerializableType<ConfirmFunc>;
-  useConfirm?: SerializableType<(() => Function)>;
-  renderSize?: AntdSize;
+  renderConfirm?: SerializableType<FnWithContextAndProps<ConfirmModalProps, ConfigContext, void>>;
+  useConfirm?: SerializableType<FactoryFnWithoutPropsWithContext<ConfirmFunc, ConfigContext>>;
   renderItem?: SerializableType<FactoryWithContext<ItemBuilderProps>>;
-  dropdownPlacement?: AntdPosition;
-  groupActionsPosition?: AntdPosition;
-  showLabels?: boolean;
-  maxLabelsLength?: number;
-  customFieldSelectProps?: AnyObject;
-  customOperatorSelectProps?: AnyObject;
   renderBeforeWidget?: SerializableType<FactoryWithContext<RuleProps>>;
   renderAfterWidget?: SerializableType<FactoryWithContext<RuleProps>>;
   renderBeforeActions?: SerializableType<FactoryWithContext<RuleProps>>;
@@ -352,20 +528,19 @@ export interface RenderSettings {
   renderAfterCaseValue?: SerializableType<FactoryWithContext<RuleProps>>;
   renderRuleError?: SerializableType<FactoryWithContext<RuleErrorProps>>;
   renderSwitchPrefix?: SerializableType<RenderedReactElement>;
-  defaultSliderWidth?: string;
-  defaultSelectWidth?: string;
-  defaultSearchWidth?: string;
-  defaultMaxRows?: number;
+
+  customFieldSelectProps?: AnyObject;
+  customOperatorSelectProps?: AnyObject;
 }
 
-export interface Settings extends CoreSettings, RenderSettings {
+export interface Settings extends CoreSettings, RenderSettings, ThemeSettings {
 }
 
 /////////////////
 // ReadyWidgets
 /////////////////
 
-export type ConfirmFunc = (opts: ConfirmModalProps) => void;
+export type ConfirmFunc = (props: ConfirmModalProps) => void;
 
 interface VanillaWidgets {
   // core
@@ -400,25 +575,94 @@ interface VanillaWidgets {
 // extend Utils
 /////////////////
 
+export interface ColorUtils {
+  chroma: typeof chroma;
+  setColorOpacity(color: string, alpha: number): string;
+  generateCssVarsForLevels(isDark: boolean, cssVar: string, baseColor: string, baseDarkColor?: string): Record<string, string>;
+  isDarkColor(color?: string): boolean | undefined;
+  isColor(color: any): boolean;
+}
+export interface NumberFormat {
+  getNumberFormatProps: (props: Record<string, any>, excludePropsNames?: string[]) => Record<string, any>;
+  NumericFormat: typeof NumericFormat;
+  numericFormatter: (val: number, numericFormatProps: NumericFormatProps) => string;
+  numericParser: (str: string, numericFormatProps: NumericFormatProps, lastStrValue?: string, lastNumValue?: number) => number | undefined;
+}
 export interface Utils extends CoreUtils {
-  NumberFormat: {
-    getNumberFormatProps: (props: Record<string, any>, excludePropsNames?: string[]) => Record<string, any>;
-    NumericFormat: typeof NumericFormat;
-    numericFormatter: (val: number, numericFormatProps: NumericFormatProps) => string;
-    numericParser: (str: string, numericFormatProps: NumericFormatProps, lastStrValue?: string, lastNumValue?: number) => number | undefined;
-  }
+  NumberFormat: NumberFormat;
+  ColorUtils: ColorUtils;
   // ReactUtils: {
   //   useOnPropsChanged(obj: ReactElement): void;
   // }
 }
 
+// Ignore "Multiple exports of name 'Utils'"
+// eslint-disable-next-line import/export
 export declare const Utils: Utils;
 
-
 //////////////////
+
+
+type AutocompleteChangeReason = "selectOption" | "removeOption" | "clear" | null;
+type AutocompleteInputChangeReason = "selectOption" | "removeOption" | "clear" | "blur" | "input" | "reset" | "my-reset" | null;
+export interface UseListValuesAutocompleteProps {
+  asyncFetch: AsyncFetchListValuesFn;
+  useLoadMore?: boolean;
+  useAsyncSearch?: boolean;
+  forceAsyncSearch?: boolean;
+  fetchSelectedValuesOnInit?: boolean;
+  asyncListValues?: ListValues; // selectedAsyncListValues
+  listValues: ListValues; // staticListValues
+  allowCustomValues?: boolean;
+  value?: string | number | string[] | number[]; // selectedValue (array for multiple=true)
+  setValue: (value: string | number | string[] | number[]) => void;
+  placeholder?: string;
+  config: Config;
+}
+export interface UseListValuesAutocompleteOptions {
+  multiple: boolean;
+  debounceTimeout?: number;
+  uif?: "antd" | "material" | "mui";
+  isFieldAutocomplete?: boolean;
+  dontFixOptionsOrder?: boolean;
+}
+export interface UseListValuesAutocompleteReturn {
+  open: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  onChange: (
+    // tip: null for mui
+    e: React.SyntheticEvent<HTMLInputElement> | null, 
+    // tip: string or string[] for mui
+    val: Empty | string | number | ListOptionUi | Array<string | number | ListOptionUi>,
+    // tip: ListOptionUi or ListOptionUi[] for mui, AutocompleteChangeReason for antd
+    option: AutocompleteChangeReason | ListOptionUi | ListOptionUi[],
+  ) => Promise<void>;
+  onInputChange: (
+    e: React.SyntheticEvent<HTMLInputElement> | null,
+    newInputValue: string,
+    eventType: AutocompleteInputChangeReason,
+  ) => Promise<void>;
+  inputValue: string;
+  options: ListOptionUi[];
+  isInitialLoading: boolean;
+  isLoading: boolean;
+  aPlaceholder: string;
+  extendOptions: (options: ListOptionUi[]) => ListOptionUi[];
+  getOptionSelected: (option: ListOptionUi, selectedValueOrOption: ListItem | null) => boolean;
+  getOptionDisabled: (valueOrOption: ListItem) => boolean;
+  getOptionIsCustom: (option: ListItem) => boolean;
+  getOptionLabel: (option: ListItem | null) => string | null;
+  selectedListValue: ListItem | null;
+}
+
+export interface Hooks {
+  useListValuesAutocomplete: (props: UseListValuesAutocompleteProps, options: UseListValuesAutocompleteOptions) => UseListValuesAutocompleteReturn;
+}
 
 export declare const Query: Query;
 export declare const Builder: Builder;
 export declare const BasicConfig: BasicConfig;
 export declare const VanillaWidgets: VanillaWidgets;
+export declare const Hooks: Hooks;
 

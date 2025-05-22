@@ -1,5 +1,6 @@
 import {BasicConfig} from "@react-awesome-query-builder/ui";
 export {BootstrapWidgets} from "./widgets";
+export { generateCssVars } from "./utils/theming";
 
 export declare const BootstrapConfig: BasicConfig;
 

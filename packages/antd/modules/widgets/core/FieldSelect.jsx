@@ -63,23 +63,21 @@ const FieldSelect = (props) => {
       if (items) {
         const simpleItems = items.filter(it => !it.items);
         const complexItems = items.filter(it => !!it.items);
-        let gr;
-        if (simpleItems.length) {
-          let groupLabel = groupPrefix+label;
-          if (tooltip) {
-            groupLabel = <Tooltip title={tooltip}>{groupLabel}</Tooltip>;
-          }
-          gr = (
-            <OptGroup
-              key={pathKey}
-              label={groupLabel}
-            >
-              {renderSelectItems(simpleItems, level+1)}
-            </OptGroup>
-          );
+        const complexList = complexItems.length ? renderSelectItems(complexItems, level+1) : [];
+        const simpleList = simpleItems.length ? renderSelectItems(simpleItems, level+1) : [];
+        let groupLabel = groupPrefix+label;
+        if (tooltip) {
+          groupLabel = <Tooltip title={tooltip}>{groupLabel}</Tooltip>;
         }
-        const list = complexItems.length ? renderSelectItems(complexItems, level+1) : [];
-        return [...(gr ? [gr] : []), ...list];
+        const grp = (
+          <OptGroup
+            key={pathKey}
+            label={groupLabel}
+          >
+            {simpleList}
+          </OptGroup>
+        );
+        return [grp, ...complexList];
       } else {
         const optionText = matchesType ? <b>{prefix+label}</b> : prefix+label;
         const option = tooltip ? <Tooltip title={tooltip}>{optionText}</Tooltip> : optionText;

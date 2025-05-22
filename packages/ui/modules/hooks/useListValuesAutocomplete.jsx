@@ -393,7 +393,7 @@ const useListValuesAutocomplete = ({
 
   const getOptionSelected = (option, valueOrOption) => {
     if (valueOrOption == null)
-      return null;
+      return false;
     const selectedValue = valueOrOption.value != undefined ? valueOrOption.value : valueOrOption;
     return option.value === selectedValue;
   };

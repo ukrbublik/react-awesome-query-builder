@@ -27,7 +27,7 @@ const typeToColor = {
   "drag": "primary",
 };
 
-export default ({type, readonly}) => {
+export default ({type, readonly, renderSize}) => {
   let icon = typeToIcon[type] || null;
   if (!icon && type === "drag") {
     return <DragIcon />;
@@ -36,7 +36,7 @@ export default ({type, readonly}) => {
   if (type === "drag") {
     return (
       <Icon
-        size="small" 
+        size={renderSize ?? "small"}
         disabled={readonly} 
         color={typeToColor[type]}
       >{icon}</Icon>

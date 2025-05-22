@@ -34,32 +34,32 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "exports": {
     ".": {
-      "types": "./modules/index.d.ts",
+      "types": "./types/index.d.ts",
       "import": "./esm/index.js",
       "require": "./cjs/index.js"
     },
     "./package.json": "./package.json",
     "./css/styles.css": "./css/styles.css",
-    "./css/compact_styles.css": "./css/compact_styles.css",
     "./css/styles.scss": {
       "sass": "./css/styles.scss",
       "default": "./css/styles.scss"
     },
-    "./css/compact_styles.scss": {
-      "sass": "./css/compact_styles.scss",
-      "default": "./css/styles.scss"
+    "./css/vars.scss": {
+      "sass": "./css/vars.scss",
+      "default": "./css/vars.scss"
     }
   },
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
-  "types": "./modules/index.d.ts",
+  "types": "./types/index.d.ts",
   "scripts": {
     "build": "sh ./scripts/build-npm.sh",
-    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
+    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --ext .d.ts  ./modules/",
     "lint": "npm run eslint && npm run tsc",
-    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/",
+    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --ext .d.ts --fix  ./modules/",
     "prepare": "npm run build",
-    "tsc": "tsc -p . --noEmit"
+    "tsc": "tsc -p . --noEmit",
+    "tsc-emit-types": "tsc -p . --declaration --emitDeclarationOnly --allowJs false --declarationDir types"
   },
   "dependencies": {
     "@babel/runtime": "^7.27.0",
@@ -69,7 +69,8 @@
     "prop-types": "^15.8.1",
     "react-redux": "^8.1.3",
     "redux": "^4.2.1",
-    "react-number-format": "^5.0.0"
+    "react-number-format": "^5.0.0",
+    "chroma-js": "^3.1.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.27.0",
@@ -86,6 +87,7 @@
     "@types/prop-types": "^15.7.3",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
+    "@types/chroma-js": "^3.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "sass": "^1.77.2"

@@ -5,6 +5,7 @@ import {
 import type { DemoQueryBuilderState } from "../types";
 import loadConfig from "../config";
 import { validationTranslateOptions } from "../options";
+import merge from "lodash/merge";
 
 
 export const useSkins = (
@@ -13,7 +14,8 @@ export const useSkins = (
 ) => {
   const changeSkin = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const skin = e.target.value;
-    const config = loadConfig(e.target.value);
+    let config = loadConfig(e.target.value);
+    config = merge(config, state.configChanges);
     const {fixedTree, fixedErrors, nonFixedErrors} = Utils.sanitizeTree(state.tree, config, {
       ...validationTranslateOptions,
       removeEmptyGroups: false,

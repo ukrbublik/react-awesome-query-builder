@@ -5,19 +5,26 @@ import {
   BuilderProps, ImmutableTree, Config, ActionMeta, Actions
 } from "@react-awesome-query-builder/ui";
 import throttle from "lodash/throttle";
-import ImportSkinStyles from "../skins";
+import merge from "lodash/merge";
+import { ImportSkinStyles } from "../skins";
 import loadConfig from "./config";
 import {
   useActions, useValidation, useBenchmark, useOutput, useInput, useInitFiles, useConfigChange, useSkins, useBlocksSwitcher,
+  useThemeing,
 } from "./blocks";
 import { initTreeWithValidation, dispatchHmrUpdate, useHmrUpdate } from "./utils";
 import type { DemoQueryBuilderState, DemoQueryBuilderMemo } from "./types";
 import { emptyTree } from "./init_data";
 import { defaultInitFile, initialSkin, validationTranslateOptions, defaultRenderBlocks } from "./options";
+import type { LazyStyleModule } from "../skins";
 import "./i18n";
 
+// @ts-ignore
+import mainStyles from "../styles.scss";
+(mainStyles as LazyStyleModule).use();
+
 // Load config and initial tree
-const loadedConfig = loadConfig(window._initialSkin || initialSkin);
+const loadedConfig = merge(loadConfig(window._initialSkin || initialSkin), window._configChanges ?? {});
 const {tree: initTree, errors: initErrors} = initTreeWithValidation(window._initFile || defaultInitFile, loadedConfig, validationTranslateOptions);
 
 // Trick for HMR: triggers callback put in useHmrUpdate on every update from HMR
@@ -41,6 +48,13 @@ const DemoQueryBuilder: React.FC = () => {
     sqlWarnings: [] as Array<string>,
     renderBocks: defaultRenderBlocks,
     initFile: defaultInitFile,
+    themeMode: "light", //"auto",
+    useOldDesign: false,
+    isBodyDark: false,
+    renderSize: "small",
+    compactMode: false,
+    liteMode: true,
+    configChanges: {},
   });
 
   // Trick for HMR
@@ -57,12 +71,12 @@ const DemoQueryBuilder: React.FC = () => {
   const { renderInitFilesHeader, renderInitErrors } = useInitFiles(state, setState);
   const { renderSkinSelector } = useSkins(state, setState);
   const { renderBlocksSwitcher } = useBlocksSwitcher(state, setState);
-
+  const { renderThemeModeSelector, renderBodyIsDarkSelector, renderUseOldDesignSelector, renderCompactModeSelector, renderLiteModeSelector, renderSizeSelector } = useThemeing(state, setState);
 
   const renderBuilder = useCallback((bprops: BuilderProps) => {
     return (
       <div className="query-builder-container" style={{padding: "10px"}}>
-        <div className="query-builder qb-lite">
+        <div className="query-builder">
           <Builder {...bprops} />
         </div>
       </div>
@@ -100,12 +114,32 @@ const DemoQueryBuilder: React.FC = () => {
     });
   };
 
+  const builder = state.renderBocks.queryBuilder && (
+    <Query
+      {...state.config}
+      value={state.tree}
+      onInit={onChange}
+      onChange={onChange}
+      renderBuilder={renderBuilder}
+    />
+  );
+
   return (
     <div>
       <div>
-        Settings: &nbsp;
+        Theme: &nbsp;
         {renderSkinSelector()}
-        &nbsp;
+        {renderThemeModeSelector()}
+        {renderLiteModeSelector()}
+        {renderSizeSelector()}
+        {renderCompactModeSelector()}
+        {" "}
+        {renderBodyIsDarkSelector()}
+        {" "}
+        {renderUseOldDesignSelector()}
+      </div>
+      <div>
+        Settings: &nbsp;
         {renderConfigChangeHeader()}
       </div>
       <div>
@@ -132,13 +166,7 @@ const DemoQueryBuilder: React.FC = () => {
 
       <ImportSkinStyles skin={state.skin} />
 
-      {state.renderBocks.queryBuilder && <Query
-        {...state.config}
-        value={state.tree}
-        onInit={onChange}
-        onChange={onChange}
-        renderBuilder={renderBuilder}
-      />}
+      {builder}
 
       <div className="query-builder-result">
         <div>

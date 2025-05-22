@@ -153,7 +153,6 @@ import React, {Component} from 'react';
 // >>>
 import { Utils as QbUtils, Query, Builder, BasicConfig } from '@react-awesome-query-builder/ui';
 import '@react-awesome-query-builder/ui/css/styles.css';
-// or import '@react-awesome-query-builder/ui/css/compact_styles.css';
 const InitialConfig = BasicConfig;
 // <<<
 
@@ -264,7 +263,6 @@ import React, { useState, useCallback } from "react";
 import type { JsonGroup, Config, ImmutableTree, BuilderProps } from '@react-awesome-query-builder/ui';
 import { Utils as QbUtils, Query, Builder, BasicConfig } from '@react-awesome-query-builder/ui';
 import '@react-awesome-query-builder/ui/css/styles.css';
-// or import '@react-awesome-query-builder/ui/css/compact_styles.css';
 const InitialConfig = BasicConfig;
 // <<<
 

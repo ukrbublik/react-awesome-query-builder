@@ -8,7 +8,8 @@ import {
 import { Utils } from "@react-awesome-query-builder/ui";
 const { mapListValues } = Utils.ListUtils;
 
-export default ({listValues, value, setValue, allowCustomValues, placeholder, readonly}) => {
+export default ({listValues, value, setValue, allowCustomValues, placeholder, readonly, config}) => {
+  const darkMode = config.settings.themeMode === "dark";
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValues, setSelectedValues] = useState(value ?? []);
 
@@ -73,22 +74,25 @@ export default ({listValues, value, setValue, allowCustomValues, placeholder, re
 
   return (
     <Dropdown
-      isOpen={isOpen}
+      isOpen={!readonly && isOpen}
       onClick={() => (!isOpen ? setIsOpen(true) : setIsOpen(false))}
       disabled={readonly}
       toggle={() => setIsOpen(!isOpen)}
     >
       <DropdownToggle
-        tag={"button"}
+        tag={!darkMode ? "button" : undefined}
+        caret={darkMode}
         className={"form-select"}
         style={stylesDropdownWrapper}
-        color={"transparent"}
+        color={darkMode ? "dark" : "transparent"}
+        disabled={readonly}
       >
         {selectedValues.length ? renderValue(selectedValues) : <span>&nbsp;</span>}
       </DropdownToggle>
       <DropdownMenu
         container="body"
         style={stylesDropdownMenuWrapper}
+        dark={darkMode}
       >
         {renderOptions()}
       </DropdownMenu>

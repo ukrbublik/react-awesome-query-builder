@@ -24,5 +24,4 @@ export {default as VanillaButtonGroup} from "./core/VanillaButtonGroup";
 export {default as VanillaValueSources} from "./core/VanillaValueSources";
 export {default as VanillaSwitch} from "./core/VanillaSwitch";
 export {default as vanillaConfirm} from "./core/vanillaConfirm";
-
-export const VanillaProvider = ({config, children}) => children;
+export { VanillaProvider } from "./core/VanillaProvider";

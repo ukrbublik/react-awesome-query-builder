@@ -41,6 +41,7 @@ export class BasicGroup extends Component {
     addRule: PropTypes.func.isRequired,
     addGroup: PropTypes.func.isRequired,
     removeSelf: PropTypes.func.isRequired,
+    removeGroupChildren: PropTypes.func.isRequired,
     setConjunction: PropTypes.func.isRequired,
     setNot: PropTypes.func.isRequired,
     setLock: PropTypes.func.isRequired,
@@ -54,6 +55,7 @@ export class BasicGroup extends Component {
     this.onPropsChanged(props);
 
     this.removeSelf = this.removeSelf.bind(this);
+    this.removeGroupChildren = this.removeGroupChildren.bind(this);
     this.setLock = this.setLock.bind(this);
     this.renderItem = this.renderItem.bind(this);
   }
@@ -82,6 +84,10 @@ export class BasicGroup extends Component {
 
   setLock(lock) {
     this.props.setLock(lock);
+  }
+
+  removeGroupChildren() {
+    this.props.removeGroupChildren();
   }
 
   removeSelf() {
@@ -315,10 +321,12 @@ export class BasicGroup extends Component {
   }
 
   renderDrag() {
-    const { handleDraggerMouseDown } = this.props;
+    const { handleDraggerMouseDown, config, isLocked } = this.props;
     const Icon = this.Icon;
     const icon = <Icon
       type="drag"
+      readonly={isLocked}
+      config={config}
     />;
     return this.showDragIcon() && (<div 
       key="group-drag-icon"
@@ -349,17 +357,24 @@ export class BasicGroup extends Component {
     return conjunctionOptions;
   }
 
+  canRenderConjs() {
+    const { children1 } = this.props;
+    if (!this.showConjs())
+      return false;
+    if (!children1 || !children1.size)
+      return false;
+    return true;
+  }
+
   renderConjs() {
     const {
-      config, children1, id,
+      config, id,
       selectedConjunction, setConjunction, not, setNot, isLocked
     } = this.props;
 
     const {immutableGroupsMode, notLabel} = config.settings;
     const conjunctionOptions = this.conjunctionOptions();
-    if (!this.showConjs())
-      return null;
-    if (!children1 || !children1.size)
+    if (!this.canRenderConjs())
       return null;
 
     const renderProps = {
@@ -403,4 +418,4 @@ export class BasicGroup extends Component {
   }
 }
 
-export default GroupContainer(Draggable("group")(WithConfirmFn(BasicGroup)), "group");
+export default GroupContainer(Draggable("group simple_group")(WithConfirmFn(BasicGroup)), "group");

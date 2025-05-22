@@ -1,6 +1,9 @@
 # Changelog
 - 6.7.0
   - Added `price` widget based on `react-number-format` (PR #1206) (issue #1025)
+  - Improved theming (PR #1188) (issues #892 #970 #599)
+  - Dropped `compact_styles.scss`. Use class `.qb-compact` instead if you need. See new `vars_compact.scss` (PR #1188)
+  - Added customized modals to confirm item deleteion for Fluent, Bootstrap (PR #1188)
 - 6.6.15
   - Fixed support of AntDesign 4.x DatePicker (PR #1239) (issue #1238)
   - Prevent potential prototype pollution in `OtherUtils.mergeIn` and `OtherUtils.setIn` (PR #1240)

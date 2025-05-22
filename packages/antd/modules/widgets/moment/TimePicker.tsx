@@ -3,6 +3,7 @@ import * as React from "react";
 import type { PickerProps } from "antd/es/date-picker/generatePicker";
 import DatePicker from "./DatePicker";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TimePickerProps extends Omit<PickerProps<Moment>, "picker"> {}
 
 const TimePicker = React.forwardRef<any, TimePickerProps>((props, ref) => (

@@ -10,7 +10,7 @@
     ],
     "allowJs": true,
     "outDir": "ts_out",
-    "noEmit": true,
+    // "noEmit": false,
 
     "strict": true,
     "alwaysStrict": true,
@@ -21,6 +21,7 @@
     "moduleResolution": "node",
     // there is 1 null check issue with rc-picker
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     
     "paths": {
       "@react-awesome-query-builder/core": ["../core/modules"],

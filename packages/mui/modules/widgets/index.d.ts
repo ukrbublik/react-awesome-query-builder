@@ -3,6 +3,7 @@ import {
   FieldProps, ConjsProps, SwitchProps, ButtonProps, ButtonGroupProps, ProviderProps, ValueSourcesProps, ConfirmFunc,
   BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, RangeSliderWidgetProps, PriceWidgetProps
 } from "@react-awesome-query-builder/ui";
+import { ConfirmOptions } from "material-ui-confirm";
 
 export interface MuiWidgets {
   // material core widgets
@@ -12,10 +13,11 @@ export interface MuiWidgets {
   MuiSwitch: ElementType<SwitchProps>,
   MuiButton: ElementType<ButtonProps>,
   MuiButtonGroup: ElementType<ButtonGroupProps>,
-  MuiProvider: ElementType<ProviderProps>,
   MuiValueSources: ElementType<ValueSourcesProps>,
+  
+  MuiProvider: ElementType<ProviderProps>,
   MuiConfirm: ConfirmFunc,
-  MuiUseConfirm: () => Function,
+  MuiUseConfirm: () => ConfirmFunc,
 
   // material core widgets
   MuiBooleanWidget: ElementType<BooleanWidgetProps>,

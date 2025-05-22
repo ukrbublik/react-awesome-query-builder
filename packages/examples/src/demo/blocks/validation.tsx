@@ -6,7 +6,6 @@ import type { DemoQueryBuilderState } from "../types";
 import { validationTranslateOptions } from "../options";
 
 const stringify = JSON.stringify;
-const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
 
 export const useValidation = (
@@ -96,11 +95,11 @@ export const useValidation = (
     return (
       <>
         <hr/>
-        {isValid ? null : <pre style={preErrorStyle}>{"Tree has errors"}</pre>}
+        {isValid ? null : <pre className="qb-demo-error-pre">{"Tree has errors"}</pre>}
         <div>
           Validation errors: 
           { validationRes.length > 0
-            ? <pre style={preErrorStyle}>
+            ? <pre className="qb-demo-error-pre">
               {stringify(validationRes, undefined, 2)}
             </pre>
             : "no"

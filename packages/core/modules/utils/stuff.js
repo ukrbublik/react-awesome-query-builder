@@ -35,6 +35,10 @@ export const isTypeOf = (v, type) => {
   return false;
 };
 
+export const isTruthy = (value) => {
+  return !!value;
+};
+
 export const shallowCopy = (v) => {
   if (typeof v === "object" && v !== null) {
     if (Array.isArray(v)) {
