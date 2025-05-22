@@ -125,17 +125,17 @@ export type TreeMultiSelectWidgetProps<C = Config> = _TreeMultiSelectWidgetProps
  * @deprecated
  */
 export type CaseValueWidgetProps<C = Config> = _CaseValueWidgetProps<C>;
-export type CoreOperators<C = Config, CTX extends CoreConfigContext = ConfigContext> = _CoreOperators<C, CTX>;
-export type CoreWidgets<C = Config, CTX extends CoreConfigContext = ConfigContext> = _CoreWidgets<C, CTX>;
-export type ConfigMixin<C extends CoreConfigType = Config, CTX extends CoreConfigContext = ConfigContext> = _ConfigMixin<C, CTX>;
-export type ConfigMixinExt<C extends CoreConfigType = Config, CTX extends CoreConfigContext = ConfigContext> = _ConfigMixinExt<C, CTX>;
+export type CoreOperators<C = Config> = _CoreOperators<C>;
+export type CoreWidgets<C = Config> = _CoreWidgets<C>;
+export type ConfigMixin<C extends Config = Config> = _ConfigMixin<C>;
+export type ConfigMixinExt<C extends Config = Config> = _ConfigMixinExt<C>;
 
 /////////////////
 // extend config
 /////////////////
 
 export interface ConfigContextUtils extends CoreConfigContextUtils {
-  ColorUtils?: ColorUtils;
+  ColorUtils: ColorUtils;
 }
 
 export interface ConfigContext extends CoreConfigContext {
@@ -147,14 +147,12 @@ export interface Config extends CoreConfigType {
   settings: Settings;
   operators: Operators;
   widgets: Widgets;
-  ctx: ConfigContext;
 }
 
 export interface BasicConfig extends CoreConfig {
   settings: Settings;
-  operators: CoreOperators<Config, ConfigContext>;
-  widgets: CoreWidgets<Config, ConfigContext>;
-  ctx: ConfigContext;
+  operators: CoreOperators<Config>;
+  widgets: CoreWidgets<Config>;
 }
 
 
@@ -468,6 +466,7 @@ export interface DesignSettings {
   useShadowOnHoverItem?: boolean;
   generateCssVarsFromThemeLibrary?: boolean;
   generateCssVars?: {
+    // todo: override with correct typings in dedicated packages
     material?: (this: ConfigContext, theme: /*Theme*/ any, config: Config) => CssVars;
     mui?: (this: ConfigContext, theme: /*Theme*/ any, config: Config) => CssVars;
     antd?: (this: ConfigContext, token: /*GlobalToken*/ any, config: Config) => CssVars;
@@ -516,8 +515,8 @@ export interface RenderSettings {
   renderSwitch?: SerializableType<FactoryWithContext<SwitchProps>>;
   renderProvider?: SerializableType<FactoryWithContext<ProviderProps>>;
   renderValueSources?: SerializableType<FactoryWithContext<ValueSourcesProps>>;
-  renderConfirm?: SerializableType<FnWithContextAndProps<ConfirmModalProps, ConfigContext, void>>;
-  useConfirm?: SerializableType<FactoryFnWithoutPropsWithContext<ConfirmFunc, ConfigContext>>;
+  renderConfirm?: SerializableType<FnWithContextAndProps<ConfirmModalProps, void>>;
+  useConfirm?: SerializableType<FactoryFnWithoutPropsWithContext<ConfirmFunc>>;
   renderItem?: SerializableType<FactoryWithContext<ItemBuilderProps>>;
   renderBeforeWidget?: SerializableType<FactoryWithContext<RuleProps>>;
   renderAfterWidget?: SerializableType<FactoryWithContext<RuleProps>>;

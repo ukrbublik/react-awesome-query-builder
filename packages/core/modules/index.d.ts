@@ -23,9 +23,9 @@ interface ReactAttributes {
   key?: ReactKey | null | undefined;
 }
 
-export type FactoryFnWithoutPropsWithContext<F, CTX extends ConfigContext = ConfigContext> = (this: CTX, ctx: CTX) => F;
-export type FnWithContextAndProps<P, CTX extends ConfigContext = ConfigContext, R = void> = (this: CTX, props: P, ctx?: CTX) => R;
-export type FactoryWithContext<P, CTX extends ConfigContext = ConfigContext> = (this: CTX, props: ReactAttributes & P, ctx?: CTX) => ReactElement<P>;
+export type FactoryFnWithoutPropsWithContext<F> = (this: ConfigContext, ctx: ConfigContext) => F;
+export type FnWithContextAndProps<P, R = void> = (this: ConfigContext, props: P, ctx?: ConfigContext) => R;
+export type FactoryWithContext<P> = (this: ConfigContext, props: ReactAttributes & P, ctx?: ConfigContext) => ReactElement<P>;
 export type RenderedReactElement = ReactElement | string;
 export type SerializedFunction = JsonLogicFunction | string;
 export type SerializableType<T, SER = false> = SER extends true ? T | SerializedFunction : T;
@@ -774,12 +774,12 @@ export interface Config {
 export type ZipConfig = Omit<Config, "ctx">;
 
 
-export type ConfigMixinExt<C extends Config = Config, CTX extends ConfigContext = ConfigContext> = MixType<C>;
+export type ConfigMixinExt<C extends Config = Config> = MixType<C>;
 
-export interface ConfigMixin<C extends Config = Config, CTX extends ConfigContext = ConfigContext> {
+export interface ConfigMixin<C extends Config = Config> {
   conjunctions?: Record<string, PartialPartial<Conjunction>>;
-  operators?: Record<string, PartialPartial<Operator<C, CTX>>>;
-  widgets?: Record<string, PartialPartial<Widget<C, CTX>>>;
+  operators?: Record<string, PartialPartial<Operator<C>>>;
+  widgets?: Record<string, PartialPartial<Widget<C>>>;
   types?: Record<string, PartialPartial<Type>>;
   settings?: PartialPartial<C["settings"]>;
   fields?: Record<string, PartialPartial<FieldOrGroup>>;
@@ -1005,7 +1005,7 @@ type ElasticSearchFormatValue =     (this: ConfigContext, queryType: ElasticQuer
 
 export type ValidateValue<V = RuleValue> = (this: ConfigContext, val: V, fieldSettings: FieldSettings, op: string, opDef: Operator, rightFieldDef?: Field) => boolean | string | { error: string | {key: string, args?: Record<string, any>}, fixedValue?: V } | null;
 
-export interface BaseWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = WidgetProps<C>> {
+export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   type: string;
   // Used for validation. Can be one of JS types (typeof) or "array"
   jsType?: string;
@@ -1028,14 +1028,14 @@ export interface BaseWidget<C = Config, CTX extends ConfigContext = ConfigContex
   //obsolete:
   validateValue?: SerializableType<ValidateValue>;
   //@ui
-  factory: SerializableType<FactoryWithContext<WP, CTX>>;
+  factory: SerializableType<FactoryWithContext<WP>>;
   customProps?: AnyObject;
 }
-export interface RangeableWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = WidgetProps<C>> extends BaseWidget<C, CTX, WP> {
+export interface RangeableWidget<C = Config, WP = WidgetProps<C>> extends BaseWidget<C, WP> {
   singleWidget?: string;
   valueLabels?: Array<string | {label: string, placeholder: string}>;
 }
-interface BaseFieldWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = WidgetProps<C>> {
+interface BaseFieldWidget<C = Config, WP = WidgetProps<C>> {
   valuePlaceholder?: string;
   valueLabel?: string;
   formatValue?: SerializableType<FormatValue>; // with rightFieldDef
@@ -1045,50 +1045,50 @@ interface BaseFieldWidget<C = Config, CTX extends ConfigContext = ConfigContext,
   validateValue?: SerializableType<ValidateValue>;
   //@ui
   customProps?: AnyObject;
-  factory: SerializableType<FactoryWithContext<WP, CTX>>;
+  factory: SerializableType<FactoryWithContext<WP>>;
 }
-export interface FieldWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = WidgetProps<C>> extends BaseFieldWidget<C, CTX, WP> {
+export interface FieldWidget<C = Config, WP = WidgetProps<C>> extends BaseFieldWidget<C, WP> {
   valueSrc: "field";
 }
-export interface FuncWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = WidgetProps<C>> extends BaseFieldWidget<C, CTX, WP> {
+export interface FuncWidget<C = Config, WP = WidgetProps<C>> extends BaseFieldWidget<C, WP> {
   valueSrc: "func";
 }
 
-export type TextWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = TextWidgetProps<C>> = BaseWidget<C, CTX, WP> & TextFieldSettings;
-export type DateTimeWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = DateTimeWidgetProps<C>> = RangeableWidget<C, CTX, WP> & DateTimeFieldSettings;
-export type BooleanWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = BooleanWidgetProps<C>> = BaseWidget<C, CTX, WP> & BooleanFieldSettings;
-export type NumberWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = NumberWidgetProps<C>> = RangeableWidget<C, CTX, WP> & NumberFieldSettings;
-export type RangeSliderWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = RangeSliderWidgetProps<C>> = RangeableWidget<C, CTX, WP> & NumberFieldSettings;
-export type PriceWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = PriceWidgetProps<C>> = BaseWidget<C, CTX, WP> & PriceFieldSettings;
-export type SelectWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = SelectWidgetProps<C>> = BaseWidget<C, CTX, WP> & SelectFieldSettings;
-export type MultiSelectWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = MultiSelectWidgetProps<C>> = BaseWidget<C, CTX, WP> & MultiSelectFieldSettings;
-export type TreeSelectWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = TreeSelectWidgetProps<C>> = BaseWidget<C, CTX, WP> & TreeSelectFieldSettings;
-export type TreeMultiSelectWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = TreeMultiSelectWidgetProps<C>> = BaseWidget<C, CTX, WP> & TreeMultiSelectFieldSettings;
+export type TextWidget<C = Config, WP = TextWidgetProps<C>> = BaseWidget<C, WP> & TextFieldSettings;
+export type DateTimeWidget<C = Config, WP = DateTimeWidgetProps<C>> = RangeableWidget<C, WP> & DateTimeFieldSettings;
+export type BooleanWidget<C = Config, WP = BooleanWidgetProps<C>> = BaseWidget<C, WP> & BooleanFieldSettings;
+export type NumberWidget<C = Config, WP = NumberWidgetProps<C>> = RangeableWidget<C, WP> & NumberFieldSettings;
+export type RangeSliderWidget<C = Config, WP = RangeSliderWidgetProps<C>> = RangeableWidget<C, WP> & NumberFieldSettings;
+export type PriceWidget<C = Config, WP = PriceWidgetProps<C>> = BaseWidget<C, WP> & PriceFieldSettings;
+export type SelectWidget<C = Config, WP = SelectWidgetProps<C>> = BaseWidget<C, WP> & SelectFieldSettings;
+export type MultiSelectWidget<C = Config, WP = MultiSelectWidgetProps<C>> = BaseWidget<C, WP> & MultiSelectFieldSettings;
+export type TreeSelectWidget<C = Config, WP = TreeSelectWidgetProps<C>> = BaseWidget<C, WP> & TreeSelectFieldSettings;
+export type TreeMultiSelectWidget<C = Config, WP = TreeMultiSelectWidgetProps<C>> = BaseWidget<C, WP> & TreeMultiSelectFieldSettings;
 /**
  * @deprecated
  */
-export type CaseValueWidget<C = Config, CTX extends ConfigContext = ConfigContext, WP = CaseValueWidgetProps<C>> = BaseWidget<C, CTX, WP> & CaseValueFieldSettings;
+export type CaseValueWidget<C = Config, WP = CaseValueWidgetProps<C>> = BaseWidget<C, WP> & CaseValueFieldSettings;
 
-export type TypedWidget<C = Config, CTX extends ConfigContext = ConfigContext> =
-  TextWidget<C, CTX>
-  | DateTimeWidget<C, CTX>
-  | BooleanWidget<C, CTX>
-  | NumberWidget<C, CTX>
-  | RangeSliderWidget<C, CTX>
-  | PriceWidget<C, CTX>
-  | SelectWidget<C, CTX>
-  | MultiSelectWidget<C, CTX>
-  | TreeSelectWidget<C, CTX>
-  | TreeMultiSelectWidget<C, CTX>
-  | CaseValueWidget<C, CTX>;
+export type TypedWidget<C = Config> =
+  TextWidget<C>
+  | DateTimeWidget<C>
+  | BooleanWidget<C>
+  | NumberWidget<C>
+  | RangeSliderWidget<C>
+  | PriceWidget<C>
+  | SelectWidget<C>
+  | MultiSelectWidget<C>
+  | TreeSelectWidget<C>
+  | TreeMultiSelectWidget<C>
+  | CaseValueWidget<C>;
 
-export type Widget<C = Config, CTX extends ConfigContext = ConfigContext> =
-  FieldWidget<C, CTX>
-  | FuncWidget<C, CTX>
-  | TypedWidget<C, CTX>
-  | RangeableWidget<C, CTX>
-  | BaseWidget<C, CTX>;
-export type Widgets<C = Config, CTX extends ConfigContext = ConfigContext> = TypedMap<Widget<C, CTX>>;
+export type Widget<C = Config> =
+  FieldWidget<C>
+  | FuncWidget<C>
+  | TypedWidget<C>
+  | RangeableWidget<C>
+  | BaseWidget<C>;
+export type Widgets<C = Config> = TypedMap<Widget<C>>;
 
 
 /////////////////
@@ -1171,9 +1171,9 @@ export interface ProximityProps<C = Config> extends ProximityConfig {
   setOption: (key: string, value: any) => void;
   config: C;
 }
-export interface ProximityOptions<C = Config, CTX extends ConfigContext = ConfigContext, PP = ProximityProps<C>> extends ProximityConfig {
+export interface ProximityOptions<C = Config, PP = ProximityProps<C>> extends ProximityConfig {
   //@ui
-  factory?: SerializableType<FactoryWithContext<PP, CTX>>;
+  factory?: SerializableType<FactoryWithContext<PP>>;
 }
 
 export interface BaseOperator {
@@ -1211,11 +1211,11 @@ export interface Operator2 extends BaseOperator {
   valueLabels: Array<string | {label: string, placeholder: string}>;
   isSpecialRange?: boolean;
 }
-export interface OperatorProximity<C = Config, CTX extends ConfigContext = ConfigContext> extends Operator2 {
-  options: ProximityOptions<C, CTX, ProximityProps<C>>;
+export interface OperatorProximity<C = Config> extends Operator2 {
+  options: ProximityOptions<C, ProximityProps<C>>;
 }
-export type Operator<C = Config, CTX extends ConfigContext = ConfigContext> = UnaryOperator | BinaryOperator | Operator2 | OperatorProximity<C, CTX>;
-export type Operators<C = Config, CTX extends ConfigContext = ConfigContext> = TypedMap<Operator<C, CTX>>;
+export type Operator<C = Config> = UnaryOperator | BinaryOperator | Operator2 | OperatorProximity<C>;
+export type Operators<C = Config> = TypedMap<Operator<C>>;
 
 
 
@@ -1631,7 +1631,7 @@ export type Funcs = TypedMap<FuncOrGroup>;
 // CoreConfig
 /////////////////
 
-export interface CoreOperators<C = Config, CTX extends ConfigContext = ConfigContext> extends Operators<C, CTX> {
+export interface CoreOperators<C = Config> extends Operators<C> {
   equal: BinaryOperator;
   not_equal: BinaryOperator;
   less: BinaryOperator;
@@ -1656,7 +1656,7 @@ export interface CoreOperators<C = Config, CTX extends ConfigContext = ConfigCon
   multiselect_not_contains: BinaryOperator;
   multiselect_equals: BinaryOperator;
   multiselect_not_equals: BinaryOperator;
-  proximity: OperatorProximity<C, CTX>;
+  proximity: OperatorProximity<C>;
 }
 
 export interface CoreConjunctions extends Conjunctions {
@@ -1664,27 +1664,27 @@ export interface CoreConjunctions extends Conjunctions {
   OR: Conjunction;
 }
 
-export interface CoreWidgets<C = Config, CTX extends ConfigContext = ConfigContext> extends Widgets<C, CTX> {
-  text: TextWidget<C, CTX>;
-  textarea: TextWidget<C, CTX>;
-  number: NumberWidget<C, CTX>;
-  slider: NumberWidget<C, CTX>;
-  price: PriceWidget<C, CTX>;
-  rangeslider: RangeSliderWidget<C, CTX>;
-  select: SelectWidget<C, CTX>;
-  multiselect: MultiSelectWidget<C, CTX>;
-  treeselect: TreeSelectWidget<C, CTX>;
-  treemultiselect: TreeMultiSelectWidget<C, CTX>;
-  date: DateTimeWidget<C, CTX>;
-  time: DateTimeWidget<C, CTX>;
-  datetime: DateTimeWidget<C, CTX>;
-  boolean: BooleanWidget<C, CTX>;
-  field: FieldWidget<C, CTX>;
-  func: FuncWidget<C, CTX>;
+export interface CoreWidgets<C = Config> extends Widgets<C> {
+  text: TextWidget<C>;
+  textarea: TextWidget<C>;
+  number: NumberWidget<C>;
+  slider: NumberWidget<C>;
+  price: PriceWidget<C>;
+  rangeslider: RangeSliderWidget<C>;
+  select: SelectWidget<C>;
+  multiselect: MultiSelectWidget<C>;
+  treeselect: TreeSelectWidget<C>;
+  treemultiselect: TreeMultiSelectWidget<C>;
+  date: DateTimeWidget<C>;
+  time: DateTimeWidget<C>;
+  datetime: DateTimeWidget<C>;
+  boolean: BooleanWidget<C>;
+  field: FieldWidget<C>;
+  func: FuncWidget<C>;
   /**
    * @deprecated
    */
-  case_value: CaseValueWidget<C, CTX>;
+  case_value: CaseValueWidget<C>;
 }
 
 export interface CoreTypes extends Types {
