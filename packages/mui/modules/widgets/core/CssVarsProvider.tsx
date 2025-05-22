@@ -12,12 +12,12 @@ const CssVarsProvider: React.FC<CssVarsProviderProps> = ({ children, config }) =
   const ref = React.createRef<HTMLDivElement>();
   const themeMode = config.settings.themeMode ?? "light";
   const compactMode = config.settings.compactMode;
-  const generateCssVars = config.settings.designSettings?.generateCssVars?.mui ?? defaultGenerateCssVars;
 
   const theme = useTheme();
 
   React.useEffect(() => {
     const cssVarsTarget = ref.current;
+    const generateCssVars = config.settings.designSettings?.generateCssVars?.mui ?? defaultGenerateCssVars;
     const cssVars = generateCssVars.call(config.ctx, theme, config) as Record<string, string>;
     for (const k in cssVars) {
       if (cssVars[k] != undefined) {

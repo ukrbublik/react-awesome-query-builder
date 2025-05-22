@@ -1,7 +1,7 @@
 import React from "react";
 import { Utils, Config } from "@react-awesome-query-builder/ui";
 import { useTheme } from "@material-ui/core/styles";
-import { generateCssVars } from "../../utils/theming";
+import { generateCssVars as defaultGenerateCssVars } from "../../utils/theming";
 
 interface CssVarsProviderProps {
   config: Config;
@@ -17,7 +17,8 @@ const CssVarsProvider: React.FC<CssVarsProviderProps> = ({ children, config }) =
   
   React.useEffect(() => {
     const cssVarsTarget = ref.current;
-    const cssVars = generateCssVars(theme, config) as Record<string, string>;
+    const generateCssVars = config.settings.designSettings?.generateCssVars?.material ?? defaultGenerateCssVars;
+    const cssVars = generateCssVars.call(config.ctx, theme, config) as Record<string, string>;
     for (const k in cssVars) {
       if (cssVars[k] != undefined) {
         cssVarsTarget?.style.setProperty(k, cssVars[k]);

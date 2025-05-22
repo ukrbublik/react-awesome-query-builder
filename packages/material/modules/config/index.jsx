@@ -1,6 +1,7 @@
 import React from "react";
-import {default as MaterialWidgets} from "../widgets";
 import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
+import {default as MaterialWidgets} from "../widgets";
+import { generateCssVars } from "../utils/theming";
 
 
 const settings = {
@@ -23,6 +24,14 @@ const settings = {
   renderProvider: (props, {RCE, W: {MaterialProvider}}) => RCE(MaterialProvider, props),
   renderConfirm: (props, {W: {MaterialConfirm}}) => MaterialConfirm(props),
   useConfirm: ({W: {MaterialUseConfirm}}) => MaterialUseConfirm(),
+
+  designSettings: {
+    ...(BasicConfig.settings.designSettings ?? {}),
+    generateCssVars: {
+      ...(BasicConfig.settings.designSettings.generateCssVars ?? {}),
+      material: generateCssVars,
+    }
+  }
 };
 
 
@@ -98,6 +107,7 @@ const ctx = {
     ...BasicConfig.ctx.W,
     ...MaterialWidgets,
   },
+  generateCssVars,
 };
 
 let config = {
