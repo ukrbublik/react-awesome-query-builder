@@ -566,7 +566,7 @@ export interface ColorUtils {
   chroma: typeof chroma;
   setColorOpacity(color: string, alpha: number): string;
   generateCssVarsForLevels(isDark: boolean, cssVar: string, baseColor: string, baseDarkColor?: string): Record<string, string>;
-  isDarkColor(color?: string): boolean;
+  isDarkColor(color?: string): boolean | undefined;
   isColor(color: any): boolean;
 }
 export interface NumberFormat {

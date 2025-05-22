@@ -98,7 +98,7 @@ export const mergeThemes = (themeMode: ThemeMode | undefined, _existingTheme: Th
 
 const generateCssVars = (token: GlobalToken, config: Config) => {
   logger.log("generateCssVars - antd token", token);
-  const darkMode = isDarkColor(token.colorBgBase);
+  const darkMode = isDarkColor(token.colorBgBase)!;
   const renderSize = config.settings.renderSize;
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;

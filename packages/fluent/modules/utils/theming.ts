@@ -106,27 +106,35 @@ const buildTheme = (config: Config, existingTheme?: Theme): PartialTheme | undef
 const generateCssVars = (theme: Theme, config: Config) => {
   logger.log("generateCssVars - Fluent theme", theme);
   const { fonts, effects, semanticColors } = theme;
-  const darkMode = isDarkColor(semanticColors.bodyBackground);
+  const darkMode = isDarkColor(semanticColors.bodyBackground) ?? isDarkColor(semanticColors.inputBackground);
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
 
   let cssVars: CssVars = {
+    "--main-background": semanticColors.bodyBackground,
+
     "--rule-background": semanticColors.cardStandoutBackground,
-    "--group-background": semanticColors.menuItemBackgroundHovered,
-    "--rulegroup-background": semanticColors.defaultStateBackground,
-    "--rulegroupext-background": semanticColors.defaultStateBackground,
-    "--switch-background": semanticColors.defaultStateBackground,
-    "--case-background": semanticColors.defaultStateBackground,
+    // "--group-background": semanticColors.menuItemBackgroundHovered,
+    // "--rulegroup-background": semanticColors.defaultStateBackground,
+    // "--rulegroupext-background": semanticColors.defaultStateBackground,
+    // "--switch-background": semanticColors.defaultStateBackground,
+    // "--case-background": semanticColors.defaultStateBackground,
+    // level-based background colors
+    ...generateCssVarsForLevels(darkMode, "--group-background", semanticColors.defaultStateBackground),
+    ...generateCssVarsForLevels(darkMode, "--rulegroup-background", semanticColors.defaultStateBackground),
+    ...generateCssVarsForLevels(darkMode, "--rulegroupext-background", semanticColors.defaultStateBackground),
+    ...generateCssVarsForLevels(darkMode, "--switch-background", semanticColors.defaultStateBackground),
+    ...generateCssVarsForLevels(darkMode, "--case-background", semanticColors.defaultStateBackground),
 
     "--rule-border-color": semanticColors.variantBorder,
-    "--group-border-color": semanticColors.inputBorder,
+    "--group-border-color": darkMode ? chroma(semanticColors.inputBorder).alpha(0.3).hex() : chroma(semanticColors.inputBorder).alpha(0.3).hex(),
     "--rulegroup-border-color": semanticColors.disabledBorder,
     "--rulegroupext-border-color": semanticColors.disabledBorder,
     "--switch-border-color": semanticColors.disabledBorder,
-    "--case-border-color": semanticColors.inputFocusBorderAlt,
+    "--case-border-color": semanticColors.buttonBorder,
 
     "--treeline-color": semanticColors.accentButtonBackground,
-    "--treeline-switch-color": semanticColors.accentButtonBackground,
+    "--treeline-switch-color": semanticColors.inputBackgroundCheckedHovered,
 
     "--main-text-color": semanticColors.bodyText,
     "--main-font-family": fonts.medium.fontFamily,
