@@ -99,10 +99,10 @@ const generateCssVars = (theme: Theme, config: Config) => {
   if (useThickLeftBorderOnHoverItem) {
     cssVars = {
       ...cssVars,
-      "--rule-border-left-width-hover": "3px",
-      "--group-border-left-width-hover": "3px",
-      "--rulegroup-border-left-width-hover": "3px",
-      "--rulegroupext-border-left-width-hover": "3px",
+      "--rule-border-left-width-hover": "2px",
+      "--group-border-left-width-hover": "2px",
+      "--rulegroup-border-left-width-hover": "2px",
+      "--rulegroupext-border-left-width-hover": "2px",
     };
   }
   

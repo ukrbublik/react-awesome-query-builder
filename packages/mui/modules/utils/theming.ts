@@ -63,8 +63,10 @@ const buildTheme = (config: Config, existingTheme?: Theme): Theme | null => {
 };
 
 const generateCssVars = (theme: Theme, config: Config): CssVars => {
-  // logger.log("generateCssVars - MUI theme", theme);
-  const { palette, typography, shadows, shape } = theme;
+  logger.log("generateCssVars - MUI theme", theme);
+  const { palette, typography, shadows } = theme;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const shape: Record<string, number> = (theme as any).shape;
   const darkMode = palette.mode === "dark";
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
@@ -99,10 +101,10 @@ const generateCssVars = (theme: Theme, config: Config): CssVars => {
   if (useThickLeftBorderOnHoverItem) {
     cssVars = {
       ...cssVars,
-      "--rule-border-left-width-hover": "3px",
-      "--group-border-left-width-hover": "3px",
-      "--rulegroup-border-left-width-hover": "3px",
-      "--rulegroupext-border-left-width-hover": "3px",
+      "--rule-border-left-width-hover": "2px",
+      "--group-border-left-width-hover": "2px",
+      "--rulegroup-border-left-width-hover": "2px",
+      "--rulegroupext-border-left-width-hover": "2px",
     };
   }
   

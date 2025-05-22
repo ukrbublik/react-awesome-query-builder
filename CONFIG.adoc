@@ -426,6 +426,15 @@ Theme settings:
 |theme.mui |{} |Options for https://mui.com/material-ui/customization/theming/[createTheme]
 |theme.antd |{} |Options for https://ant.design/docs/react/customize-theme[ConfigProvider]
 |theme.fluent |{} |Options for https://developer.microsoft.com/en-us/fluentui#/controls/web/themeprovider[ThemeProvider]
+|designSettings.canInheritThemeFromOuterProvider |true |If <Query> is wrapped in theme provider component (eg. `<ThemeProvider>` for MUI) and `settings.theme.mui` is also provided then merge themes.
+|designSettings.generateCssVarsFromThemeLibrary |true |Adopt <Query> styling to used UI framework theme (MUI/AntDesign etc.). +
+ Use false if you don't want a new behaviour and want to use static styles like in versions < 6.7.0
+|designSettings.useThickLeftBorderOnHoverItem |false |Fancy effect for hovering on rule/group
+|designSettings.useShadowOnHoverItem |false |Fancy effect for hovering on rule/group
+|generateCssVars.* | |If you want to override generation of css vars for RAQB using UI framework's theme, use your own function. +
+ `generateCssVars` is an object with keys `mui`, `antd`, `fluent`, `material`. Value - function `(theme, config) => Object` +
+ Example of overriding: `generateCssVars.mui = (theme, config) => ({ "--group-background": theme.palette.background.paper })` +
+ Example of extending: `generateCssVars.mui = (theme, config) => ({ ...config.ctx.generateCssVars(theme, config), "--group-background": theme.palette.grey["200"] })`
 |renderSize |`small` |Size of components - `small`, `middle` or `large`
 |dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
 |groupActionsPosition |`topRight` |You can change the position of the group actions to the following: +
