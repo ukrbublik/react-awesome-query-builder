@@ -142,13 +142,21 @@ const settings = {
     // showSearch: false
   },
 
+  //theme
+  designSettings: {
+    canInheritThemeFromOuterProvider: true,
+    useThickLeftBorderOnHoverItem: false,
+    useShadowOnHoverItem: false,
+    generateCssVarsFromThemeLibrary: true, // false to use design like in < 6.7
+  },
+  themeMode: undefined,
+  liteMode: true,
+  compactMode: false,
+  renderSize: "small",
   defaultSliderWidth: "200px",
   defaultSelectWidth: "200px",
   defaultSearchWidth: "100px",
   defaultMaxRows: 5,
-  renderSize: "small",
-  compactMode: false,
-  // themeMode: "light",
   maxLabelsLength: 100,
 
   showLock: false,

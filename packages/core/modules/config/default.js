@@ -38,17 +38,6 @@ export const settings = {
   // todo: deprecated, remove this in favour of defaultConjunction
   defaultGroupConjunction: "AND",
 
-  //theme
-  designSettings: {
-    canInheritThemeFromOuterProvider: true,
-    useThickLeftBorderOnHoverItem: false,
-    useShadowOnHoverItem: false,
-    generateCssVarsFromThemeLibrary: true, // false to use design like in < 6.7
-  },
-  themeMode: undefined,
-  liteMode: true,
-  renderSize: "small",
-
   // localization
   locale: {
     moment: "en",
