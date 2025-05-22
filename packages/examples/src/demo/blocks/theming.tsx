@@ -106,8 +106,8 @@ export const useThemeing = (
 
   const renderThemeModeSelector = () => {
     return (
-      <select value={state.themeMode} onChange={changeThemeMode}>
-        <option key="auto">auto</option>
+      <select value={state.themeMode ?? "light"} onChange={changeThemeMode}>
+        {/* <option key="auto">auto</option> */}
         <option key="light">light</option>
         <option key="dark">dark</option>
       </select>
