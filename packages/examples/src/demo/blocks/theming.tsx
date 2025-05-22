@@ -17,6 +17,21 @@ export const useThemeing = (
     document.body.setAttribute("data-theme", themeMode);
     setState({...state, isBodyDark});
   };
+
+  const changeUseOldDesign = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const useOldDesign = e.target.checked;
+    let newConfig: Config = clone(state.config);
+    state.configChanges = merge(state.configChanges, {
+      settings: {
+        designSettings: {
+          generateCssVarsFromThemeLibrary: !useOldDesign,
+        },
+      }
+    });
+    window._configChanges = state.configChanges;
+    newConfig = merge(newConfig, state.configChanges);
+    setState({...state, config: newConfig, useOldDesign});
+  };
     
   const changeThemeMode = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const themeMode = e.target.value as DemoQueryBuilderState["themeMode"];
@@ -24,7 +39,7 @@ export const useThemeing = (
     let newConfig: Config = clone(state.config);
     state.configChanges = merge(state.configChanges, {
       settings: {
-        themeMode: themeMode === "" ? null : themeMode,
+        themeMode: themeMode === "auto" ? null : themeMode,
       }
     });
     window._configChanges = state.configChanges;
@@ -43,6 +58,19 @@ export const useThemeing = (
     window._configChanges = state.configChanges;
     newConfig = merge(newConfig, state.configChanges);
     setState({...state, config: newConfig, compactMode});
+  };
+
+  const changeLiteMode = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const liteMode = e.target.value === "lite";
+    let newConfig: Config = clone(state.config);
+    state.configChanges = merge(state.configChanges, {
+      settings: {
+        liteMode,
+      }
+    });
+    window._configChanges = state.configChanges;
+    newConfig = merge(newConfig, state.configChanges);
+    setState({...state, config: newConfig, liteMode});
   };
 
   const changeRenderSize = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -67,10 +95,19 @@ export const useThemeing = (
     );
   };
 
+  const renderUseOldDesignSelector = () => {
+    return (
+      <>
+        <input id="use-old-design" type="checkbox" checked={state.useOldDesign} onChange={changeUseOldDesign} />
+        <label htmlFor="use-old-design">use old design</label>
+      </>
+    );
+  };
+
   const renderThemeModeSelector = () => {
     return (
       <select value={state.themeMode} onChange={changeThemeMode}>
-        <option key=""></option>
+        <option key="auto">auto</option>
         <option key="light">light</option>
         <option key="dark">dark</option>
       </select>
@@ -82,6 +119,15 @@ export const useThemeing = (
       <select value={state.compactMode ? "compact" : "normal"} onChange={changeCompactMode}>
         <option key="normal">normal</option>
         <option key="compact">compact</option>
+      </select>
+    );
+  };
+
+  const renderLiteModeSelector = () => {
+    return (
+      <select value={state.liteMode ? "lite" : "full"} onChange={changeLiteMode}>
+        <option key="full">full</option>
+        <option key="lite">lite</option>
       </select>
     );
   };
@@ -99,7 +145,9 @@ export const useThemeing = (
   return {
     renderThemeModeSelector,
     renderBodyIsDarkSelector,
+    renderUseOldDesignSelector,
     renderCompactModeSelector,
+    renderLiteModeSelector,
     renderSizeSelector,
   };
 };

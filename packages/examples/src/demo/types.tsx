@@ -15,10 +15,12 @@ export interface DemoQueryBuilderState {
   sqlErrors: Array<string>;
   sqlWarnings: Array<string>;
   initFile: string;
-  themeMode: ThemeMode | "";
+  themeMode: ThemeMode | "auto";
   isBodyDark: boolean;
+  useOldDesign: boolean;
   renderSize: RenderSize;
   compactMode: boolean;
+  liteMode: boolean;
   configChanges: PartialPartial<Config>;
 }
 

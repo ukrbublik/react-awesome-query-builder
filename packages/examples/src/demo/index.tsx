@@ -52,6 +52,7 @@ const DemoQueryBuilder: React.FC = () => {
     isBodyDark: false,
     renderSize: "small",
     compactMode: false,
+    liteMode: true,
     configChanges: {},
   });
 

@@ -420,6 +420,8 @@ Theme settings:
  If <Query> is wrapped in theme provider component (eg. `<ThemeProvider>` for MUI, `<ConfigProvider>` for AntDesign) then will be detected automatically (doesn't work for `reactstrap`). +
  Otherwise `light` by default
 |compactMode |false | Use compact styles (eg. smaller margins)
+|liteMode |true | Hide some elements (butons "Add", "Delete", drag icon, select source arrow, inactive conjunctions buttons). Show only on hover. +
+ Same as adding class `.qb-lite` to `.query-builder`
 |theme.material |{} |Options for https://v4.mui.com/customization/theming/[createTheme]
 |theme.mui |{} |Options for https://mui.com/material-ui/customization/theming/[createTheme]
 |theme.antd |{} |Options for https://ant.design/docs/react/customize-theme[ConfigProvider]

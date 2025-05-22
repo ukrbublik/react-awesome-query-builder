@@ -42,8 +42,12 @@ export const settings = {
   designSettings: {
     canInheritThemeFromOuterProvider: true,
     useThickLeftBorderOnHoverItem: false,
-    useShadowOnHoverItem: true,
+    useShadowOnHoverItem: false,
+    generateCssVarsFromThemeLibrary: true, // false to use design like in < 6.7
   },
+  themeMode: undefined,
+  liteMode: true,
+  renderSize: "small",
 
   // localization
   locale: {

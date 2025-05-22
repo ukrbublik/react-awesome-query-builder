@@ -494,6 +494,7 @@ export interface ThemeSettings {
   designSettings?: DesignSettings;
   renderSize?: RenderSize;
   themeMode?: ThemeMode;
+  liteMode?: boolean;
   compactMode?: boolean;
   dropdownPlacement?: AntdPosition;
   groupActionsPosition?: AntdPosition;

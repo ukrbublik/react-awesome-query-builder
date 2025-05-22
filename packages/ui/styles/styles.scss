@@ -842,7 +842,7 @@ $active_conjs: false !default;
 $rule_actions: (".rule--fieldsrc", ".widget--valuesrc", ".rule--drag-handler", ".rule--header") !default;
 
 
-.query-builder.qb-lite {
+.qb-lite {
   @include visible_only_for_hovered_group($group_actions);
   @include display_conjs_only_for_hovered_group($inactive_conjs, $active_conjs);
   @include show_only_for_hovered_rule($rule_actions);
