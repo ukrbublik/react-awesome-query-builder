@@ -89,22 +89,23 @@ $main-text-color: var(--main-text-color, $default-main-text-color);
 
 
 // [Advanced] colors for complex nesting
-$rule-in-rulegroup-background: var(--rule-in-rulegroup-background, $rule-background);
-$rulegroup-in-rulegroup-background: var(--rulegroup-in-rulegroup-background, $rulegroup-background);
-$rulegroupext-in-rulegroup-background: var(--rulegroupext-in-rulegroup-background, $rulegroupext-background);
 $rule-in-rulegroup-border-color: var(--rule-in-rulegroup-border-color, $rule-border-color);
 $rulegroup-in-rulegroup-border-color: var(--rulegroup-in-rulegroup-border-color, $rulegroup-border-color);
 $rulegroupext-in-rulegroup-border-color: var(--rulegroupext-in-rulegroup-border-color, $rulegroupext-border-color);
-$rule-in-rulegroupext-background: var(--rule-in-rulegroupext-background, $rule-background);
-$group-in-rulegroupext-background: var(--group-in-rulegroupext-background, $rulegroupext-background);
-$rulegroupext-in-rulegroupext-background: var(--rulegroupext-in-rulegroupext-background, $rulegroupext-background);
-$rulegroup-in-rulegroupext-background: var(--rulegroup-in-rulegroupext-background, $rulegroup-background);
 $rule-in-rulegroupext-border-color: var(--rule-in-rulegroupext-border-color, $rule-border-color);
 $group-in-rulegroupext-border-color: var(--group-in-rulegroupext-border-color, $default-group-in-rulegroupext-border-color);
 $rulegroupext-in-rulegroupext-border-color: var(--rulegroupext-in-rulegroupext-border-color, $rulegroupext-border-color);
 $rulegroup-in-rulegroupext-border-color: var(--rulegroup-in-rulegroupext-border-color, $rulegroup-border-color);
+// using backgrounds for complex nesting will break level-based backgrounds
+//$rule-in-rulegroup-background: var(--rule-in-rulegroup-background, $rule-background);
+//$rulegroup-in-rulegroup-background: var(--rulegroup-in-rulegroup-background, $rulegroup-background);
+//$rulegroupext-in-rulegroup-background: var(--rulegroupext-in-rulegroup-background, $rulegroupext-background);
+//$rule-in-rulegroupext-background: var(--rule-in-rulegroupext-background, $rule-background);
+//$group-in-rulegroupext-background: var(--group-in-rulegroupext-background);
+//$rulegroupext-in-rulegroupext-background: var(--rulegroupext-in-rulegroupext-background, $rulegroupext-background);
+//$rulegroup-in-rulegroupext-background: var(--rulegroup-in-rulegroupext-background, $rulegroup-background);
 
 
-// [Static] vars for generating borders in loop
+// [Static] vars for generating level-based backgrounds
 $minLevel: 0;
 $maxLevel: 20;

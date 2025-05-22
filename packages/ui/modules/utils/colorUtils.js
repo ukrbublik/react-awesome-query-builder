@@ -1,15 +1,20 @@
 import {default as chroma} from "chroma-js";
 
-// todo: replace with chroma
-export const setOpacityForHex = (hex, alpha) => `${hex}${Math.floor(alpha * 255).toString(16).padStart(2, 0)}`;
+export const setColorOpacity = (color, alpha) => chroma(color).alpha(alpha).hex();
 
-export const generateCssVarsForLevels = (isDark, cssVar, baseColor, baseDarkColor = undefined, lightRatio = 0.1, darkRatio = 0.02, maxLevel = 20, minLevel = 0) => {
-  return Object.fromEntries(Array.from({length: maxLevel}, (_v, k) => k).filter(lev => lev >= minLevel).map(lev => [
-    `${cssVar}-${lev}`,
-    isDark
-      ? chroma(baseDarkColor ?? baseColor).tint((minLevel === 0 ? lev + 1 : lev) * darkRatio).hex()
-      : chroma(baseColor).shade((minLevel === 0 ? lev + 1 : lev) * lightRatio).hex(),
-  ]));
+export const generateCssVarsForLevels = (
+  isDark, cssVar, baseColor, baseDarkColor = undefined
+) => {
+  const maxLevel = 20;
+  const maxRatio = isDark ? 0.2 : 0.85;
+  return Object.fromEntries(Array.from({length: maxLevel + 1}, (_v, k) => k).map(lev => {
+    const k =  `${cssVar}-${lev}`;
+    const chr = chroma(isDark ? (baseDarkColor ?? baseColor) : baseColor);
+    const ratio = ((lev + 1) / (maxLevel + 1)) * maxRatio;
+    const chr2 = isDark ? chr.tint(ratio) : chr.shade(ratio);
+    const v = chr2.hex();
+    return [k, v];
+  }));
 };
 
 export const isDarkColor = (color) => {

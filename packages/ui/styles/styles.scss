@@ -284,15 +284,15 @@ $root_group: ".query-builder > .group-container > .group";
   // complex nesting
   // inside rule_group
   .rule_group .rule {
-    background: $rule-in-rulegroup-background;
+    //background: $rule-in-rulegroup-background;
     border-color: $rule-in-rulegroup-border-color;
   }
   .rule_group .rule_group {
-    background: $rulegroup-in-rulegroup-background;
+    //background: $rulegroup-in-rulegroup-background;
     border-color: $rulegroup-in-rulegroup-border-color;
   }
   .rule_group .rule_group_ext {
-    background: $rulegroupext-in-rulegroup-background;
+    //background: $rulegroupext-in-rulegroup-background;
     border-color: $rulegroupext-in-rulegroup-border-color;
   }
 
@@ -339,19 +339,19 @@ $root_group: ".query-builder > .group-container > .group";
   // complex nesting
   // inside rule_group_ext
   .rule_group_ext .rule {
-    background: $rule-in-rulegroupext-background;
+    //background: $rule-in-rulegroupext-background;
     border-color: $rule-in-rulegroupext-border-color;
   }
   .rule_group_ext .simple_group {
-    background: $group-in-rulegroupext-background;
+    //background: $group-in-rulegroupext-background;
     border-color: $group-in-rulegroupext-border-color;
   }
   .rule_group_ext .rule_group_ext {
-    background: $rulegroupext-in-rulegroupext-background;
+    //background: $rulegroupext-in-rulegroupext-background;
     border-color: $rulegroupext-in-rulegroupext-border-color;
   }
   .rule_group_ext .rule_group {
-    background: $rulegroup-in-rulegroupext-background;
+    //background: $rulegroup-in-rulegroupext-background;
     border-color: $rulegroup-in-rulegroupext-border-color;
   }
 

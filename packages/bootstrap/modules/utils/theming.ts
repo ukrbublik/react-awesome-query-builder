@@ -1,6 +1,6 @@
 import { Utils, Config, CssVars } from "@react-awesome-query-builder/ui";
 
-const { setOpacityForHex, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
+const { setColorOpacity, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
 const { logger } = Utils.OtherUtils;
 
 const generateCssVars = (_: any, config: Config) => {

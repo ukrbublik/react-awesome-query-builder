@@ -12,7 +12,7 @@ type SeedToken = Parameters<typeof antdTheme["defaultAlgorithm"]>[0];
 type MapToken = ReturnType<typeof antdTheme["defaultAlgorithm"]>;
 
 const { logger, isTruthy } = Utils.OtherUtils;
-const { setOpacityForHex, generateCssVarsForLevels, chroma, isDarkColor, isColor } = Utils.ColorUtils;
+const { setColorOpacity, generateCssVarsForLevels, chroma, isDarkColor, isColor } = Utils.ColorUtils;
 
 const buildAlgorithms = (darkMode: boolean, compactMode: boolean) => {
   const algorithms: Algorithm[] = [

@@ -433,16 +433,9 @@ export interface CssVarsFonts {
 
 // For advanced usage, not including in CssVars for now
 export interface CssVarsColorsForNesting {
-  "--rule-in-rulegroup-background"?: string;
-  "--rulegroup-in-rulegroup-background"?: string;
-  "--rulegroupext-in-rulegroup-background"?: string;
   "--rule-in-rulegroup-border-color"?: string;
   "--rulegroup-in-rulegroup-border-color"?: string;
   "--rulegroupext-in-rulegroup-border-color"?: string;
-  "--rule-in-rulegroupext-background"?: string;
-  "--group-in-rulegroupext-background"?: string;
-  "--rulegroupext-in-rulegroupext-background"?: string;
-  "--rulegroup-in-rulegroupext-background"?: string;
   "--rule-in-rulegroupext-border-color"?: string;
   "--group-in-rulegroupext-border-color"?: string; // defined in CssVarsBorderColors
   "--rulegroupext-in-rulegroupext-border-color"?: string;
@@ -571,8 +564,8 @@ interface VanillaWidgets {
 
 export interface ColorUtils {
   chroma: typeof chroma;
-  setOpacityForHex(hex: string, alpha: number): string;
-  generateCssVarsForLevels(isDark: boolean, cssVar: string, baseColor: string, baseDarkColor?: string, lightRatio?: number, darkRatio?: number, maxLevel?: number, minLevel?: number): Record<string, string>;
+  setColorOpacity(color: string, alpha: number): string;
+  generateCssVarsForLevels(isDark: boolean, cssVar: string, baseColor: string, baseDarkColor?: string): Record<string, string>;
   isDarkColor(color?: string): boolean;
   isColor(color: any): boolean;
 }

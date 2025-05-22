@@ -6,7 +6,7 @@ import mergeWith from "lodash/mergeWith";
 import omit from "lodash/omit";
 //import pick from "lodash/pick";
 
-const { setOpacityForHex, generateCssVarsForLevels, chroma, isDarkColor } = Utils.ColorUtils;
+const { setColorOpacity, generateCssVarsForLevels, chroma, isDarkColor } = Utils.ColorUtils;
 const { logger, isTruthy } = Utils.OtherUtils;
 
 const darkTheme: PartialTheme = {

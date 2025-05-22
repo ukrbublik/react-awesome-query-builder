@@ -8,12 +8,12 @@ import mergeWith from "lodash/mergeWith";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
 
-const { setOpacityForHex, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
+const { setColorOpacity, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
 const { logger } = Utils.OtherUtils;
 
 const filterBasicTheme = (theme: Theme) => {
   const filteredPalette: PaletteOptions = omit(theme.palette, [
-    "background", "text"
+    "background", "text", "divider", "action",
   ]);
   // filteredPalette = pick(filteredPalette, [
   //   "primary", "secondary", "error", "warning", "info", "success"
@@ -71,19 +71,15 @@ const generateCssVars = (theme: Theme, config: Config): CssVars => {
 
   let cssVars: CssVars = {
     "--main-background": palette.background.paper,
+
     "--rule-background": darkMode ? palette.background.paper : palette.background.paper,
-    "--group-background": darkMode ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
-    "--rulegroup-background": darkMode ? setOpacityForHex(palette.grey[900], 0.3) : setOpacityForHex(palette.grey[400], 0.1),
-    "--rulegroupext-background": darkMode ? setOpacityForHex(palette.grey[900], 0.3) : setOpacityForHex(palette.grey[400], 0.1),
-    "--switch-background": darkMode ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[400], 0.1),
-    "--case-background": darkMode ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
-
-    ...generateCssVarsForLevels(darkMode, "--group-background", palette.background.paper, undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(darkMode, "--rulegroup-background", chroma(palette.background.paper).hex(), undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(darkMode, "--rulegroupext-background", palette.background.paper, undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(darkMode, "--switch-background", palette.background.paper, undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(darkMode, "--case-background", palette.background.paper, undefined, 0.1, 0.01),
-
+    // level-based background colors
+    ...generateCssVarsForLevels(darkMode, "--group-background", palette.background.paper),
+    ...generateCssVarsForLevels(darkMode, "--rulegroup-background", palette.background.paper),
+    ...generateCssVarsForLevels(darkMode, "--rulegroupext-background", palette.background.paper),
+    ...generateCssVarsForLevels(darkMode, "--switch-background", palette.background.paper),
+    ...generateCssVarsForLevels(darkMode, "--case-background", palette.background.paper),
+    
     "--rule-border-color": darkMode ? palette.divider : palette.divider,
     "--group-border-color": darkMode ? palette.divider : palette.divider,
     "--rulegroup-border-color": darkMode ? palette.divider : palette.divider,
@@ -94,7 +90,7 @@ const generateCssVars = (theme: Theme, config: Config): CssVars => {
     "--treeline-color": palette.primary.main,
     "--treeline-switch-color": palette.secondary.main,
 
-    "--main-text-color": palette.text.secondary,
+    "--main-text-color": palette.text.primary,
     "--main-font-family": typography.fontFamily!,
     "--main-font-size": typography.fontSize + "px",
     "--item-radius": shape.borderRadius + "px",
@@ -103,10 +99,10 @@ const generateCssVars = (theme: Theme, config: Config): CssVars => {
   if (useThickLeftBorderOnHoverItem) {
     cssVars = {
       ...cssVars,
-      "--rule-border-left-width-hover": "2px",
-      "--group-border-left-width-hover": "2px",
-      "--rulegroup-border-left-width-hover": "2px",
-      "--rulegroupext-border-left-width-hover": "2px",
+      "--rule-border-left-width-hover": "3px",
+      "--group-border-left-width-hover": "3px",
+      "--rulegroup-border-left-width-hover": "3px",
+      "--rulegroupext-border-left-width-hover": "3px",
     };
   }
   

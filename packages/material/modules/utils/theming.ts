@@ -8,12 +8,12 @@ import pick from "lodash/pick";
 
 type PaletteOptions = NonNullable<ThemeOptions["palette"]>;
 
-const { setOpacityForHex, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
+const { setColorOpacity, generateCssVarsForLevels, chroma } = Utils.ColorUtils;
 const { logger } = Utils.OtherUtils;
 
 const filterBasicTheme = (theme: Theme) => {
   const filteredPalette: PaletteOptions = omit(theme.palette, [
-    "background", "text"
+    "background", "text", "divider", "action",
   ]);
   // filteredPalette = pick(filteredPalette, [
   //   "primary", "secondary", "error", "warning", "info", "success"
@@ -71,30 +71,26 @@ const generateCssVars = (theme: Theme, config: Config) => {
   
   let cssVars: CssVars = {
     "--main-background": palette.background.paper,
+
     "--rule-background": darkMode ? palette.background.paper : palette.background.paper,
-    "--group-background": darkMode ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
-    "--rulegroup-background": darkMode ? setOpacityForHex(palette.grey[900], 0.3) : setOpacityForHex(palette.grey[400], 0.1),
-    "--rulegroupext-background": darkMode ? setOpacityForHex(palette.grey[900], 0.3) : setOpacityForHex(palette.grey[400], 0.1),
-    "--switch-background": darkMode ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[400], 0.1),
-    "--case-background": darkMode ? setOpacityForHex(palette.grey[900], 0.8) : setOpacityForHex(palette.grey[500], 0.1),
-
-    ...generateCssVarsForLevels(darkMode, "--group-background", palette.background.paper, undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(darkMode, "--rulegroup-background", chroma(palette.background.paper).hex(), undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(darkMode, "--rulegroupext-background", palette.background.paper, undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(darkMode, "--switch-background", palette.background.paper, undefined, 0.1, 0.01),
-    ...generateCssVarsForLevels(darkMode, "--case-background", palette.background.paper, undefined, 0.1, 0.01),
-
-    "--rule-border-color": darkMode ? palette.action.selected : palette.action.selected,
-    "--group-border-color": darkMode ? palette.action.selected : palette.action.selected,
-    "--rulegroup-border-color": darkMode ? palette.action.selected : palette.action.selected,
-    "--rulegroupext-border-color": darkMode ? palette.action.selected : palette.action.selected,
-    "--switch-border-color": darkMode ? palette.action.selected : palette.action.selected,
-    "--case-border-color": darkMode ? palette.action.selected : palette.action.selected,
+    // level-based background colors
+    ...generateCssVarsForLevels(darkMode, "--group-background", palette.background.paper),
+    ...generateCssVarsForLevels(darkMode, "--rulegroup-background", palette.background.paper),
+    ...generateCssVarsForLevels(darkMode, "--rulegroupext-background", palette.background.paper),
+    ...generateCssVarsForLevels(darkMode, "--switch-background", palette.background.paper),
+    ...generateCssVarsForLevels(darkMode, "--case-background", palette.background.paper),
+    
+    "--rule-border-color": darkMode ? palette.divider : palette.divider,
+    "--group-border-color": darkMode ? palette.divider : palette.divider,
+    "--rulegroup-border-color": darkMode ? palette.divider : palette.divider,
+    "--rulegroupext-border-color": darkMode ? palette.divider : palette.divider,
+    "--switch-border-color": darkMode ? palette.divider : palette.divider,
+    "--case-border-color": darkMode ? palette.divider : palette.divider,
 
     "--treeline-color": palette.primary.main,
     "--treeline-switch-color": palette.secondary.main,
 
-    "--main-text-color": palette.text.secondary,
+    "--main-text-color": palette.text.primary,
     "--main-font-family": typography.fontFamily,
     "--main-font-size": typography.fontSize + "px",
     "--item-radius": shape.borderRadius + "px",
