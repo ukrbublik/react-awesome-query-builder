@@ -23,14 +23,6 @@ const settings = {
   renderProvider: (props, {RCE, W: {MuiProvider}}) => RCE(MuiProvider, props),
   renderConfirm: (props, {W: {MuiConfirm}}) => MuiConfirm(props),
   useConfirm: ({W: {MuiUseConfirm}}) => MuiUseConfirm(),
-
-  designSettings: {
-    ...(BasicConfig.settings.designSettings ?? {}),
-    generateCssVars: {
-      ...(BasicConfig.settings.designSettings.generateCssVars ?? {}),
-      mui: generateCssVars,
-    }
-  }
 };
 
 const widgets = {

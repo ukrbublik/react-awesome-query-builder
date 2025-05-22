@@ -36,14 +36,6 @@ const settings = {
 
   removeInvalidMultiSelectValuesOnLoad: false, // can be removed manually in UI
   normalizeListValues: function(...args) { return this.utils.normalizeListValues.call(null, ...args); },
-
-  designSettings: {
-    ...(BasicConfig.settings.designSettings ?? {}),
-    generateCssVars: {
-      ...(BasicConfig.settings.designSettings.generateCssVars ?? {}),
-      antd: generateCssVars,
-    }
-  }
 };
 
 

@@ -24,14 +24,6 @@ const settings = {
   renderProvider: (props, {RCE, W: {MaterialProvider}}) => RCE(MaterialProvider, props),
   renderConfirm: (props, {W: {MaterialConfirm}}) => MaterialConfirm(props),
   useConfirm: ({W: {MaterialUseConfirm}}) => MaterialUseConfirm(),
-
-  designSettings: {
-    ...(BasicConfig.settings.designSettings ?? {}),
-    generateCssVars: {
-      ...(BasicConfig.settings.designSettings.generateCssVars ?? {}),
-      material: generateCssVars,
-    }
-  }
 };
 
 

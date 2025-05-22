@@ -18,14 +18,6 @@ const settings = {
   renderProvider: (props, {RCE, W: {BootstrapProvider}}) => RCE(BootstrapProvider, props),
   renderConfirm: (props, {W: {BootstrapConfirm}}) => BootstrapConfirm(props),
   useConfirm: ({W: {BootstrapUseConfirm}}) => BootstrapUseConfirm(),
-
-  designSettings: {
-    ...(BasicConfig.settings.designSettings ?? {}),
-    generateCssVars: {
-      ...(BasicConfig.settings.designSettings.generateCssVars ?? {}),
-      bootstrap: generateCssVars,
-    }
-  }
 };
 
 

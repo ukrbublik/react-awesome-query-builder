@@ -18,14 +18,6 @@ const settings = {
   renderProvider: (props, {RCE, W: {FluentUIProvider}}) => RCE(FluentUIProvider, props),
   renderConfirm: (props, {W: {FluentUIConfirm}}) => FluentUIConfirm(props),
   useConfirm: ({W: {FluentUIUseConfirm}}) => FluentUIUseConfirm(),
-
-  designSettings: {
-    ...(BasicConfig.settings.designSettings ?? {}),
-    generateCssVars: {
-      ...(BasicConfig.settings.designSettings.generateCssVars ?? {}),
-      fluent: generateCssVars,
-    }
-  }
 };
 
 
