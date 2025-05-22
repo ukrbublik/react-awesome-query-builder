@@ -1,7 +1,7 @@
 import React from "react";
 import { Config } from "@react-awesome-query-builder/ui";
 import { useTheme } from "@mui/material/styles";
-import { generateCssVars } from "../../utils/theming";
+import { generateCssVars as defaultGenerateCssVars } from "../../utils/theming";
 
 interface CssVarsProviderProps {
   config: Config;
@@ -12,6 +12,7 @@ const CssVarsProvider: React.FC<CssVarsProviderProps> = ({ children, config }) =
   const ref = React.createRef<HTMLDivElement>();
   const themeMode = config.settings.themeMode ?? "light";
   const compactMode = config.settings.compactMode;
+  const generateCssVars = config.settings.designSettings?.generateCssVars?.mui ?? defaultGenerateCssVars;
 
   const theme = useTheme();
 

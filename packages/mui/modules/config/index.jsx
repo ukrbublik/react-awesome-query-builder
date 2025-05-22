@@ -1,6 +1,7 @@
 import React from "react";
 import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 import { default as MuiWidgets } from "../widgets";
+import { generateCssVars } from "../utils/theming";
 
 
 const settings = {
@@ -22,6 +23,14 @@ const settings = {
   renderProvider: (props, {RCE, W: {MuiProvider}}) => RCE(MuiProvider, props),
   renderConfirm: (props, {W: {MuiConfirm}}) => MuiConfirm(props),
   useConfirm: ({W: {MuiUseConfirm}}) => MuiUseConfirm(),
+
+  designSettings: {
+    ...(BasicConfig.settings.designSettings ?? {}),
+    generateCssVars: {
+      ...(BasicConfig.settings.designSettings.generateCssVars ?? {}),
+      mui: generateCssVars,
+    }
+  }
 };
 
 const widgets = {
