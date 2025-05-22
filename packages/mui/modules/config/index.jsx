@@ -103,6 +103,7 @@ const ctx = {
     ...BasicConfig.ctx.W,
     ...MuiWidgets,
   },
+  generateCssVars,
 };
 
 

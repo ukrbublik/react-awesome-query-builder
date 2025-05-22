@@ -2,6 +2,7 @@ import React from "react";
 import * as Widgets from "../components/widgets";
 import * as CustomOperators from "../components/operators";
 import { CoreConfig, Utils } from "@react-awesome-query-builder/core";
+import * as ColorUtils from "../utils/colorUtils";
 
 
 //----------------------------  conjunctions
@@ -168,6 +169,10 @@ const ctx = {
     ...CustomOperators
   },
   RCE: (C, P) => React.createElement(C, P),
+  utils: {
+    ...CoreConfig.ctx.utils,
+    ColorUtils,
+  }
 };
 
 //----------------------------
