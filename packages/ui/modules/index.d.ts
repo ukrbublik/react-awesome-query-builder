@@ -84,30 +84,30 @@ import chroma from "chroma-js";
 // override <C> in types
 /////////////////
 
-export type OperatorProximity<C = Config> = _OperatorProximity<C>;
-export type Operator<C = Config> = _Operator<C>;
-export type Operators<C = Config> = _Operators<C>;
+export type OperatorProximity<C = Config, CTX = ConfigContext> = _OperatorProximity<C, CTX>;
+export type Operator<C = Config, CTX = ConfigContext> = _Operator<C, CTX>;
+export type Operators<C = Config, CTX = ConfigContext> = _Operators<C, CTX>;
 export type FieldProps<C = Config> = _FieldProps<C>;
-export type Widget<C = Config> = _Widget<C>;
-export type Widgets<C = Config> = _Widgets<C>;
-export type BaseWidget<C = Config> = _BaseWidget<C>;
-export type RangeableWidget<C = Config> = _RangeableWidget<C>;
-export type TypedWidget<C = Config> = _TypedWidget<C>;
-export type TextWidget<C = Config> = _TextWidget<C>;
-export type NumberWidget<C = Config> = _NumberWidget<C>;
-export type RangeSliderWidget<C = Config> = _RangeSliderWidget<C>;
-export type DateTimeWidget<C = Config> = _DateTimeWidget<C>;
-export type TreeSelectWidget<C = Config> = _TreeSelectWidget<C>;
-export type TreeMultiSelectWidget<C = Config> = _TreeMultiSelectWidget<C>;
-export type SelectWidget<C = Config> = _SelectWidget<C>;
-export type MultiSelectWidget<C = Config> = _MultiSelectWidget<C>;
-export type BooleanWidget<C = Config> = _BooleanWidget<C>;
-export type FieldWidget<C = Config> = _FieldWidget<C>;
-export type FuncWidget<C = Config> = _FuncWidget<C>;
+export type Widget<C = Config, CTX = ConfigContext> = _Widget<C, CTX>;
+export type Widgets<C = Config, CTX = ConfigContext> = _Widgets<C, CTX>;
+export type BaseWidget<C = Config, CTX = ConfigContext> = _BaseWidget<C, CTX>;
+export type RangeableWidget<C = Config, CTX = ConfigContext> = _RangeableWidget<C, CTX>;
+export type TypedWidget<C = Config, CTX = ConfigContext> = _TypedWidget<C, CTX>;
+export type TextWidget<C = Config, CTX = ConfigContext> = _TextWidget<C, CTX>;
+export type NumberWidget<C = Config, CTX = ConfigContext> = _NumberWidget<C, CTX>;
+export type RangeSliderWidget<C = Config, CTX = ConfigContext> = _RangeSliderWidget<C, CTX>;
+export type DateTimeWidget<C = Config, CTX = ConfigContext> = _DateTimeWidget<C, CTX>;
+export type TreeSelectWidget<C = Config, CTX = ConfigContext> = _TreeSelectWidget<C, CTX>;
+export type TreeMultiSelectWidget<C = Config, CTX = ConfigContext> = _TreeMultiSelectWidget<C, CTX>;
+export type SelectWidget<C = Config, CTX = ConfigContext> = _SelectWidget<C, CTX>;
+export type MultiSelectWidget<C = Config, CTX = ConfigContext> = _MultiSelectWidget<C, CTX>;
+export type BooleanWidget<C = Config, CTX = ConfigContext> = _BooleanWidget<C, CTX>;
+export type FieldWidget<C = Config, CTX = ConfigContext> = _FieldWidget<C, CTX>;
+export type FuncWidget<C = Config, CTX = ConfigContext> = _FuncWidget<C, CTX>;
 /**
  * @deprecated
  */
-export type CaseValueWidget<C = Config> = _CaseValueWidget<C>;
+export type CaseValueWidget<C = Config, CTX = ConfigContext> = _CaseValueWidget<C, CTX>;
 export type ProximityProps<C = Config> = _ProximityProps<C>;
 export type ProximityOptions<C = Config> = _ProximityOptions<C>;
 export type WidgetProps<C = Config> = _WidgetProps<C>;
@@ -125,10 +125,10 @@ export type TreeMultiSelectWidgetProps<C = Config> = _TreeMultiSelectWidgetProps
  * @deprecated
  */
 export type CaseValueWidgetProps<C = Config> = _CaseValueWidgetProps<C>;
-export type CoreOperators<C = Config, CTX extends CoreConfigContext = ConfigContext> = _CoreOperators<C, CTX>;
-export type CoreWidgets<C = Config, CTX extends CoreConfigContext = ConfigContext> = _CoreWidgets<C, CTX>;
-export type ConfigMixin<C extends CoreConfigType = Config, CTX extends CoreConfigContext = ConfigContext> = _ConfigMixin<C, CTX>;
-export type ConfigMixinExt<C extends CoreConfigType = Config, CTX extends CoreConfigContext = ConfigContext> = _ConfigMixinExt<C, CTX>;
+export type CoreOperators<C = Config, CTX = ConfigContext> = _CoreOperators<C, CTX>;
+export type CoreWidgets<C = Config, CTX = ConfigContext> = _CoreWidgets<C, CTX>;
+export type ConfigMixin<C = Config, CTX = ConfigContext, S = Settings> = _ConfigMixin<C, CTX, S>;
+export type ConfigMixinExt<C = Config> = _ConfigMixinExt<C>;
 
 /////////////////
 // extend config
