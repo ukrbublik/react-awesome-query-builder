@@ -588,12 +588,24 @@ export interface NumberFormat {
   numericFormatter: (val: number, numericFormatProps: NumericFormatProps) => string;
   numericParser: (str: string, numericFormatProps: NumericFormatProps, lastStrValue?: string, lastNumValue?: number) => number | undefined;
 }
+
+interface ReactUtils {
+  useOnPropsChanged(obj: React.Component): void;
+  isUsingLegacyReactDomRender(node: HTMLElement): boolean;
+  liteShouldComponentUpdate(self: React.Component, config: Record<string, string | ((nextValue: any, prevValue: any, nextProps: any, prevProps: any) => boolean)>) : 
+    (nextProps: any, nextState: any) => boolean;
+  pureShouldComponentUpdate(self: React.Component): (nextProps: any, nextState: any) => boolean;
+  bindActionCreators<T extends Record<string, (...args: any[]) => any>>(
+    actionCreators: T, 
+    config: any, 
+    dispatch: (action: any) => any
+  ): { [K in keyof T]: (...args: Parameters<T[K]>) => ReturnType<(action: any) => any> };
+}
+
 export interface Utils extends CoreUtils {
   NumberFormat: NumberFormat;
   ColorUtils: ColorUtils;
-  // ReactUtils: {
-  //   useOnPropsChanged(obj: ReactElement): void;
-  // }
+  ReactUtils: ReactUtils;
 }
 
 // Ignore "Multiple exports of name 'Utils'"
