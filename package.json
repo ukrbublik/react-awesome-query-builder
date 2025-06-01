@@ -151,6 +151,14 @@
       "cross-spawn@7.0.3": "^7.0.6",
       "serialize-javascript@6.0.0": "^6.0.2",
       "micromatch@4.0.4": "^4.0.8"
-    }
+    },
+    "ignoredBuiltDependencies": [
+      "@parcel/watcher",
+      "core-js-pure",
+      "esbuild",
+      "nx",
+      "puppeteer",
+      "unrs-resolver"
+    ]
   }
 }
