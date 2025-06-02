@@ -6,6 +6,9 @@ import { SqlUtils } from "@react-awesome-query-builder/sql";
 import type { DemoQueryBuilderState } from "../types";
 import { validationTranslateOptions } from "../options";
 
+// Try to import the correct type
+import type { JsonLogicTree, JsonLogicFunction } from "@react-awesome-query-builder/ui";
+
 const stringify = JSON.stringify;
 
 export const useInput = (
@@ -65,11 +68,11 @@ export const useInput = (
 
   const importFromJsonLogic = () => {
     try {
-      // Parse the JSON string
-      const jsonLogicObj = JSON.parse(jsonLogicStr);
+      // Parse the JSON string with proper typing
+      const jsonLogicObj: unknown = JSON.parse(jsonLogicStr);
       
-      // Import using Utils.loadFromJsonLogic (or Utils.Import._loadFromJsonLogic if that's the correct path)
-      const tree = Utils.loadFromJsonLogic(jsonLogicObj, state.config);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      const tree = Utils.loadFromJsonLogic(jsonLogicObj as JsonLogicFunction, state.config);
       
       const {fixedTree, fixedErrors} = Utils.sanitizeTree(tree!, state.config, validationTranslateOptions);
       if (fixedErrors.length) {
@@ -84,7 +87,7 @@ export const useInput = (
       setJsonLogicErrors([]);
       setShowJsonEditor(false);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Invalid JSON format';
+      const errorMessage = error instanceof Error ? error.message : "Invalid JSON format";
       setJsonLogicErrors([errorMessage]);
     }
   };
@@ -102,9 +105,9 @@ export const useInput = (
         <br />
         { state.spelErrors.length > 0
              && <pre className="qb-demo-error-pre">
-              {stringify(state.spelErrors, undefined, 2)}
-            </pre>
-         }
+               {stringify(state.spelErrors, undefined, 2)}
+             </pre>
+        }
       </div>
     );
   };
@@ -122,14 +125,14 @@ export const useInput = (
         <br />
         { state.sqlErrors.length > 0
              && <pre className="qb-demo-error-pre">
-              {stringify(state.sqlErrors, undefined, 2)}
-            </pre>
-         }
+               {stringify(state.sqlErrors, undefined, 2)}
+             </pre>
+        }
         { state.sqlWarnings.length > 0
              && <pre className="qb-demo-warning-pre">
-              {stringify(state.sqlWarnings, undefined, 2)}
-            </pre>
-         }
+               {stringify(state.sqlWarnings, undefined, 2)}
+             </pre>
+        }
       </div>
     );
   };
@@ -147,24 +150,24 @@ export const useInput = (
         
         {showJsonEditor && (
           <div className="json-editor-modal" style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'white',
-            border: '1px solid #ccc',
-            borderRadius: '8px',
-            padding: '20px',
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+            padding: "20px",
             zIndex: 1000,
-            width: '80%',
-            maxWidth: '800px',
-            maxHeight: '80%',
-            overflow: 'auto',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            width: "80%",
+            maxWidth: "800px",
+            maxHeight: "80%",
+            overflow: "auto",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
               <h3>Import from JsonLogic</h3>
-              <button onClick={() => setShowJsonEditor(false)} style={{ fontSize: '18px', cursor: 'pointer' }}>×</button>
+              <button onClick={() => setShowJsonEditor(false)} style={{ fontSize: "18px", cursor: "pointer" }}>×</button>
             </div>
             
             <textarea
@@ -172,28 +175,28 @@ export const useInput = (
               onChange={(e) => onChangeJsonLogicStr(e.target.value)}
               placeholder='Enter JsonLogic JSON here, e.g.: {"==": [{"var": "name"}, "John"]}'
               style={{
-                width: '100%',
-                height: '300px',
-                fontFamily: 'monospace',
-                fontSize: '14px',
-                padding: '10px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                resize: 'vertical'
+                width: "100%",
+                height: "300px",
+                fontFamily: "monospace",
+                fontSize: "14px",
+                padding: "10px",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                resize: "vertical"
               }}
             />
             
-            <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
-              <button onClick={importFromJsonLogic} style={{ padding: '8px 16px' }}>
+            <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
+              <button onClick={importFromJsonLogic} style={{ padding: "8px 16px" }}>
                 Import
               </button>
-              <button onClick={() => setShowJsonEditor(false)} style={{ padding: '8px 16px' }}>
+              <button onClick={() => setShowJsonEditor(false)} style={{ padding: "8px 16px" }}>
                 Cancel
               </button>
             </div>
             
             {jsonLogicErrors.length > 0 && (
-              <pre className="qb-demo-error-pre" style={{ marginTop: '10px' }}>
+              <pre className="qb-demo-error-pre" style={{ marginTop: "10px" }}>
                 {stringify(jsonLogicErrors, undefined, 2)}
               </pre>
             )}
@@ -204,12 +207,12 @@ export const useInput = (
           <div 
             className="json-editor-backdrop"
             style={{
-              position: 'fixed',
+              position: "fixed",
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
               zIndex: 999
             }}
             onClick={() => setShowJsonEditor(false)}
