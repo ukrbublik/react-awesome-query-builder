@@ -8,6 +8,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Check from "@mui/icons-material/Check";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Tooltip from "@mui/material/Tooltip";
+
 import Typography from "@mui/material/Typography";
 
 const ValueSource = React.memo(({ valueSrc, srcKey, handleChange, info }) => {
@@ -29,7 +31,7 @@ const ValueSource = React.memo(({ valueSrc, srcKey, handleChange, info }) => {
 });
 
 const ValueSources = React.memo(({ valueSources, valueSrc, title, setValueSrc, readonly, config}) => {
-  const {renderSize} = config.settings;
+  const {renderSize, showSelectedValueSourceLabel} = config.settings;
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleOpen = useCallback((event) => {
@@ -66,14 +68,32 @@ const ValueSources = React.memo(({ valueSources, valueSrc, title, setValueSrc, r
   const selectedOption = valueSources.find(([srcKey, _info]) => srcKey === (valueSrc || "value"));
   const selectedLabel = selectedOption ? selectedOption[1].label : "";
 
+  const icon = (<ExpandMoreSharpIcon />);
+  const label = (
+    <Typography variant="body2" sx={{ mr: 0.5 }}>
+      {selectedLabel}
+    </Typography>
+  );
+  const iconButton = (
+    <IconButton size={renderSize} onClick={toggleOpenClose}>
+      {icon}
+    </IconButton>
+  );
+  const withLabel = showSelectedValueSourceLabel ? (
+    <>
+      {label}
+      {iconButton}
+    </>
+  ) : iconButton;
+  const withTooltip = !showSelectedValueSourceLabel ? (
+    <Tooltip title={selectedLabel} placement="top">
+      {withLabel}
+    </Tooltip>
+  ) : withLabel;
+
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
-      <Typography variant="body2" sx={{ mr: 0.5 }}>
-        {selectedLabel}
-      </Typography>
-      <IconButton size={renderSize} onClick={toggleOpenClose}>
-        <ExpandMoreSharpIcon />
-      </IconButton>
+      {withTooltip}
 
       <Menu
         size={renderSize}

@@ -105,7 +105,7 @@ export default ({
   );
   if (tooltipText) {
     res = (
-      <Tooltip title={!open ? tooltipText : null}>{res}</Tooltip>
+      <Tooltip title={!open ? tooltipText : null} placement="top">{res}</Tooltip>
     );
   }
   res = <FormControl>{res}</FormControl>;
