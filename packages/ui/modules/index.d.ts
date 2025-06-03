@@ -591,15 +591,6 @@ export interface NumberFormat {
 
 interface ReactUtils {
   useOnPropsChanged(obj: React.Component): void;
-  isUsingLegacyReactDomRender(node: HTMLElement): boolean;
-  liteShouldComponentUpdate(self: React.Component, config: Record<string, string | ((nextValue: any, prevValue: any, nextProps: any, prevProps: any) => boolean)>) : 
-    (nextProps: any, nextState: any) => boolean;
-  pureShouldComponentUpdate(self: React.Component): (nextProps: any, nextState: any) => boolean;
-  bindActionCreators<T extends Record<string, (...args: any[]) => any>>(
-    actionCreators: T, 
-    config: any, 
-    dispatch: (action: any) => any
-  ): { [K in keyof T]: (...args: Parameters<T[K]>) => ReturnType<(action: any) => any> };
 }
 
 export interface Utils extends CoreUtils {
