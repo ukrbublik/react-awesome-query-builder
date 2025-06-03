@@ -8,6 +8,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Check from "@mui/icons-material/Check";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Typography from "@mui/material/Typography";
 
 const ValueSource = React.memo(({ valueSrc, srcKey, handleChange, info }) => {
   const isSelected = valueSrc == srcKey || !valueSrc && srcKey == "value";
@@ -62,8 +63,14 @@ const ValueSources = React.memo(({ valueSources, valueSrc, title, setValueSrc, r
 
   const open = Boolean(anchorEl);
 
+  const selectedOption = valueSources.find(([srcKey, _info]) => srcKey === (valueSrc || "value"));
+  const selectedLabel = selectedOption ? selectedOption[1].label : "";
+
   return (
-    <div>
+    <div style={{ display: "flex", alignItems: "center" }}>
+      <Typography variant="body2" sx={{ mr: 0.5 }}>
+        {selectedLabel}
+      </Typography>
       <IconButton size={renderSize} onClick={toggleOpenClose}>
         <ExpandMoreSharpIcon />
       </IconButton>
