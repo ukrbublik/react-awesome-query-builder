@@ -559,13 +559,13 @@ interface Export {
 }
 interface Autocomplete {
   simulateAsyncFetch(all: ListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
-  getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
+  getListValue(value: ListValueSimple, listValues: ListValues): ListItem; // get by value
   // internal
   mergeListValues(oldValues: ListItems, newValues: ListItems, toStart?: boolean): ListItems;
   listValueToOption(listItem: ListItem): ListOptionUi;
-  fixListValuesGroupOrder(listValues: ListValues): ListValues;
-  optionsToListValues(vals: ListItems, listValues: ListValues, allowCustomValues: boolean): [ListItems, ListItems];
-  optionToListValue(val: ListItem | undefined, listValues: ListValues, allowCustomValues: boolean): ListItem | undefined;
+  fixListValuesGroupOrder(listValues: ListItems): ListItems;
+  optionsToListValues(vals: Array<ListValueAny | undefined | null>, listValues: ListValues, allowCustomValues: boolean): [ListValueSimple[] | undefined, ListItems];
+  optionToListValue(val: ListValueAny | undefined | null, listValues: ListValues, allowCustomValues: boolean): [ListValueSimple | undefined, ListItems | undefined];
 }
 interface ConfigUtils {
   areConfigsSame(config1: Config, config2: Config): boolean;
