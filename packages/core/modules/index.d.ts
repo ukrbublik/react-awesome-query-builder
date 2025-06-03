@@ -563,6 +563,9 @@ interface Autocomplete {
   // internal
   mergeListValues(oldValues: ListItems, newValues: ListItems, toStart?: boolean): ListItems;
   listValueToOption(listItem: ListItem): ListOptionUi;
+  fixListValuesGroupOrder(listValues: ListValues): ListValues;
+  optionsToListValues(vals: ListItems, listValues: ListValues, allowCustomValues: boolean): [ListItems, ListItems];
+  optionToListValue(val: ListItem | undefined, listValues: ListValues, allowCustomValues: boolean): ListItem | undefined;
 }
 interface ConfigUtils {
   areConfigsSame(config1: Config, config2: Config): boolean;
@@ -623,6 +626,8 @@ interface ListUtils {
   toListValue(value: string | number | ListItem, title?: string): ListItem | undefined; // create
   makeCustomListValue(value: string | number): ListItem; // create
   mapListValues<T>(listValues : ListValues, mapFn: (item: ListItem | undefined) => T | null) : T[];
+  getItemInListValues(listValues: ListValues, value: string | number): ListItem | undefined;
+  getValueInListValues(listValues: ListValues, value: string | number): string | number;
 }
 interface TreeUtils {
   jsToImmutable(value: any): AnyImmutable;
@@ -729,6 +734,15 @@ interface OtherUtils {
   isImmutable(value: any): boolean;
   toImmutableList(path: string[]): ImmutablePath;
   isTruthy<T>(value: T | false | null | undefined): value is T;
+  isObject<T>(value: T): boolean;
+  typeOf<T>(value: T): "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function" | "array";
+  isTypeOf<T>(value: T, type: "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function" | "array"): boolean;
+  isObjectOrArray<T>(value: T): boolean;
+}
+
+interface ConfigMixins {
+  addMixins: (config: Config, mixins: ConfigMixin) => Config;
+  removeMixins: (config: Config, mixins: ConfigMixin) => Config;
 }
 
 export interface Utils extends Import, Export,
@@ -751,7 +765,7 @@ export interface Utils extends Import, Export,
   ListUtils: ListUtils;
   TreeUtils: TreeUtils;
   OtherUtils: OtherUtils;
-
+  ConfigMixins: ConfigMixins;
   i18n: i18n;
 }
 
