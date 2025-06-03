@@ -503,6 +503,7 @@ export interface ThemeSettings {
   defaultSearchWidth?: string;
   defaultMaxRows?: number;
   showLabels?: boolean;
+  showSelectedValueSourceLabel?: boolean;
   maxLabelsLength?: number;
 }
 
