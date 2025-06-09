@@ -1,5 +1,6 @@
 import React from "react";
 import { Config } from "@react-awesome-query-builder/ui";
+// @ts-ignore antd v4 doesn't have theme
 import { theme as antdTheme } from "antd";
 import { generateCssVars as defaultGenerateCssVars } from "../../utils/theming";
 
@@ -16,7 +17,7 @@ const CssVarsProvider: React.FC<CssVarsProviderProps> = ({ children, config }) =
   const liteMode = config.settings.liteMode;
   const enableCssVars = !!config.settings.designSettings?.generateCssVarsFromThemeLibrary;
 
-  const { token, theme } = antdTheme.useToken();
+  const { token, theme } = antdTheme?.useToken() ?? {}; // antd v4 doesn't have theme
 
   React.useEffect(() => {
     const cssVarsTarget = ref.current;
@@ -35,7 +36,7 @@ const CssVarsProvider: React.FC<CssVarsProviderProps> = ({ children, config }) =
         cssVarsTarget?.style.removeProperty(k);
       }
     };
-  }, [themeMode, renderSize, ref, theme.id, config, enableCssVars]);
+  }, [themeMode, renderSize, ref, theme?.id, config, enableCssVars]);
 
   return(<div ref={ref} className={`qb-antd qb-${themeMode} ${compactMode ? "qb-compact" : ""} ${liteMode ? "qb-lite" : ""}`}>{children}</div>);
 };

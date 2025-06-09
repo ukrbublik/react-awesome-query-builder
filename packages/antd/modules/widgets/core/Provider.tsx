@@ -1,5 +1,6 @@
 import React from "react";
 import { ProviderProps } from "@react-awesome-query-builder/ui";
+// @ts-ignore antd v4 doesn't have theme
 import { ConfigProvider, ConfigProviderProps, theme as antdTheme } from "antd";
 import { CssVarsProvider } from "./CssVarsProvider";
 import { buildAlgorithms, mergeThemes } from "../../utils/theming";
@@ -16,7 +17,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
   const canCreateAlgorithms = darkMode || compactMode;
   const canCreateTheme = !!themeConfig || localeConfig || canCreateAlgorithms;
 
-  const { token: existingOuterToken, theme: existingTheme } = antdTheme.useToken();
+  const { token: existingOuterToken, theme: existingTheme } = antdTheme?.useToken() ?? {}; // antd v4 doesn't have theme
   const existingToken = config.settings.designSettings?.canInheritThemeFromOuterProvider ? existingOuterToken : undefined;
 
   const { algorithms } = React.useMemo<ReturnType<typeof buildAlgorithms>>(() => {
@@ -25,7 +26,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
 
   const customThemeConfig = React.useMemo<ThemeConfig>(() => {
     return canCreateTheme ? mergeThemes(themeMode, existingToken, themeConfig, algorithms) : undefined;
-  }, [algorithms, themeConfig, existingTheme.id, themeMode, canCreateTheme]);
+  }, [algorithms, themeConfig, existingTheme?.id, themeMode, canCreateTheme]);
 
   const withCssVarsProvider = (
     <CssVarsProvider config={config}>
@@ -38,6 +39,7 @@ const Provider: React.FC<ProviderProps> = ({ config, children }) => {
     // @ts-ignore error TS2786: 'ConfigProvider' cannot be used as a JSX component. Its return type 'ReactNode | Promise<ReactNode>' is not a valid JSX element.
     <ConfigProvider
       locale={localeConfig as Locale | undefined}
+      // @ts-ignore antd v4 doesn't have theme
       theme={customThemeConfig}
     >{withCssVarsProvider}</ConfigProvider>
   ) : withCssVarsProvider;

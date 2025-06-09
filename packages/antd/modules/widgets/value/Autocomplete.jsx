@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from "react";
-import { Select, Divider, Tooltip } from "antd";
+import { Select, Divider, Tooltip, version as antdVersion } from "antd";
 import { calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../utils/domUtils";
 import { Hooks , Utils } from "@react-awesome-query-builder/ui";
 const { fixListValuesGroupOrder } = Utils.Autocomplete;
@@ -241,6 +241,14 @@ export default (props) => {
     return matches;
   }, [config]);
 
+  const selectProps = {};
+  const antdMajorVersion = parseInt(antdVersion.split(".")[0]);
+  if (antdMajorVersion >= 5) {
+    selectProps.popupMatchSelectWidth = customProps?.popupMatchSelectWidth || customProps?.dropdownMatchSelectWidth || false;
+  } else {
+    selectProps.dropdownMatchSelectWidth = customProps?.popupMatchSelectWidth || customProps?.dropdownMatchSelectWidth || false;
+  }
+
   return (
     <Select
       filterOption={useAsyncSearch ? false : filterOption}
@@ -252,7 +260,6 @@ export default (props) => {
       style={customProps?.style || style}
       dropdownStyle={customProps?.dropdownStyle || dropdownStyle}
       key={"widget-autocomplete"}
-      popupMatchSelectWidth={customProps?.popupMatchSelectWidth || customProps?.dropdownMatchSelectWidth || false}
       placeholder={customProps?.placeholder || dynamicPlaceholder}
       onDropdownVisibleChange={onDropdownVisibleChange}
       onChange={aOnChange}
@@ -266,6 +273,7 @@ export default (props) => {
       searchValue={inputValue}
       open={open}
       options={optionsToRender}
+      {...selectProps}
       {...customProps}
     >
     </Select>

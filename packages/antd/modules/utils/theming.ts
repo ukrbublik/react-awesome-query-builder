@@ -1,6 +1,7 @@
 // https://ant.design/docs/react/customize-theme
 
 import { Utils, RenderSize, Config, ThemeMode, CssVars } from "@react-awesome-query-builder/ui";
+// @ts-ignore antd v4 doesn't have theme
 import { theme as antdTheme, ConfigProviderProps, GlobalToken } from "antd";
 import omitBy from "lodash/omitBy";
 import pickBy from "lodash/pickBy";
@@ -15,6 +16,10 @@ const { logger, isTruthy } = Utils.OtherUtils;
 const { setColorOpacity, generateCssVarsForLevels, chroma, isDarkColor, isColor } = Utils.ColorUtils;
 
 const buildAlgorithms = (darkMode: boolean, compactMode: boolean) => {
+  if (!antdTheme) {
+    // antd v4 doesn't have theme
+    return {};
+  }
   const algorithms: Algorithm[] = [
     darkMode && antdTheme.darkAlgorithm,
     compactMode && antdTheme.compactAlgorithm,
@@ -49,22 +54,23 @@ const detectTokenThemeMode = (token: GlobalToken | undefined): ThemeMode | undef
 const filterBasicTokens = (token: GlobalToken) => {
   return pickBy(token, (tokenValue: string | number | boolean, tokenName: keyof GlobalToken) => {
     return (
-      // preserve primary color!
-      tokenName === "colorPrimary"
-      // seed color tokens - seems fine to reuse
-      || [
-        "colorInfo",
-        "colorSuccess",
-        "colorWarning",
-        "colorError",
-        "colorLink",
-      ].includes(tokenName)
-      // non-color tokens
-      || tokenName.startsWith("boxShadow")
-      || tokenName.startsWith("font")
-      || tokenName.startsWith("lineType")
-      || tokenName.startsWith("motion")
-      || typeof tokenValue !== "string"
+      typeof tokenName === "string" && (
+        // preserve primary color!
+        tokenName === "colorPrimary"
+        // seed color tokens - seems fine to reuse
+        || [
+          "colorInfo",
+          "colorSuccess",
+          "colorWarning",
+          "colorError",
+          "colorLink",
+        ].includes(tokenName)
+        // non-color tokens
+        || tokenName.startsWith("boxShadow")
+        || tokenName.startsWith("font")
+        || tokenName.startsWith("lineType")
+        || tokenName.startsWith("motion")
+      ) || typeof tokenValue !== "string"
     );
   }) as GlobalToken;
 };
@@ -75,12 +81,12 @@ const filterTokens = (token: GlobalToken) => {
   return filterBasicTokens(token);
 };
 
-export const mergeThemes = (themeMode: ThemeMode | undefined, existingToken: GlobalToken | undefined, themeConfig: ThemeConfig | undefined, algorithms: Algorithm[]) => {
+export const mergeThemes = (themeMode: ThemeMode | undefined, existingToken: GlobalToken | undefined, themeConfig: ThemeConfig | undefined, algorithms?: Algorithm[]) => {
   const tokenThemeMode = detectTokenThemeMode(existingToken);
   const canInheritToken = !themeMode || !existingToken || themeMode == tokenThemeMode;
   const filteredExistingToken = existingToken ? filterTokens(existingToken) : undefined;
   const mergedTheme: ThemeConfig = {
-    ...(algorithms.length ? { algorithm: algorithms } : {}),
+    ...(algorithms?.length ? { algorithm: algorithms } : {}),
     ...(existingToken ? { token: filteredExistingToken } : {}),
     inherit: canInheritToken,
     ...(themeConfig ? themeConfig : {}),
@@ -96,24 +102,29 @@ export const mergeThemes = (themeMode: ThemeMode | undefined, existingToken: Glo
   return mergedTheme;
 };
 
-const generateCssVars = (token: GlobalToken, config: Config) => {
+const generateCssVars = (token: GlobalToken | undefined, config: Config) => {
   // logger.log("generateCssVars - antd token", token);
-  const darkMode = isDarkColor(token.colorBgBase)!;
+  const darkMode = isDarkColor(token?.colorBgBase)!;
   const renderSize = config.settings.renderSize;
   const useThickLeftBorderOnHoverItem = config.settings.designSettings?.useThickLeftBorderOnHoverItem ?? false;
   const useShadowOnHoverItem = config.settings.designSettings?.useShadowOnHoverItem ?? false;
 
+  if (!token) {
+    // antd v4 doesn't have theme
+    return {} as CssVars;
+  }
+
   let sizedBorderRadius;
   switch (renderSize) {
   case "large":
-    sizedBorderRadius = token?.borderRadiusLG ?? token?.borderRadius;
+    sizedBorderRadius = token.borderRadiusLG ?? token.borderRadius;
     break;
   case "small": 
-    sizedBorderRadius = token?.borderRadiusSM ?? token?.borderRadius;
+    sizedBorderRadius = token.borderRadiusSM ?? token.borderRadius;
     break;
   case "medium":
   default:
-    sizedBorderRadius = token?.borderRadius;
+    sizedBorderRadius = token.borderRadius;
     break;
   }
 
