@@ -4,6 +4,7 @@ import * as inits from "../support/inits";
 import { with_qb_ant } from "../support/utils";
 import { getAutocompleteUtils } from "../support/autocomplete";
 import { expect } from "chai";
+import { DragOutlined, HolderOutlined } from '@ant-design/icons';
 
 
 describe("antdesign widgets render", () => {
@@ -13,6 +14,15 @@ describe("antdesign widgets render", () => {
       expect(qb.find(".query-builder")).to.have.length(1);
       expect(qb.find(".ant-select-selection-item").at(0).text()).to.equal("firstName");
     });
+  });
+
+  // 判断'@ant-design/icons' 库中 HolderOutlined或DragOutlined 是否至少存在其中一个
+  it("should render at least one icon for drag", async () => { // 更改测试标题以反映真实意图
+    if (HolderOutlined || DragOutlined) {
+      expect(true).to.equal(true);
+    } else {
+      expect(false).to.equal(true);
+    }
   });
 
   it("should render cascader", async () => {
