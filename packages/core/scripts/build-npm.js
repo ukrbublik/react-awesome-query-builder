@@ -1,6 +1,6 @@
 const { rmSync, mkdirSync, copyFileSync } = require('fs');
 const { resolve, dirname } = require('path');
-const { execSync } = require('child_process');
+const { execSync, execFileSync } = require('child_process');
 let globbySync; // to be imported dynamically using ESM syntax
 
 const SCRIPTS = __dirname;
@@ -65,11 +65,17 @@ async function main() {
   execSync("npm run tsc-emit-types", { stdio: 'inherit' });
 
   // cjs
-  execSync(`${BABEL} --extensions ".ts,.js" -d ${CJS} ${MODULES}`, { stdio: 'inherit' });
+  execFileSync(
+    BABEL, ['--extensions', '.ts,.js', '-d', CJS, MODULES],
+    { stdio: 'inherit' }
+  );
   deleteFilesSync(CJS, `*.d.js`);
 
   // esm
-  execSync(`ESM=1 ${BABEL} --extensions ".ts,.js" -d ${ESM} ${MODULES}`, { stdio: 'inherit' });
+  execFileSync(
+    BABEL, ['--extensions', '.ts,.js', '-d', ESM, MODULES],
+    { stdio: 'inherit', env: { ...process.env, ESM: '1' } }
+  );
   deleteFilesSync(ESM, `*.d.js`);
 
   // copy .d.ts files
