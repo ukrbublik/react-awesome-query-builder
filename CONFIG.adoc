@@ -445,6 +445,7 @@ Theme settings:
 |defaultMaxRows |5 | Max rows for `textarea` widget
 |maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
 |showLabels |false |Show labels above all fields?
+|showSelectedValueSourceLabel |false |Show selected value source label?
 |===
 
 
