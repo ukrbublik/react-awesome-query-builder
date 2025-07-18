@@ -27,7 +27,7 @@ Now [Fluent UI](https://developer.microsoft.com/en-us/fluentui#/get-started/web)
 
 See [live demo](https://ukrbublik.github.io/react-awesome-query-builder) 
 
-[![Edit in codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/ukrbublik/react-awesome-query-builder/master?file=%2Fpackages%2Fexamples%2Fdemo%2Findex.tsx)
+[![Edit in codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/ukrbublik/react-awesome-query-builder/master?file=%2Fpackages%2Fexamples%2Fsrc%2Fdemo%2Findex.tsx)
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/ukrbublik/react-awesome-query-builder)
 
 

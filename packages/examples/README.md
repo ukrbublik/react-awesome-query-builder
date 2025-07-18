@@ -31,7 +31,7 @@ Feel free to play with code in [`demo`](demo) (advanced demo) and [`demo_switch`
 [![Open in codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/packages/examples?file=/demo/index.tsx)
 (if it freezes on "Initializing Sandbox Container" please click "Fork")
 
-[![Open in stackblitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/ukrbublik/react-awesome-query-builder/tree/master?file=packages%examples%2Fdemo%2Findex.tsx)
+[![Open in stackblitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/ukrbublik/react-awesome-query-builder/tree/master?file=packages%2Fexamples%2Fsrc%2Fdemo%2Findex.tsx)
 (installing dependencies can take a while)
 
 ### Testing antd v4
