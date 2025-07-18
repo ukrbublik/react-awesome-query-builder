@@ -30,7 +30,7 @@
   "module": "./esm/index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "build": "sh ./scripts/build-npm.sh",
+    "build": "node ./scripts/build-npm.js",
     "eslint": "eslint --ext .js --ext .ts  ./modules/",
     "lint": "npm run eslint && npm run tsc-lint",
     "lint-fix": "eslint --ext .js --ext .ts --fix  ./modules/",
