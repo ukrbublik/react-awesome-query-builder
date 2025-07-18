@@ -37,3 +37,13 @@ Feel free to play with code in [`demo`](demo) (advanced demo) and [`demo_switch`
 ### Testing antd v4
 
 Best way is to change verison of `antd` and `@ant-design/icons` in `package.json` for both `examples` and `antd` packages.
+
+In file [`src/skins/lazyStyles/antd.tsx`](/packages/examples/src/skins/lazyStyles/antd.tsx) uncomment
+
+```js
+//import antd from "antd/dist/antd.css";
+...
+//(antd as LazyStyleModule).use();
+...
+//(antd as LazyStyleModule).unuse();
+```
