@@ -15,7 +15,7 @@
 echo "(before) node: $(node -v)"
 echo "(before) pnpm: $(pnpm -v)"
 
-if [ -f ~/.nvm/nvm.sh ]; then
+if [[ -f ~/.nvm/nvm.sh ]]; then
     . ~/.nvm/nvm.sh
     nvm use
 else
@@ -32,7 +32,7 @@ if [[ "$(pnpm -v)" != "9."* ]]; then
     echo "Now pnpm: $(pnpm -v)"
 fi
 
-if [ $# -gt 0 ]; then
+if [[ $# -gt 0 ]]; then
     orig_cmd="$1"
     fixed_cmd="${orig_cmd/yarn run/pnpm run}"
     bin="$(which $fixed_cmd | head -n 1)"
