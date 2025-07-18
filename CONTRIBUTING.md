@@ -14,7 +14,7 @@ Pull Requests are always welcomed :)
 
 We use [pnpm](https://pnpm.io/). Please [install pnpm](https://pnpm.io/installation):
 ```
-npm install -g pnpm@8
+npm install -g pnpm@9
 ```
 Clone this repo, install deps with `pnpm i`.
 

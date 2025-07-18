@@ -26,9 +26,9 @@ fi
 echo "Now node: $(node -v)"
 echo "Now pnpm: $(pnpm -v)"
 
-if [[ "$(pnpm -v)" != "8."* ]]; then
+if [[ "$(pnpm -v)" != "9."* ]]; then
     echo "Installing pnpm..."
-    npm i -g pnpm@8
+    npm i -g pnpm@9
     echo "Now pnpm: $(pnpm -v)"
 fi
 
