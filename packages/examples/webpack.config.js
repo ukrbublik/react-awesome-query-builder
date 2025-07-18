@@ -140,11 +140,14 @@ const babel_options = {
         ["@babel/plugin-transform-private-property-in-object", { "loose": true }],
         "@babel/plugin-transform-runtime",
         ...(isDev ? ["react-refresh/babel"] : []),
-        ["import", {
-            "libraryName": "antd",
-            "style": false,
-            "libraryDirectory": "es"
-        }],
+        // TODO: can safely remove?
+        // not needed for antd v5
+        // https://ant.design/docs/react/migration-v5#remove-babel-plugin-import
+        // ["import", {
+        //     "libraryName": "antd",
+        //     "style": false,
+        //     "libraryDirectory": "es"
+        // }],
     ]
 };
 

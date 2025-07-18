@@ -4,6 +4,7 @@
   - Improved theming (PR #1188) (issues #892 #970 #599)
   - Dropped `compact_styles.scss`. Use class `.qb-compact` instead if you need. See new `vars_compact.scss` (PR #1188)
   - Added customized modals to confirm item deleteion for Fluent, Bootstrap (PR #1188)
+  - Added some missing type declarations. Restored support of AntDesign v4 (PR #1264)
   - Added `showSelectedValueSourceLabel` to config settings (PR #1272) (issue #1144)
 - 6.6.15
   - Fixed support of AntDesign 4.x DatePicker (PR #1239) (issue #1238)

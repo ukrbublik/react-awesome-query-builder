@@ -589,12 +589,15 @@ export interface NumberFormat {
   numericFormatter: (val: number, numericFormatProps: NumericFormatProps) => string;
   numericParser: (str: string, numericFormatProps: NumericFormatProps, lastStrValue?: string, lastNumValue?: number) => number | undefined;
 }
+
+interface ReactUtils {
+  useOnPropsChanged(obj: React.Component): void;
+}
+
 export interface Utils extends CoreUtils {
   NumberFormat: NumberFormat;
   ColorUtils: ColorUtils;
-  // ReactUtils: {
-  //   useOnPropsChanged(obj: ReactElement): void;
-  // }
+  ReactUtils: ReactUtils;
 }
 
 // Ignore "Multiple exports of name 'Utils'"

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../utils/domUtils";
-import { Select } from "antd";
+import { Select, version as antdVersion } from "antd";
 import omit from "lodash/omit";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { useOnPropsChanged } = Utils.ReactUtils;
@@ -75,17 +75,25 @@ export default class SelectWidget extends Component {
     const aValue = value != undefined ? value+"" : undefined;
     const customSelectProps = omit(customProps, [""]);
 
+    const selectProps = {};
+    const antdMajorVersion = parseInt(antdVersion.split(".")[0]);
+    if (antdMajorVersion >= 5) {
+      selectProps.popupMatchSelectWidth = false;
+    } else {
+      selectProps.dropdownMatchSelectWidth = false;
+    }
+
     return (
       <Select
         disabled={readonly}
         style={{ width }}
         key={"widget-select"}
-        popupMatchSelectWidth={false}
         placeholder={placeholder}
         size={renderSize}
         value={aValue}
         onChange={this.handleChange}
         filterOption={this.filterOption}
+        {...selectProps}
         {...customSelectProps}
       >{this.options}
       </Select>

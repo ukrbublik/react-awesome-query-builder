@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { LazyStyleModule } from "./utils";
 // @ts-ignore
-//import antd from "antd/dist/antd.css"; // for v4
+//import antd from "antd/dist/antd.css"; // only for v4
 // @ts-ignore
 import styles from "@react-awesome-query-builder/antd/css/styles.scss";
 

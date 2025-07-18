@@ -559,10 +559,13 @@ interface Export {
 }
 interface Autocomplete {
   simulateAsyncFetch(all: ListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
-  getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
+  getListValue(value: ListValueSimple, listValues: ListValues): ListItem; // get by value
   // internal
   mergeListValues(oldValues: ListItems, newValues: ListItems, toStart?: boolean): ListItems;
   listValueToOption(listItem: ListItem): ListOptionUi;
+  fixListValuesGroupOrder(listValues: ListItems): ListItems;
+  optionsToListValues(vals: Array<ListValueAny | undefined | null>, listValues: ListValues, allowCustomValues: boolean): [ListValueSimple[] | undefined, ListItems];
+  optionToListValue(val: ListValueAny | undefined | null, listValues: ListValues, allowCustomValues: boolean): [ListValueSimple | undefined, ListItems | undefined];
 }
 interface ConfigUtils {
   areConfigsSame(config1: Config, config2: Config): boolean;
@@ -616,13 +619,15 @@ interface ExportUtils extends PickDeprecated<SpelUtils, "spelFixList" | "spelEsc
   stringifyForDisplay(val: any): string;
 }
 interface ListUtils {
-  getTitleInListValues(listValues: ListValues, value: string | number): string;
-  getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
+  getTitleInListValues(listValues: ListValues, value: ListValueSimple): string;
+  getListValue(value: ListValueSimple, listValues: ListValues): ListItem; // get by value
   searchListValue(search: string, listValues: ListValues): ListItem; // search by value and title
   listValuesToArray(listValues: ListValues): ListItems; // normalize
-  toListValue(value: string | number | ListItem, title?: string): ListItem | undefined; // create
-  makeCustomListValue(value: string | number): ListItem; // create
-  mapListValues<T>(listValues : ListValues, mapFn: (item: ListItem | undefined) => T | null) : T[];
+  toListValue(value: ListValueSimple | ListItem, title?: string): ListItem | undefined; // create
+  makeCustomListValue(value: ListValueSimple): ListItem; // create
+  mapListValues<T>(listValues: ListValues, mapFn: (item: ListItem | undefined) => T | null) : T[];
+  getItemInListValues(listValues: ListValues, value: ListValueSimple): ListItem | undefined;
+  getValueInListValues(listValues: ListValues, value: ListValueSimple): ListValueSimple;
 }
 interface TreeUtils {
   jsToImmutable(value: any): AnyImmutable;
@@ -729,6 +734,15 @@ interface OtherUtils {
   isImmutable(value: any): boolean;
   toImmutableList(path: string[]): ImmutablePath;
   isTruthy<T>(value: T | false | null | undefined): value is T;
+  isObject<T>(value: T): boolean;
+  typeOf<T>(value: T): "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function" | "array";
+  isTypeOf<T>(value: T, type: "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function" | "array"): boolean;
+  isObjectOrArray<T>(value: T): boolean;
+}
+
+interface ConfigMixins {
+  addMixins: (config: Config, mixins: ConfigMixin) => Config;
+  removeMixins: (config: Config, mixins: ConfigMixin) => Config;
 }
 
 export interface Utils extends Import, Export,
@@ -751,7 +765,7 @@ export interface Utils extends Import, Export,
   ListUtils: ListUtils;
   TreeUtils: TreeUtils;
   OtherUtils: OtherUtils;
-
+  ConfigMixins: ConfigMixins;
   i18n: i18n;
 }
 
@@ -1250,7 +1264,7 @@ export type Types = TypedMap<Type>;
 
 
 export interface ListItem {
-  value: string | number;
+  value: ListValueSimple;
   title?: string;
   disabled?: boolean;
   isCustom?: boolean;
@@ -1273,14 +1287,18 @@ export interface TreeItem extends ListItem {
   path?: Array<string>;
 }
 export type TreeData = Array<TreeItem>;
-export type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Array<ListItem> | Array<string | number>;
+export type ListValueSimple = string | number;
+export type ListValueAny = ListValueSimple | ListItem;
+export type ListValuesMap = TypedMap<string> | TypedKeyMap<string | number, string>;
+export type ListValuesArray = Array<ListValueAny>;
+export type ListValues = ListValuesMap | ListValuesArray;
 
 export interface AsyncFetchListValuesResult {
   values: ListItems;
   hasMore?: boolean;
 }
 /* searchOrValues can be a search string or array of exact values */
-export type AsyncFetchListValuesFn = (this: ConfigContext | void, searchOrValues: string | Array<string | number> | null, offset?: number) => Promise<AsyncFetchListValuesResult>;
+export type AsyncFetchListValuesFn = (this: ConfigContext | void, searchOrValues: string | Array<ListValueSimple> | null, offset?: number) => Promise<AsyncFetchListValuesResult>;
 
 
 export interface BasicFieldSettings<V = RuleValue> {

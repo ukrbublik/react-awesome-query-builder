@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { Tooltip, Select } from "antd";
+import { Tooltip, Select, version as antdVersion } from "antd";
 import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../utils/domUtils";
 const { Option, OptGroup } = Select;
 
@@ -101,12 +101,19 @@ const FieldSelect = (props) => {
 
   const fieldSelectItems = renderSelectItems(items);
 
+  const selectProps = {};
+  const antdMajorVersion = parseInt(antdVersion.split(".")[0]);
+  if (antdMajorVersion >= 5) {
+    selectProps.popupMatchSelectWidth = false;
+  } else {
+    selectProps.dropdownMatchSelectWidth = false;
+  }
+
   let res = (
     <Select
       open={open}
       onDropdownVisibleChange={setOpen}
       dropdownAlign={dropdownAlign}
-      popupMatchSelectWidth={false}
       style={style}
       placeholder={placeholder}
       size={config.settings.renderSize}
@@ -119,6 +126,7 @@ const FieldSelect = (props) => {
       showSearch={!!showSearch}
       searchValue={searchValue}
       onSearch={showSearch ? onSearch : undefined}
+      {...selectProps}
       {...customProps}
     >{fieldSelectItems}</Select>
   );

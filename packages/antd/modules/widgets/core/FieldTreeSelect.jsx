@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Tooltip, TreeSelect } from "antd";
+import { Tooltip, TreeSelect, version as antdVersion } from "antd";
 import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../utils/domUtils";
 import PropTypes from "prop-types";
 import { Utils } from "@react-awesome-query-builder/ui";
@@ -145,6 +145,14 @@ export default class FieldTreeSelect extends Component {
     const useAutoWidth = true || !this.optionsMaxWidth; //tip: "auto" is good, but width will jump on expand/collapse
     const dropdownWidth = Math.max(dropdownMinWidth, Math.min(dropdownMaxWidth, this.optionsMaxWidth));
 
+    const selectProps = {};
+    const antdMajorVersion = parseInt(antdVersion.split(".")[0]);
+    if (antdMajorVersion >= 5) {
+      selectProps.popupMatchSelectWidth = false;
+    } else {
+      selectProps.dropdownMatchSelectWidth = false;
+    }
+
     let res = (
       <TreeSelect
         open={open}
@@ -168,8 +176,8 @@ export default class FieldTreeSelect extends Component {
         placeholder={placeholder}
         filterTreeNode={this.filterTreeNode}
         treeDefaultExpandedKeys={treeDefaultExpandedKeys}
-        popupMatchSelectWidth={false}
         disabled={readonly}
+        {...selectProps}
         {...customProps}
       />
     );

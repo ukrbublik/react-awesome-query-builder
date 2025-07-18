@@ -1,5 +1,5 @@
 import React from "react";
-import { PlusOutlined, PlusCircleOutlined, DeleteFilled, HolderOutlined } from "@ant-design/icons";
+import { PlusOutlined, PlusCircleOutlined, DeleteFilled, HolderOutlined, DragOutlined } from "@ant-design/icons";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { DragIcon } = Utils;
 
@@ -12,7 +12,7 @@ const typeToIcon = {
   "addSubRuleSimple": <PlusOutlined />,
   "addSubRule": <PlusOutlined />,
   "addSubGroup": <PlusCircleOutlined />,
-  "drag": <HolderOutlined />,
+  "drag": HolderOutlined ? <HolderOutlined /> : <DragOutlined />, // Compatible with @ant-design/icons@4.x
 };
 
 export default ({type}) => {
