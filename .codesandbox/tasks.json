@@ -8,10 +8,6 @@
       "command": "npm i -g pnpm@9"
     },
     {
-      "name": "Patch dependencies for sandboxes",
-      "command": "pnpm preinstall"
-    },
-    {
       "name": "Install dependencies",
       "command": "pnpm install --frozen-lockfile"
     },
