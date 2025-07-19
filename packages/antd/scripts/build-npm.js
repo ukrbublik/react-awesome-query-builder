@@ -13,6 +13,7 @@ const TYPES = resolve(PACKAGE, 'types');
 const MODULES = resolve(PACKAGE, 'modules');
 const CSS = resolve(PACKAGE, 'css');
 const STYLES = resolve(PACKAGE, 'styles');
+const FIX_ANTD = resolve(SCRIPTS, 'fix-antd.js');
 const BABEL = resolve(PACKAGE, 'node_modules', '.bin', 'babel');
 const SASS = resolve(PACKAGE, 'node_modules', '.bin', 'sass');
 const NODE_MODULES = resolve(PACKAGE, 'node_modules');
@@ -90,7 +91,10 @@ async function main() {
   copyFilesSync(TYPES, ESM, '*.d.ts');
 
   // fix cjs build (replace antd/es/ with antd/lib/)
-  execSync(`node ${SCRIPTS}/fix-antd.js`, { stdio: 'inherit' });
+  execFileSync(
+    'node', [FIX_ANTD],
+    { stdio: 'inherit' }
+  );
 
   // build .css + copy .css and .scss files to /css
   execFileSync(
