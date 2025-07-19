@@ -9,5 +9,5 @@
       "name": "Install dependencies",
       "command": "pnpm install"
     }
-  ] 
+  ]
 }

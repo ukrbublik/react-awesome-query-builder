@@ -3,10 +3,10 @@
 
   // These tasks will run in order when initializing your CodeSandbox project.
   "setupTasks": [
-    {
-      "name": "Clean npm cache",
-      "command": "sudo npm cache clean --force"
-    },
+    // {
+    //   "name": "Clean npm cache",
+    //   "command": "sudo npm cache clean --force"
+    // },
     {
       "name": "Install pnpm 9",
       "command": "npm i -g pnpm@9"

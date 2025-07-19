@@ -1,7 +1,7 @@
-const { rmSync, mkdirSync, copyFileSync, existsSync } = require('fs');
-const { resolve, dirname } = require('path');
+const { rmSync, existsSync } = require('fs');
+const { resolve } = require('path');
 const { execFileSync } = require('child_process');
-let globbySync; // to be imported dynamically using ESM syntax
+const { initUtils, deleteFilesSync, copyFilesSync, waitFor } = require('../../core/scripts/utils.js');
 
 const SCRIPTS = __dirname;
 const PACKAGE = resolve(SCRIPTS, '..');
@@ -21,65 +21,8 @@ const ROOT_NODE_MODULES = resolve(ROOT, 'node_modules');
 const UI_PACKAGE = resolve(PACKAGE, '..', 'ui');
 const UI_STYLES = resolve(UI_PACKAGE, 'css', 'styles.scss');
 
-const deleteFilesSync = (from, pattern, { verbose } = {}) => {
-  const fromRelPath = from.substring(PACKAGE.length + 1);
-  const removedFiles = globbySync([`${from}/**/${pattern}`])
-    .map(fullPath => {
-      const relativePath = fullPath.substring(from.length + 1);
-      rmSync(fullPath);
-      if (verbose) {
-        console.log(`Deleted ${relativePath} from ${fromRelPath}`);
-      }
-      return relativePath;
-    });
-  console.log(`Removed ${removedFiles.length} ${pattern} files in ${fromRelPath}`);
-};
-
-const copyFilesSync = (from, to, pattern, { verbose } = {}) => {
-  const fromRelPath = from.substring(PACKAGE.length + 1);
-  const toRelPath = to.substring(PACKAGE.length + 1);
-  const copiedFiles = globbySync([`${from}/**/${pattern}`])
-    .map(fullPath => {
-      const fromFullPath = fullPath;
-      const relativePath = fullPath.substring(from.length + 1);
-      const toFullPath = `${to}/${relativePath}`;
-      const toDir = dirname(toFullPath);
-      return {
-        fromFullPath,
-        toFullPath,
-        toDir,
-        relativePath,
-      };
-    })
-    .map(({ fromFullPath, toDir, toFullPath, relativePath }) => {
-      mkdirSync(toDir, { recursive: true });
-      copyFileSync(fromFullPath, toFullPath);
-      if (verbose) {
-        console.log(`Copied ${relativePath} from ${fromRelPath} to ${toRelPath}`);
-      }
-      return relativePath;
-    });
-  console.log(`Copied ${copiedFiles.length} ${pattern} files from ${fromRelPath} to ${toRelPath}`);
-};
-
-const waitFor = async (cond) => {
-  const maxTries = 120;
-  const retryInterval = 1000; // ms
-  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  let tryNo = 0;
-  let res;
-  while (!res && tryNo < maxTries) {
-    tryNo++;
-    res = await cond();
-    if (!res) {
-      await wait(retryInterval);
-    }
-  }
-  return res;
-};
-
 async function main() {
-  ({ globbySync } = await import('globby'));
+  await initUtils();
 
   // clean
   [LIB, CJS, ESM, TYPES, CSS].map(fullPath => {
