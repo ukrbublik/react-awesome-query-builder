@@ -13,6 +13,32 @@ export type ImmutableMap<K, V> = ImmMap<K, V>;
 export type ImmutableOMap<K, V> = ImmOMap<K, V>;
 export type AnyImmutable = ImmutableList<any> | ImmutableMap<string, any> | ImmutableOMap<string, any>;
 export type SqlDialect = "BigQuery" | "PostgreSQL" | "MySQL";
+export type SqlType = 
+  // ValueExpr["type"] in "node-sql-parser"
+  | "backticks_quote_string"
+  | "string"
+  | "regex_string"
+  | "hex_string"
+  | "full_hex_string"
+  | "natural_string"
+  | "bit_string"
+  | "double_quote_string"
+  | "single_quote_string"
+  | "boolean"
+  | "bool"
+  | "null"
+  | "star"
+  | "param"
+  | "origin"
+  | "date"
+  | "datetime"
+  | "default"
+  | "time"
+  | "timestamp"
+  | "var_string"
+  // missing in ValueExpr["type"]
+  | "number";
+
 
 ////////////////
 // common
@@ -611,10 +637,13 @@ interface ExportUtils extends PickDeprecated<SpelUtils, "spelFixList" | "spelEsc
   wrapWithBrackets(val?: string): string;
   sqlEmptyValue(fieldDef?: Field): string;
   SqlString: {
-    trim(val?: string): string;
-    escape(val?: string): string;
-    escapeLike(val?: string, any_start?: boolean, any_end?: boolean, sqlDialect?: SqlDialect): string;
-    unescapeLike(val?: string, sqlDialect?: SqlDialect): string;
+    escape(val: any): string;
+    // added methods
+    escapeStr(str: string, sqlDialect?: SqlDialect): string;
+    unescapeStr(str: string, sqlDialect?: SqlDialect, literalType?: SqlType): string;
+    escapeLike(str: string, anyStart?: boolean, anyEnd?: boolean, sqlDialect?: SqlDialect): string;
+    unescapeLike(likeStr: string, sqlDialect?: SqlDialect): {str: string, anyStart?: boolean, anyEnd?: boolean};
+    trimQuote(str: string, sqlDialect?: SqlDialect, literalType?: SqlType): {str: string, literalType?: SqlType, prefix?: string};
   },
   stringifyForDisplay(val: any): string;
 }
