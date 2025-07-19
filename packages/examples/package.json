@@ -75,7 +75,7 @@
     "@babel/preset-react": "^7.26.3",
     "@babel/preset-typescript": "^7.27.0",
     "@babel/runtime": "^7.27.0",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.16",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.6.1",
     "@types/clone": "^2.1.1",
     "@types/json-logic-js": "^2.0.8",
     "@types/lodash": "^4.14.170",
@@ -97,9 +97,9 @@
     "style-loader": "^3.2.1",
     "typescript": "~5.4.5",
     "url-loader": "^4.1.1",
-    "webpack": "^5.98.0",
+    "webpack": "^5.100.2",
     "webpack-bundle-analyzer": "^4.10.2",
-    "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.15.2"
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
   }
 }

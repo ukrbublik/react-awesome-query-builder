@@ -150,7 +150,10 @@
       "nise@5.1.4": "^5.1.9",
       "cross-spawn@7.0.3": "^7.0.6",
       "serialize-javascript@6.0.0": "^6.0.2",
-      "micromatch@4.0.4": "^4.0.8"
+      "micromatch@4.0.4": "^4.0.8",
+      "on-headers@1.0.2": "^1.1.0",
+      "brace-expansion@1.1.11": "^1.1.12",
+      "brace-expansion@2.0.1": "^2.0.2"
     }
   }
 }
