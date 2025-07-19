@@ -76,7 +76,7 @@ async function main() {
 
   // esm
   execFileSync(
-    BABEL, ['--extensions', '.ts,.js', '-d', ESM, MODULES],
+    BABEL, ['--extensions', '.tsx,.jsx,.ts,.js', '-d', ESM, MODULES],
     { stdio: 'inherit', env: { ...process.env, ESM: '1' } }
   );
   deleteFilesSync(ESM, `*.d.js`);
