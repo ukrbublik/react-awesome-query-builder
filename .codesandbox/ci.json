@@ -16,5 +16,6 @@
     "/packages/sandbox_next"
   ],
   "node": "18",
-  "buildCommand": false
+  "installCommand": "install-frozen",
+  "buildCommand": "build"
 }

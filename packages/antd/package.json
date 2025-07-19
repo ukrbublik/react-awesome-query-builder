@@ -37,7 +37,7 @@
   "module": "./esm/index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "build": "sh ./scripts/build-npm.sh",
+    "build": "node ./scripts/build-npm.js",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --ext .d.ts  ./modules/",
     "lint": "npm run eslint && npm run tsc",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --ext .d.ts --fix  ./modules/",
@@ -69,6 +69,7 @@
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
     "antd": "^5.24.5",
+    "globby": "^14.1.0",
     "less": "^4.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

@@ -30,7 +30,7 @@
   "module": "./esm/index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "build": "sh ./scripts/build-npm.sh",
+    "build": "node ./scripts/build-npm.js",
     "eslint": "eslint --ext .js --ext .ts  ./modules/",
     "lint": "npm run eslint && npm run tsc-lint",
     "lint-fix": "eslint --ext .js --ext .ts --fix  ./modules/",
@@ -61,7 +61,8 @@
     "@react-awesome-query-builder/core": "workspace:^",
     "@types/clone": "^2.1.1",
     "@types/lodash": "^4.14.170",
-    "@types/node": "^18.15.0"
+    "@types/node": "^18.15.0",
+    "globby": "^14.1.0"
   },
   "peerDependencies": {
     "@react-awesome-query-builder/core": "workspace:^"

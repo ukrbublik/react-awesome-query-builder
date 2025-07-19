@@ -36,7 +36,7 @@
   "module": "./esm/index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "build": "sh ./scripts/build-npm.sh",
+    "build": "node ./scripts/build-npm.js",
     "eslint": "eslint --ext .js --ext .ts --ext .d.ts  ./modules/",
     "lint": "npm run eslint && npm run tsc && npm run circular",
     "lint-fix": "eslint --ext .js --ext .ts --ext .d.ts --fix  ./modules/",
@@ -71,6 +71,7 @@
     "@types/clone": "^2.1.1",
     "@types/lodash": "^4.14.170",
     "@types/node": "^18.15.0",
-    "@types/react": "^17.0.39"
+    "@types/react": "^17.0.39",
+    "globby": "^14.1.0"
   }
 }

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://codesandbox.io/schemas/tasks.json",
+  "setupTasks": [
+    {
+      "name": "Patch dependencies for sandboxes",
+      "command": "pnpm preinstall"
+    },
+    {
+      "name": "Install dependencies",
+      "command": "pnpm install"
+    }
+  ]
+}

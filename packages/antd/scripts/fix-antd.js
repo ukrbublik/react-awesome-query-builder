@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+
 const SCRIPTS = __dirname;
 const PACKAGE = path.resolve(SCRIPTS, '../');
 const CJS = path.resolve(PACKAGE, 'cjs');

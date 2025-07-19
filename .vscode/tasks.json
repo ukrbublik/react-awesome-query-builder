@@ -4,7 +4,7 @@
 		// {
 		// 	"label": "install-pnpm",
 		// 	"type": "shell",
-		// 	"command": "npm install -g pnpm@8",
+		// 	"command": "npm install -g pnpm@9",
 		// 	"group": "build",
 		// 	"detail": "install pnpm",
         //     "presentation": {

@@ -15,7 +15,7 @@
 echo "(before) node: $(node -v)"
 echo "(before) pnpm: $(pnpm -v)"
 
-if [ -f ~/.nvm/nvm.sh ]; then
+if [[ -f ~/.nvm/nvm.sh ]]; then
     . ~/.nvm/nvm.sh
     nvm use
 else
@@ -26,13 +26,13 @@ fi
 echo "Now node: $(node -v)"
 echo "Now pnpm: $(pnpm -v)"
 
-if [[ "$(pnpm -v)" != "8."* ]]; then
+if [[ "$(pnpm -v)" != "9."* ]]; then
     echo "Installing pnpm..."
-    npm i -g pnpm@8
+    npm i -g pnpm@9
     echo "Now pnpm: $(pnpm -v)"
 fi
 
-if [ $# -gt 0 ]; then
+if [[ $# -gt 0 ]]; then
     orig_cmd="$1"
     fixed_cmd="${orig_cmd/yarn run/pnpm run}"
     bin="$(which $fixed_cmd | head -n 1)"
