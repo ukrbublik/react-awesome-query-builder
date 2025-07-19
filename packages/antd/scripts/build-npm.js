@@ -1,6 +1,6 @@
 const { rmSync, mkdirSync, copyFileSync } = require('fs');
 const { resolve, dirname } = require('path');
-const { execSync, execFileSync } = require('child_process');
+const { execFileSync } = require('child_process');
 let globbySync; // to be imported dynamically using ESM syntax
 
 const SCRIPTS = __dirname;
@@ -69,19 +69,22 @@ async function main() {
   });
 
   // types
-  execSync("npm run tsc-emit-types", { stdio: 'inherit' });
+  execFileSync(
+    'npm', ['run', 'tsc-emit-types'],
+    { stdio: 'inherit', cwd: PACKAGE }
+  );
 
   // cjs
   execFileSync(
     BABEL, ['--extensions', '.tsx,.jsx,.ts,.js', '-d', CJS, MODULES],
-    { stdio: 'inherit' }
+    { stdio: 'inherit', cwd: PACKAGE }
   );
   deleteFilesSync(CJS, `*.d.js`);
 
   // esm
   execFileSync(
     BABEL, ['--extensions', '.tsx,.jsx,.ts,.js', '-d', ESM, MODULES],
-    { stdio: 'inherit', env: { ...process.env, ESM: '1' } }
+    { env: { ...process.env, ESM: '1' }, stdio: 'inherit', cwd: PACKAGE }
   );
   deleteFilesSync(ESM, `*.d.js`);
 
@@ -93,13 +96,13 @@ async function main() {
   // fix cjs build (replace antd/es/ with antd/lib/)
   execFileSync(
     'node', [FIX_ANTD],
-    { stdio: 'inherit' }
+    { stdio: 'inherit', cwd: PACKAGE }
   );
 
   // build .css + copy .css and .scss files to /css
   execFileSync(
     SASS, ['-I', NODE_MODULES, '-I', ROOT_NODE_MODULES, `${STYLES}/:${CSS}/`, '--no-source-map', '--style=expanded'],
-    { stdio: 'inherit' }
+    { stdio: 'inherit', cwd: PACKAGE }
   );
   copyFilesSync(STYLES, CSS, '*');
 }
