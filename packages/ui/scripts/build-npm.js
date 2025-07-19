@@ -1,6 +1,6 @@
 const { rmSync, mkdirSync, copyFileSync } = require('fs');
 const { resolve, dirname } = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 let globbySync; // to be imported dynamically using ESM syntax
 
 const SCRIPTS = __dirname;
@@ -65,14 +65,23 @@ async function main() {
   });
 
   // types
-  execSync("npm run tsc-emit-types", { stdio: 'inherit' });
+  execFileSync(
+    'npm', ['run', 'tsc-emit-types'],
+    { stdio: 'inherit', cwd: PACKAGE }
+  );
 
   // cjs
-  execSync(`${BABEL} --extensions ".tsx,.jsx,.ts,.js" -d ${CJS} ${MODULES}`, { stdio: 'inherit' });
+  execFileSync(
+    BABEL, ['--extensions', '.tsx,.jsx,.ts,.js', '-d', CJS, MODULES],
+    { stdio: 'inherit', cwd: PACKAGE }
+  );
   deleteFilesSync(CJS, `*.d.js`);
 
   // esm
-  execSync(`ESM=1 ${BABEL} --extensions ".tsx,.jsx,.ts,.js" -d ${ESM} ${MODULES}`, { stdio: 'inherit' });
+  execFileSync(
+    BABEL, ['--extensions', '.tsx,.jsx,.ts,.js', '-d', ESM, MODULES],
+    { env: { ...process.env, ESM: '1' }, stdio: 'inherit', cwd: PACKAGE }
+  );
   deleteFilesSync(ESM, `*.d.js`);
 
   // copy .d.ts files
@@ -81,7 +90,10 @@ async function main() {
   copyFilesSync(TYPES, ESM, '*.d.ts');
 
   // build .css + copy .css and .scss files to /css
-  execSync(`${SASS} ${STYLES}/:${CSS}/ --no-source-map --style=expanded`, { stdio: 'inherit' });
+  execFileSync(
+    SASS, [`${STYLES}/:${CSS}/`, '--no-source-map', '--style=expanded'],
+    { stdio: 'inherit', cwd: PACKAGE }
+  );
   copyFilesSync(STYLES, CSS, '*');
 }
 
