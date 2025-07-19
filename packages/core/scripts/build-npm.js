@@ -1,7 +1,7 @@
-const { rmSync, mkdirSync, copyFileSync } = require('fs');
-const { resolve, dirname } = require('path');
+const { rmSync } = require('fs');
+const { resolve } = require('path');
 const { execFileSync } = require('child_process');
-let globbySync; // to be imported dynamically using ESM syntax
+const { initUtils, deleteFilesSync, copyFilesSync } = require('./utils.js');
 
 const SCRIPTS = __dirname;
 const PACKAGE = resolve(SCRIPTS, '../');
@@ -12,49 +12,8 @@ const TYPES = resolve(PACKAGE, 'types');
 const MODULES = resolve(PACKAGE, 'modules');
 const BABEL = resolve(PACKAGE, 'node_modules', '.bin', 'babel');
 
-const deleteFilesSync = (from, pattern, { verbose } = {}) => {
-  const fromRelPath = from.substring(PACKAGE.length + 1);
-  const removedFiles = globbySync([`${from}/**/${pattern}`])
-    .map(fullPath => {
-      const relativePath = fullPath.substring(from.length + 1);
-      rmSync(fullPath);
-      if (verbose) {
-        console.log(`Deleted ${relativePath} from ${fromRelPath}`);
-      }
-      return relativePath;
-    });
-  console.log(`Removed ${removedFiles.length} ${pattern} files in ${fromRelPath}`);
-};
-
-const copyFilesSync = (from, to, pattern, { verbose } = {}) => {
-  const fromRelPath = from.substring(PACKAGE.length + 1);
-  const toRelPath = to.substring(PACKAGE.length + 1);
-  const copiedFiles = globbySync([`${from}/**/${pattern}`])
-    .map(fullPath => {
-      const fromFullPath = fullPath;
-      const relativePath = fullPath.substring(from.length + 1);
-      const toFullPath = `${to}/${relativePath}`;
-      const toDir = dirname(toFullPath);
-      return {
-        fromFullPath,
-        toFullPath,
-        toDir,
-        relativePath,
-      };
-    })
-    .map(({ fromFullPath, toDir, toFullPath, relativePath }) => {
-      mkdirSync(toDir, { recursive: true });
-      copyFileSync(fromFullPath, toFullPath);
-      if (verbose) {
-        console.log(`Copied ${relativePath} from ${fromRelPath} to ${toRelPath}`);
-      }
-      return relativePath;
-    });
-  console.log(`Copied ${copiedFiles.length} ${pattern} files from ${fromRelPath} to ${toRelPath}`);
-};
-
 async function main() {
-  ({ globbySync } = await import('globby'));
+  await initUtils();
 
   // clean
   [LIB, CJS, ESM, TYPES].map(fullPath => {
