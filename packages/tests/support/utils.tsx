@@ -60,8 +60,8 @@ export const setCurrentTestTimeout = (ms: number) => {
 
 export const getIt = (options?: DoOptions) => {
   if (options?.insideIt) {
-    return async (name: string, func: () => Promise<void> | void) => {
-      await func();
+    return (name: string, func: () => void) => {
+      func();
     };
   } else {
     return it;

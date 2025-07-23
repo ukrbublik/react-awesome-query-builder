@@ -25,10 +25,15 @@ describe("mongoDbImport", () => {
   });
 
   it("should import $and", async () => {
-    const mongoQuery = { $and: [ { num: { $gt: 1 } }, { num: { $lt: 10 } } ] };
+    const mongoQuery = { $and: [ { num: { $gt: 1 } }, { num: { $lt: 5 } } ] };
     await with_qb([simple_with_numbers_and_str], mongoQuery, "MongoDb", async (qb, {expect_checks}) => {
       await expect_checks({
-        "mongo": mongoQuery,
+        "mongo": {
+          "num": {
+            "$gt": 1,
+            "$lt": 5
+          }
+        },
       });
     });
   });

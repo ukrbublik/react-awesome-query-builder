@@ -112,17 +112,17 @@ function convertFromMongoDb(mongoQuery, config) {
   }
 
   let operator = "equal";
-  let opValue = value;
+  let opValue = [value];
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
     // e.g. { num: { $gt: 2 } } or { num: { $gte: 1, $lte: 2 } }
     const opKeys = Object.keys(value);
     if (opKeys.length === 1) {
       const mongoOp = opKeys[0];
       operator = findOperatorByMongoOp(config, mongoOp, value[mongoOp]) || "equal";
-      opValue = value[mongoOp];
+      opValue = [ value[mongoOp] ];
     } else if (opKeys.length === 2 && opKeys.includes("$gte") && opKeys.includes("$lte")) {
       operator = findOperatorByMongoOp(config, ["$gte", "$lte"], [value["$gte"], value["$lte"]]) || "between";
-      opValue = [value["$gte"], value["$lte"]];
+      opValue = [ value["$gte"], value["$lte"] ];
     }
   }
 
@@ -132,7 +132,7 @@ function convertFromMongoDb(mongoQuery, config) {
     properties: {
       field,
       operator,
-      value: [opValue],
+      value: opValue,
       valueSrc: ["value"],
       valueType: [fieldConfig.type],
     }
