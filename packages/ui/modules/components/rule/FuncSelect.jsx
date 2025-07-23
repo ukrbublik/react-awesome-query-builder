@@ -122,15 +122,15 @@ export default class FuncSelect extends Component {
       expectedType = fieldType;
     }
 
-    function _filter(list, path) {
-      for (let funcKey in list) {
-        let subfields = list[funcKey].subfields;
+    function _filter(funcs, path) {
+      for (let funcKey in funcs) {
+        let subfields = funcs[funcKey].subfields;
         let subpath = (path ? path : []).concat(funcKey);
         let funcFullkey = subpath.join(fieldSeparator);
         let funcConfig = getFuncConfig(config, funcFullkey);
         if (funcConfig.type == "!struct") {
           if (_filter(subfields, subpath) == 0)
-            delete list[funcKey];
+            delete funcs[funcKey];
         } else {
           let canUse = !expectedType || funcConfig.returnType == expectedType;
           if (targetDefinition?.funcs)
@@ -141,10 +141,10 @@ export default class FuncSelect extends Component {
           if (!funcConfig.allowSelfNesting && parentFuncs && parentFuncs.map(([func, _arg]) => func).includes(funcFullkey))
             canUse = false;
           if (!canUse)
-            delete list[funcKey];
+            delete funcs[funcKey];
         }
       }
-      return keys(list).length;
+      return keys(funcs).length;
     }
 
     _filter(funcs, []);

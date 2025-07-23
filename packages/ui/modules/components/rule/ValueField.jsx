@@ -123,16 +123,16 @@ export default class ValueField extends Component {
     const fields = clone(fieldsToFilter);
     const initialPathToFilter = canCompareWithAncestors ? [] : parentFieldPath;
     
-    function _filter(list, path) {
-      for (let rightFieldKey in list) {
-        const subfields = list[rightFieldKey].subfields;
+    function _filter(rightFields, path) {
+      for (let rightFieldKey in rightFields) {
+        const subfields = rightFields[rightFieldKey].subfields;
         const subpath = (path ? path : []).concat(rightFieldKey);
         const rightFieldFullkey = subpath.join(fieldSeparator);
         const rightFieldConfig = getFieldConfig(config, rightFieldFullkey);
-        const isGroup = rightFieldConfig.type === "!group"; // todo: mode = array
+        const isGroup = rightFieldConfig.type === "!group"; // todo: mode == array
         const isStruct = rightFieldConfig.type === "!struct";
         if (!rightFieldConfig) {
-          delete list[rightFieldKey];
+          delete rightFields[rightFieldKey];
         } else if (isStruct || isGroup) {
           const hasInitialPath = !parentFieldPath.length ? true
             : !subpath.find((f, i) => parentFieldPath[i] === undefined || parentFieldPath[i] !== f);
@@ -149,11 +149,11 @@ export default class ValueField extends Component {
      //     console.log('?has=', hasInitialPath, parentFieldPath, subpath, isGroup)
           if (isGroup && !hasInitialPath) {
      //       console.log('!delete',parentFieldPath, {hasInitialPath, subpath, parentFieldPath})
-            delete list[rightFieldKey];
+            delete rightFields[rightFieldKey];
           } else {
       //      console.log('f',parentFieldPath, subpath)
             if (_filter(subfields, subpath) == 0)
-              delete list[rightFieldKey];
+              delete rightFields[rightFieldKey];
           }
         } else {
           // tip: LHS field can be used as arg in RHS function
@@ -163,11 +163,11 @@ export default class ValueField extends Component {
           if (fn)
             canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig, operator);
           if (!canUse) {
-            delete list[rightFieldKey];
+            delete rightFields[rightFieldKey];
           }
         }
       }
-      return keys(list).length;
+      return keys(rightFields).length;
     }
 
     _filter(fields, initialPathToFilter, false);
