@@ -5,3 +5,4 @@ export {
 } from "./tree";
 export { loadFromJsonLogic, _loadFromJsonLogic } from "./jsonLogic";
 export { loadFromSpel, _loadFromSpel } from "./spel";
+export { loadFromMongoDb } from "./mongoDb";

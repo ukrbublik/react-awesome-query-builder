@@ -18,12 +18,13 @@ import {
   JsonLogicTree, JsonTree, ImmutableTree, ConfigContext,
   Query, Builder, BasicConfig, Config,
   BuilderProps, ValidationItemErrors, SanitizeOptions,
-  ActionMeta, OnInit, OnChange,
+  ActionMeta, OnInit, OnChange, MongoQueryObject,
 } from "@react-awesome-query-builder/ui";
 const {
   uuid, 
   sanitizeTree, loadTree, _loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
-  queryString, sqlFormat, _sqlFormat, spelFormat, _spelFormat, mongodbFormat, _mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
+  queryString, sqlFormat, _sqlFormat, spelFormat, _spelFormat, mongodbFormat, _mongodbFormat, 
+  jsonLogicFormat, queryBuilderFormat, loadFromMongoDb, getTree, ConfigUtils
 } = Utils;
 import { AntdConfig } from "@react-awesome-query-builder/antd";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
@@ -85,8 +86,8 @@ interface MockedAlert extends Alert {
   __origAlert: Alert;
   __alertData: AlertData;
 }
-type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | "SQL" | null | undefined;
-type TreeValue = JsonLogicTree | JsonTree | string | undefined;
+type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | "SQL" | "MongoDb" | null | undefined;
+type TreeValue = JsonLogicTree | JsonTree | string | MongoQueryObject | undefined;
 type ConfigFn = (_: Config) => Config;
 type ConfigFns = ConfigFn | ConfigFn[];
 type ChecksFn = (qb: ReactWrapper, checkMeta: CheckMeta) => Promise<void> | void;
@@ -261,6 +262,8 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
     } else if (typeof value === "string") {
       // todo: can be SQL
       valueFormat = "SpEL";
+    } else if (typeof value === "object") {
+      valueFormat = "MongoDb";
     } else {
       valueFormat = "default";
     }
@@ -276,7 +279,10 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     ({tree, errors} = SqlUtils.loadFromSql(value as string, config));
   } else if (valueFormat === "SpEL") {
-    [tree, errors] = loadFromSpel(value as string, config);
+    ([tree, errors] = loadFromSpel(value as string, config));
+  } else if (valueFormat === "MongoDb") {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+    ([tree, errors] = Utils.loadFromMongoDb(value as MongoQueryObject, config));
   } else {
     tree = loadTree(value as JsonTree);
   }

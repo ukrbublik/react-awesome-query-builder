@@ -541,6 +541,8 @@ interface Import {
   _loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): [ImmutableTree | undefined, Array<string>];
   // spel
   loadFromSpel(spelStr: string, config: Config): [ImmutableTree | undefined, Array<string>];
+  // mongodb
+  loadFromMongoDb(mongoQuery: MongoQueryObject | undefined, config: Config): [ImmutableTree | undefined, Array<string>];
 }
 interface Export {
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;

@@ -7,6 +7,7 @@ Enzyme.configure({adapter: new Adapter()});
 
 // FILTER YOUR TESTS HERE
 const testsFilter = [
+  "MongoImport",
   // "QueryWithOperators",
   // "OtherUtils",
 ];

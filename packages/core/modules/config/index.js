@@ -107,6 +107,7 @@ const operators = {
       return { "==": [field, val] };
     },
     elasticSearchQueryType: "term",
+    mongoImportOp: ["$eq"],
   },
   not_equal: {
     isNotOp: true,
@@ -132,6 +133,7 @@ const operators = {
       }
       return { "!=": [field, val] };
     },
+    mongoImportOp: ["$ne"],
   },
   less: {
     label: "<",
@@ -143,6 +145,7 @@ const operators = {
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$lt", v => v, false, ...args); },
     jsonLogic: "<",
     elasticSearchQueryType: "range",
+    mongoImportOp: ["$lt"],
   },
   less_or_equal: {
     label: "<=",
@@ -154,6 +157,7 @@ const operators = {
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$lte", v => v, false, ...args); },
     jsonLogic: "<=",
     elasticSearchQueryType: "range",
+    mongoImportOp: ["$lte"],
   },
   greater: {
     label: ">",
@@ -165,6 +169,7 @@ const operators = {
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$gt", v => v, false, ...args); },
     jsonLogic: ">",
     elasticSearchQueryType: "range",
+    mongoImportOp: ["$gt"],
   },
   greater_or_equal: {
     label: ">=",
@@ -176,6 +181,7 @@ const operators = {
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$gte", v => v, false, ...args); },
     jsonLogic: ">=",
     elasticSearchQueryType: "range",
+    mongoImportOp: ["$gte"],
   },
   like: {
     label: "Contains",
@@ -211,6 +217,9 @@ const operators = {
     jsonLogic2: "#in",
     valueSources: ["value"],
     elasticSearchQueryType: "regexp",
+    mongoImportOp: [
+      (mongoOp, value) => mongoOp === "$regex" && typeof value === "string" && !value.startsWith("^") && !value.endsWith("$") ? "like" : null
+    ],
   },
   not_like: {
     isNotOp: true,
@@ -223,6 +232,9 @@ const operators = {
     jsonLogic2: "#!in",
     _jsonLogicIsExclamationOp: true,
     valueSources: ["value"],
+    mongoImportOp: [
+      (mongoOp, value) => mongoOp === "$regex" && typeof value === "string" && value.startsWith("^") ? "starts_with" : null
+    ],
   },
   starts_with: {
     label: "Starts with",
@@ -232,6 +244,9 @@ const operators = {
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? "^" + this.utils.escapeRegExp(v) : undefined), false, ...args); },
     jsonLogic: undefined, // not supported
     valueSources: ["value"],
+    mongoImportOp: [
+      (mongoOp, value) => mongoOp === "$regex" && typeof value === "string" && value.endsWith("$") ? "ends_with" : null
+    ],
   },
   ends_with: {
     label: "Ends with",
@@ -278,6 +293,7 @@ const operators = {
       }
       return null;
     },
+    mongoImportOp: [["$gte", "$lte"]],
     elasticSearchQueryType: function elasticSearchQueryType(type) {
       return type === "time" ? "filter" : "range";
     },
@@ -320,6 +336,9 @@ const operators = {
       }
       return null;
     },
+    mongoImportOp: [
+      (mongoOp, value) => mongoOp === "$in" && Array.isArray(value) && value.includes("") ? "is_empty" : null
+    ],
   },
   is_empty: {
     label: "Is empty",
@@ -351,6 +370,7 @@ const operators = {
     },
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$in", (v, fieldDef) => [this.utils.mongoEmptyValue(fieldDef), null], false, ...args); },
     jsonLogic: "!",
+    mongoImportOp: ["$in"],
   },
   is_not_empty: {
     isNotOp: true,
