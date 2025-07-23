@@ -60,7 +60,7 @@ function wrapInGroup(rule, config) {
     type: "group",
     properties: { conjunction: defaultGroupConjunction(config), not: false },
     children1: {
-      [uuid()]: rule
+      [rule.id]: rule
     }
   };
 }
@@ -77,7 +77,7 @@ function convertFromMongoDb(mongoQuery, config) {
       arr.forEach((sub, idx) => {
         const [childTree, childErrors] = convertFromMongoDb(sub, config);
         if (childTree) {
-          children1[uuid()] = childTree;
+          children1[childTree.id] = childTree;
         }
         if (childErrors && childErrors.length) {
           errors.push(...childErrors);
@@ -132,7 +132,7 @@ function convertFromMongoDb(mongoQuery, config) {
     properties: {
       field,
       operator,
-      value: opValue,
+      value: [opValue],
       valueSrc: ["value"],
       valueType: [fieldConfig.type],
     }
