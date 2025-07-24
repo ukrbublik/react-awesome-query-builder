@@ -1,6 +1,7 @@
 import React, { Dispatch, SetStateAction } from "react";
 import {
   Utils,
+  JsonLogicTree,
 } from "@react-awesome-query-builder/ui";
 import { SqlUtils } from "@react-awesome-query-builder/sql";
 import type { DemoQueryBuilderState } from "../types";
@@ -73,7 +74,7 @@ export const useInput = (
   const importFromJsonLogic = (jsonLogicStr: string) => {
     try {
       const jsonLogic = JSON.parse(jsonLogicStr);
-      const tree = Utils.loadFromJsonLogic(jsonLogic, state.config);
+      const [tree, jsonLogicErrors] = Utils._loadFromJsonLogic(jsonLogic as JsonLogicTree, state.config);
       
       if (tree) {
         const {fixedTree, fixedErrors} = Utils.sanitizeTree(tree, state.config, validationTranslateOptions);
@@ -84,7 +85,7 @@ export const useInput = (
           ...state,
           tree: fixedTree ?? state.tree,
           jsonLogicStr,
-          jsonLogicErrors: [],
+          jsonLogicErrors: jsonLogicErrors || [],
           isJsonEditorOpen: false
         });
       } else {

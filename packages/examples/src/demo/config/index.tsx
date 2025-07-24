@@ -381,10 +381,6 @@ export default (skin: string) => {
   //////////////////////////////////////////////////////////////////////
 
   const fields: Fields = {
-    name: {
-      label: "Name",
-      type: "text",
-    },
     age: {
       label: "Age",
       type: "number",

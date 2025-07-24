@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import { IconButton, ActionButton, CommandBarButton, DefaultButton } from "@fluentui/react";
-import JSONEditorModal from './JSONEditorModal';
 
 const hideLabelsFor = {
   "addSubRuleSimple": true,
@@ -16,24 +15,21 @@ const useAction = {
 
 const FluentUIButton = (props) => {
   const { type, label, onClick, readonly, renderIcon, config } = props;
-  const [isModalOpen, setModalOpen] = useState(false);
-
-  const handleButtonClick = () => {
-    setModalOpen(true);
-  };
-
-  const handleModalDismiss = () => {
-    setModalOpen(false);
-  };
 
   let renderBtn;
   if (!label || hideLabelsFor[type]) {
     renderBtn = (bprops) => (
-      <IconButton
+      <CommandBarButton
         key={type}
         onClick={onClick}
         disabled={readonly}
+        text={label}
         color="primary"
+        styles={{
+          root: {
+            backgroundColor: "transparent"
+          }
+        }}
         {...bprops}
       />
     );
@@ -65,23 +61,7 @@ const FluentUIButton = (props) => {
   };
   const buttonIcon = renderIcon?.(iconProps);
 
-  return (
-    <div>
-      {buttonIcon}
-      {renderBtn({})}
-      <JSONEditorButton onClick={handleButtonClick} />
-      <JSONEditorModal isOpen={isModalOpen} onDismiss={handleModalDismiss} />
-    </div>
-  );
+  return buttonIcon;
 };
 
-const JSONEditorButton = ({ onClick }) => (
-  <DefaultButton
-    text="Open JSON Editor"
-    onClick={onClick}
-    style={{ marginTop: '10px' }}
-  />
-);
-
-export { FluentUIButton, JSONEditorButton };
 export default FluentUIButton;
