@@ -65,7 +65,7 @@ function wrapInGroup(rule, config) {
   };
 }
 
-function convertFromMongoDb(mongoQuery, config) {
+function handleLogicalOperators(mongoQuery, config) {
   const errors = [];
 
   // Handle $and/$or at root
@@ -94,6 +94,19 @@ function convertFromMongoDb(mongoQuery, config) {
       ];
     }
   }
+
+  return [null, []];
+}
+
+function convertFromMongoDb(mongoQuery, config) {
+  const errors = [];
+
+  // Handle $and/$or operators
+  const [logicalTree, logicalErrors] = handleLogicalOperators(mongoQuery, config);
+  if (logicalTree) {
+    return [logicalTree, [...errors, ...logicalErrors]];
+  }
+  errors.push(...logicalErrors);
 
   // Only support single field for now
   const fields = Object.keys(mongoQuery);
