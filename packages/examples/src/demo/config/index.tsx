@@ -381,6 +381,18 @@ export default (skin: string) => {
   //////////////////////////////////////////////////////////////////////
 
   const fields: Fields = {
+    name: {
+      label: "Name",
+      type: "text",
+    },
+    age: {
+      label: "Age",
+      type: "number",
+      fieldSettings: {
+        min: 0,
+        max: 120,
+      }
+    },
     user: {
       label: "User",
       tooltip: "Group of fields",

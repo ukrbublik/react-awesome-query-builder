@@ -56,6 +56,55 @@ export const useInput = (
     });
   };
 
+  const openJsonEditor = () => {
+    setState({
+      ...state,
+      isJsonEditorOpen: true
+    });
+  };
+
+  const closeJsonEditor = () => {
+    setState({
+      ...state,
+      isJsonEditorOpen: false
+    });
+  };
+
+  const importFromJsonLogic = (jsonLogicStr: string) => {
+    try {
+      const jsonLogic = JSON.parse(jsonLogicStr);
+      const tree = Utils.loadFromJsonLogic(jsonLogic, state.config);
+      
+      if (tree) {
+        const {fixedTree, fixedErrors} = Utils.sanitizeTree(tree, state.config, validationTranslateOptions);
+        if (fixedErrors.length) {
+          console.warn("Fixed errors after import from JsonLogic:", fixedErrors);
+        }
+        setState({
+          ...state,
+          tree: fixedTree ?? state.tree,
+          jsonLogicStr,
+          jsonLogicErrors: [],
+          isJsonEditorOpen: false
+        });
+      } else {
+        setState({
+          ...state,
+          jsonLogicStr,
+          jsonLogicErrors: ["Failed to parse JsonLogic"],
+          isJsonEditorOpen: false
+        });
+      }
+    } catch (error) {
+      setState({
+        ...state,
+        jsonLogicStr,
+        jsonLogicErrors: ["Invalid JSON: " + (error as Error).message],
+        isJsonEditorOpen: false
+      });
+    }
+  };
+
   const renderSpelInputBlock = () => {
     if (!state.renderBocks.spel) {
       return null;
@@ -101,17 +150,40 @@ export const useInput = (
     );
   };
 
+  const renderJsonLogicInputBlock = () => {
+    if (!state.renderBocks.jsonlogic) {
+      return null;
+    }
+
+    return (
+      <div className="query-import-jsonlogic">
+        JsonLogic: &nbsp;
+        <button onClick={openJsonEditor}>Open JSON Editor</button>
+        <br />
+        { state.jsonLogicErrors.length > 0 
+            && <pre className="qb-demo-error-pre">
+              {stringify(state.jsonLogicErrors, undefined, 2)}
+            </pre> 
+        }
+      </div>
+    );
+  };
+
   const renderInputs = () => {
     return (
       <div>
         <br />
         {renderSpelInputBlock()}
         {renderSqlInputBlock()}
+        {renderJsonLogicInputBlock()}
       </div>
     );
   };
 
   return {
     renderInputs,
+    openJsonEditor,
+    closeJsonEditor,
+    importFromJsonLogic,
   };
 };

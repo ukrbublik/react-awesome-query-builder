@@ -14,6 +14,9 @@ export interface DemoQueryBuilderState {
   spelErrors: Array<string>;
   sqlErrors: Array<string>;
   sqlWarnings: Array<string>;
+  jsonLogicStr: string;
+  jsonLogicErrors: Array<string>;
+  isJsonEditorOpen: boolean;
   initFile: string;
   themeMode: ThemeMode | "auto";
   isBodyDark: boolean;

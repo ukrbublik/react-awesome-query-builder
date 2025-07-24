@@ -154,6 +154,16 @@
       "on-headers@1.0.2": "^1.1.0",
       "brace-expansion@1.1.11": "^1.1.12",
       "brace-expansion@2.0.1": "^2.0.2"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@fortawesome/fontawesome-common-types",
+      "@fortawesome/fontawesome-svg-core",
+      "@fortawesome/free-solid-svg-icons",
+      "core-js-pure",
+      "esbuild",
+      "nx",
+      "puppeteer",
+      "unrs-resolver"
+    ]
   }
 }
