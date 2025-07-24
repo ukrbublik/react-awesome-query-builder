@@ -17,6 +17,7 @@ import type { DemoQueryBuilderState, DemoQueryBuilderMemo } from "./types";
 import { emptyTree } from "./init_data";
 import { defaultInitFile, initialSkin, validationTranslateOptions, defaultRenderBlocks } from "./options";
 import type { LazyStyleModule } from "../skins";
+import JSONEditorModal from "./components/JSONEditorModal";
 import "./i18n";
 
 // @ts-ignore
@@ -46,6 +47,9 @@ const DemoQueryBuilder: React.FC = () => {
     spelErrors: [] as Array<string>,
     sqlErrors: [] as Array<string>,
     sqlWarnings: [] as Array<string>,
+    jsonLogicStr: "",
+    jsonLogicErrors: [] as Array<string>,
+    isJsonEditorOpen: false,
     renderBocks: defaultRenderBlocks,
     initFile: defaultInitFile,
     themeMode: "light", //"auto",
@@ -66,7 +70,7 @@ const DemoQueryBuilder: React.FC = () => {
   const { renderValidationHeader, renderValidationBlock } = useValidation(state, setState);
   const { renderBenchmarkHeader } = useBenchmark(state, setState, memo);
   const { renderOutput } = useOutput(state);
-  const { renderInputs } = useInput(state, setState);
+  const { renderInputs, openJsonEditor, closeJsonEditor, importFromJsonLogic } = useInput(state, setState);
   const { renderConfigChangeHeader } = useConfigChange(state, setState);
   const { renderInitFilesHeader, renderInitErrors } = useInitFiles(state, setState);
   const { renderSkinSelector } = useSkins(state, setState);
@@ -174,6 +178,13 @@ const DemoQueryBuilder: React.FC = () => {
           {renderOutput()}
         </div>
       </div>
+      
+      <JSONEditorModal
+        isOpen={state.isJsonEditorOpen}
+        onClose={closeJsonEditor}
+        onImport={importFromJsonLogic}
+        initialValue={state.jsonLogicStr}
+      />
     </div>
   );
 };

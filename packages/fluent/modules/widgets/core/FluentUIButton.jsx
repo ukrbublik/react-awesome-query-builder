@@ -74,8 +74,8 @@ const FluentUIButton = (props) => {
     renderDefaultButton,
   };
   const buttonIcon = renderIcon?.(iconProps);
-  return buttonIcon;
 
+  return buttonIcon;
 };
 
 export default FluentUIButton;
