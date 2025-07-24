@@ -4,6 +4,7 @@ process.env.TZ = "Etc/UTC";
 // Set the proper environment for babel
 process.env.BABEL_ENV = "test";
 
+const isGH = !!process.env.CODESPACE_NAME;
 const isCI = !!process.env.CI;
 const isDebug = process.env.TEST_DEBUG === "1";
 const isWatch = process.env.TEST_WATCH === "1";
@@ -107,7 +108,7 @@ module.exports = function(config) {
     singleRun: !isWatch,
     concurrency: 1,
     // captureTimeout: 60000,
-    browserDisconnectTimeout : isDebug ? 1000*60*10 : 1000*20,
+    browserDisconnectTimeout : isDebug ? 1000*60*10 : isGH ? 1000*60 : 1000*20,
     browserDisconnectTolerance : isDebug ? 1 : 0,
     browserNoActivityTimeout : isDebug ? 1000*90 : 1000*30,
   });

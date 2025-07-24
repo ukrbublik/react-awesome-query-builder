@@ -68,12 +68,21 @@ function wrapInGroup(rule, config) {
 function convertFromMongoDb(mongoQuery, config) {
   const errors = [];
 
-  // Handle $and/$or at root
-  for (const conjKey of ["$and", "$or"]) {
+  // Handle logical operators at any level
+  for (const conjKey of ["$and", "$or", "$nor"]) {
     if (mongoQuery[conjKey]) {
-      const conj = findConjunctionByMongoConj(config, conjKey);
+      let conj = findConjunctionByMongoConj(config, conjKey);
+      let not = false;
+      
+      // Handle $nor as negated $or
+      if (conjKey === "$nor") {
+        conj = findConjunctionByMongoConj(config, "$or");
+        not = true;
+      }
+      
       const arr = mongoQuery[conjKey];
       const children1 = {};
+      
       arr.forEach((sub, idx) => {
         const [childTree, childErrors] = convertFromMongoDb(sub, config);
         if (childTree) {
@@ -83,11 +92,12 @@ function convertFromMongoDb(mongoQuery, config) {
           errors.push(...childErrors);
         }
       });
+      
       return [
         {
           id: uuid(),
           type: "group",
-          properties: { conjunction: conj, not: false },
+          properties: { conjunction: conj, not },
           children1,
         },
         errors,
@@ -95,12 +105,35 @@ function convertFromMongoDb(mongoQuery, config) {
     }
   }
 
-  // Only support single field for now
+  // Handle multiple fields as implicit $and
   const fields = Object.keys(mongoQuery);
-  if (fields.length !== 1) {
-    errors.push("Only single field queries are supported in minimal import");
-    return [undefined, errors];
+  if (fields.length > 1) {
+    const children1 = {};
+    
+    fields.forEach((field) => {
+      const fieldQuery = { [field]: mongoQuery[field] };
+      const [childTree, childErrors] = convertFromMongoDb(fieldQuery, config);
+      if (childTree) {
+        children1[childTree.id] = childTree;
+      }
+      if (childErrors && childErrors.length) {
+        errors.push(...childErrors);
+      }
+    });
+    
+    const conj = findConjunctionByMongoConj(config, "$and");
+    return [
+      {
+        id: uuid(),
+        type: "group", 
+        properties: { conjunction: conj, not: false },
+        children1,
+      },
+      errors,
+    ];
   }
+
+  // Handle single field
   const field = fields[0];
   const value = mongoQuery[field];
 
