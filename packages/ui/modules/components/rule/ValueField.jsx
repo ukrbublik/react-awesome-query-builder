@@ -170,7 +170,7 @@ export default class ValueField extends Component {
       return keys(rightFields).length;
     }
 
-    _filter(fields, initialPathToFilter, false);
+    _filter(fields, initialPathToFilter);
 
     return fields;
   }
