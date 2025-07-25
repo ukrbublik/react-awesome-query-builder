@@ -60,14 +60,17 @@ const JSONEditorModal: React.FC<JSONEditorModalProps> = ({
       <div 
         className="json-editor-modal-content"
         style={{
-          backgroundColor: 'white',
+          backgroundColor: "white",
           borderRadius: "8px",
-          padding: "20px",
-          width: "90%",
-          maxHeight: "90%",
+          padding: "24px",
+          width: "80%",
+          maxWidth: "800px",
+          height: "70vh",
+          maxHeight: "600px",
           display: "flex",
           flexDirection: "column",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.15)",
+          overflow: "hidden"
         }}
       >
         <div style={{ marginBottom: "16px" }}>
@@ -79,28 +82,39 @@ const JSONEditorModal: React.FC<JSONEditorModalProps> = ({
           </p>
         </div>
         
-        <textarea
-          value={jsonInput}
-          onChange={(e) => setJsonInput(e.target.value)}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          placeholder={"{\"and\": [{\"==\": [{\"var\": \"name\"}, \"John\"]}, {\">\": [{\"var\": \"age\"}, 18]}]}"}
-          style={{
-            height: "400px",
-            width: "100%",
-            padding: "12px",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            fontSize: "14px",
-            fontFamily: "monospace",
-            resize: "both",
-            marginBottom: "16px",
-            minHeight: "200px",
-            minWidth: "300px"
-          }}
-        />
+        <div style={{ 
+          flex: 1, 
+          display: "flex", 
+          flexDirection: "column", 
+          minHeight: 0,
+          alignItems: "center",
+          justifyContent: "center"
+        }}>
+          <textarea
+            value={jsonInput}
+            onChange={(e) => setJsonInput(e.target.value)}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            placeholder={"{\"and\": [{\"==\": [{\"var\": \"name\"}, \"John\"]}, {\">\": [{\"var\": \"age\"}, 18]}]}"}
+            style={{
+              width: "calc(100% - 24px)",
+              height: "calc(100% - 40px)",
+              padding: "12px",
+              border: "1px solid #ddd",
+              borderRadius: "6px",
+              fontSize: "14px",
+              fontFamily: "'Monaco', 'Menlo', 'Ubuntu Mono', monospace",
+              resize: "none",
+              marginBottom: "20px",
+              minHeight: "200px",
+              outline: "none",
+              lineHeight: "1.5",
+              boxSizing: "border-box"
+            }}
+          />
+        </div>
         
-        <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", flexShrink: 0 }}>
           <button
             onClick={onClose}
             style={{
