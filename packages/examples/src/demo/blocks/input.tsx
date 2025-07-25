@@ -73,8 +73,8 @@ export const useInput = (
 
   const importFromJsonLogic = (jsonLogicStr: string) => {
     try {
-      const jsonLogic = JSON.parse(jsonLogicStr);
-      const [tree, jsonLogicErrors] = Utils._loadFromJsonLogic(jsonLogic as JsonLogicTree, state.config);
+      const jsonLogic = JSON.parse(jsonLogicStr) as JsonLogicTree;
+      const [tree, jsonLogicErrors] = Utils._loadFromJsonLogic(jsonLogic, state.config);
       
       if (tree) {
         const {fixedTree, fixedErrors} = Utils.sanitizeTree(tree, state.config, validationTranslateOptions);
