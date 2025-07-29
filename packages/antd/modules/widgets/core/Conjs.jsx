@@ -1,7 +1,8 @@
 import React, { PureComponent } from "react";
 import map from "lodash/map";
-import { Button, Radio } from "antd";
-const ButtonGroup = Button.Group;
+import { Button, Radio, Space } from "antd";
+// Button.Group is deprecated in Ant Design v5
+const ButtonGroup = Space.Compact;
 
 
 class ConjsButton extends PureComponent {

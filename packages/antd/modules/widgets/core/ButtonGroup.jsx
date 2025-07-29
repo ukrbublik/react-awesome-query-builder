@@ -1,6 +1,7 @@
 import React from "react";
-import { Button } from "antd";
-const ButtonGroup = Button.Group;
+import { Space } from "antd";
+// Button.Group is deprecated in Ant Design v5
+const ButtonGroup = Space.Compact;
 
 export default ({children, config: {settings}}) => {
   const {renderSize} = settings;
