@@ -9,6 +9,7 @@ import {
   AST, Select, Function as SqlFunction, ExpressionValue, ExprList, LocationRange,
   ColumnRef, ValueExpr, Value, Case, Interval, Column,
 } from "node-sql-parser";
+import { SqlType } from "@react-awesome-query-builder/core";
 
 
 export const processAst = (sqlAst: AST, meta: Meta): OutSelect => {
@@ -133,18 +134,13 @@ const processBinaryOp = (expr: BinaryExpr, meta: Meta, not = false): OutLogic | 
   };
 };
 
-const getExprValue = (expr: ValueExpr, meta: Meta, not = false): string | number | boolean => {
+const getExprValue = <T = string | number | boolean> (expr: ValueExpr<T>, meta: Meta, not = false): T => {
   let value = expr.value;
   if (expr.type === "boolean" && not) {
-    value = !value;
+    value = !value as T;
   }
   // todo: date literals?
   return value;
-};
-
-const getExprStringValue = (expr: ValueExpr, meta: Meta, not = false): string => {
-  const v = getExprValue(expr, meta, not);
-  return String(v);
 };
 
 const processExprList = (expr: ExprList, meta: Meta, not = false): OutLogic | undefined => {
@@ -178,7 +174,7 @@ const processInterval = (expr: Interval, meta: Meta, not = false): OutLogic | un
 };
 
 const processValue = (expr: Value, meta: Meta, not = false): OutLogic | undefined => {
-  const {type: valueType} = expr;
+  const valueType = expr.type as SqlType;
   const value = getExprValue(expr as ValueExpr, meta, not);
   return {
     valueType,
@@ -191,8 +187,19 @@ const processField = (expr: ColumnRef, meta: Meta, not = false): OutLogic | unde
     return undefined;
   }
   const parentheses = (expr as BaseExpr).parentheses;
-  const field = typeof expr.column === "string" ? expr.column : getExprStringValue(expr.column.expr, meta, not);
-  const table = expr.table ?? undefined;
+  let idQuotesType;
+  let table = expr.table ?? undefined;
+  let field = expr.column;
+  if (field != undefined && typeof field === "object") {
+    const expr = field.expr as ValueExpr<string>;
+    field = getExprValue(expr, meta, not);
+    idQuotesType = idQuotesType ?? expr.type;
+  }
+  if (table != undefined && typeof table === "object") {
+    const expr = table as ValueExpr<string>;
+    table = getExprValue(expr, meta, not);
+    idQuotesType = idQuotesType ?? expr.type;
+  }
 
   if (field === "") {
     // fix for empty string
@@ -205,6 +212,7 @@ const processField = (expr: ColumnRef, meta: Meta, not = false): OutLogic | unde
       parentheses,
       field,
       table,
+      idQuotesType,
     };
   }
 };

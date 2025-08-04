@@ -32,8 +32,7 @@ export const loadFromSql = (
     options = {};
   }
   if (!options?.database) {
-    // todo
-    options.database = "Postgresql";
+    options.database = config.settings?.sqlDialect ?? "MySQL";
   }
   if (!sqlStr.startsWith("SELECT ")) {
     sqlStr = "SELECT * FROM t WHERE " + sqlStr;

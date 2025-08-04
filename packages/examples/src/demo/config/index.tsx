@@ -282,6 +282,9 @@ export default (skin: string) => {
         },
       }
     },
+    
+    //sqlDialect: "MySQL",
+    sqlDialect: "PostgreSQL",
 
     defaultSliderWidth: "200px",
     defaultSelectWidth: "200px",
