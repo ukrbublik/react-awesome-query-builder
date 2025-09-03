@@ -1205,6 +1205,124 @@ describe("sanitizeTree", () => {
     });
   });
 
+  describe("list handling", () => {
+    it("can fix BAD_SELECT_VALUE by removing rule", async () => {
+      await with_qb(
+        [ with_all_types, with_show_error ], inits.empty, null,
+        async (_qb, {config}) => {
+          const treeWithBadSelect = Utils.loadFromJsonLogic(inits.with_bad_select_value, config)!;
+          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(treeWithBadSelect, config, {
+            forceFix: true
+          });
+          const fixedJsonTree = Utils.getTree(fixedTree);
+
+          expect(nonFixedErrors.length).to.eq(0);
+          expect(fixedErrors).to.containSubsetInOrder([{
+            itemStr: "Color = unexisting",
+            errors: [{
+              fixed: true,
+              key: "BAD_SELECT_VALUE",
+              args: {
+                value: "unexisting",
+              },
+              str: "Value unexisting is not in the list of allowed values",
+              fixedFrom: "unexisting",
+              fixedTo: null,
+            }, {
+              fixed: true,
+              key: "INCOMPLETE_RHS",
+              str: "Incomplete RHS",
+            }]
+          }]);
+          expect(fixedJsonTree.children1?.length).to.eq(0);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ]
+        }
+      );
+    });
+
+    it("can fix BAD_MULTISELECT_VALUES by removing bad values", async () => {
+      await with_qb(
+        [ with_all_types, with_show_error ], inits.empty, null,
+        async (qb, { config }) => {
+          const treeWithBadMultiSelect = Utils.loadFromJsonLogic(inits.with_bad_multiselect_value, config)!;
+          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(treeWithBadMultiSelect, config, {
+            forceFix: true
+          });
+          const fixedJsonTree = Utils.getTree(fixedTree);
+
+          expect(nonFixedErrors.length).to.eq(0);
+          expect(fixedErrors).to.containSubsetInOrder([{
+            itemStr: "Colors = [unexisting1, Orange, unexisting2]",
+            errors: [{
+              fixed: true,
+              key: "BAD_MULTISELECT_VALUES",
+              args: {
+                badValues: ["unexisting1", "unexisting2"],
+                count: 2,
+              },
+              str: "Values unexisting1 and unexisting2 are not in the list of allowed values",
+              fixedFrom: ["unexisting1", "orange", "unexisting2"],
+              fixedTo: ["orange"],
+            }]
+          }]);
+          expect(fixedJsonTree).to.containSubsetInOrder({
+            children1: [{
+              properties: {
+                field: "multicolor",
+                operator: "multiselect_equals",
+                value: [ ["orange"] ],
+                valueError: [null],
+              }
+            }]
+          });
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ]
+        }
+      );
+    });
+  });
+
+  describe("fuzzy queries and wildcard escaping", () => {
+    it("should handle fuzzy queries correctly", async () => {
+      await with_qb(
+        [ with_all_types ], inits.empty, null,
+        async (qb, { config }) => {
+          const tree = Utils.loadFromJsonLogic({
+            "and": [{
+              "fuzzy": ["name", "john"]
+            }]
+          }, config)!;
+          const { fixedTree } = Utils.sanitizeTree(tree, config);
+          expect(Utils.jsonLogicFormat(fixedTree, config)).to.deep.equal({
+            "and": [{
+              "fuzzy": ["name", "john"]
+            }]
+          });
+        }
+      );
+    });
+
+    it("should escape wildcards in queries", async () => {
+      await with_qb(
+        [ with_all_types ], inits.empty, null,
+        async (qb, { config }) => {
+          const tree = Utils.loadFromJsonLogic({
+            "and": [{
+              "like": ["product", "foo%bar_baz"]
+            }]
+          }, config)!;
+          const { fixedTree } = Utils.sanitizeTree(tree, config);
+          expect(Utils.jsonLogicFormat(fixedTree, config)).to.deep.equal({
+            "and": [{
+              "like": ["product", "foo%bar_baz"]
+            }]
+          });
+        }
+      );
+    });
+  });
+
   describe("with forceFix=true", () => {
     it("can fix VALUE_MAX_CONSTRAINT_FAIL", async () => {
       await with_qb(
