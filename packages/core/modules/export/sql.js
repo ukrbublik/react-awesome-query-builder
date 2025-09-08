@@ -248,6 +248,7 @@ const formatField = (meta, config, field) => {
   const formatFieldFn = config.settings.formatField;
   const fieldName = formatFieldName(field, config, meta, null, {useTableName: true});
   const formattedField = formatFieldFn(fieldName, fieldParts, fieldFullLabel, fieldDefinition, config);
+  // todo: use SqlString.escapeId
   return formattedField;
 };
 

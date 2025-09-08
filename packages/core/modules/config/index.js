@@ -188,19 +188,16 @@ const operators = {
         const not = sqlObj?.operator == "NOT LIKE";
         const [_left, right] = sqlObj.children || [];
         if (right?.valueType?.endsWith("_quote_string")) {
-          if (right?.value.startsWith("%") && right?.value.endsWith("%")) {
-            right.value = this.utils.SqlString.unescapeLike(right.value.substring(1, right.value.length - 1), sqlDialect);
+          const {str, anyStart, anyEnd} = this.utils.SqlString.unescapeLike(right.value, sqlDialect);
+          right.value = str;
+          if (anyStart && anyEnd) {
             sqlObj.operator = not ? "not_like" : "like";
-            return sqlObj;
-          } else if (right?.value.startsWith("%")) {
-            right.value = this.utils.SqlString.unescapeLike(right.value.substring(1), sqlDialect);
-            sqlObj.operator = "ends_with";
-            return sqlObj;
-          } else if (right?.value.endsWith("%")) {
-            right.value = this.utils.SqlString.unescapeLike(right.value.substring(0, right.value.length - 1), sqlDialect);
+          } else if (anyStart) {
             sqlObj.operator = "starts_with";
-            return sqlObj;
+          } else if (anyEnd) {
+            sqlObj.operator = "ends_with";
           }
+          return sqlObj;
         }
       }
     },
@@ -560,7 +557,8 @@ const operators = {
     sqlFormatOp: function (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) {
       if (valueSrc == "value")
       // set
-        return `${field} = '${values.map(v => this.utils.SqlString.trim(v)).join(",")}'`;
+        // todo: escape instead of wrap with '
+        return `${field} = '${values.map(v => this.utils.SqlString.unescapeStr(v)).join(",")}'`;
       else
         return undefined; //not supported
     },
@@ -590,7 +588,8 @@ const operators = {
     sqlFormatOp: function (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) {
       if (valueSrc == "value")
       // set
-        return `${field} != '${values.map(v => this.utils.SqlString.trim(v)).join(",")}'`;
+        // todo: escape instead of wrap with '
+        return `${field} != '${values.map(v => this.utils.SqlString.unescapeStr(v)).join(",")}'`;
       else
         return undefined; //not supported
     },
@@ -624,9 +623,10 @@ const operators = {
       // https://learn.microsoft.com/en-us/sql/relational-databases/search/search-for-words-close-to-another-word-with-near?view=sql-server-ver16#example-1
       const val1 = values.first();
       const val2 = values.get(1);
-      const aVal1 = this.utils.SqlString.trim(val1);
-      const aVal2 = this.utils.SqlString.trim(val2);
+      const aVal1 = this.utils.SqlString.unescapeStr(val1);
+      const aVal2 = this.utils.SqlString.unescapeStr(val2);
       const prox = operatorOptions?.get("proximity");
+      // todo: escape NEAR instead of wrap with '
       return `CONTAINS(${field}, 'NEAR((${aVal1}, ${aVal2}), ${prox})')`;
     },
     sqlImport: function (sqlObj, _, sqlDialect) {

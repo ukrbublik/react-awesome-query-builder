@@ -1,4 +1,4 @@
-import { Func, FuncValue, RuleValue, SimpleValue, SqlImportFunc, ValueSource } from "@react-awesome-query-builder/core";
+import { Func, FuncValue, RuleValue, SimpleValue, SqlImportFunc, ValueSource, SqlType } from "@react-awesome-query-builder/core";
 import type {
   ExpressionValue, ExprList, LocationRange, ValueExpr,
 } from "node-sql-parser";
@@ -58,9 +58,10 @@ export interface OutLogic  {
   ternaryChildren?: [OutLogic | undefined, OutLogic][];
   field?: string;
   table?: string;
+  idQuotesType?: SqlType; /* ValueExpr["type"] */ /* string */
   value?: any;
   values?: any[]; // for expr_list
-  valueType?: /* ValueExpr["type"] */ string;
+  valueType?: SqlType; /* ValueExpr["type"] */ /* string */
   oneValueType?: string;
   operator?: string;
   func?: string;
