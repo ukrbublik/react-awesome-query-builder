@@ -249,7 +249,7 @@ export const _validateTree = (
     if (includeStringifiedItems) {
       const item = getItemByPath(stringifyFixedItems ? fixedTree : tree, path);
       const isRoot = path.length === 1;
-      if (!isRoot && item.get("type") !== "group") {
+      if (!isRoot && item?.get("type") !== "group") {
         const isDebugMode = true;
         const isForDisplay = stringifyItemsUserFriendly;
         const itemStr = queryString(item, config, isForDisplay, isDebugMode);
@@ -337,7 +337,7 @@ export const _validateTree = (
 };
 
 function _addError(meta, item, path, err) {
-  const id = item.get("id");
+  const id = item?.get("id");
   if (!meta.errors[id]) {
     meta.errors[id] = {
       path: [...path, id],
