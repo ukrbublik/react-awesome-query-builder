@@ -145,15 +145,19 @@ describe("query with ops", () => {
               }
             },
             {
-              "term": {
-                "color": "yellow"
+              "terms": {
+                "color": [
+                  "yellow"
+                ]
               }
             },
             {
               "bool": {
                 "must_not": {
-                  "term": {
-                    "color": "green"
+                  "terms": {
+                    "color": [
+                      "green"
+                    ]
                   }
                 }
               }
@@ -371,16 +375,20 @@ describe("query with ops", () => {
               }
             },
             {
-              "term": {
-                "color": "yellow"
+              "terms": {
+                "color": [
+                  "yellow"
+                ]
               }
             },
             {
               "bool": {
                 "must_not": [
                   {
-                    "term": {
-                      "color": "green"
+                    "terms": {
+                      "color": [
+                        "green"
+                      ]
                     }
                   }
                 ]

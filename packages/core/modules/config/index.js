@@ -468,7 +468,7 @@ const operators = {
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$in", v => v, false, ...args); },
     reversedOp: "select_not_any_in",
     jsonLogic: "in",
-    elasticSearchQueryType: "term",
+    elasticSearchQueryType: "terms",
   },
   select_not_any_in: {
     isNotOp: true,
@@ -524,7 +524,7 @@ const operators = {
         ],
       }
     ],
-    elasticSearchQueryType: "term",
+    elasticSearchQueryType: "terms",
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$in", v => v, false, ...args); },
   },
   multiselect_not_contains: {
