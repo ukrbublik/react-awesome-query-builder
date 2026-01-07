@@ -171,6 +171,12 @@ function determineField(fieldName, config) {
   return fieldName;
 }
 
+function formatTermValue(fieldName, value, syntax) {
+  return syntax === ES_7_SYNTAX
+    ? { [fieldName]: { value } }
+    : { [fieldName]: value };
+}
+
 function buildParameters(queryType, value, operator, fieldName, config, syntax) {
   const textField = determineField(fieldName, config);
   switch (queryType) {
@@ -187,10 +193,10 @@ function buildParameters(queryType, value, operator, fieldName, config, syntax) 
     return { [textField]: value[0] };
 
   case "term":
-    return syntax === ES_7_SYNTAX
-      ? { [fieldName]: {
-        value: value[0]
-      }} : { [fieldName]: value[0] };
+    return formatTermValue(fieldName, value[0], syntax);
+
+  case "terms":
+    return formatTermValue(fieldName, value, syntax);
 
   //todo: not used
   // need to add geo type into RAQB or remove this code
@@ -334,14 +340,8 @@ export function elasticSearchFormat(tree, config, syntax = ES_6_SYNTAX) {
       return;
     }
 
-    if (value && Array.isArray(value[0])) {
-      //TODO : Handle case where the value has multiple values such as in the case of a list
-      return value[0].map((val) =>
-        buildEsRule(field, [val], operator, extendedConfig, valueSrc, syntax)
-      );
-    } else {
-      return buildEsRule(field, value, operator, extendedConfig, valueSrc, syntax);
-    }
+    const normalizedValue = value && Array.isArray(value[0]) ? value[0] : value;
+    return buildEsRule(field, normalizedValue, operator, extendedConfig, valueSrc, syntax);
   }
 
   if (type === "group" || type === "rule_group") {
