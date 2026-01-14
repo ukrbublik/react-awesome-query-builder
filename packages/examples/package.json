@@ -59,7 +59,7 @@
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-router-dom": "^6.23.1",
+    "react-router-dom": "^6.30.3",
     "react-select": "^5.8.0",
     "reactstrap": "^9.2.2"
   },
