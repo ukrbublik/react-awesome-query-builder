@@ -113,7 +113,7 @@ importers:
         version: link:../ui
       lodash:
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.23
       prop-types:
         specifier: ^15.8.1
         version: 15.8.1
@@ -277,7 +277,7 @@ importers:
         version: 2.0.2
       lodash:
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.23
       moment:
         specifier: ^2.30.1
         version: 2.30.1
@@ -434,7 +434,7 @@ importers:
         version: 2.0.2
       lodash:
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.23
       moment:
         specifier: ^2.30.1
         version: 2.30.1
@@ -579,7 +579,7 @@ importers:
         version: link:../ui
       lodash:
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.23
     devDependencies:
       '@babel/cli':
         specifier: ^7.27.0
@@ -658,7 +658,7 @@ importers:
         version: link:../ui
       lodash:
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.23
       material-ui-confirm:
         specifier: ^2.1.3
         version: 2.1.4(@material-ui/core@4.12.4(@types/react@17.0.80)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
@@ -743,7 +743,7 @@ importers:
         version: link:../ui
       lodash:
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.23
       material-ui-confirm:
         specifier: ^3.0.5
         version: 3.0.7(@mui/material@6.3.1(@emotion/react@11.11.4(@types/react@17.0.80)(react@17.0.2))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@17.0.80)(react@17.0.2))(@types/react@17.0.80)(react@17.0.2))(@types/react@17.0.80)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
@@ -861,7 +861,7 @@ importers:
         version: 5.24.5(moment@2.30.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       lodash:
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.23
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -937,7 +937,7 @@ importers:
         version: 6.1.0
       lodash:
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.23
       nanoid:
         specifier: ^5.0.9
         version: 5.0.9
@@ -1004,7 +1004,7 @@ importers:
         version: link:../ui
       lodash:
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.23
       react:
         specifier: ^16.14.0
         version: 16.14.0
@@ -1171,7 +1171,7 @@ importers:
         version: 5.3.3(@popperjs/core@2.11.8)
       lodash:
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.23
       moment:
         specifier: ^2.30.1
         version: 2.30.1
@@ -1331,7 +1331,7 @@ importers:
         version: 2.5.1
       lodash:
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.23
       prop-types:
         specifier: ^15.8.1
         version: 15.8.1
@@ -2469,6 +2469,7 @@ packages:
 
   '@fortawesome/react-fontawesome@0.2.1':
     resolution: {integrity: sha512-ldr5QO2MneAX5W5WBCYB2pZp/PiHDD1hy9YEBLcXUyJb0qnO86oP8RU+CgmYVSH/R4Dbe2ernhcWOrcgaKD9NQ==}
+    deprecated: v0.2.x is no longer supported. Unless you are still using FontAwesome 5, please update to v3.1.1 or greater.
     peerDependencies:
       '@fortawesome/fontawesome-svg-core': ~1 || ~6
       react: '>=16.3'
@@ -2656,6 +2657,7 @@ packages:
   '@mui/base@5.0.0-beta.68':
     resolution: {integrity: sha512-F1JMNeLS9Qhjj3wN86JUQYBtJoXyQvknxlzwNl6eS0ZABo1MiohMONj3/WQzYPSXIKC2bS/ZbyBzdHhi2GnEpA==}
     engines: {node: '>=14.0.0'}
+    deprecated: This package has been replaced by @base-ui/react
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -6573,9 +6575,11 @@ packages:
 
   lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
+    deprecated: This package is deprecated. Use the optional chaining (?.) operator instead.
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash.ismatch@4.4.0:
     resolution: {integrity: sha512-fPMfXjGQEV9Xsq/8MTSgUf255gawYRbjwMyDbcvDhXgV7enSZA0hynz6vMPnpAb5iONEzBHBPsT+0zes5Z301g==}
@@ -6586,8 +6590,8 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+  lodash@4.17.23:
+    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
 
   log-symbols@2.2.0:
     resolution: {integrity: sha512-VeIAFslyIerEJLXHziedo2basKbMKtTw3vfn5IzG0XTjhAVEJyNHnL2p7vc+wBDSdQuUpNw3M2u6xb9QsAY5Eg==}
@@ -6930,6 +6934,7 @@ packages:
   next@14.2.30:
     resolution: {integrity: sha512-+COdu6HQrHHFQ1S/8BBsCag61jZacmvbuL2avHvQFbWa2Ox7bE+d8FyNgxRLjXQ5wtPyQwEmk85js/AuaG2Sbg==}
     engines: {node: '>=18.17.0'}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -7509,6 +7514,7 @@ packages:
   puppeteer@24.14.0:
     resolution: {integrity: sha512-GB7suRDkp9pUnxpNGAORICQCtw11KFbg6U2iJXVTflzJLK5D1qzq8xOOmLgN/QnDBpDMdpn96ri52XkuN83Giw==}
     engines: {node: '>=18'}
+    deprecated: < 24.15.0 is no longer supported
     hasBin: true
 
   pvtsutils@1.3.5:
@@ -8156,6 +8162,7 @@ packages:
 
   rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   rimraf@4.4.1:
@@ -8702,6 +8709,7 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   temp-dir@1.0.0:
     resolution: {integrity: sha512-xZFXEGbG7SNC3itwBzI3RYjq/cEhBkx2hJuKGIUOcEULmkQExXiHat2z/qkISYsuR+IKumhEfKKbV5qXmhICFQ==}
@@ -10948,7 +10956,7 @@ snapshots:
       js-yaml: 4.1.0
       libnpmpublish: 9.0.9
       load-json-file: 6.2.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       make-dir: 4.0.0
       minimatch: 3.0.5
       multimatch: 5.0.0
@@ -15321,7 +15329,7 @@ snapshots:
       cli-width: 3.0.0
       external-editor: 3.1.0
       figures: 3.2.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       mute-stream: 0.0.8
       ora: 5.4.1
       run-async: 2.4.1
@@ -15886,7 +15894,7 @@ snapshots:
       graceful-fs: 4.2.11
       http-proxy: 1.18.1
       isbinaryfile: 4.0.10
-      lodash: 4.17.21
+      lodash: 4.17.23
       log4js: 6.7.1
       mime: 2.6.0
       minimatch: 3.1.2
@@ -15961,7 +15969,7 @@ snapshots:
       libnpmaccess: 8.0.6
       libnpmpublish: 9.0.9
       load-json-file: 6.2.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       make-dir: 4.0.0
       minimatch: 3.0.5
       multimatch: 5.0.0
@@ -16119,7 +16127,7 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-  lodash@4.17.21: {}
+  lodash@4.17.23: {}
 
   log-symbols@2.2.0:
     dependencies:
@@ -18759,7 +18767,7 @@ snapshots:
 
   sort-any@2.0.0:
     dependencies:
-      lodash: 4.17.21
+      lodash: 4.17.23
 
   sort-keys@2.0.0:
     dependencies:
@@ -19534,7 +19542,7 @@ snapshots:
 
   webpack-merge@4.2.2:
     dependencies:
-      lodash: 4.17.21
+      lodash: 4.17.23
 
   webpack-merge@6.0.1:
     dependencies:
