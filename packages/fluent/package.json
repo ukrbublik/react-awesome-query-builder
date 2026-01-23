@@ -47,7 +47,7 @@
   "dependencies": {
     "@babel/runtime": "^7.27.0",
     "@react-awesome-query-builder/ui": "workspace:^",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.23"
   },
   "devDependencies": {
     "@babel/cli": "^7.27.0",
