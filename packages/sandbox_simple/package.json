@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@react-awesome-query-builder/ui": "workspace:^",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "react": "^16.14.0",
     "react-dom": "^16.14.0"
   },
