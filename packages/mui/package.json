@@ -49,7 +49,7 @@
   "dependencies": {
     "@babel/runtime": "^7.27.0",
     "@react-awesome-query-builder/ui": "workspace:^",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "material-ui-confirm": "^3.0.5"
   },
   "devDependencies": {
