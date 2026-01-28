@@ -65,7 +65,7 @@
     "@babel/runtime": "^7.27.0",
     "@react-awesome-query-builder/core": "workspace:^",
     "classnames": "^2.5.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "prop-types": "^15.8.1",
     "react-number-format": "^5.0.0",
     "react-redux": "^8.1.3",
