@@ -48,7 +48,7 @@
   "dependencies": {
     "@babel/runtime": "^7.27.0",
     "@react-awesome-query-builder/ui": "workspace:^",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "prop-types": "^15.8.1",
     "rc-picker": "^4.5.0"
   },
