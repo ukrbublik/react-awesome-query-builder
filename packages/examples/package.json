@@ -54,7 +54,7 @@
     "clone": "^2.1.2",
     "immutable": "^4.3.6",
     "json-logic-js": "^2.0.2",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "moment": "^2.30.1",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
