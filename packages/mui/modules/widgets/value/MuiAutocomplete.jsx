@@ -103,25 +103,53 @@ export default (props) => {
     const selectedTitle = selectedListValue?.title ?? value?.toString() ?? "";
     const shouldHide = multiple && !open;
     const renderValue = shouldRenderSelected ? selectedTitle : (shouldHide ? "" : inputValue ?? value?.toString() ?? "");
-    return (
-      <TextField 
-        variant="standard"
-        {...params}
-        inputProps={{
+
+    // MUI v7 replaced TextField/Autocomplete `InputProps`/`inputProps` with `slotProps.input`/`slotProps.htmlInput`,
+    // and the `renderInput` params follow the same change. Support both shapes so the widget keeps working on
+    // MUI v5/v6 (InputProps/inputProps) as well as v7+ (slotProps).
+    const useSlotProps = params.slotProps != null;
+    const inheritedInputProps = (useSlotProps ? params.slotProps.input : params.InputProps) ?? {};
+    const endAdornment = (
+      <React.Fragment>
+        {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
+        {inheritedInputProps.endAdornment}
+      </React.Fragment>
+    );
+
+    const compatInputProps = useSlotProps
+      ? {
+        slotProps: {
+          ...params.slotProps,
+          htmlInput: {
+            "aria-label": ariaLabel,
+            ...params.slotProps.htmlInput,
+            value: renderValue,
+          },
+          input: {
+            ...params.slotProps.input,
+            readOnly: readonly,
+            endAdornment,
+          },
+        },
+      }
+      : {
+        inputProps: {
           "aria-label": ariaLabel,
           ...params.inputProps,
           value: renderValue,
-        }}
-        InputProps={{
+        },
+        InputProps: {
           ...params.InputProps,
           readOnly: readonly,
-          endAdornment: (
-            <React.Fragment>
-              {isLoading ? <CircularProgress color="inherit" size={20}  /> : null}
-              {params.InputProps.endAdornment}
-            </React.Fragment>
-          ),
-        }}
+          endAdornment,
+        },
+      };
+
+    return (
+      <TextField
+        variant="standard"
+        {...params}
+        {...compatInputProps}
         size={renderSize}
         disabled={readonly}
         placeholder={placeholder}
