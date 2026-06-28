@@ -53,6 +53,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
 * [SSR](#ssr)
   * [ctx](#ctx)
 * [Versions](#versions)
+  * [Supported React versions](#supported-react-versions)
   * [Changelog](#changelog)
   * [Migration to 6.5.0](#migration-to-650)
   * [Migration to 6.4.0](#migration-to-640)
@@ -720,6 +721,25 @@ It's recommended to update your version to 6.x. You just need to change your imp
 | 2.x     | :x:                |
 | 1.x     | :x:                |
 | 0.x     | :x:                |
+
+### Supported React versions
+Current major version (6.x) requires **React ^16.8.4 || ^17 || ^18 || ^19** (see `peerDependencies` of any UI package, e.g. [`@react-awesome-query-builder/ui`](/packages/ui/package.json)).
+
+The library heavily relies on React features introduced in React 16.8+:
+- **Hooks** (`useState`, `useEffect`, `useMemo`, `useCallback`, `useRef`) — used across `Query`, `Builder`, value editors, async autocomplete, etc.
+- **Modern Context API** (`React.createContext`, `useContext`) — used for the Redux store bridge and confirm modals
+- **`React.Fragment` shorthand** (`<>...</>`)
+- **`React.createRef`** / **`forwardRef`**
+
+For these reasons **React 15.x is NOT supported** in 6.x and there are no plans to backport it. A backport would require rewriting ~30 components as class components, replacing the context API with the legacy `childContextTypes` mechanism, and dropping Fragment/createRef usage — while also losing compatibility with every supported UI framework (Ant Design, MUI, Bootstrap 5, Fluent UI, Material-UI 4), none of which run on React 15.
+
+If you are stuck on **React 15.6** (e.g. SharePoint 2019 on-premise), use the legacy **v1.x** of the standalone `react-awesome-query-builder` package, which was the last line that supported React 15:
+
+```bash
+npm install react-awesome-query-builder@^1.0.0
+```
+
+See [Migration from v1 to v2](#migration-from-v1-to-v2) for the differences between v1 and the current major versions.
 
 ### Changelog
 See [`CHANGELOG`](/CHANGELOG.md)
