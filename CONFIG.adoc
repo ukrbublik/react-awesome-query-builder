@@ -43,7 +43,7 @@ They have common param `isForDisplay` - false by default, true will be used for 
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc`, `mongoFormatFunc`, `mongoArgsAsObject` for building MongoDb query with `QbUtils.mongodbFormat()`. +
 And `sqlFormatConj`, `sqlOp`, `sqlOps`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `formatSpelField`, `sqlFunc`, `sqlFormatFunc`, `sqlImport` for building SQL where query with `QbUtils.sqlFormat()`. +
 And `spelFormatConj`, `spelOp`, `spelFormatOp`, `spelFormatValue`, `spelFormatReverse`, `spelFunc`, `spelFormatFunc` for building query in (https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)[Spring Expression Language (SpEL)] with `QbUtils.spelFormat()`. +
-And `celFormatConj`, `celOp`, `celFormatOp`, `celFormatValue`, `celFormatReverse`, `formatCelField`, `celFormatFunc` for building query in https://github.com/google/cel-spec[Google Common Expression Language (CEL)] with `QbUtils.celFormat()` (and back with `QbUtils.loadFromCel()`). +
+And `celFormatConj`, `celOp`, `celFormatOp`, `celFormatValue`, `celFormatReverse`, `formatCelField`, `celFormatFunc` for building query in https://github.com/google/cel-spec[Google Common Expression Language (CEL)] with `QbUtils.celFormat()` (and back with `await QbUtils.loadFromCel()`, which is async because the `cel-js` parser is loaded lazily). +
 And `jsonLogic` for building http://jsonlogic.com[JsonLogic] with `QbUtils.jsonLogicFormat()`. +
 
 TIP: Example 1: {config1}[`config for sandbox_simple`]

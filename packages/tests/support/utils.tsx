@@ -22,7 +22,7 @@ import {
 } from "@react-awesome-query-builder/ui";
 const {
   uuid,
-  sanitizeTree, loadTree, _loadFromJsonLogic, loadFromSpel, loadFromCel, isJsonLogic, elasticSearchFormat,
+  sanitizeTree, loadTree, _loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
   queryString, sqlFormat, _sqlFormat, spelFormat, _spelFormat, celFormat, _celFormat, mongodbFormat, _mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
 } = Utils;
 import { AntdConfig } from "@react-awesome-query-builder/antd";
@@ -85,7 +85,7 @@ interface MockedAlert extends Alert {
   __origAlert: Alert;
   __alertData: AlertData;
 }
-type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | "SQL" | "CEL" | null | undefined;
+type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | "SQL" | null | undefined;
 type TreeValue = JsonLogicTree | JsonTree | string | undefined;
 type ConfigFn = (_: Config) => Config;
 type ConfigFns = ConfigFn | ConfigFn[];
@@ -278,8 +278,6 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
     ({tree, errors} = SqlUtils.loadFromSql(value as string, config));
   } else if (valueFormat === "SpEL") {
     [tree, errors] = loadFromSpel(value as string, config);
-  } else if (valueFormat === "CEL") {
-    [tree, errors] = loadFromCel(value as string, config);
   } else {
     tree = loadTree(value as JsonTree);
   }

@@ -1,4 +1,3 @@
-import { parse as celParse } from "cel-js";
 import uuid from "../utils/uuid";
 import { loadTree } from "./tree";
 import { getFieldConfig, getOperatorConfig, getWidgetForFieldOp } from "../utils/configUtils";
@@ -12,17 +11,33 @@ import { defaultConjunction } from "../utils/defaultUtils";
 // It's the inverse of `modules/export/cel.js`, so a tree exported to CEL and
 // re-imported yields an equivalent tree. Constructs that CEL export doesn't
 // produce (arithmetic, maps, macros other than the ones below) aren't supported.
+//
+// `cel-js` is ESM-only. It's loaded lazily via dynamic `import()` so that:
+//  - importing this package for export-only use never pulls it in;
+//  - the package still loads on CommonJS + old Node (`require` of an ESM module
+//    is unsupported before Node 20.19/22) — the dep is touched only when a CEL
+//    string is actually imported.
+// As a consequence `loadFromCel`/`_loadFromCel` are async (return a Promise).
+
+let _celParsePromise;
+const getCelParse = () => {
+  if (!_celParsePromise) {
+    _celParsePromise = import("cel-js").then((m) => m.parse || (m.default && m.default.parse));
+  }
+  return _celParsePromise;
+};
 
 export const loadFromCel = (celStr, config) => {
   return _loadFromCel(celStr, config, true);
 };
 
-export const _loadFromCel = (celStr, config, returnErrors = true) => {
+export const _loadFromCel = async (celStr, config, returnErrors = true) => {
   const meta = { errors: [] };
   const extendedConfig = extendConfig(config, undefined, false);
 
   let jsTree;
   try {
+    const celParse = await getCelParse();
     const res = celParse(celStr);
     if (!res || res.isSuccess === false) {
       const errs = res?.errors?.map((e) => e?.message || String(e)) || ["Failed to parse CEL"];
@@ -194,20 +209,50 @@ const convertAtomic = (node, config, meta) => {
   return undefined;
 };
 
-// field.contains(x) / field.startsWith(x) / field.endsWith(x)
+// field.contains(x) / field.startsWith(x) / field.endsWith(x) / field.exists(v, v in [..])
 const convertMethodCall = (identNode, config, meta) => {
   const dot = firstChild(identNode, "identifierDotExpression");
   if (!dot) return undefined;
   const methodName = tokenImg(dot, "Identifier");
-  const methodMap = { contains: "like", startsWith: "starts_with", endsWith: "ends_with" };
-  const operator = methodMap[methodName];
-  if (!operator) return undefined;
   const baseField = tokenImg(identNode, "Identifier");
   const field = resolveField(baseField, config);
   if (!field) return undefined;
+
+  // `list.exists(v, v in [..])` — the "contains any" multiselect operator
+  if (methodName === "exists") {
+    return convertExistsMacro(field, dot, config, meta);
+  }
+
+  const methodMap = { contains: "like", startsWith: "starts_with", endsWith: "ends_with" };
+  const operator = methodMap[methodName];
+  if (!operator) return undefined;
   const argExpr = firstChild(dot, "arg");
-  const argVal = evalLiteral(firstChild(argExpr, "conditionalOr") ? argExpr : argExpr, config, meta);
+  const argVal = evalLiteral(argExpr, config, meta);
   return mkRule(field, operator, [argVal], config, meta);
+};
+
+// `field.exists(_v, _v in [..])` (exported by multiselect_contains)
+const convertExistsMacro = (field, dot, config, meta) => {
+  // macro predicate is the 2nd argument: `_v in [..]`
+  const predExpr = firstChild(dot, "args");
+  const rel = firstRelation(predExpr);
+  if (!rel || firstChild(rel, "ComparisonOperator")?.image !== "in") {
+    meta.errors.push("Unsupported exists() predicate; expected `<var> in [..]`");
+    return undefined;
+  }
+  const list = evalLiteral(firstChild(rel, "rhs"), config, meta);
+  if (!Array.isArray(list)) {
+    meta.errors.push("exists() predicate must test membership in a list");
+    return undefined;
+  }
+  return mkRule(field, "multiselect_contains", [list], config, meta);
+};
+
+// navigate expr => conditionalOr => conditionalAnd => relation
+const firstRelation = (exprNode) => {
+  const or = firstChild(exprNode, "conditionalOr");
+  const and = firstChild(or, "lhs");
+  return firstChild(and, "lhs");
 };
 
 // -----------------------------------------------------------------------------

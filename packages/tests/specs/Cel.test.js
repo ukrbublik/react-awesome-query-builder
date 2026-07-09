@@ -72,13 +72,15 @@ describe("import from CEL", () => {
     "str == 'he\\'llo'",
     "sel == 'x'",
     "sel in ['x', 'y']",
+    "tags == ['a', 'b']",
+    "tags.exists(_v, _v in ['a', 'b'])",
     "num == null",
     "num != null",
     "!(num == 5)",
   ];
   for (const cel of roundTrips) {
-    it(`round-trips ${JSON.stringify(cel)}`, () => {
-      const [tree, errors] = loadFromCel(cel, config);
+    it(`round-trips ${JSON.stringify(cel)}`, async () => {
+      const [tree, errors] = await loadFromCel(cel, config);
       expect(JSON.stringify(errors)).to.equal("[]");
       expect(tree, "tree should load").to.not.equal(undefined);
       const out = celFormat(checkTree(tree, config), config);
@@ -86,8 +88,8 @@ describe("import from CEL", () => {
     });
   }
 
-  it("reports errors for unparseable CEL", () => {
-    const [tree, errors] = loadFromCel("num === ", config);
+  it("reports errors for unparseable CEL", async () => {
+    const [tree, errors] = await loadFromCel("num === ", config);
     expect(errors.length).to.be.greaterThan(0);
     expect(tree).to.equal(undefined);
   });
