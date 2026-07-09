@@ -17,6 +17,7 @@ const FluentUIBoolean = (props) => {
 
   return (
     <Toggle
+      checked={value}
       disabled={readonly}
       onText={onText}
       offText={offText}

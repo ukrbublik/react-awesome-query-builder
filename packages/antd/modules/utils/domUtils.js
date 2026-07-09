@@ -40,7 +40,7 @@ export const BUILT_IN_PLACEMENTS = {
 export const calcTextWidth = function(str, fontFamily = DEFAULT_FONT_FAMILY, fontSize = DEFAULT_FONT_SIZE) {
   if (typeof document !== "undefined") {
     var div = document.createElement("div");
-    div.innerHTML = str;
+    div.innerText = str;
     var css = {
       "position": "absolute", "float": "left", "white-space": "nowrap", "visibility": "hidden", 
       "font-size": fontSize, "font-family": fontFamily

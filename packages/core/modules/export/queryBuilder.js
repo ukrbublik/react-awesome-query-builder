@@ -1,4 +1,4 @@
-import {defaultValue} from "../utils/stuff";
+import {getOpCardinality} from "../utils/stuff";
 import {getFieldConfig, getOperatorConfig} from "../utils/configUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {formatFieldName} from "../utils/ruleUtils";
@@ -119,7 +119,7 @@ const formatRule = (item, config, meta) => {
   const fieldDefinition = getFieldConfig(config, field) || {};
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
   const fieldType = fieldDefinition.type || "undefined";
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDefinition);
   const typeConfig = config.types[fieldDefinition.type] || {};
   const fieldName = formatFieldName(field, config, meta);
 

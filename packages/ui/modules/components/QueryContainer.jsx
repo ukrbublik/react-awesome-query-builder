@@ -6,12 +6,12 @@ import context from "../stores/context";
 import {createStore} from "redux";
 import {Provider} from "react-redux";
 import * as actions from "../actions";
-import {createConfigMemo} from "../utils/configUtils";
 import {immutableEqual} from "../utils/stuff";
-import {createValidationMemo} from "../utils/validation";
+import {createValidationMemo} from "../utils/validationMemo";
 import {liteShouldComponentUpdate, useOnPropsChanged} from "../utils/reactUtils";
 import ConnectedQuery from "./Query";
 const {defaultRoot} = Utils.DefaultUtils;
+const {createConfigMemo, extendConfig} = Utils.ConfigUtils;
 
 
 export default class QueryContainer extends Component {
@@ -26,6 +26,7 @@ export default class QueryContainer extends Component {
     ctx: PropTypes.object.isRequired,
 
     onChange: PropTypes.func,
+    onInit: PropTypes.func,
     renderBuilder: PropTypes.func,
     value: PropTypes.any, //instanceOf(Immutable.Map)
   };
@@ -34,9 +35,15 @@ export default class QueryContainer extends Component {
     super(props, context);
     useOnPropsChanged(this);
 
-    const { getExtended, getBasic } = createConfigMemo();
-    this.getMemoizedConfig = getExtended;
-    this.getBasicConfig = getBasic;
+    const { getExtendedConfig, getBasicConfig, clearConfigMemo } = createConfigMemo({
+      reactIndex: this._reactInternals?.index ?? -1,
+      maxSize: 2, // current and prev
+      canCompile: true,
+      extendConfig,
+    });
+    this.getMemoizedConfig = getExtendedConfig;
+    this.getBasicConfig = getBasicConfig;
+    this.clearConfigMemo = clearConfigMemo;
     this.getMemoizedTree = createValidationMemo();
     
     const config = this.getMemoizedConfig(props);
@@ -47,7 +54,7 @@ export default class QueryContainer extends Component {
     const tree = props.value || emptyTree;
     const validatedTree = this.getMemoizedTree(config, tree, undefined, sanitizeTree);
 
-    const reducer = treeStoreReducer(config, validatedTree, this.getMemoizedTree, this.setLastTree);
+    const reducer = treeStoreReducer(config, validatedTree, this.getMemoizedTree, this.setLastTree, this.getConfig);
     const store = createStore(reducer);
 
     this.config = config;
@@ -57,6 +64,10 @@ export default class QueryContainer extends Component {
     this.QueryWrapper = (pr) => config.settings.renderProvider(pr, config.ctx);
   }
 
+  componentWillUnmount() {
+    this.clearConfigMemo();
+  }
+
   setLastTree = (lastTree) => {
     if (this.prevTree) {
       this.prevprevTree = this.prevTree;
@@ -64,8 +75,12 @@ export default class QueryContainer extends Component {
     this.prevTree = lastTree;
   };
 
+  getConfig = () => {
+    return this.config;
+  };
+
   shouldComponentUpdate = liteShouldComponentUpdate(this, {
-    value: (nextValue, prevValue, state) => { return false; }
+    value: (nextValue, prevValue) => { return false; }
   });
 
   onPropsChanged(nextProps) {
@@ -81,6 +96,7 @@ export default class QueryContainer extends Component {
     const currentTree = isTreeChanged ? (nextProps.value || defaultRoot(nextProps)) : storeValue;
     const isTreeTrulyChanged = isTreeChanged && !immutableEqual(nextProps.value, this.prevTree) && !immutableEqual(nextProps.value, this.prevprevTree);
     this.sanitizeTree = isTreeTrulyChanged || isConfigChanged;
+    const canUseOldConfig = isConfigChanged && !isTreeChanged;
 
     if (isConfigChanged) {
       if (prevProps.settings.renderProvider !== nextProps.settings.renderProvider) {
@@ -90,7 +106,7 @@ export default class QueryContainer extends Component {
     }
     
     if (isTreeChanged || isConfigChanged) {
-      const validatedTree = this.getMemoizedTree(nextConfig, currentTree, oldConfig, this.sanitizeTree);
+      const validatedTree = this.getMemoizedTree(nextConfig, currentTree, canUseOldConfig ? oldConfig : undefined, this.sanitizeTree);
       //return Promise.resolve().then(() => {
       this.state.store.dispatch(
         actions.tree.setTree(nextConfig, validatedTree)
@@ -101,7 +117,7 @@ export default class QueryContainer extends Component {
 
   render() {
     // `get_children` is deprecated!
-    const {renderBuilder, get_children, onChange} = this.props;
+    const {renderBuilder, get_children, onChange, onInit} = this.props;
     const {store} = this.state;
     const config = this.config;
     const QueryWrapper = this.QueryWrapper;
@@ -115,6 +131,7 @@ export default class QueryContainer extends Component {
             getBasicConfig={this.getBasicConfig}
             sanitizeTree={this.sanitizeTree}
             onChange={onChange}
+            onInit={onInit}
             renderBuilder={renderBuilder || get_children}
           />
         </Provider>

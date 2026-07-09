@@ -1,6 +1,7 @@
 {
   "packages": [
     "packages/core",
+    "packages/sql",
     "packages/ui",
     "packages/antd",
     "packages/mui",
@@ -15,5 +16,6 @@
     "/packages/sandbox_next"
   ],
   "node": "18",
-  "buildCommand": "build-libs"
+  "installCommand": "install-frozen",
+  "buildCommand": "build"
 }

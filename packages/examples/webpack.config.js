@@ -14,6 +14,7 @@ const isDev = (MODE == "development");
 const isAnalyze = process.env.ANALYZE == "1";
 const isSeparateCss = process.env.CSS == "1";
 const EXAMPLES = __dirname;
+
 const CORE_MODULES = path.resolve(EXAMPLES, '../core/modules/');
 const UI_MODULES = path.resolve(EXAMPLES, '../ui/modules/');
 const ANTD_MODULES = path.resolve(EXAMPLES, '../antd/modules/');
@@ -21,13 +22,17 @@ const MUI_MODULES = path.resolve(EXAMPLES, '../mui/modules/');
 const MATERIAL_MODULES = path.resolve(EXAMPLES, '../material/modules/');
 const BOOTSTRAP_MODULES = path.resolve(EXAMPLES, '../bootstrap/modules/');
 const FLUENT_MODULES = path.resolve(EXAMPLES, '../fluent/modules/');
+const SQL_MODULES = path.resolve(EXAMPLES, '../sql/modules/');
+
 const UI_CSS = path.resolve(EXAMPLES, '../ui/styles/');
 const ANTD_CSS = path.resolve(EXAMPLES, '../antd/styles/');
 const MUI_CSS = path.resolve(EXAMPLES, '../mui/styles/');
 const MATERIAL_CSS = path.resolve(EXAMPLES, '../material/styles/');
 const BOOTSTRAP_CSS = path.resolve(EXAMPLES, '../bootstrap/styles/');
 const FLUENT_CSS = path.resolve(EXAMPLES, '../fluent/styles/');
-const DIST = path.resolve(EXAMPLES, './build');
+
+const DIST = path.resolve(EXAMPLES, './build/');
+const NODE_MODULES = path.resolve(EXAMPLES, './node_modules/');
 const isMono = fs.existsSync(CORE_MODULES);
 
 let plugins = [
@@ -57,6 +62,11 @@ let aliases = isMono ? {
     '@react-awesome-query-builder/material': MATERIAL_MODULES,
     '@react-awesome-query-builder/bootstrap': BOOTSTRAP_MODULES,
     '@react-awesome-query-builder/fluent': FLUENT_MODULES,
+    '@react-awesome-query-builder/sql': SQL_MODULES,
+
+
+    'react': path.resolve(NODE_MODULES, 'react'),
+    'react-dom': path.resolve(NODE_MODULES, 'react-dom'),
 } : {};
 
 let style_loaders = [{
@@ -74,14 +84,18 @@ const lazy_style_loaders = [
 })
 ];
 
+plugins = [
+    ...plugins,
+    new CopyPlugin({
+      patterns: [
+        { from: "./index.html", to: DIST },
+      ],
+    }),
+];
+
 if (isProd) {
     plugins = [
         ...plugins,
-        new CopyPlugin({
-          patterns: [
-            { from: "./index.html", to: DIST },
-          ],
-        }),
         new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
         new MomentLocalesPlugin({
             localesToKeep: ['es-us', 'ru'],
@@ -121,16 +135,19 @@ const babel_options = {
         '@babel/preset-typescript', // or can use 'ts-loader' instead
     ],
     plugins: [
-        ["@babel/plugin-proposal-class-properties", { "loose": true }],
-        ["@babel/plugin-proposal-private-methods", { "loose": true }],
-        ["@babel/plugin-proposal-private-property-in-object", { "loose": true }],
+        ["@babel/plugin-transform-class-properties", { "loose": true }],
+        ["@babel/plugin-transform-private-methods", { "loose": true }],
+        ["@babel/plugin-transform-private-property-in-object", { "loose": true }],
         "@babel/plugin-transform-runtime",
         ...(isDev ? ["react-refresh/babel"] : []),
-        ["import", {
-            "libraryName": "antd",
-            "style": false,
-            "libraryDirectory": "es"
-        }],
+        // TODO: can safely remove?
+        // not needed for antd v5
+        // https://ant.design/docs/react/migration-v5#remove-babel-plugin-import
+        // ["import", {
+        //     "libraryName": "antd",
+        //     "style": false,
+        //     "libraryDirectory": "es"
+        // }],
     ]
 };
 
@@ -141,19 +158,39 @@ module.exports = {
     devServer: {
         port: PORT,
         host: '0.0.0.0',
+        client: {
+            webSocketURL: 'ws://0.0.0.0:0/ws',
+            overlay: {
+                errors: true,
+                runtimeErrors: (error) => {
+                    // https://github.com/ant-design/ant-design/issues/26621
+                    // MultiSelectWidget (antd) can throw this error
+                    if (error.message === 'ResizeObserver loop completed with undelivered notifications.') {
+                        return false;
+                    }
+                    return true;
+                },
+                warnings: false,
+            },
+        },
         allowedHosts: [
             'localhost',
             '.csb.app', // codesandbox.io
             '.webcontainer.io', // stackblitz.com
+            '.app.github.dev', // GitHub Codespaces
+            '.github.dev', // GitHub Codespaces
         ],
+        headers: {
+            'Document-Policy': 'js-profiling',
+        },
         historyApiFallback: true,
         hot: true,
         // inline: true,
         static: {
-          directory: path.join(__dirname, '/'),
+          directory: DIST,
         },
     },
-    entry: './index',
+    entry: './src/index',
     output: {
         path: DIST,
         filename: 'bundle.js'

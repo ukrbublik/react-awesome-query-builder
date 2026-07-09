@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+
 const SCRIPTS = __dirname;
 const PACKAGE = path.resolve(SCRIPTS, '../');
 const CJS = path.resolve(PACKAGE, 'cjs');
@@ -13,7 +14,8 @@ const findJsFilesInDirRec = (dir) => {
     .map(e => e.name)
     .map(name => path.resolve(dir, name));
   const jsFiles = ents
-    .filter(e => e.isFile() && path.extname(e.name) === '.js')
+    // find .js and .d.ts
+    .filter(e => e.isFile() && ['.js', '.ts'].includes(path.extname(e.name)))
     .map(e => e.name)
     .map(name => path.resolve(dir, name));
   const recFiles = dirs.map(findJsFilesInDirRec).reduce((arr, files) => [...arr, ...files], []);
@@ -21,7 +23,8 @@ const findJsFilesInDirRec = (dir) => {
 };
 
 const allJsFiles = findJsFilesInDirRec(CJS);
-const fixedCnt = allJsFiles.map(filePath => {
+const fixesFiles = [];
+allJsFiles.map(filePath => {
   const content = fs.readFileSync(filePath, {
     encoding: 'utf8'
   });
@@ -30,9 +33,15 @@ const fixedCnt = allJsFiles.map(filePath => {
     fs.writeFileSync(filePath, fixedContent, {
       encoding: 'utf8'
     });
-    return 1;
-  } else {
-    return 0;
+    fixesFiles.push(filePath);
   }
-}).reduce((cnt, r) => cnt + r, 0);
-console.log(`Fixed antd/es/ -> antd/lib/ in ${fixedCnt} files in /cjs`);
+});
+
+console.log(`Fixed antd/es/ -> antd/lib/ in ${fixesFiles.length} files in /cjs`);
+if (fixesFiles.length > 0) {
+  console.log('Fixed files:');
+  fixesFiles.forEach(filePath => {
+    const relativePath = path.relative(CJS, filePath);
+    console.log(`- ${relativePath}`);
+  });
+}

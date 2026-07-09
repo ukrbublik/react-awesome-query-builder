@@ -1,12 +1,12 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, getWidgetForFieldOp,
 } from "../utils/configUtils";
+import {extendConfig} from "../utils/configExtend";
 import {
-  getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue
+  getFieldPathLabels, formatFieldName, completeValue
 } from "../utils/ruleUtils";
-import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 import {SqlString} from "../utils/export";
@@ -75,12 +75,12 @@ const formatGroup = (item, config, meta) => {
     conjunction = defaultConjunction(config);
   const conjunctionDefinition = config.conjunctions[conjunction];
 
-  return conjunctionDefinition.sqlFormatConj(list, conjunction, not);
+  return conjunctionDefinition.sqlFormatConj.call(config.ctx, list, conjunction, not);
 };
 
 const buildFnToFormatOp = (operator, operatorDefinition) => {
   const sqlOp = operatorDefinition.sqlOp || operator;
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDefinition);
   let fn;
   if (cardinality == 0) {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
@@ -93,8 +93,8 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
   } else if (cardinality == 2) {
     // between
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      const valFrom = values.first();
-      const valTo = values.get(1);
+      const valFrom = values?.first?.();
+      const valTo = values?.get?.(1);
       return `${field} ${sqlOp} ${valFrom} AND ${valTo}`;
     };
   }
@@ -118,7 +118,7 @@ const formatRule = (item, config, meta) => {
   let opDef = getOperatorConfig(config, operator, field) || {};
   let reversedOp = opDef.reversedOp;
   let revOpDef = getOperatorConfig(config, reversedOp, field) || {};
-  const cardinality = defaultValue(opDef.cardinality, 1);
+  const cardinality = getOpCardinality(opDef);
 
   // check op
   let isRev = false;
@@ -137,25 +137,28 @@ const formatRule = (item, config, meta) => {
   //format value
   let valueSrcs = [];
   let valueTypes = [];
-  const fvalue = iValue.map((currentValue, ind) => {
-    const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
-    const valueType = iValueType ? iValueType.get(ind) : null;
-    const cValue = completeValue(currentValue, valueSrc, config);
-    const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-    let fv = formatValue(
-      meta, config, cValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, opDef, asyncListValues
-    );
-    if (fv !== undefined) {
-      valueSrcs.push(valueSrc);
-      valueTypes.push(valueType);
-    }
-    return fv;
-  });
-  const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
-  if (hasUndefinedValues || fvalue.size < cardinality)
-    return undefined;
-  const formattedValue = (cardinality == 1 ? fvalue.first() : fvalue);
+  let formattedValue;
+  if (iValue != undefined) {
+    const fvalue = iValue.map((currentValue, ind) => {
+      const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
+      const valueType = iValueType ? iValueType.get(ind) : null;
+      const cValue = completeValue(currentValue, valueSrc, config);
+      const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+      const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, widget, valueSrc, { forExport: true });
+      let fv = formatValue(
+        meta, config, cValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, opDef, asyncListValues
+      );
+      if (fv !== undefined) {
+        valueSrcs.push(valueSrc);
+        valueTypes.push(valueType);
+      }
+      return fv;
+    });
+    const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
+    if (hasUndefinedValues || fvalue.size < cardinality)
+      return undefined;
+    formattedValue = (cardinality == 1 ? fvalue.first() : fvalue);
+  }
 
   //find fn to format expr
   const fn = opDef.sqlFormatOp || buildFnToFormatOp(operator, opDef);
@@ -186,7 +189,7 @@ const formatRule = (item, config, meta) => {
   let ret;
   ret = fn.call(config.ctx, ...args);
   if (isRev) {
-    ret = config.settings.sqlFormatReverse(ret);
+    ret = config.settings.sqlFormatReverse.call(config.ctx, ret);
   }
   if (ret === undefined) {
     meta.errors.push(`Operator ${operator} is not supported for value source ${valueSrcs.join(", ")}`);
@@ -204,9 +207,12 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
     ret = formatField(meta, config, currentValue);
   } else if (valueSrc == "func") {
     ret = formatFunc(meta, config, currentValue);
+  } else if (currentValue == undefined) {
+    ret = undefined;
   } else {
-    if (typeof fieldWidgetDef.sqlFormatValue === "function") {
+    if (typeof fieldWidgetDef?.sqlFormatValue === "function") {
       const fn = fieldWidgetDef.sqlFormatValue;
+      const valFieldDefinition = valueSrc == "field" && getFieldConfig(config, currentValue) || {}; 
       const args = [
         currentValue,
         {
@@ -215,15 +221,11 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
         },
         //useful options: valueFormat for date/time
         omit(fieldWidgetDef, widgetDefKeysToOmit),
+        operator,
+        operatorDef,
+        valFieldDefinition,
+        config.settings.sqlDialect,
       ];
-      if (operator) {
-        args.push(operator);
-        args.push(operatorDef);
-      }
-      if (valueSrc == "field") {
-        const valFieldDefinition = getFieldConfig(config, currentValue) || {}; 
-        args.push(valFieldDefinition);
-      }
       ret = fn.call(config.ctx, ...args);
     } else {
       if (Array.isArray(currentValue)) {
@@ -251,8 +253,8 @@ const formatField = (meta, config, field) => {
 
 
 const formatFunc = (meta, config, currentValue) => {
-  const funcKey = currentValue.get("func");
-  const args = currentValue.get("args");
+  const funcKey = currentValue.get?.("func");
+  const args = currentValue.get?.("args");
   const funcConfig = getFuncConfig(config, funcKey);
   if (!funcConfig) {
     meta.errors.push(`Func ${funcKey} is not defined in config`);
@@ -271,14 +273,18 @@ const formatFunc = (meta, config, currentValue) => {
     const {defaultValue, isOptional} = argConfig;
     const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
-    const argValue = argVal ? argVal.get("value") : undefined;
+    let argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    if (argValueSrc !== "func" && argValue?.toJS) {
+      // value should not be Immutable
+      argValue = argValue.toJS();
+    }
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
     const formattedArgVal = formatValue(
       meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
-      if (argValueSrc != "func") // don't triger error if args value is another uncomplete function
+      if (argValueSrc != "func") // don't triger error if args value is another incomplete function
         meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
     }
@@ -288,7 +294,7 @@ const formatFunc = (meta, config, currentValue) => {
         meta, config, defaultValue, defaultValueSrc, argConfig.type, fieldDef, argConfig, null, null, argAsyncListValues
       );
       if (formattedDefaultVal === undefined) {
-        if (defaultValueSrc != "func") // don't triger error if args value is another uncomplete function
+        if (defaultValueSrc != "func") // don't triger error if args value is another incomplete function
           meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
         return undefined;
       }
@@ -311,14 +317,15 @@ const formatFunc = (meta, config, currentValue) => {
   }
   if (missingArgKeys.length) {
     //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
-    return undefined; // uncomplete
+    return undefined; // incomplete
   }
 
   let ret;
   if (typeof funcConfig.sqlFormatFunc === "function") {
     const fn = funcConfig.sqlFormatFunc;
     const args = [
-      formattedArgs
+      formattedArgs,
+      config.settings.sqlDialect,
     ];
     ret = fn.call(config.ctx, ...args);
   } else {

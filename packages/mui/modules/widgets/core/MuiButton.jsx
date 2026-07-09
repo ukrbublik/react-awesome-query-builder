@@ -1,44 +1,50 @@
-import React from "react";
+import React, { memo } from "react";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 
 const hideLabelsFor = {
-  "addRuleGroup": true,
-  "addRuleGroupExt": true,
+  "addSubRuleSimple": true,
+  // "addSubRule": true,
+  // "addSubGroup": true,
   "delGroup": true,
   "delRuleGroup": true,
   "delRule": true,
 };
 
 const typeToColor = {
-  "addRule": "neutral",
+  "addRule": "primary",
   "addGroup": "primary",
   "delGroup": "secondary",
   "delRuleGroup": "secondary",
   "delRule": "secondary",
 };
 
-export default (props) => {
-  const {type, label, onClick, readonly, renderIcon} = props;
+export default memo((props) => {
+  const {type, label, onClick, readonly, renderIcon, config} = props;
+  const {renderSize} = config.settings;
   const iconProps = {
     type,
     readonly,
+    renderSize,
+    config,
   };
   const icon = renderIcon?.(iconProps);
 
   if (!label || hideLabelsFor[type]) {
+    // For icons, use the label as aria-label for accessibility
     return (
       <IconButton
-        size="small" 
+        size={renderSize}
         disabled={readonly} 
         onClick={onClick} 
         color={typeToColor[type]}
+        aria-label={label}
       >{icon}</IconButton>
     );
   } else {
     return (
       <Button 
-        size="small" 
+        size={renderSize} 
         disabled={readonly} 
         onClick={onClick} 
         color={typeToColor[type]} 
@@ -46,4 +52,4 @@ export default (props) => {
       >{label}</Button>
     );
   }
-};
+});

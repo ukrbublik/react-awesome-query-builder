@@ -1,15 +1,16 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, getWidgetForFieldOp,
+  getFieldPartsConfigs,
 } from "../utils/configUtils";
+import {extendConfig} from "../utils/configExtend";
 import {
-  getWidgetForFieldOp, formatFieldName, getFieldPartsConfigs, completeValue
+  formatFieldName, completeValue
 } from "../utils/ruleUtils";
-import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {defaultValue, logger, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
-import {spelEscape} from "../utils/export";
+import {spelEscape} from "../utils/spelUtils";
 
 // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions
 
@@ -68,7 +69,7 @@ const formatCase = (item, config, meta, parentField = null) => {
   }
   const properties = item.get("properties") || new Map();
   
-  const [formattedValue, valueSrc, valueType] = formatItemValue(
+  const {value: formattedValue, valueSrc, valueType} = formatItemValue(
     config, properties, meta, null, parentField, "!case_value"
   );
 
@@ -83,6 +84,7 @@ const formatSwitch = (item, config, meta, parentField = null) => {
   const cases = children
     .map((currentChild) => formatCase(currentChild, config, meta, null))
     .filter((currentChild) => typeof currentChild !== "undefined")
+    .valueSeq()
     .toArray();
   
   if (!cases.length) return undefined;
@@ -135,7 +137,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
   const conjunctionDefinition = config.conjunctions[conjunction];
   const not = properties.get("not");
 
-  const isRuleGroup = type === "rule_group";
+  const isRuleGroup = type === "rule_group" && field;
   const isRuleGroupArray = isRuleGroup && mode != "struct";
   const groupField = isRuleGroupArray ? field : parentField;
   const groupFieldDef = getFieldConfig(config, groupField) || {};
@@ -153,7 +155,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
   const isGroup0 = isRuleGroup && (!realGroupOperator || realGroupOperatorDefinition.cardinality == 0);
   
   // build value for aggregation op
-  const [formattedValue, valueSrc, valueType] = formatItemValue(
+  const {value: formattedValue, valueSrc, valueType} = formatItemValue(
     config, properties, meta, realGroupOperator, parentField, null
   );
   
@@ -172,12 +174,12 @@ const formatGroup = (item, config, meta, parentField = null) => {
   }
 
   const omitBrackets = isRuleGroup;
-  const filter = list.size ? conjunctionDefinition.spelFormatConj(list, conjunction, not, omitBrackets) : null;
+  const filter = list.size ? conjunctionDefinition.spelFormatConj.call(config.ctx, list, conjunction, not, omitBrackets) : null;
 
   // build result
   let ret;
   if (isRuleGroupArray) {
-    const formattedField = formatField(meta, config, field, parentField);
+    const {value: formattedField} = formatField(meta, config, field, parentField);
     const sep = fieldSeparator || ".";
     const getSize = sep + (isSpelArray ? "length" : "size()");
     const fullSize = `${formattedField}${getSize}`;
@@ -202,7 +204,7 @@ const buildFnToFormatOp = (operator, operatorDefinition, valueType) => {
   const isCompareTo = TypesWithCompareTo[valueType];
   let sop = spelOp;
   let fn;
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDefinition);
   if (isCompareTo) {
     // date1.compareTo(date2) >= 0
     //   instead of
@@ -235,7 +237,7 @@ const formatExpression = (meta, config, properties, formattedField, formattedVal
   const operatorOptions = properties.get("operatorOptions");
 
   //find fn to format expr
-  const fn = opDef.spelFormatOp || buildFnToFormatOp(operator, opDef, valueType);
+  const fn = opDef.spelFormatOp || buildFnToFormatOp(operator, opDef, valueType ?? fieldDef.type);
   if (!fn) {
     meta.errors.push(`Operator ${operator} is not supported`);
     return undefined;
@@ -257,7 +259,7 @@ const formatExpression = (meta, config, properties, formattedField, formattedVal
 
   //rev
   if (isRev) {
-    ret = config.settings.spelFormatReverse(ret);
+    ret = config.settings.spelFormatReverse.call(config.ctx, ret);
   }
 
   if (ret === undefined) {
@@ -304,20 +306,20 @@ const formatRule = (item, config, meta, parentField = null) => {
   const isRev = realOp != operator;
 
   //format value
-  const [formattedValue, valueSrc, valueType] = formatItemValue(
+  const {value: formattedValue, valueSrc, valueType} = formatItemValue(
     config, properties, meta, realOp, parentField, null
   );
   if (formattedValue === undefined)
     return undefined;
       
   //format field
-  const formattedField = formatLhs(meta, config, field, fieldSrc, parentField);
+  const {value: formattedField, valueSrc: _fieldSrc, valueType: fieldType} = formatLhs(meta, config, field, fieldSrc, parentField) ?? {};
   if (formattedField === undefined)
     return undefined;
-  
+
   // format expression
   let res = formatExpression(
-    meta, config, properties, formattedField, formattedValue, realOp, valueSrc, valueType, isRev
+    meta, config, properties, formattedField, formattedValue, realOp, valueSrc, valueType ?? fieldType, isRev
   );
   return res;
 };
@@ -338,7 +340,7 @@ const formatItemValue = (config, properties, meta, operator, parentField, expect
   }
   const fieldDef = getFieldConfig(config, field) || {};
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDefinition);
   const iValue = properties.get("value");
   const asyncListValues = properties.get("asyncListValues");
   
@@ -352,7 +354,7 @@ const formatItemValue = (config, properties, meta, operator, parentField, expect
       const valueType = iValueType ? iValueType.get(ind) : null;
       const cValue = completeValue(currentValue, valueSrc, config);
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-      const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+      const fieldWidgetDef = getFieldWidgetConfig(config, field, operator, widget, valueSrc, { forExport: true });
       const fv = formatValue(
         meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDefinition, parentField, asyncListValues
       );
@@ -368,23 +370,25 @@ const formatItemValue = (config, properties, meta, operator, parentField, expect
     }
   }
   
-  return [
-    formattedValue, 
-    (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
-    (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-  ];
+  return {
+    value: formattedValue,
+    valueSrc: (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
+    valueType: (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
+  };
 };
 
 const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef, parentField = null, asyncListValues) => {
   if (currentValue === undefined)
     return undefined;
   let ret;
-  if (valueSrc == "field") {
-    ret = formatField(meta, config, currentValue, parentField);
-  } else if (valueSrc == "func") {
-    ret = formatFunc(meta, config, currentValue, parentField);
+  if (valueSrc === "field") {
+    // formatField() returns type {value, valueSrc, valueType}
+    ret = formatField(meta, config, currentValue, parentField)?.value;
+  } else if (valueSrc === "func") {
+    // formatFunc() returns type {value, valueSrc, valueType}
+    ret = formatFunc(meta, config, currentValue, parentField, valueType)?.value;
   } else {
-    if (typeof fieldWidgetDef.spelFormatValue === "function") {
+    if (typeof fieldWidgetDef?.spelFormatValue === "function") {
       const fn = fieldWidgetDef.spelFormatValue;
       const args = [
         currentValue,
@@ -423,9 +427,9 @@ const formatField = (meta, config, field, parentField = null) => {
     let parent;
     if (parentCnf) {
       if (parentCnf.type == "!struct" || parentCnf.type == "!group" && parentCnf.mode == "struct")
-        parent = cnf.isSpelMap ? "map" : "class";
+        parent = cnf?.isSpelMap ? "map" : "class";
       else if (parentCnf.type == "!group")
-        parent = cnf.isSpelItemMap ? "[map]" : "[class]";
+        parent = cnf?.isSpelItemMap ? "[map]" : "[class]";
       else
         parent = "class";
     }
@@ -438,13 +442,13 @@ const formatField = (meta, config, field, parentField = null) => {
     };
   });
   const formattedField = formatFieldFn.call(config.ctx, fieldName, parentField, fieldParts, fieldPartsMeta, fieldDefinition, config);
-  return formattedField;
+  return {value: formattedField, valueSrc: "field", valueType: fieldDefinition?.type};
 };
 
 
-const formatFunc = (meta, config, currentValue, parentField = null) => {
-  const funcKey = currentValue.get("func");
-  const args = currentValue.get("args");
+const formatFunc = (meta, config, currentValue, parentField = null, valueType = null) => {
+  const funcKey = currentValue.get?.("func");
+  const args = currentValue.get?.("args");
   const funcConfig = getFuncConfig(config, funcKey);
   if (!funcConfig) {
     meta.errors.push(`Func ${funcKey} is not defined in config`);
@@ -460,31 +464,35 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     const {defaultValue, isOptional} = argConfig;
     const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
-    const argValue = argVal ? argVal.get("value") : undefined;
+    let argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    if (argValueSrc !== "func" && argValue?.toJS) {
+      // value should not be Immutable
+      argValue = argValue.toJS();
+    }
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
-    const doEscape = argConfig.spelEscapeForFormat ?? true;
+    const doEscape = argConfig.escapeForFormat ?? true;
     const operator = null;
     const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
-    const fieldWidgetDef = omit(getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc), ["factory"]);
+    const fieldWidgetDef = getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc, { forExport: true });
 
     const formattedArgVal = formatValue(
       meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, null, null, parentField, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
-      if (argValueSrc != "func") // don't triger error if args value is another uncomplete function
+      if (argValueSrc != "func") // don't triger error if args value is another incomplete function
         meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
     }
     let formattedDefaultVal;
     if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
       const defaultWidget = getWidgetForFieldOp(config, argConfig, operator, defaultValueSrc);
-      const defaultFieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc), ["factory"] );
+      const defaultFieldWidgetDef = getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc, { forExport: true });
       formattedDefaultVal = formatValue(
         meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, null, null, parentField, argAsyncListValues
       );
       if (formattedDefaultVal === undefined) {
-        if (defaultValueSrc != "func") // don't triger error if args value is another uncomplete function
+        if (defaultValueSrc != "func") // don't triger error if args value is another incomplete function
           meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
         return undefined;
       }
@@ -507,7 +515,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   }
   if (missingArgKeys.length) {
     //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
-    return undefined; // uncomplete
+    return undefined; // incomplete
   }
   
   let ret;
@@ -537,5 +545,6 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   } else {
     meta.errors.push(`Func ${funcKey} is not supported`);
   }
-  return ret;
+  // tip: returnType should equal valueType
+  return {value: ret, valueSrc: "func", valueType: funcConfig.returnType};
 };

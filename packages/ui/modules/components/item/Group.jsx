@@ -7,8 +7,11 @@ import Draggable from "../containers/Draggable";
 import classNames from "classnames";
 import { Item } from "./Item";
 import {GroupActions} from "./GroupActions";
-import {WithConfirmFn, dummyFn} from "../utils";
+import {WithConfirmFn, dummyFn, getRenderFromConfig} from "../utils";
+import {useOnPropsChanged} from "../../utils/reactUtils";
+const {getFieldConfig} = Utils.ConfigUtils;
 const {isEmptyGroupChildren} = Utils.RuleUtils;
+const {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} = Utils.TreeUtils;
 
 const defaultPosition = "topRight";
 
@@ -18,6 +21,7 @@ export class BasicGroup extends Component {
     reordableNodesCnt: PropTypes.number,
     conjunctionOptions: PropTypes.object.isRequired,
     allowFurtherNesting: PropTypes.bool.isRequired,
+    isMaxNestingExceeded: PropTypes.bool,
     isRoot: PropTypes.bool.isRequired,
     not: PropTypes.bool,
     selectedConjunction: PropTypes.string,
@@ -30,12 +34,14 @@ export class BasicGroup extends Component {
     isDraggingTempo: PropTypes.bool,
     isLocked: PropTypes.bool,
     isTrueLocked: PropTypes.bool,
+    parentField: PropTypes.string, //from RuleGroup
     //actions
     handleDraggerMouseDown: PropTypes.func,
     onDragStart: PropTypes.func,
     addRule: PropTypes.func.isRequired,
     addGroup: PropTypes.func.isRequired,
     removeSelf: PropTypes.func.isRequired,
+    removeGroupChildren: PropTypes.func.isRequired,
     setConjunction: PropTypes.func.isRequired,
     setNot: PropTypes.func.isRequired,
     setLock: PropTypes.func.isRequired,
@@ -45,9 +51,31 @@ export class BasicGroup extends Component {
   constructor(props) {
     super(props);
 
+    useOnPropsChanged(this);
+    this.onPropsChanged(props);
+
     this.removeSelf = this.removeSelf.bind(this);
+    this.removeGroupChildren = this.removeGroupChildren.bind(this);
     this.setLock = this.setLock.bind(this);
     this.renderItem = this.renderItem.bind(this);
+  }
+
+  onPropsChanged(nextProps) {
+    const prevProps = this.props;
+    const configChanged = !this.Icon || prevProps?.config !== nextProps?.config;
+
+    if (configChanged) {
+      const { config } = nextProps;
+      const { renderIcon, renderConjs, renderBeforeActions, renderAfterActions } = config.settings;
+      this.Icon = getRenderFromConfig(config, renderIcon);
+      this.Conjs = getRenderFromConfig(config, renderConjs);
+      this.BeforeActions = getRenderFromConfig(config, renderBeforeActions);
+      this.AfterActions = getRenderFromConfig(config, renderAfterActions);
+    }
+
+    this.doRemove = () => {
+      this.props.removeSelf();
+    };
   }
 
   isGroupTopPosition() {
@@ -58,20 +86,21 @@ export class BasicGroup extends Component {
     this.props.setLock(lock);
   }
 
+  removeGroupChildren() {
+    this.props.removeGroupChildren();
+  }
+
   removeSelf() {
     const {confirmFn, config} = this.props;
     const {renderConfirm, removeGroupConfirmOptions: confirmOptions} = config.settings;
-    const doRemove = () => {
-      this.props.removeSelf();
-    };
     if (confirmOptions && !this.isEmptyCurrentGroup()) {
       renderConfirm.call(config.ctx, {...confirmOptions,
-        onOk: doRemove,
+        onOk: this.doRemove,
         onCancel: null,
         confirmFn: confirmFn
       }, config.ctx);
     } else {
-      doRemove();
+      this.doRemove();
     }
   }
 
@@ -80,24 +109,23 @@ export class BasicGroup extends Component {
     return isEmptyGroupChildren(children1, config);
   }
 
-  render() {
-    return <>
-      {this.renderHeaderWrapper()}
-      {this.renderChildrenWrapper()}
-      {this.renderFooterWrapper()}
-    </>;
-  }
-
   showNot() {
-    const {config} = this.props;
-    return config.settings.showNot;
+    const {config, parentField} = this.props;
+    let showNot = config.settings.showNot;
+    if (parentField) {
+      const ruleGroupFieldConfig = getFieldConfig(config, parentField);
+      showNot = showNot && (ruleGroupFieldConfig?.showNot ?? true);
+    }
+    return showNot;
   }
 
   // show conjs for 2+ children?
   showConjs() {
-    const {conjunctionOptions, children1, config} = this.props;
+    const {config} = this.props;
+    const {forceShowConj} = config.settings;
+    const conjunctionOptions = this.conjunctionOptions();
     const conjunctionCount = Object.keys(conjunctionOptions).length;
-    return conjunctionCount > 1 || this.showNot();
+    return conjunctionCount > 1 && !this.isOneChild() || this.showNot() || forceShowConj;
   }
 
   isNoChildren() {
@@ -157,25 +185,30 @@ export class BasicGroup extends Component {
   }
 
   renderBeforeActions = () => {
-    const BeforeActions = this.props.config.settings.renderBeforeActions;
+    const BeforeActions = this.BeforeActions;
     if (BeforeActions == undefined)
       return null;
-
-    return typeof BeforeActions === "function" ? BeforeActions(this.props, this.props.config.ctx) : BeforeActions;
+    return <BeforeActions
+      key="group-actions-before"
+      {...this.props}
+    />;
   };
 
   renderAfterActions = () => {
-    const AfterActions = this.props.config.settings.renderAfterActions;
+    const AfterActions = this.AfterActions;
     if (AfterActions == undefined)
       return null;
-
-    return typeof AfterActions === "function" ? AfterActions(this.props, this.props.config.ctx) : AfterActions;
+    return <AfterActions
+      key="group-actions-after"
+      {...this.props}
+    />;
   };
 
   renderActions() {
-    const {config, addRule, addGroup, isLocked, isTrueLocked, id} = this.props;
+    const {config, addRule, addGroup, isLocked, isTrueLocked, id, parentField} = this.props;
 
     return <GroupActions
+      key="group-actions"
       config={config}
       addRule={addRule}
       addGroup={addGroup}
@@ -187,54 +220,69 @@ export class BasicGroup extends Component {
       isLocked={isLocked}
       isTrueLocked={isTrueLocked}
       id={id}
+      parentField={parentField}
     />;
   }
 
   canAddGroup() {
     return this.props.allowFurtherNesting;
   }
+
   canAddRule() {
-    const maxNumberOfRules = this.props.config.settings.maxNumberOfRules;
-    const totalRulesCnt = this.props.totalRulesCnt;
+    const { totalRulesCnt, isMaxNestingExceeded, parentField } = this.props;
+    let { maxNumberOfRules } = this.props.config.settings;
+    if (parentField) {
+      const ruleGroupFieldConfig = getFieldConfig(this.props.config, parentField);
+      maxNumberOfRules = ruleGroupFieldConfig.maxNumberOfRules;
+    }
+    if (isMaxNestingExceeded) {
+      return false;
+    }
     if (maxNumberOfRules) {
       return totalRulesCnt < maxNumberOfRules;
     }
     return true;
   }
+
   canDeleteGroup() {
     return !this.props.isRoot;
   }
 
   renderChildren() {
     const {children1} = this.props;
-    return children1 ? children1.map(this.renderItem).toList() : null;
+    return children1 ? children1.valueSeq().toArray().map(this.renderItem) : null;
   }
 
   renderItem(item) {
+    if (!item) {
+      return undefined;
+    }
     const props = this.props;
-    const {config, actions, onDragStart, isLocked} = props;
+    const {config, actions, onDragStart, isLocked, parentField, parentFieldPathSize, parentFieldCanReorder} = props;
     const isRuleGroup = item.get("type") == "group" && item.getIn(["properties", "field"]) != null;
     const type = isRuleGroup ? "rule_group" : item.get("type");
     
     return (
       <Item
-        {...this.extraPropsForItem(item)}
         key={item.get("id")}
         id={item.get("id")}
         groupId={props.id}
-        //path={props.path.push(item.get('id'))}
         path={item.get("path")}
         type={type}
         properties={item.get("properties")}
         config={config}
         actions={actions}
         children1={item.get("children1")}
+        parentField={parentField}
+        parentFieldPathSize={parentFieldPathSize}
+        parentFieldCanReorder={parentFieldCanReorder}
         reordableNodesCnt={this.reordableNodesCntForItem(item)}
         totalRulesCnt={this.totalRulesCntForItem(item)}
         parentReordableNodesCnt={this.reordableNodesCnt()}
         onDragStart={onDragStart}
         isDraggingTempo={this.props.isDraggingTempo}
         isParentLocked={isLocked}
+        {...this.extraPropsForItem(item)}
       />
     );
   }
@@ -249,7 +297,10 @@ export class BasicGroup extends Component {
     return this.props.reordableNodesCnt;
   }
 
-  totalRulesCntForItem(_item) {
+  totalRulesCntForItem(item) {
+    if (item.get("type") === "rule_group") {
+      return getTotalRulesCountInTree(item);
+    }
     return this.props.totalRulesCnt;
   }
 
@@ -260,18 +311,22 @@ export class BasicGroup extends Component {
   }
 
   showDragIcon() {
-    const { config, isRoot, isLocked } = this.props;
+    const { config, isRoot, isLocked, parentField, parentFieldCanReorder } = this.props;
     const reordableNodesCnt = this.reordableNodesCnt();
-    return config.settings.canReorder && !isRoot && reordableNodesCnt > 1 && !isLocked;
+    let canReorder = config.settings.canReorder && !isRoot && reordableNodesCnt > 1 && !isLocked;
+    if (parentField) {
+      canReorder = canReorder && parentFieldCanReorder;
+    }
+    return canReorder;
   }
 
   renderDrag() {
-    const { handleDraggerMouseDown } = this.props;
-    const { config } = this.props;
-    const { renderIcon } = config.settings;
-    const Icon = (pr) => renderIcon?.(pr, config.ctx);
+    const { handleDraggerMouseDown, config, isLocked } = this.props;
+    const Icon = this.Icon;
     const icon = <Icon
       type="drag"
+      readonly={isLocked}
+      config={config}
     />;
     return this.showDragIcon() && (<div 
       key="group-drag-icon"
@@ -281,21 +336,45 @@ export class BasicGroup extends Component {
   }
 
   conjunctionOptions() {
-    const { conjunctionOptions } = this.props;
+    const { parentField, conjunctionOptions } = this.props;
+    // Note: if current group is a group inside rule-group, we should respect config of parent rule-group
+    return parentField ? this.conjunctionOptionsForGroupField(parentField) : conjunctionOptions;
+  }
+
+  conjunctionOptionsForGroupField(groupField = null) {
+    const {config, conjunctionOptions} = this.props;
+    const groupFieldConfig = getFieldConfig(config, groupField);
+    if (groupFieldConfig?.conjunctions) {
+      let filtered = {};
+      for (let k of groupFieldConfig.conjunctions) {
+        const options = conjunctionOptions[k];
+        if (options) {
+          filtered[k] = options;
+        }
+      }
+      return filtered;
+    }
     return conjunctionOptions;
+  }
+
+  canRenderConjs() {
+    const { children1 } = this.props;
+    if (!this.showConjs())
+      return false;
+    if (!children1 || !children1.size)
+      return false;
+    return true;
   }
 
   renderConjs() {
     const {
-      config, children1, id,
+      config, id,
       selectedConjunction, setConjunction, not, setNot, isLocked
     } = this.props;
 
-    const {immutableGroupsMode, renderConjs, showNot: _showNot, notLabel} = config.settings;
+    const {immutableGroupsMode, notLabel} = config.settings;
     const conjunctionOptions = this.conjunctionOptions();
-    if (!this.showConjs())
-      return null;
-    if (!children1 || !children1.size)
+    if (!this.canRenderConjs())
       return null;
 
     const renderProps = {
@@ -312,17 +391,31 @@ export class BasicGroup extends Component {
       showNot: this.showNot(),
       isLocked: isLocked
     };
-    return renderConjs(renderProps, config.ctx);
+    const Conjs = this.Conjs;
+    return (
+      <Conjs
+        key="group-conjs"
+        {...renderProps}
+      />
+    );
   }
 
   renderHeader() {
     return (
-      <div className={"group--conjunctions"}>
+      <div key="group-conjunctions" className={"group--conjunctions"}>
         {this.renderConjs()}
         {this.renderDrag()}
       </div>
     );
   }
+
+  render() {
+    return <>
+      {this.renderHeaderWrapper()}
+      {this.renderChildrenWrapper()}
+      {this.renderFooterWrapper()}
+    </>;
+  }
 }
 
-export default GroupContainer(Draggable("group")(WithConfirmFn(BasicGroup)), "group");
+export default GroupContainer(Draggable("group simple_group")(WithConfirmFn(BasicGroup)), "group");

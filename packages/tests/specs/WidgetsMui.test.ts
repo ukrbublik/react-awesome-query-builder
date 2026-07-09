@@ -3,6 +3,13 @@ import { expect } from "chai";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_mui, hexToRgbString } from "../support/utils";
+import { getAutocompleteUtils } from "../support/autocomplete";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+
+const {
+  with_all_types,
+  with_theme_mui,
+} = configs;
 
 const ignoreLogDatePicker = (errText: string) => {
   return errText.includes("The `anchorEl` prop provided to the component is invalid");
@@ -10,7 +17,7 @@ const ignoreLogDatePicker = (errText: string) => {
 
 describe("mui theming", () => {
   it("applies secondary color", async () => {
-    await with_qb_mui(configs.with_theme_mui, inits.with_bool, "JsonLogic", (qb) => {
+    await with_qb_mui([with_all_types, with_theme_mui], inits.with_bool, "JsonLogic", (qb) => {
       const boolSwitch = qb.find(".rule--value .MuiSwitch-thumb");
       // for some reason elements are duplicated for MUI
       expect(boolSwitch, "boolSwitch").to.have.length(2);
@@ -23,10 +30,63 @@ describe("mui theming", () => {
   });
 });
 
+describe("mui core widgets", () => {
+  it("change field with autocomplete", async () => {
+    await with_qb_mui(configs.with_struct, inits.with_nested, "JsonLogic", async (qb) => {
+      const {
+        createCtx,
+        setStep,
+        expectInput,
+        expectOptions,
+        expectVisibleOptions,
+        selectOption,
+        openSelect,
+        enterSearch,
+        expectOpened,
+      } = getAutocompleteUtils("mui", 5);
+      createCtx({qb, selectType: "field"});
+      expectInput("firstName");
+      await openSelect();
+      expectOptions("login;firstName", {withValues: false});
+      expectVisibleOptions("  login;    firstName", {withValues: false});
+      await selectOption("firstName");
+      expectInput("firstName");
+      await openSelect();
+      await selectOption("login");
+      expectInput("login");
+      await openSelect();
+      await enterSearch("first");
+      expectInput("first");
+      expectOpened(true);
+      expectVisibleOptions("    firstName", {withValues: false});
+    }, {
+      ignoreLog: ignoreLogDatePicker,
+    });
+  });
+
+  it("change field without autocomplete", async () => {
+    await with_qb_mui([configs.with_struct, configs.without_field_autocomplete], inits.with_nested, "JsonLogic", (qb, {expect_jlogic}) => {
+      const sel = qb.find(".rule--field").find(Select).last();
+      sel.prop("onChange")?.({target: {value: "user.login"}} as SelectChangeEvent, null);
+      qb.update();
+      
+      expect_jlogic([null,
+        {
+          "and": [
+            { "==": [ { "var": "user.login" }, "abc" ] },
+          ]
+        }
+      ]);
+    }, {
+      ignoreLog: ignoreLogDatePicker,
+    });
+  });
+});
+
 describe("mui widgets interactions", () => {
 
   it("change date", async () => {
-    await with_qb_mui(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_mui(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", (qb, {expect_jlogic}) => {
       // open date picker for '2020-05-18'
       const openPickerBtn = qb.find(".rule--widget--DATE button.MuiIconButton-root");
       const dateInput = qb.find(".rule--widget--DATE input.MuiInput-input");
@@ -69,10 +129,10 @@ describe("mui widgets interactions", () => {
       expect_jlogic([null,
         {
           "or": [{
-            "==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]
+            "datetime==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]
           }, {
             "and": [{
-              "==": [ {  "var": "date" }, "2020-05-11T00:00:00.000Z" ]
+              "date==": [ {  "var": "date" }, "2020-05-11T00:00:00.000Z" ]
             }, {
               "==": [ { "var": "time" }, 3000 ]
             }]
@@ -85,7 +145,7 @@ describe("mui widgets interactions", () => {
   });
 
   it("change time value", async function() {
-    await with_qb_mui(configs.with_all_types, inits.with_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_mui(configs.with_all_types, inits.with_time, "JsonLogic", (qb, {expect_jlogic}) => {
       const timeInput = qb.find(".rule--widget--TIME input.MuiInput-input");
       expect(timeInput, "timeInput").to.have.length(1);
       timeInput.simulate("click");
@@ -100,14 +160,14 @@ describe("mui widgets interactions", () => {
         }
         this.skip();
       } else if (clockBtn.length) {
-        // v6 desktop mode
+        // v6-7 desktop mode
         clockBtn.last().simulate("click");
         const dclockPicker = document.querySelector<HTMLElement>(".MuiMultiSectionDigitalClock-root");
         expect(dclockPicker, "dclockPicker").to.exist;
 
         const hourBtn = document.querySelector<HTMLElement>(
           ".MuiMultiSectionDigitalClock-root" 
-          + " > .MuiMultiSectionDigitalClock-root:nth-child(1)" 
+          + " > .MuiMultiSectionDigitalClockSection-root:nth-child(1)" 
           + " > .MuiMenuItem-root:nth-child(11)" 
         );
         expect(hourBtn, "hourBtn").to.exist;
@@ -116,7 +176,7 @@ describe("mui widgets interactions", () => {
 
         const minBtn = document.querySelector<HTMLElement>(
           ".MuiMultiSectionDigitalClock-root" 
-          + " > .MuiMultiSectionDigitalClock-root:nth-child(2)" 
+          + " > .MuiMultiSectionDigitalClockSection-root:nth-child(2)" 
           + " > .MuiMenuItem-root:nth-child(7)" 
         );
         expect(minBtn, "minBtn").to.exist;
@@ -152,5 +212,70 @@ describe("mui widgets interactions", () => {
     });
   });
 
+});
 
+describe("mui IconButton accessibility - aria-label", () => {
+  // When deleteLabel is defined it is used as the aria-label for icon buttons
+  it("delete button label is used as aria-label", async () => {
+    await with_qb_mui(configs.with_modified_delete_label,
+      inits.with_number,
+      "JsonLogic",
+      () => {
+        const deleteBtn = document.querySelector<HTMLElement>(
+          ".rule--header .MuiIconButton-root" 
+        );
+        expect(deleteBtn, "deleteBtn").to.exist;
+        const ariaLabel = deleteBtn?.getAttribute("aria-label");
+        expect(ariaLabel).to.eq("Delete rule");
+      }
+    );
+  });
+
+  // When deleteLabel is not defined icon buttons do not have an aria-label
+  it("delete button with no label defined has no aria-label", async () => {
+    await with_qb_mui(configs.with_no_delete_label,
+      inits.with_number,
+      "JsonLogic",
+      () => {
+        const deleteBtn = document.querySelector<HTMLElement>(
+          ".rule--header .MuiIconButton-root" 
+        );
+        expect(deleteBtn, "deleteBtn").to.exist;
+        expect(deleteBtn?.hasAttribute("aria-label")).to.eq(false);
+      }
+    );
+  });
+});
+
+describe("mui Autocomplete accessibility - aria-label", () => {
+  // Autocomplete uses fieldPlaceholder from config as the aria-label
+  it("fieldPlaceholder is used as aria-label", async () => {
+    await with_qb_mui(configs.with_modified_field_placeholder,
+      inits.with_number,
+      "JsonLogic",
+      () => {
+        const fieldCombo = document.querySelector<HTMLElement>(
+          ".rule--field .MuiAutocomplete-input"
+        );
+        expect(fieldCombo, "field combobox").to.exist;
+        const ariaLabel = fieldCombo?.getAttribute("aria-label");
+        expect(ariaLabel).to.eq("autocomplete placeholder");
+      }
+    );
+  });
+
+  // When fieldPlaceholder is not defined Autocompletes do not have an aria-label
+  it("select field combobox has no aria-label when fieldPlaceholder is not defined", async () => {
+    await with_qb_mui(configs.with_no_field_placeholder,
+      inits.with_number,
+      "JsonLogic",
+      () => {
+        const fieldCombo = document.querySelector<HTMLElement>(
+          ".rule--field .MuiAutocomplete-input"
+        );
+        expect(fieldCombo, "field combobox").to.exist;
+        expect(fieldCombo?.hasAttribute("aria-label")).to.eq(false);
+      }
+    );
+  });
 });

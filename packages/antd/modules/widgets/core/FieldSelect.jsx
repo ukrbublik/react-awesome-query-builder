@@ -1,7 +1,6 @@
-import React, { PureComponent } from "react";
-import { Tooltip, Select } from "antd";
+import React, { useState, useCallback, useMemo } from "react";
+import { Tooltip, Select, version as antdVersion } from "antd";
 import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../utils/domUtils";
-import PropTypes from "prop-types";
 const { Option, OptGroup } = Select;
 
 // see type FieldItemSearchableKeys
@@ -15,31 +14,37 @@ const mapFieldItemToOptionKeys = {
   fullLabel: "_fullLabel",
 };
 
-export default class FieldSelect extends PureComponent {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    customProps: PropTypes.object,
-    errorText: PropTypes.string,
-    items: PropTypes.array.isRequired,
-    placeholder: PropTypes.string,
-    selectedKey: PropTypes.string,
-    selectedKeys: PropTypes.array,
-    selectedPath: PropTypes.array,
-    selectedLabel: PropTypes.string,
-    selectedAltLabel: PropTypes.string,
-    selectedFullLabel: PropTypes.string,
-    selectedOpts: PropTypes.object,
-    readonly: PropTypes.bool,
-    //actions
-    setField: PropTypes.func.isRequired,
-  };
+const FieldSelect = (props) => {
+  const {
+    setField, config, customProps, items, placeholder,
+    selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly, errorText,
+  } = props;
+  const {showSearch} = customProps || {};
 
-  onChange = (key) => {
-    this.props.setField(key);
-  };
+  const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
-  filterOption = (input, option) => {
-    const { config } = this.props;
+  const selectText = selectedLabel || placeholder;
+  const selectWidth = calcTextWidth(selectText);
+  const isFieldSelected = !!selectedKey;
+  const dropdownPlacement = config.settings.dropdownPlacement;
+  const dropdownAlign = dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined;
+  const width = isFieldSelected && !showSearch || !selectWidth ? null : selectWidth + SELECT_WIDTH_OFFSET_RIGHT;
+  let tooltipText = selectedAltLabel || selectedFullLabel;
+  if (tooltipText == selectedLabel)
+    tooltipText = null;
+
+  const style = useMemo(() => ({ width }), [width]);
+
+  const onChange = useCallback((key) => {
+    setField(key);
+  }, [setField]);
+
+  const onSearch = useCallback((search) => {
+    setSearchValue(search);
+  }, [setSearchValue]);
+
+  const filterOption = useCallback((input, option) => {
     const keysForFilter = config.settings.fieldItemKeysForSearch
       .map(k => mapFieldItemToOptionKeys[k]);
     const valueForFilter = keysForFilter
@@ -47,52 +52,9 @@ export default class FieldSelect extends PureComponent {
       .join("\0");
     const matches = valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
     return matches;
-  };
+  }, [config.settings.fieldItemKeysForSearch]);
 
-  render() {
-    const {
-      config, customProps, items, placeholder,
-      selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly, errorText,
-    } = this.props;
-    const {showSearch} = customProps || {};
-
-    const selectText = selectedLabel || placeholder;
-    const selectWidth = calcTextWidth(selectText);
-    const isFieldSelected = !!selectedKey;
-    const dropdownPlacement = config.settings.dropdownPlacement;
-    const dropdownAlign = dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined;
-    const width = isFieldSelected && !showSearch || !selectWidth ? null : selectWidth + SELECT_WIDTH_OFFSET_RIGHT;
-    let tooltipText = selectedAltLabel || selectedFullLabel;
-    if (tooltipText == selectedLabel)
-      tooltipText = null;
-
-    const fieldSelectItems = this.renderSelectItems(items);
-
-    let res = (
-      <Select
-        dropdownAlign={dropdownAlign}
-        popupMatchSelectWidth={false}
-        style={{ width }}
-        placeholder={placeholder}
-        size={config.settings.renderSize}
-        onChange={this.onChange}
-        value={selectedKey || undefined}
-        optionLabelProp={"label"}
-        filterOption={this.filterOption}
-        disabled={readonly}
-        status={errorText && "error"}
-        {...customProps}
-      >{fieldSelectItems}</Select>
-    );
-
-    if (tooltipText && !selectedOpts.tooltip) {
-      res = <Tooltip title={tooltipText}>{res}</Tooltip>;
-    }
-
-    return res;
-  }
-
-  renderSelectItems(fields, level = 0) {
+  const renderSelectItems = (fields, level = 0) => {
     return fields.map(field => {
       const {items, key, path, label, fullLabel, altLabel, tooltip, grouplabel, disabled, matchesType} = field;
       const groupPrefix = level > 0 ? "\u00A0\u00A0".repeat(level) : "";
@@ -101,14 +63,21 @@ export default class FieldSelect extends PureComponent {
       if (items) {
         const simpleItems = items.filter(it => !it.items);
         const complexItems = items.filter(it => !!it.items);
-        const gr = simpleItems.length
-          ? [<OptGroup
+        const complexList = complexItems.length ? renderSelectItems(complexItems, level+1) : [];
+        const simpleList = simpleItems.length ? renderSelectItems(simpleItems, level+1) : [];
+        let groupLabel = groupPrefix+label;
+        if (tooltip) {
+          groupLabel = <Tooltip title={tooltip}>{groupLabel}</Tooltip>;
+        }
+        const grp = (
+          <OptGroup
             key={pathKey}
-            label={groupPrefix+label}
-          >{this.renderSelectItems(simpleItems, level+1)}</OptGroup>]
-          : [];
-        const list = complexItems.length ? this.renderSelectItems(complexItems, level+1) : [];
-        return [...gr, ...list];
+            label={groupLabel}
+          >
+            {simpleList}
+          </OptGroup>
+        );
+        return [grp, ...complexList];
       } else {
         const optionText = matchesType ? <b>{prefix+label}</b> : prefix+label;
         const option = tooltip ? <Tooltip title={tooltip}>{optionText}</Tooltip> : optionText;
@@ -128,6 +97,47 @@ export default class FieldSelect extends PureComponent {
         </Option>;
       }
     }).flat(Infinity);
+  };
+
+  const fieldSelectItems = renderSelectItems(items);
+
+  const selectProps = {};
+  const antdMajorVersion = parseInt(antdVersion.split(".")[0]);
+  if (antdMajorVersion >= 5) {
+    selectProps.popupMatchSelectWidth = false;
+  } else {
+    selectProps.dropdownMatchSelectWidth = false;
   }
 
-}
+  let res = (
+    <Select
+      open={open}
+      onDropdownVisibleChange={setOpen}
+      dropdownAlign={dropdownAlign}
+      style={style}
+      placeholder={placeholder}
+      size={config.settings.renderSize}
+      onChange={onChange}
+      value={selectedKey || undefined}
+      optionLabelProp={"label"}
+      filterOption={filterOption}
+      disabled={readonly}
+      status={errorText && "error"}
+      showSearch={!!showSearch}
+      searchValue={searchValue}
+      onSearch={showSearch ? onSearch : undefined}
+      {...selectProps}
+      {...customProps}
+    >{fieldSelectItems}</Select>
+  );
+
+  if (tooltipText) {
+    res = <Tooltip title={!open ? tooltipText : null}>{res}</Tooltip>;
+  }
+
+  return res;
+};
+
+FieldSelect.displayName = "FieldSelect";
+export default FieldSelect;
+

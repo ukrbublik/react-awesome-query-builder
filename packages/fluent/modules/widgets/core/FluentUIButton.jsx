@@ -2,18 +2,19 @@ import React from "react";
 import { IconButton, ActionButton, CommandBarButton, DefaultButton } from "@fluentui/react";
 
 const hideLabelsFor = {
-  "addRuleGroup": true,
+  "addSubRuleSimple": true,
   "delRuleGroup": true,
   "delRule": true,  
-  // "addRuleGroupExt": true,
+  // "addSubRule": true,
+  // "addSubGroup": true,
   // "delGroup": true,
 };
 const useAction = {
-  "addRuleGroup": true,
+  "addSubRuleSimple": true,
 };
 
 const FluentUIButton = (props) => {
-  const { type, label, onClick, readonly, renderIcon } = props;
+  const { type, label, onClick, readonly, renderIcon, config } = props;
 
   let renderBtn;
   if (!label || hideLabelsFor[type]) {
@@ -68,12 +69,13 @@ const FluentUIButton = (props) => {
   const iconProps = {
     type,
     readonly,
+    config,
     renderBtn,
     renderDefaultButton,
   };
   const buttonIcon = renderIcon?.(iconProps);
-  return buttonIcon;
 
+  return buttonIcon;
 };
 
 export default FluentUIButton;

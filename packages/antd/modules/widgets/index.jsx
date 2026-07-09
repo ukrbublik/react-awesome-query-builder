@@ -8,6 +8,7 @@ import SelectWidget from "./value/Select";
 import TextWidget from "./value/Text";
 import TextAreaWidget from "./value/TextArea";
 import NumberWidget from "./value/Number";
+import PriceWidget from "./value/Price";
 import SliderWidget from "./value/Slider";
 import RangeWidget from "./value/Range";
 import BooleanWidget from "./value/Boolean";
@@ -28,12 +29,12 @@ import ButtonGroup from "./core/ButtonGroup";
 import Conjs from "./core/Conjs";
 import Switch from "./core/Switch";
 import ValueSources from "./core/ValueSources";
-import confirm from "./core/confirm";
+import { useConfirm, Confirm } from "./core/Confirm";
 
-import { ConfigProvider } from "antd";
-const Provider = ({ config, children }) => <ConfigProvider locale={config.settings.locale.antd}>{children}</ConfigProvider>;
+// Provider
+import { Provider } from "./core/Provider";
 
-export default {
+const AntdWidgets = {
   DateWidget,
   DateTimeWidget,
   TimeWidget,
@@ -41,6 +42,7 @@ export default {
   TextWidget,
   TextAreaWidget,
   NumberWidget,
+  PriceWidget,
   SliderWidget,
   RangeWidget,
   BooleanWidget,
@@ -59,7 +61,9 @@ export default {
   Conjs,
   Switch,
   ValueSources,
-  confirm,
-
+  useConfirm,
+  Confirm,
   Provider,
 };
+
+export default AntdWidgets;

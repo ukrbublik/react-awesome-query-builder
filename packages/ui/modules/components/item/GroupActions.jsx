@@ -15,11 +15,12 @@ export class GroupActions extends PureComponent {
   render() {
     const {
       config, 
-      addRule, addGroup, removeSelf, setLock, isLocked, isTrueLocked, id,
+      addRule, addGroup, removeSelf, setLock, isLocked, isTrueLocked, id, parentField,
       canAddGroup, canAddRule, canDeleteGroup
     } = this.props;
     const {
-      immutableGroupsMode, addRuleLabel, addGroupLabel, delGroupLabel, groupActionsPosition, 
+      immutableGroupsMode, addRuleLabel, addGroupLabel, addSubRuleLabel, addSubGroupLabel, 
+      delGroupLabel, groupActionsPosition, 
       renderButton, renderIcon, renderSwitch, renderButtonGroup,
       lockLabel, lockedLabel, showLock, canDeleteLocked,
     } = config.settings;
@@ -34,10 +35,10 @@ export class GroupActions extends PureComponent {
     />;
 
     const addRuleBtn = !immutableGroupsMode && canAddRule && !isLocked && <Btn
-      type="addRule" onClick={addRule} label={addRuleLabel} readonly={isLocked} config={config} renderIcon={Icon}
+      type={parentField ? "addSubRule" : "addRule"} onClick={addRule} label={parentField ? addSubRuleLabel : addRuleLabel} readonly={isLocked} config={config} renderIcon={Icon}
     />;
     const addGroupBtn = !immutableGroupsMode && canAddGroup && !isLocked && <Btn
-      type="addGroup" onClick={addGroup} label={addGroupLabel} readonly={isLocked} config={config} renderIcon={Icon}
+      type={parentField ? "addSubGroup" : "addGroup"} onClick={addGroup} label={parentField ? addSubGroupLabel : addGroupLabel} readonly={isLocked} config={config} renderIcon={Icon}
     />;
     const delGroupBtn = !immutableGroupsMode && canDeleteGroup && (!isLocked || isLocked && canDeleteLocked) && <Btn
       type="delGroup" onClick={removeSelf} label={delGroupLabel} config={config} renderIcon={Icon}

@@ -2,13 +2,12 @@
   "compilerOptions": {
     "target": "es6",
     "module": "esnext",
-    "jsx": "preserve",
     "lib": [
-      "es2015"
+      "es2020"
     ],
     "allowJs": true,
     "outDir": "ts_out",
-    "noEmit": true,
+    // "noEmit": false,
 
     "strict": true,
     "alwaysStrict": true,
@@ -16,7 +15,7 @@
 
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "skipLibCheck": true
+    "skipLibCheck": false
   },
   "include": [
     "modules/**/*"

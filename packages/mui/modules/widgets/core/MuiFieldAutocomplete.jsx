@@ -11,12 +11,13 @@ const mapFieldItemToOptionKeys = {
   grouplabel: "groupTitle",
 };
 
-const itemsToListValues = (items, level = 0) => (
-  items.map(item => {
-    const {items, path, key, label, altLabel, disabled, grouplabel, matchesType, tooltip} = item;
-    const prefix = "\u00A0\u00A0".repeat(level);
+const itemsToListValues = (items, level = 0, parentGroups = []) => {
+  const lvs = items.map(item => {
+    const {items, path, key, label, altLabel, disabled, grouplabel, group, matchesType, tooltip} = item;
+    const getPrefix = (lev) => "\u00A0\u00A0".repeat(lev);
+    const prefix = getPrefix(level);
     if (items) {
-      return itemsToListValues(items, level+1);
+      return itemsToListValues(items, level+1, [...parentGroups, item]);
     } else {
       return {
         title: label,
@@ -24,15 +25,44 @@ const itemsToListValues = (items, level = 0) => (
         value: path,
         disabled,
         groupTitle: level > 0 ? prefix+grouplabel : null,
+        group: level > 0 ? {
+          ...group,
+          label: prefix+group.label,
+          parentGroups: parentGroups.map(({
+            tooltip, label, path
+          }, ind) => ({
+            path, tooltip, label: getPrefix(ind)+label
+          })),
+        } : null,
         tooltip: tooltip,
         _value2: key,
         _altLabel: altLabel,
       };
     }
-  }).flat(Infinity)
-);
+  }).flat(Infinity);
+  
+  // Don't repeat groups
+  const usedGroups = [];
+  for (const lv of lvs) {
+    if (lv.group) {
+      lv.group.parentGroups = lv.group.parentGroups.filter(({path}) => (!usedGroups.includes(path)));
+      for (const gr of lv.group.parentGroups) {
+        usedGroups.push(gr.path);
+      }
+    }
+  }
 
-const fieldAdapter = ({items, selectedKey, setField, isValueField, ...rest}, config) => {
+  return lvs;
+};
+
+const fieldAdapter = ({
+  items, selectedKey, setField, isValueField,
+  selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel,
+  ...rest
+}, config) => {
+  let tooltipText = selectedAltLabel || selectedFullLabel;
+  if (tooltipText == selectedLabel)
+    tooltipText = null;
   const listValues = itemsToListValues(items);
   const value = selectedKey;
   const setValue = (value, _asyncValues) => {
@@ -52,6 +82,7 @@ const fieldAdapter = ({items, selectedKey, setField, isValueField, ...rest}, con
 
   return {
     ...rest,
+    tooltipText,
     listValues,
     setValue,
     filterOptionsConfig,
@@ -59,6 +90,8 @@ const fieldAdapter = ({items, selectedKey, setField, isValueField, ...rest}, con
     multiple: false,
     disableClearable: !isValueField,
     value,
+    isFieldAutocomplete: true,
+    dontFixOptionsOrder: true, // don't apply fixListValuesGroupOrder() for options
   };
 };
 

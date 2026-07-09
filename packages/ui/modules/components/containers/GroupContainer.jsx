@@ -4,8 +4,10 @@ import PropTypes from "prop-types";
 import mapValues from "lodash/mapValues";
 import context from "../../stores/context";
 import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUtils";
+import classNames from "classnames";
 import {connect} from "react-redux";
 const {defaultGroupConjunction} = Utils.DefaultUtils;
+const {getFieldConfig} = Utils.ConfigUtils;
 
 
 const createGroupContainer = (Group, itemType) => 
@@ -25,6 +27,9 @@ const createGroupContainer = (Group, itemType) =>
       fieldSrc: PropTypes.string, // for RuleGroup
       fieldType: PropTypes.string, // for RuleGroup
       parentField: PropTypes.string, //from RuleGroup
+      value: PropTypes.any, // for RuleGroup, CaseGroup
+      valueSrc: PropTypes.any,
+      valueError: PropTypes.any,
       isLocked: PropTypes.bool,
       isTrueLocked: PropTypes.bool,
       //connected:
@@ -111,8 +116,13 @@ const createGroupContainer = (Group, itemType) =>
       this.props.actions.removeGroup(this.props.path);
     };
 
+    removeGroupChildren = () => {
+      this.props.actions.removeGroupChildren(this.props.path);
+    };
+
     addGroup = () => {
-      this.props.actions.addGroup(this.props.path);
+      const parentRuleGroupField = itemType == "rule_group" ? this.props.field : this.props.parentField;
+      this.props.actions.addGroup(this.props.path, undefined, undefined, parentRuleGroupField);
     };
 
     addCaseGroup = () => {
@@ -124,13 +134,13 @@ const createGroupContainer = (Group, itemType) =>
     };
 
     addRule = () => {
-      const parentRuleGroupPath = itemType == "rule_group" ? this.props.field : null;
-      this.props.actions.addRule(this.props.path, undefined, undefined, undefined, parentRuleGroupPath);
+      const parentRuleGroupField = itemType == "rule_group" ? this.props.field : this.props.parentField;
+      this.props.actions.addRule(this.props.path, undefined, undefined, undefined, parentRuleGroupField);
     };
 
     // for RuleGroup
-    setField = (field, asyncListValues, __isInternal) => {
-      this.props.actions.setField(this.props.path, field, asyncListValues, __isInternal);
+    setField = (field, asyncListValues, _meta) => {
+      this.props.actions.setField(this.props.path, field, asyncListValues, _meta);
     };
 
     // for RuleGroupExt
@@ -138,24 +148,55 @@ const createGroupContainer = (Group, itemType) =>
       this.props.actions.setOperator(this.props.path, operator);
     };
 
-    setValue = (delta, value, type) => {
-      this.props.actions.setValue(this.props.path, delta, value, type);
+    // for RuleGroupExt, CaseGroup
+    setValue = (delta, value, type, asyncListValues, _meta) => {
+      this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, _meta);
+    };
+
+    setValueSrc = (delta, srcKey, _meta) => {
+      this.props.actions.setValueSrc(this.props.path, delta, srcKey, _meta);
+    };
+
+    // can be used for both LHS and LHS
+    setFuncValue = (delta, parentFuncs, argKey, value, type, asyncListValues, _meta) => {
+      this.props.actions.setFuncValue(this.props.path, delta, parentFuncs, argKey, value, type, asyncListValues, _meta);
     };
 
     render() {
+      const {showErrorMessage} = this.props.config.settings;
       const isDraggingMe = this.props.dragging.id == this.props.id;
-      const currentNesting = this.props.path.size;
-      const maxNesting = this.props.config.settings.maxNesting;
+      const lev = this.props.path.size - 1;
+      let currentNesting = this.props.path.size;
+      let maxNesting = this.props.config.settings.maxNesting;
+      let isRoot = currentNesting == 1;
+      if (this.props.parentField && this.props.parentFieldPathSize) {
+        // inside rule-group
+        const ruleGroupFieldConfig = getFieldConfig(this.props.config, this.props.parentField);
+        currentNesting = this.props.path.size - this.props.parentFieldPathSize + 1;
+        maxNesting = ruleGroupFieldConfig?.maxNesting;
+        isRoot = false;
+      } else if (this.props.field) {
+        // it is rule-group
+        const ruleGroupFieldConfig = getFieldConfig(this.props.config, this.props.field);
+        currentNesting = 1;
+        maxNesting = ruleGroupFieldConfig?.maxNesting;
+        isRoot = false;
+      }
       const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;
       const fieldType = this.props.fieldType || null;
+
+      const {valueError} = this.props;
+      const oneError = [...(valueError?.toArray() || [])].filter(e => !!e).shift() || null;
+      const hasError = oneError != null && showErrorMessage;
 
       // Don't allow nesting further than the maximum configured depth and don't
       // allow removal of the root group.
       const allowFurtherNesting = typeof maxNesting === "undefined" || currentNesting < maxNesting;
-      const isRoot = currentNesting == 1;
+      const isMaxNestingExceeded = maxNesting && currentNesting > maxNesting;
+
       return (
         <div
-          className={"group-or-rule-container group-container"}
+          className={classNames("group-or-rule-container", "group-container", hasError ? "group-with-error" : null)}
           data-id={this.props.id}
         >
           {[
@@ -167,7 +208,9 @@ const createGroupContainer = (Group, itemType) =>
               isDraggingTempo={true}
               dragging={this.props.dragging}
               isRoot={isRoot}
+              lev={lev}
               allowFurtherNesting={allowFurtherNesting}
+              isMaxNestingExceeded={isMaxNestingExceeded}
               conjunctionOptions={this.conjunctionOptions}
               not={this.props.not}
               selectedConjunction={this.selectedConjunction}
@@ -175,14 +218,19 @@ const createGroupContainer = (Group, itemType) =>
               setNot={this.dummyFn}
               setLock={this.dummyFn}
               removeSelf={this.dummyFn}
+              removeGroupChildren={this.dummyFn}
               addGroup={this.dummyFn}
               addCaseGroup={this.dummyFn}
               addDefaultCaseGroup={this.dummyFn}
               addRule={this.dummyFn}
               setField={this.dummyFn}
+              setFuncValue={this.dummyFn}
               setOperator={this.dummyFn}
               setValue={this.dummyFn}
+              setValueSrc={this.dummyFn}
               value={this.props.value || null}
+              valueError={this.props.valueError || null}
+              valueSrc={this.props.valueSrc || null}
               config={this.props.config}
               children1={this.props.children1}
               actions={this.props.actions}
@@ -192,6 +240,8 @@ const createGroupContainer = (Group, itemType) =>
               selectedFieldSrc={this.props.fieldSrc || "field"}
               selectedFieldType={fieldType}
               parentField={this.props.parentField || null}
+              parentFieldPathSize={this.props.parentFieldPathSize}
+              parentFieldCanReorder={this.props.parentFieldCanReorder}
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}
@@ -206,7 +256,9 @@ const createGroupContainer = (Group, itemType) =>
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
               isRoot={isRoot}
+              lev={lev}
               allowFurtherNesting={allowFurtherNesting}
+              isMaxNestingExceeded={isMaxNestingExceeded}
               conjunctionOptions={this.conjunctionOptions}
               not={this.props.not}
               selectedConjunction={this.selectedConjunction}
@@ -214,14 +266,19 @@ const createGroupContainer = (Group, itemType) =>
               setNot={isInDraggingTempo ? this.dummyFn : this.setNot}
               setLock={isInDraggingTempo ? this.dummyFn : this.setLock}
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
+              removeGroupChildren={isInDraggingTempo ? this.dummyFn : this.removeGroupChildren}
               addGroup={isInDraggingTempo ? this.dummyFn : this.addGroup}
               addCaseGroup={isInDraggingTempo ? this.dummyFn : this.addCaseGroup}
               addDefaultCaseGroup={isInDraggingTempo ? this.dummyFn : this.addDefaultCaseGroup}
               addRule={isInDraggingTempo ? this.dummyFn : this.addRule}
               setField={isInDraggingTempo ? this.dummyFn : this.setField}
+              setFuncValue={isInDraggingTempo ? this.dummyFn : this.setFuncValue}
               setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
               setValue={isInDraggingTempo ? this.dummyFn : this.setValue}
+              setValueSrc={isInDraggingTempo ? this.dummyFn : this.setValueSrc}
               value={this.props.value || null}
+              valueError={this.props.valueError || null}
+              valueSrc={this.props.valueSrc || null}
               config={this.props.config}
               children1={this.props.children1}
               actions={this.props.actions}
@@ -231,6 +288,8 @@ const createGroupContainer = (Group, itemType) =>
               selectedFieldSrc={this.props.fieldSrc || "field"}
               selectedFieldType={fieldType}
               parentField={this.props.parentField || null}
+              parentFieldPathSize={this.props.parentFieldPathSize}
+              parentFieldCanReorder={this.props.parentFieldCanReorder}
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}

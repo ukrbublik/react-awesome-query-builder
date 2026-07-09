@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Select } from "antd";
+import { Select, version as antdVersion } from "antd";
 import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../utils/domUtils";
 import omit from "lodash/omit";
 import { Utils } from "@react-awesome-query-builder/ui";
@@ -66,6 +66,14 @@ export default class MultiSelectWidget extends Component {
     const dropdownWidth = this.optionsMaxWidth ? this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT : null;
     const customSelectProps = omit(customProps, ["showCheckboxes"]);
     
+    const selectProps = {};
+    const antdMajorVersion = parseInt(antdVersion.split(".")[0]);
+    if (antdMajorVersion >= 5) {
+      selectProps.popupMatchSelectWidth = false;
+    } else {
+      selectProps.dropdownMatchSelectWidth = false;
+    }
+
     return (
       <Select
         disabled={readonly}
@@ -78,12 +86,12 @@ export default class MultiSelectWidget extends Component {
           width: dropdownWidth,
         }}
         key={"widget-multiselect"}
-        popupMatchSelectWidth={false}
         placeholder={placeholder}
         size={renderSize}
         value={aValue}
         onChange={this.handleChange}
         filterOption={this.filterOption}
+        {...selectProps}
         {...customSelectProps}
       >{this.options}
       </Select>

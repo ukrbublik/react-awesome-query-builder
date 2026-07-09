@@ -1,6 +1,7 @@
 import React from "react";
-import MaterialWidgets from "../widgets";
 import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
+import {default as MaterialWidgets} from "../widgets";
+import { generateCssVars } from "../utils/theming";
 
 
 const settings = {
@@ -9,7 +10,9 @@ const settings = {
   renderField: (props, {RCE, W: {MaterialFieldAutocomplete, MaterialFieldSelect}}) => props?.customProps?.showSearch 
     ? RCE(MaterialFieldAutocomplete, props)
     : RCE(MaterialFieldSelect, props),
-  renderOperator: (props, {RCE, W: {MaterialFieldSelect}}) => RCE(MaterialFieldSelect, props),
+  renderOperator: (props, {RCE, W: {MaterialFieldAutocomplete, MaterialFieldSelect}}) => props?.customProps?.showSearch 
+    ? RCE(MaterialFieldAutocomplete, props)
+    : RCE(MaterialFieldSelect, props),
 
   renderFunc: (props, {RCE, W: {MaterialFieldSelect}}) => RCE(MaterialFieldSelect, props),
   renderConjs: (props, {RCE, W: {MaterialConjs}}) => RCE(MaterialConjs, props),
@@ -18,7 +21,6 @@ const settings = {
   renderIcon: (props, {RCE, W: {MaterialIcon}}) => RCE(MaterialIcon, props),
   renderButtonGroup: (props, {RCE, W: {MaterialButtonGroup}}) => RCE(MaterialButtonGroup, props),
   renderValueSources: (props, {RCE, W: {MaterialValueSources}}) => RCE(MaterialValueSources, props),
-  renderFieldSources: (props, {RCE, W: {MaterialValueSources}}) => RCE(MaterialValueSources, props),
   renderProvider: (props, {RCE, W: {MaterialProvider}}) => RCE(MaterialProvider, props),
   renderConfirm: (props, {W: {MaterialConfirm}}) => MaterialConfirm(props),
   useConfirm: ({W: {MaterialUseConfirm}}) => MaterialUseConfirm(),
@@ -39,10 +41,14 @@ const widgets = {
     ...BasicConfig.widgets.number,
     factory: (props, {RCE, W: {MaterialNumberWidget}}) => RCE(MaterialNumberWidget, props),
   },
+  price: {
+    ...BasicConfig.widgets.price,
+    factory: (props, { RCE, W: { MaterialPriceWidget } }) => RCE(MaterialPriceWidget, props),
+  },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
     factory: (props, {RCE, W: {MaterialAutocompleteWidget, MaterialMultiSelectWidget}}) => {
-      return (props.asyncFetch || props.showSearch) 
+      return (props.asyncFetch || props.showSearch || props.allowCustomValues) 
         ? RCE(MaterialAutocompleteWidget, {...props, multiple: true}) 
         : RCE(MaterialMultiSelectWidget, props);
     },
@@ -50,7 +56,7 @@ const widgets = {
   select: {
     ...BasicConfig.widgets.select,
     factory: (props, {RCE, W: {MaterialAutocompleteWidget, MaterialSelectWidget}}) => {
-      return (props.asyncFetch || props.showSearch) 
+      return (props.asyncFetch || props.showSearch || props.allowCustomValues) 
         ? RCE(MaterialAutocompleteWidget, props) 
         : RCE(MaterialSelectWidget, props);
     },
@@ -93,6 +99,7 @@ const ctx = {
     ...BasicConfig.ctx.W,
     ...MaterialWidgets,
   },
+  generateCssVars,
 };
 
 let config = {

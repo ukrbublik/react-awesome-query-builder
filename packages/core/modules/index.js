@@ -5,7 +5,15 @@ import * as BasicFuncs from "./config/funcs";
 import CoreConfig, { ConfigMixins } from "./config";
 import TreeStore from "./stores/tree";
 import * as TreeActions from "./actions";
+import Immutable from "immutable";
 
-const Utils = {...BasicUtils, ...Export, ...Import, ConfigMixins};
+const Utils = {
+  ...BasicUtils,
+  Export, Import,
+  // intrenal
+  ConfigMixins,
+  // expose import/export api to top level for convenience
+  ...Export, ...Import
+};
 
-export {Utils, Export, Import, BasicFuncs, CoreConfig, TreeStore, TreeActions};
+export {Utils, BasicFuncs, CoreConfig, TreeStore, TreeActions, Immutable};

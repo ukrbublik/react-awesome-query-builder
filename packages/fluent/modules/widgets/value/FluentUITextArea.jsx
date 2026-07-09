@@ -21,7 +21,7 @@ export default (props) => {
   const textValue = value || "";
   return (
     <TextField
-      readonly={readonly}
+      readOnly={readonly}
       multiline
       rows={maxRows}
       maxLength={maxLength}

@@ -1,6 +1,7 @@
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_skins, export_checks } from "../support/utils";
+import { expect } from "chai";
 
 
 describe("query with subquery and datetime types", () => {
@@ -21,13 +22,60 @@ describe("query with subquery and datetime types", () => {
       "mongo": {
         "$or": [
           {
-            "datetime": "2020-05-18T21:50:01.000Z"
-          }, {
-            "date": "2020-05-18T00:00:00.000Z",
-            "time": 3000
+            "$expr": {
+              "$eq": [
+                "$datetime",
+                {
+                  "$dateFromString": {
+                    "dateString": "2020-05-18 21:50:01",
+                    "format": "%Y-%m-%d %H:%M:%S"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "$and": [
+              {
+                "$expr": {
+                  "$eq": [
+                    "$date",
+                    {
+                      "$dateFromString": {
+                        "dateString": "2020-05-18",
+                        "format": "%Y-%m-%d"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "time": 3000
+              }
+            ]
           }
         ]
       },
+      "logic": {
+        "or": [
+          {
+            "datetime==": [ { "var": "datetime" },  "2020-05-18T21:50:01.000Z" ]
+          }, {
+            "and": [
+              {
+                "date==": [ { "var": "date" },  "2020-05-18T00:00:00.000Z" ]
+              }, {
+                "==": [ { "var": "time" },  3000 ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("export to JL with fixJsonLogicDateCompareOp = false", () => {
+    export_checks([configs.with_date_and_time, configs.without_fix_jl_date_compare], inits.with_date_and_time, "JsonLogic", {
       "logic": {
         "or": [
           {

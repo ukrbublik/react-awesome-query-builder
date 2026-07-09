@@ -1,3 +1,5 @@
+import React from "react";
+
 // value widgets
 import BootstrapTextWidget from "./value/BootstrapText";
 import BootstrapTextAreaWidget from "./value/BootstrapTextArea";
@@ -6,6 +8,7 @@ import BootstrapDateTimeWidget from "./value/BootstrapDateTime";
 import BootstrapTimeWidget from "./value/BootstrapTime";
 import BootstrapSelectWidget from "./value/BootstrapSelect";
 import BootstrapNumberWidget from "./value/BootstrapNumber";
+import BootstrapPriceWidget from "./value/BootstrapPrice";
 import BootstrapSliderWidget from "./value/BootstrapSlider";
 import BootstrapBooleanWidget from "./value/BootstrapBoolean";
 import BootstrapMultiSelectWidget from "./value/BootstrapMultiSelect";
@@ -19,10 +22,8 @@ import BootstrapButton from "./core/BootstrapButton";
 import BootstrapButtonGroup from "./core/BootstrapButtonGroup";
 import BootstrapConjs from "./core/BootstrapConjs";
 import BootstrapValueSources from "./core/BootstrapValueSources";
-import BootstrapConfirm from "./core/BootstrapConfirm";
-
-// provider
-const BootstrapProvider = ({config, children}) => children;
+import { BootstrapConfirm, BootstrapUseConfirm } from "./core/BootstrapConfirm";
+import { BootstrapProvider } from "./core/BootstrapProvider";
 
 export default {
   BootstrapTextWidget,
@@ -32,6 +33,7 @@ export default {
   BootstrapTimeWidget,
   BootstrapSelectWidget,
   BootstrapNumberWidget,
+  BootstrapPriceWidget,
   BootstrapSliderWidget,
   BootstrapBooleanWidget,
   BootstrapMultiSelectWidget,
@@ -43,7 +45,8 @@ export default {
   BootstrapButtonGroup,
   BootstrapConjs,
   BootstrapValueSources,
-  BootstrapConfirm,
 
+  BootstrapConfirm,
+  BootstrapUseConfirm,
   BootstrapProvider,
 };

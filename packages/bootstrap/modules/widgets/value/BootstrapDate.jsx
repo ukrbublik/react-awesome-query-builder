@@ -3,6 +3,7 @@ import { Input } from "reactstrap";
 
 export default (props) => {
   const {value, setValue, config, valueFormat, readonly} = props;
+  const darkMode = config.settings.themeMode === "dark";
 
   const onChange = e => {
     let value = e.target.value;
@@ -12,6 +13,13 @@ export default (props) => {
   };
   
   return (
-    <Input type="date" bsSize={"sm"} value={value || ""} disabled={readonly} onChange={onChange} />
+    <Input
+      type="date"
+      bsSize={"sm"}
+      value={value || ""} 
+      disabled={readonly}
+      onChange={onChange}
+      className={darkMode ? "bg-dark text-light border-dark color-scheme-dark" : undefined}
+    />
   );
 };

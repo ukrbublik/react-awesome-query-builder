@@ -1,6 +1,7 @@
 import React from "react";
-import MuiWidgets from "../widgets";
 import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
+import { default as MuiWidgets } from "../widgets";
+import { generateCssVars } from "../utils/theming";
 
 
 const settings = {
@@ -9,7 +10,9 @@ const settings = {
   renderField: (props, {RCE, W: {MuiFieldAutocomplete, MuiFieldSelect}}) => props?.customProps?.showSearch 
     ? RCE(MuiFieldAutocomplete, props)
     : RCE(MuiFieldSelect, props),
-  renderOperator: (props, {RCE, W: {MuiFieldSelect}}) => RCE(MuiFieldSelect, props),
+  renderOperator: (props, {RCE, W: {MuiFieldAutocomplete, MuiFieldSelect}}) => props?.customProps?.showSearch 
+    ? RCE(MuiFieldAutocomplete, props)
+    : RCE(MuiFieldSelect, props),
   renderFunc: (props, {RCE, W: {MuiFieldSelect}}) => RCE(MuiFieldSelect, props),
   renderConjs: (props, {RCE, W: {MuiConjs}}) => RCE(MuiConjs, props),
   renderSwitch: (props, {RCE, W: {MuiSwitch}}) => RCE(MuiSwitch, props),
@@ -17,7 +20,6 @@ const settings = {
   renderIcon: (props, {RCE, W: {MuiIcon}}) => RCE(MuiIcon, props),
   renderButtonGroup: (props, {RCE, W: {MuiButtonGroup}}) => RCE(MuiButtonGroup, props),
   renderValueSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
-  renderFieldSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
   renderProvider: (props, {RCE, W: {MuiProvider}}) => RCE(MuiProvider, props),
   renderConfirm: (props, {W: {MuiConfirm}}) => MuiConfirm(props),
   useConfirm: ({W: {MuiUseConfirm}}) => MuiUseConfirm(),
@@ -37,10 +39,14 @@ const widgets = {
     ...BasicConfig.widgets.number,
     factory: (props, {RCE, W: {MuiNumberWidget}}) => RCE(MuiNumberWidget, props),
   },
+  price: {
+    ...BasicConfig.widgets.price,
+    factory: (props, { RCE, W: { MuiPriceWidget } }) => RCE(MuiPriceWidget, props),
+  },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
     factory: (props, {RCE, W: {MuiAutocompleteWidget, MuiMultiSelectWidget}}) => {
-      return (props.asyncFetch || props.showSearch) 
+      return (props.asyncFetch || props.showSearch || props.allowCustomValues) 
         ? RCE(MuiAutocompleteWidget, {...props, multiple: true}) 
         : RCE(MuiMultiSelectWidget, props);
     },
@@ -48,7 +54,7 @@ const widgets = {
   select: {
     ...BasicConfig.widgets.select,
     factory: (props, {RCE, W: {MuiAutocompleteWidget, MuiSelectWidget}}) => {
-      return (props.asyncFetch || props.showSearch) 
+      return (props.asyncFetch || props.showSearch || props.allowCustomValues) 
         ? RCE(MuiAutocompleteWidget, props) 
         : RCE(MuiSelectWidget, props);
     },
@@ -89,6 +95,7 @@ const ctx = {
     ...BasicConfig.ctx.W,
     ...MuiWidgets,
   },
+  generateCssVars,
 };
 
 

@@ -48,8 +48,9 @@ export default class ConjsButtons extends PureComponent {
           && <Button
             key={"group-not"}
             onClick={this.setNot}
-            type={not ? "primary" : null}
+            type={not ? "primary" : "text"}
             disabled={readonly}
+            danger
           >{notLabel}</Button>
         }
         {showConj && map(conjunctionOptions, (item, _index) => (readonly || disabled) && !item.checked ? null : (

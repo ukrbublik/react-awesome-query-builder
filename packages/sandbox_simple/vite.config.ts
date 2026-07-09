@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     host: true,
     port: 5174,
+    allowedHosts: ['.csb.app', '.github.dev'],
   },
   plugins: [
     reactSupport()

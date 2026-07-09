@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Tooltip, TreeSelect } from "antd";
+import { Tooltip, TreeSelect, version as antdVersion } from "antd";
 import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../utils/domUtils";
 import PropTypes from "prop-types";
 import { Utils } from "@react-awesome-query-builder/ui";
@@ -38,6 +38,9 @@ export default class FieldTreeSelect extends Component {
     super(props);
     useOnPropsChanged(this);
     this.onPropsChanged(props);
+    this.state = {
+      open: false
+    };
   }
 
   onPropsChanged(nextProps) {
@@ -56,6 +59,12 @@ export default class FieldTreeSelect extends Component {
       this.optionsMaxWidth = optionsMaxWidth;
     }
   }
+
+  setOpen = (newOpen) => {
+    this.setState({
+      open: newOpen
+    });
+  };
 
   getTreeData(fields, fn = null) {
     return fields.map(field => {
@@ -116,6 +125,7 @@ export default class FieldTreeSelect extends Component {
       config, customProps = {}, placeholder, errorText,
       selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly,
     } = this.props;
+    const { open } = this.state;
     const { renderSize, fieldSeparator } = config.settings;
       
     let tooltipText = selectedAltLabel || selectedFullLabel;
@@ -135,8 +145,18 @@ export default class FieldTreeSelect extends Component {
     const useAutoWidth = true || !this.optionsMaxWidth; //tip: "auto" is good, but width will jump on expand/collapse
     const dropdownWidth = Math.max(dropdownMinWidth, Math.min(dropdownMaxWidth, this.optionsMaxWidth));
 
+    const selectProps = {};
+    const antdMajorVersion = parseInt(antdVersion.split(".")[0]);
+    if (antdMajorVersion >= 5) {
+      selectProps.popupMatchSelectWidth = false;
+    } else {
+      selectProps.dropdownMatchSelectWidth = false;
+    }
+
     let res = (
       <TreeSelect
+        open={open}
+        onDropdownVisibleChange={this.setOpen}
         status={errorText && "error"}
         onChange={this.onChange}
         value={selectedKey || undefined}
@@ -156,14 +176,14 @@ export default class FieldTreeSelect extends Component {
         placeholder={placeholder}
         filterTreeNode={this.filterTreeNode}
         treeDefaultExpandedKeys={treeDefaultExpandedKeys}
-        popupMatchSelectWidth={false}
         disabled={readonly}
+        {...selectProps}
         {...customProps}
       />
     );
 
     if (tooltipText && !selectedOpts.tooltip) {
-      res = <Tooltip title={tooltipText}>{res}</Tooltip>;
+      res = <Tooltip title={!open ? tooltipText : null}>{res}</Tooltip>;
     }
 
     return res;

@@ -1,7 +1,7 @@
 import { ElementType } from "react";
 import {
   FieldProps, ConjsProps, SwitchProps, ButtonProps, ButtonGroupProps, ProviderProps, ValueSourcesProps, ConfirmFunc,
-  BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, RangeSliderWidgetProps, TreeSelectWidgetProps
+  BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, PriceWidgetProps, RangeSliderWidgetProps, TreeSelectWidgetProps
 } from "@react-awesome-query-builder/ui";
 
 export interface AntdWidgets {
@@ -14,14 +14,13 @@ export interface AntdWidgets {
   ButtonGroup: ElementType<ButtonGroupProps>,
   Conjs: ElementType<ConjsProps>,
   Switch: ElementType<SwitchProps>,
-  Provider: ElementType<ProviderProps>,
   ValueSources: ElementType<ValueSourcesProps>,
-  confirm: ConfirmFunc,
 
   // antd value widgets
   TextWidget: ElementType<TextWidgetProps>,
   TextAreaWidget: ElementType<TextWidgetProps>,
   NumberWidget: ElementType<NumberWidgetProps>,
+  PriceWidget: ElementType<PriceWidgetProps>,
   SliderWidget: ElementType<NumberWidgetProps>,
   RangeWidget: ElementType<RangeSliderWidgetProps>,
   SelectWidget: ElementType<SelectWidgetProps>,
@@ -32,7 +31,11 @@ export interface AntdWidgets {
   TimeWidget: ElementType<DateTimeWidgetProps>,
   DateTimeWidget: ElementType<DateTimeWidgetProps>,
   BooleanWidget: ElementType<BooleanWidgetProps>,
+
+  Confirm: ConfirmFunc,
+  useConfirm: () => ConfirmFunc,
+  Provider: ElementType<ProviderProps>,
 }
 
-declare const AntdWidgets: AntdWidgets;
+export declare const AntdWidgets: AntdWidgets;
 export default AntdWidgets;

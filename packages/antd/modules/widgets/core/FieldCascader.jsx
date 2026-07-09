@@ -8,8 +8,8 @@ const { getFieldParts } = Utils.ConfigUtils;
 
 // see type FieldItemSearchableKeys
 const mapFieldItemToOptionKeys = {
-  key: "_value2",
-  path: "path",
+  key: "key",
+  path: "_path",
   label: "_label",
   altLabel: "altLabel",
   tooltip: "tooltip",
@@ -41,6 +41,9 @@ export default class FieldCascader extends Component {
     super(props);
     useOnPropsChanged(this);
     this.onPropsChanged(props);
+    this.state = {
+      open: false
+    };
   }
 
   onPropsChanged(nextProps) {
@@ -50,28 +53,38 @@ export default class FieldCascader extends Component {
 
   getItems(items) {
     return items.map(item => {
-      const {items, matchesType, label, key, path} = item;
+      const {items, matchesType, label, key, path, tooltip} = item;
+      let finalLabel = matchesType ? <b>{label}</b> : label;
+      if (tooltip) {
+        finalLabel = <Tooltip title={tooltip}>{finalLabel}</Tooltip>;
+      }
 
       if (items) {
         return {
           ...item,
-          key: path,
-          _value2: key,
+          key: key,
+          _path: path,
           items: this.getItems(items),
-          label: matchesType ? <b>{label}</b> : label,
+          label: finalLabel,
           _label: label,
         };
       } else {
         return {
           ...item,
-          key: path,
-          _value2: key,
-          label: matchesType ? <b>{label}</b> : label,
+          key: key,
+          _path: path,
+          label: finalLabel,
           _label: label,
         };
       }
     });
   }
+
+  setOpen = (newOpen) => {
+    this.setState({
+      open: newOpen
+    });
+  };
 
   onChange = (keys) => {
     const { parentField } = this.props;
@@ -99,6 +112,7 @@ export default class FieldCascader extends Component {
       config, customProps, items, placeholder, errorText,
       selectedPath, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly, selectedField, parentField, 
     } = this.props;
+    const { open } = this.state;
     let customProps2 = {...customProps};
     if (customProps2.showSearch) {
       customProps2.showSearch = {
@@ -111,6 +125,8 @@ export default class FieldCascader extends Component {
     const value = removePrefixPath(selectedPath, parentFieldPath);
     let res = (
       <Cascader
+        open={open}
+        onDropdownVisibleChange={this.setOpen}
         status={errorText && "error"}
         fieldNames={{ label: "label", value: "key", children: "items" }}
         options={this.items}
@@ -128,7 +144,7 @@ export default class FieldCascader extends Component {
     if (tooltipText == selectedLabel)
       tooltipText = null;
     if (tooltipText) {
-      res = <Tooltip title={tooltipText}>{res}</Tooltip>;
+      res = <Tooltip title={!open ? tooltipText : null}>{res}</Tooltip>;
     }
     
     return res;

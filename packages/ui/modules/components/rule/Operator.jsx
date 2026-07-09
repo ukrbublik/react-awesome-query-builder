@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import keys from "lodash/keys";
 import pickBy from "lodash/pickBy";
 import mapValues from "lodash/mapValues";
-import {useOnPropsChanged} from "../../utils/reactUtils";
+import {useOnPropsChanged, pureShouldComponentUpdate, liteShouldComponentUpdate} from "../../utils/reactUtils";
 const {getFieldConfig, getOperatorConfig} = Utils.ConfigUtils;
 
 
@@ -14,10 +14,12 @@ export default class Operator extends Component {
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
     selectedField: PropTypes.any,
+    selectedFieldId: PropTypes.string,
     selectedFieldType: PropTypes.string,
     selectedFieldSrc: PropTypes.string,
     selectedOperator: PropTypes.string,
     readonly: PropTypes.bool,
+    customProps: PropTypes.object,
     //actions
     setOperator: PropTypes.func.isRequired,
   };
@@ -38,6 +40,11 @@ export default class Operator extends Component {
       this.meta = this.getMeta(nextProps);
     }
   }
+
+  shouldComponentUpdate = liteShouldComponentUpdate(this, {
+    // tip: rely on selectedFieldId instead
+    selectedField: (nextValue, prevValue) => { return false; }
+  });
 
   getMeta({config, selectedField, selectedFieldType, selectedOperator}) {
     const fieldConfig = getFieldConfig(config, selectedField);
@@ -65,10 +72,12 @@ export default class Operator extends Component {
     const selectedKeys = selectedKey ? [selectedKey] : null;
     const selectedPath = selectedKeys;
     const selectedLabel = selectedOpts.label;
+    // tip: label2 is not documented for operators
+    const selectedAltLabel = selectedOpts.label2 || selectedOpts.tooltip;
     
     return {
       placeholder, items,
-      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, fieldConfig
+      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedAltLabel, selectedOpts, fieldConfig
     };
   }
 
@@ -79,10 +88,14 @@ export default class Operator extends Component {
     return keys(fields).sort((a, b) => (ops.indexOf(a) - ops.indexOf(b))).map(fieldKey => {
       const field = fields[fieldKey];
       const label = field.label;
+      const altLabel = field.label2;
+      const tooltip = field.tooltip;
       return {
         key: fieldKey,
         path: fieldKey,
         label,
+        altLabel,
+        tooltip,
       };
     });
   }

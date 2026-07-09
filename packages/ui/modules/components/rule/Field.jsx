@@ -43,7 +43,7 @@ export default class Field extends Component {
   }
 
   getMeta({selectedField, selectedFieldType, config, parentField}) {
-    const selectedKey = selectedField;
+    let selectedKey = selectedField;
     const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder, fieldSeparator} = config.settings;
     const isFieldSelected = !!selectedField;
     const placeholder = !isFieldSelected ? truncateString(fieldPlaceholder, maxLabelsLength) : null;
@@ -57,7 +57,7 @@ export default class Field extends Component {
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
     if (selectedFullLabel == selectedLabel || parentField)
       selectedFullLabel = null;
-    const selectedAltLabel = selectedOpts.label2;
+    const selectedAltLabel = selectedOpts.label2 || selectedOpts.tooltip;
 
     const parentFieldPath = getFieldParts(parentField, config);
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
@@ -67,6 +67,11 @@ export default class Field extends Component {
 
     // Field source has been chnaged, no new field selected, but op & value remains
     const errorText = lookingForFieldType ? "Please select field" : null;
+
+    if (selectedKey && typeof selectedKey === "object") {
+      // can happen due to incorrect rule state: field is Map{func, args} but fieldSrc is not "func"
+      selectedKey = undefined;
+    }
 
     return {
       placeholder, items, parentField,
@@ -84,14 +89,14 @@ export default class Field extends Component {
     return label;
   }
 
-  buildOptions(parentFieldPath, config, fields, fieldType = undefined, path = null, optGroupLabel = null) {
+  buildOptions(parentFieldPath, config, fields, fieldType = undefined, path = null, optGroup = null) {
     if (!fields)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
     const prefix = path?.length ? path.join(fieldSeparator) + fieldSeparator : "";
 
     const countFieldsMatchesType = (fields) => {
-      return Object.keys(fields).reduce((acc, fieldKey) => {
+      return Object.keys(fields || {}).reduce((acc, fieldKey) => {
         const field = fields[fieldKey];
         if (field.type === "!struct") {
           return acc + countFieldsMatchesType(field.subfields);
@@ -112,12 +117,15 @@ export default class Field extends Component {
       const altLabel = field.label2;
       const tooltip = field.tooltip;
       const disabled = field.disabled;
-            
+
       if (field.hideForSelect)
         return undefined;
 
       if (field.type == "!struct") {
-        const items = this.buildOptions(parentFieldPath, config, field.subfields, fieldType, fullFieldPath, label);
+        const items = this.buildOptions(parentFieldPath, config, field.subfields, fieldType, fullFieldPath, {
+          label,
+          tooltip,
+        });
         const hasItemsMatchesType = countFieldsMatchesType(field.subfields) > 0;
         return {
           disabled,
@@ -140,23 +148,40 @@ export default class Field extends Component {
           fullLabel,
           altLabel,
           tooltip,
-          grouplabel: optGroupLabel,
+          grouplabel: optGroup?.label,
+          group: optGroup,
           matchesType,
         };
       }
     }).filter(o => !!o);
   }
 
+  setField = (field, asyncListValues, _meta = {}) => {
+    const {id} = this.props;
+    if (!_meta.widgetId) {
+      const widgetId = [
+        id,
+        "L",
+        -1,
+      ].join(":");
+      _meta.widgetId = widgetId;
+    }
+    this.props.setField(field, asyncListValues, _meta);
+  };
+
   render() {
-    const {config, customProps, setField, setFieldSrc, readonly, id, groupId} = this.props;
+    const {config, customProps, setFieldSrc, readonly, id, groupId} = this.props;
     const {renderField} = config.settings;
+    if (!this.meta.items) {
+      return null;
+    }
     const renderProps = {
       id,
       groupId,
       config, 
       customProps, 
       readonly,
-      setField,
+      setField: this.setField,
       setFieldSrc,
       ...this.meta
     };

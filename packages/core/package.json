@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/core",
-  "version": "6.4.1",
+  "version": "6.7.0-alpha.0",
   "description": "User-friendly query builder for React. Core",
   "keywords": [
     "query-builder",
@@ -26,7 +26,7 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "exports": {
     ".": {
-      "types": "./modules/index.d.ts",
+      "types": "./types/index.d.ts",
       "import": "./esm/index.js",
       "require": "./cjs/index.js"
     },
@@ -34,39 +34,44 @@
   },
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
-  "types": "./modules/index.d.ts",
+  "types": "./types/index.d.ts",
   "scripts": {
-    "build": "sh ./scripts/build-npm.sh",
-    "eslint": "eslint --ext .js --ext .ts  ./modules/",
-    "lint": "npm run eslint && npm run tsc",
-    "lint-fix": "eslint --ext .js --ext .ts --fix  ./modules/",
+    "build": "node ./scripts/build-npm.js",
+    "eslint": "eslint --ext .js --ext .ts --ext .d.ts  ./modules/",
+    "lint": "npm run eslint && npm run tsc && npm run circular",
+    "lint-fix": "eslint --ext .js --ext .ts --ext .d.ts --fix  ./modules/",
     "prepare": "npm run build",
-    "tsc": "tsc -p . --noEmit"
+    "tsc": "tsc -p . --noEmit",
+    "circular": "madge --circular ./modules",
+    "tsc-emit-types": "tsc -p . --declaration --emitDeclarationOnly --allowJs false --declarationDir types"
   },
   "dependencies": {
+    "@babel/runtime": "^7.27.0",
     "clone": "^2.1.2",
-    "immutable": "^3.8.2",
+    "i18next": "^23.11.5",
+    "immutable": "^4.3.6",
     "json-logic-js": "^2.0.2",
     "lodash": "^4.17.21",
-    "moment": "^2.29.4",
+    "moment": "^2.30.1",
     "spel2js": "^0.2.8",
     "sqlstring": "^2.3.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.22.5",
-    "@babel/core": "^7.22.5",
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/plugin-proposal-private-methods": "^7.18.6",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@babel/plugin-transform-modules-commonjs": "^7.22.5",
-    "@babel/plugin-transform-runtime": "^7.22.5",
-    "@babel/preset-env": "^7.22.5",
-    "@babel/preset-react": "^7.22.5",
-    "@babel/preset-typescript": "^7.22.5",
-    "@babel/runtime": "^7.22.5",
+    "@babel/cli": "^7.27.0",
+    "@babel/core": "^7.26.10",
+    "@babel/plugin-transform-class-properties": "^7.25.9",
+    "@babel/plugin-transform-modules-commonjs": "^7.26.3",
+    "@babel/plugin-transform-private-methods": "^7.25.9",
+    "@babel/plugin-transform-private-property-in-object": "^7.25.9",
+    "@babel/plugin-transform-runtime": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
+    "@babel/preset-typescript": "^7.27.0",
+    "@babel/runtime": "^7.27.0",
     "@types/clone": "^2.1.1",
     "@types/lodash": "^4.14.170",
     "@types/node": "^18.15.0",
-    "@types/react": "^17.0.39"
+    "@types/react": "^17.0.39",
+    "globby": "^14.1.0"
   }
 }

@@ -2,15 +2,17 @@ import React, { Component } from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import range from "lodash/range";
-import {defaultValue} from "../../utils/stuff";
+import {getOpCardinality} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import pick from "lodash/pick";
 import WidgetFactory from "./WidgetFactory";
 import classNames from "classnames";
-import {Col} from "../utils";
-const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
-const {getValueSourcesForFieldOp, getWidgetForFieldOp, getValueLabel} = Utils.RuleUtils;
-const { createListFromArray } = Utils.DefaultUtils;
+import {Col, getWidgetId, getRenderFromConfig} from "../utils";
+const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getWidgetForFieldOp, getValueSourcesForFieldOp} = Utils.ConfigUtils;
+const {getValueLabel} = Utils.RuleUtils;
+const { createListWithOneElement } = Utils.DefaultUtils;
+const {shallowEqual} = Utils.OtherUtils;
+const { isImmutable } = Utils.TreeUtils;
 
 const funcArgDummyOpDef = {cardinality: 1};
 
@@ -19,10 +21,12 @@ export default class Widget extends Component {
     config: PropTypes.object.isRequired,
     value: PropTypes.any, //instanceOf(Immutable.List)
     valueSrc: PropTypes.any, //instanceOf(Immutable.List)
-    valueError: PropTypes.any,
+    valueError: PropTypes.any, //instanceOf(Immutable.List)
+    fieldError: PropTypes.string,
     field: PropTypes.any,
     fieldSrc: PropTypes.string,
     fieldType: PropTypes.string,
+    fieldId: PropTypes.string,
     operator: PropTypes.string,
     readonly: PropTypes.bool,
     asyncListValues: PropTypes.array,
@@ -31,6 +35,7 @@ export default class Widget extends Component {
     //actions
     setValue: PropTypes.func,
     setValueSrc: PropTypes.func,
+    setFuncValue: PropTypes.func,
     // for isFuncArg
     isFuncArg: PropTypes.bool,
     fieldFunc: PropTypes.string,
@@ -42,6 +47,7 @@ export default class Widget extends Component {
     // for func in func
     parentFuncs: PropTypes.array,
     isLHS: PropTypes.bool,
+    parentDelta: PropTypes.number,
     // for case_value
     isCaseValue: PropTypes.bool,
   };
@@ -55,50 +61,80 @@ export default class Widget extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
+    const configChanged = !this.ValueSources || prevProps?.config !== nextProps?.config;
     const keysForMeta = [
-      "config", "field", "fieldSrc", "fieldType", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "isFuncArg", "asyncListValues", "isLHS"
+      "config", "id", "parentFuncs",
+      "field", "fieldId", "fieldSrc", "fieldType", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "asyncListValues",
+      "isLHS", "isFuncArg", "isForRuleGroup", "isCaseValue", "value", "parentDelta",
     ];
-    const needUpdateMeta = !this.meta 
-          || keysForMeta
-            .map(k => (
-              nextProps[k] !== prevProps[k] 
-                  //tip: for isFuncArg we need to wrap value in Imm list
-                  || k == "isFuncArg" && nextProps["isFuncArg"] && nextProps["value"] !== prevProps["value"])
-            )
-            .filter(ch => ch).length > 0;
+    const changedKeys = keysForMeta
+      .filter(k => {
+        if (k === "parentFuncs") {
+          return !shallowEqual(nextProps[k], prevProps[k], true);
+        }
+        // if (k === "value") {
+        //   if (nextProps["value"] !== prevProps["value"] && isImmutable(nextProps["value"])) {
+        //   }
+        // }
+        if (k === "field") {
+          //tip: if `fieldId` has not changed, but `field` changed -> ignore
+          // (because we are in RHS and field is LHS)
+          return nextProps["fieldId"] !== prevProps["fieldId"];
+        }
+        return nextProps[k] !== prevProps[k];
+      });
 
+    const needUpdateMeta = !this.meta || changedKeys.length > 0;
     if (needUpdateMeta) {
-      this.meta = this.getMeta(nextProps);
+      this.meta = this.getMeta(nextProps, changedKeys);
+    }
+    if (configChanged) {
+      const { config } = nextProps;
+      const { renderValueSources } = config.settings;
+      this.ValueSources = getRenderFromConfig(config, renderValueSources);
     }
   }
 
-  _setValue = (isSpecialRange, delta, widgetType, value, asyncListValues, __isInternal) => {
+  _setValue = (
+    isSpecialRange, delta, widgetType, widgetId, // bound!
+    value, asyncListValues, _meta = {}
+  ) => {
+    if (!_meta.widgetId) {
+      _meta.widgetId = widgetId;
+    }
     if (isSpecialRange && Array.isArray(value)) {
       const oldRange = [this.props.value.get(0), this.props.value.get(1)];
       if (oldRange[0] != value[0])
-        this.props.setValue(0, value[0], widgetType, asyncListValues, __isInternal);
+        this.props.setValue(0, value[0], widgetType, asyncListValues, _meta);
       if (oldRange[1] != value[1])
-        this.props.setValue(1, value[1], widgetType, asyncListValues, __isInternal);
+        this.props.setValue(1, value[1], widgetType, asyncListValues, _meta);
     } else {
-      this.props.setValue(delta, value, widgetType, asyncListValues, __isInternal);
+      this.props.setValue(delta, value, widgetType, asyncListValues, _meta);
     }
   };
 
-  _onChangeValueSrc = (delta, srcKey) => {
-    this.props.setValueSrc(delta, srcKey);
+  _setValueSrc = (
+    delta, widgetId, // bound!
+    srcKey
+  ) => {
+    const _meta = {
+      widgetId,
+    };
+    this.props.setValueSrc(delta, srcKey, _meta);
   };
 
   getMeta({
     config, field: simpleField, fieldSrc, fieldType, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values,
-    isForRuleGroup, isCaseValue, isFuncArg, leftField, asyncListValues
-  }) {
+    isForRuleGroup, isCaseValue, isFuncArg, leftField, asyncListValues, parentFuncs, isLHS, id, parentDelta,
+  }, changedKeys = []) {
+    const {valueSourcesInfo} = config.settings;
     const field = isFuncArg ? {func: fieldFunc, arg: fieldArg} : simpleField;
     const isOkWithoutField = !simpleField && fieldType;
     let iValueSrcs = valueSrcs;
     let iValues = values;
     if (isFuncArg || isForRuleGroup || isCaseValue) {
-      iValueSrcs = createListFromArray([valueSrcs]);
-      iValues = createListFromArray([values]);
+      iValueSrcs = createListWithOneElement(valueSrcs);
+      iValues = createListWithOneElement(values);
     }
 
     let fieldDefinition = getFieldConfig(config, field);
@@ -116,19 +152,36 @@ export default class Widget extends Component {
       return null;
     }
     const isSpecialRange = operatorDefinition?.isSpecialRange;
-    const isSpecialRangeForSrcField = isSpecialRange && (iValueSrcs.get(0) == "field" || iValueSrcs.get(1) == "field");
+    const isSpecialRangeForSrcField = isSpecialRange && (iValueSrcs?.get(0) === "field" || iValueSrcs?.get(1) === "field");
     const isTrueSpecialRange = isSpecialRange && !isSpecialRangeForSrcField;
-    const cardinality = isTrueSpecialRange ? 1 : defaultValue(operatorDefinition?.cardinality, 1);
+    const cardinality = isTrueSpecialRange ? 1 : getOpCardinality(operatorDefinition);
     if (cardinality === 0) {
       return null;
     }
 
-    let valueSources = getValueSourcesForFieldOp(config, field, operator, fieldDefinition);
-    if (!field) {
-      valueSources = Object.keys(config.settings.valueSourcesInfo);
+    let valueSources = this.meta?.valueSources;
+    let valueSourcesOptions = this.meta?.valueSourcesOptions;
+    const defaultValueSourcesLabels = {
+      value: "Value",
+      field: "Field",
+      func: "Function"
+    };
+    if (!valueSources || ["field", "operator", "config", "fieldDefinition", "isForRuleGroup"].filter(k => changedKeys.includes(k)).length) {
+      valueSources = getValueSourcesForFieldOp(config, field, operator, fieldDefinition);
+      if (isForRuleGroup) {
+        // todo: aggregation can be not only number?
+        valueSources = ["value"];
+      }
+      if (!field) {
+        valueSources = Object.keys(valueSourcesInfo);
+      }
+      valueSourcesOptions = valueSources.map(srcKey => [srcKey, {
+        label: valueSourcesInfo[srcKey]?.label ?? defaultValueSourcesLabels[srcKey] ?? srcKey,
+      }]);
     }
-    const widgets = range(0, cardinality).map(delta => {
-      const valueSrc = iValueSrcs.get(delta) || null;
+    const widgets = (isFuncArg ? [0] : range(0, cardinality)).map(delta => {
+      const oldWidgetMeta = this.meta?.widgets?.[delta];
+      const valueSrc = iValueSrcs?.get(delta) || null;
       let widget = getWidgetForFieldOp(config, field, operator, valueSrc);
       let widgetDefinition = getFieldWidgetConfig(config, field, operator, widget, valueSrc);
       if (isSpecialRangeForSrcField) {
@@ -143,7 +196,6 @@ export default class Widget extends Component {
       const valueLabel = getValueLabel(config, field, operator, delta, valueSrc, isTrueSpecialRange);
       const widgetValueLabel = getValueLabel(config, field, operator, delta, null, isTrueSpecialRange);
       const sepText = operatorDefinition?.textSeparators ? operatorDefinition?.textSeparators[delta] : null;
-      const setValueSrcHandler = this._onChangeValueSrc.bind(this, delta);
 
       let valueLabels = null;
       let textSeparators = null;
@@ -159,19 +211,35 @@ export default class Widget extends Component {
         textSeparators = operatorDefinition?.textSeparators;
       }
 
-      const setValueHandler = this._setValue.bind(this, isSpecialRange, delta, widgetType);
+      const widgetId = getWidgetId({ id, isLHS, delta: parentDelta ?? delta, parentFuncs });
+      const vsId = widgetId + ":" + "VS";
+
+      let setValueSrc = oldWidgetMeta?.setValueSrc;
+      if (!setValueSrc || oldWidgetMeta?.widgetId !== widgetId) {
+        setValueSrc = this._setValueSrc.bind(this, delta, vsId);
+      }
+      let setValue = oldWidgetMeta?.setValue;
+      if (!setValue
+        || oldWidgetMeta?.widgetId !== widgetId
+        || oldWidgetMeta?.widgetType !== widgetType
+        || this.meta?.isSpecialRange !== isSpecialRange
+      ) {
+        setValue = this._setValue.bind(this, isSpecialRange, delta, widgetType, widgetId);
+      }
 
       return {
         valueSrc,
         valueLabel,
         widget,
         sepText,
-        setValueSrcHandler,
         widgetDefinition,
         widgetValueLabel,
         valueLabels,
         textSeparators,
-        setValueHandler
+        setValueSrc,
+        setValue,
+        widgetId,
+        widgetType,
       };
     });
       
@@ -182,6 +250,7 @@ export default class Widget extends Component {
       isSpecialRange: isTrueSpecialRange,
       cardinality,
       valueSources,
+      valueSourcesOptions,
       widgets,
       iValues, //correct for isFuncArg
       aField: field, //correct for isFuncArg
@@ -190,40 +259,50 @@ export default class Widget extends Component {
   }
 
   renderWidget = (delta, meta, props) => {
-    const {config, isFuncArg, leftField, operator, value: values, valueError, readonly, parentField, parentFuncs, id, groupId, fieldSrc, fieldType, isLHS} = props;
+    const {
+      config, isFuncArg, leftField, operator, value: values, valueError, fieldError,
+      readonly, parentField, parentFuncs, id, groupId, fieldSrc, fieldType, isLHS, setFuncValue, parentDelta,
+    } = props;
     const {settings} = config;
     const { widgets, iValues, aField, valueSources } = meta;
     const value = isFuncArg ? iValues : values;
     const field = isFuncArg ? leftField : aField;
-    const {valueSrc, valueLabel} = widgets[delta];
+    const { valueSrc, valueLabel, widgetId } = widgets[delta];
     const hasValueSources = valueSources.length > 1 && !readonly;
     
     const widgetLabel = settings.showLabels
-      ? <label className="rule--label">{valueLabel.label}</label>
+      ? <label key={"label-"+widgetId} className="rule--label">{valueLabel.label}</label>
       : null;
     return (
-      <div key={"widget-"+field+"-"+delta} className={classNames(
-        valueSrc == "func" ? "widget--func" : "widget--widget",
-        hasValueSources ? "widget--has-valuerscs" : "widget--has-no-valuerscs"
+      <div key={"wrapper-"+widgetId} className={classNames(
+        valueSrc === "func" ? "widget--func" : "widget--widget",
+        hasValueSources ? "widget--has-valuesrcs" : "widget--has-no-valuesrcs"
       )}>
-        {valueSrc == "func" ? null : widgetLabel}
+        {valueSrc === "func" ? null : widgetLabel}
         <WidgetFactory
-          id={id}
+          key={widgetId}
+          id={id} // id of rule
           groupId={groupId}
+          widgetId={widgetId}
           valueSrc={valueSrc}
           delta={delta}
           value={value}
           valueError={valueError}
+          fieldError={fieldError}
           isFuncArg={isFuncArg}
           isLHS={isLHS}
           {...pick(meta, ["isSpecialRange", "fieldDefinition", "asyncListValues"])}
-          {...pick(widgets[delta], ["widget", "widgetDefinition", "widgetValueLabel", "valueLabels", "textSeparators", "setValueHandler"])}
+          {...pick(widgets[delta], [
+            "widget", "widgetDefinition", "widgetValueLabel", "valueLabels", "textSeparators", "setValue",
+          ])}
+          setFuncValue={setFuncValue}
           config={config}
           field={field}
           fieldSrc={fieldSrc}
           fieldType={fieldType}
           parentField={parentField}
           parentFuncs={parentFuncs}
+          parentDelta={parentDelta ?? delta}
           operator={operator}
           readonly={readonly}
         />
@@ -234,21 +313,17 @@ export default class Widget extends Component {
   renderValueSources = (delta, meta, props) => {
     const {config, isFuncArg, leftField, operator, readonly} = props;
     const {settings} = config;
-    const { valueSources, widgets, aField } = meta;
+    const { valueSources, widgets, aField, valueSourcesOptions } = meta;
     const field = isFuncArg ? leftField : aField;
-    const {valueSrc, setValueSrcHandler} = widgets[delta];
-    const {valueSourcesInfo, renderValueSources} = settings;
-    const valueSourcesOptions = valueSources.map(srcKey => [srcKey, {
-      label: valueSourcesInfo[srcKey].label
-    }]);
-    const ValueSources = (pr) => renderValueSources(pr, config.ctx);
+    const {valueSrc, setValueSrc} = widgets[delta];
+    const ValueSources = this.ValueSources;
 
     const sourceLabel = settings.showLabels
       ? <label className="rule--label">&nbsp;</label>
       : null;
 
     return valueSources.length > 1 && !readonly
-      && <div key={"valuesrc-"+field+"-"+delta} className="widget--valuesrc">
+      && <div key={"wrapper-"+"valuesrc-"+delta} className="widget--valuesrc">
         {sourceLabel}
         <ValueSources
           key={"valuesrc-"+delta}
@@ -258,7 +333,7 @@ export default class Widget extends Component {
           config={config}
           field={field}
           operator={operator}
-          setValueSrc={setValueSrcHandler}
+          setValueSrc={setValueSrc}
           readonly={readonly}
           title={settings.valueSourcesPopupTitle}
         />
@@ -300,6 +375,7 @@ export default class Widget extends Component {
   render() {
     if (!this.meta) return null;
     const { defaultWidget, cardinality } = this.meta;
+    const { isFuncArg } = this.meta;
     if (!defaultWidget) return null;
     const name = defaultWidget;
 
@@ -308,7 +384,7 @@ export default class Widget extends Component {
         className={`rule--widget rule--widget--${name.toUpperCase()}`}
         key={"widget-col-"+name}
       >
-        {range(0, cardinality).map(this.renderWidgetDelta)}
+        {(isFuncArg ? [0] : range(0, cardinality)).map(this.renderWidgetDelta)}
       </Col>
     );
   }

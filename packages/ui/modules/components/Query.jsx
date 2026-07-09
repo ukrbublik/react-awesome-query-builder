@@ -12,10 +12,10 @@ class Query extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func,
+    onInit: PropTypes.func,
     renderBuilder: PropTypes.func,
     tree: PropTypes.any, //instanceOf(Immutable.Map)
     //dispatch: PropTypes.func.isRequired,
-    //__isInternalValueChange
     //__lastAction
     //getMemoizedTree: PropTypes.func.isRequired,
     //getBasicConfig: PropTypes.func.isRequired,
@@ -34,7 +34,8 @@ class Query extends Component {
     this.validatedTree = props.getMemoizedTree(props.config, props.tree, undefined, props.sanitizeTree);
     this.oldValidatedTree = this.validatedTree;
 
-    //props.onChange && props.onChange(this.validatedTree, props.config);
+    const basicConfig = props.getBasicConfig(props.config);
+    props.onInit && props.onInit(this.validatedTree, basicConfig, undefined, this.actions);
   }
 
   _updateActions (props) {
@@ -70,18 +71,17 @@ class Query extends Component {
     const validatedTreeChanged = !immutableEqual(this.validatedTree, this.oldValidatedTree);
     if (validatedTreeChanged) {
       const newBasicConfig = nextProps.getBasicConfig(newConfig);
-      onChange && onChange(this.validatedTree, newBasicConfig, nextProps.__lastAction);
+      onChange && onChange(this.validatedTree, newBasicConfig, nextProps.__lastAction, this.actions);
     }
   }
 
   render() {
-    const {config, renderBuilder, dispatch, __isInternalValueChange} = this.props;
+    const {config, renderBuilder, dispatch} = this.props;
     const builderProps = {
       tree: this.validatedTree,
       actions: this.actions,
       config: config,
       dispatch: dispatch,
-      __isInternalValueChange
     };
 
     return renderBuilder(builderProps);
@@ -93,7 +93,6 @@ const ConnectedQuery = connect(
   (state) => {
     return {
       tree: state.tree,
-      __isInternalValueChange: state.__isInternalValueChange,
       __lastAction: state.__lastAction,
     };
   },

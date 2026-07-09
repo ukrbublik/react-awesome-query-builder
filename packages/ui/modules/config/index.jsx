@@ -2,6 +2,7 @@ import React from "react";
 import * as Widgets from "../components/widgets";
 import * as CustomOperators from "../components/operators";
 import { CoreConfig, Utils } from "@react-awesome-query-builder/core";
+import * as ColorUtils from "../utils/colorUtils";
 
 
 //----------------------------  conjunctions
@@ -38,6 +39,10 @@ const widgets = {
   number: {
     ...CoreConfig.widgets.number,
     factory: (props, {RCE, W: {VanillaNumberWidget}}) => RCE(VanillaNumberWidget, props),
+  },
+  price: {
+    ...CoreConfig.widgets.price,
+    factory: (props, {RCE, W: {VanillaPriceWidget}}) => RCE(VanillaPriceWidget, props),
   },
   slider: {
     ...CoreConfig.widgets.slider,
@@ -81,6 +86,9 @@ const widgets = {
       //showSearch: true
     }
   },
+  /**
+   * @deprecated
+   */
   case_value: {
     ...CoreConfig.widgets.case_value,
     // simple text value
@@ -123,19 +131,32 @@ const settings = {
   renderButtonGroup: (props, {RCE, W: {VanillaButtonGroup}}) => RCE(VanillaButtonGroup, props),
   renderProvider: (props, {RCE, W: {VanillaProvider}}) => RCE(VanillaProvider, props),
   renderValueSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),
-  renderFieldSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),
   renderConfirm: (props, {W: {vanillaConfirm}}) => vanillaConfirm(props),
-  renderSwitchPrefix: "Conditions",
+  renderSwitchPrefix: "IF",
+  renderBeforeCaseValue: (props, {RCE}) => RCE("span", {children: [" then "]}),
 
   customFieldSelectProps: {
     showSearch: true
   },
+  customOperatorSelectProps: {
+    // showSearch: false
+  },
 
+  //theme
+  designSettings: {
+    canInheritThemeFromOuterProvider: true,
+    useThickLeftBorderOnHoverItem: false,
+    useShadowOnHoverItem: false,
+    generateCssVarsFromThemeLibrary: true, // false to use design like in < 6.7
+  },
+  themeMode: undefined,
+  liteMode: true,
+  compactMode: false,
+  renderSize: "small",
   defaultSliderWidth: "200px",
   defaultSelectWidth: "200px",
   defaultSearchWidth: "100px",
   defaultMaxRows: 5,
-  renderSize: "small",
   maxLabelsLength: 100,
 
   showLock: false,
@@ -156,6 +177,10 @@ const ctx = {
     ...CustomOperators
   },
   RCE: (C, P) => React.createElement(C, P),
+  utils: {
+    ...CoreConfig.ctx.utils,
+    ColorUtils,
+  }
 };
 
 //----------------------------

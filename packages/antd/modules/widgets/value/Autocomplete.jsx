@@ -1,10 +1,10 @@
 import React, { useMemo, useCallback } from "react";
-import { Select, Spin, Divider } from "antd";
+import { Select, Divider, Tooltip, version as antdVersion } from "antd";
 import { calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../utils/domUtils";
 import { Hooks , Utils } from "@react-awesome-query-builder/ui";
 const { fixListValuesGroupOrder } = Utils.Autocomplete;
+const { makeCustomListValue } = Utils.ListUtils;
 const { useListValuesAutocomplete } = Hooks;
-const Option = Select.Option;
 
 // see type ListItem
 const mapListItemToOptionKeys = {
@@ -41,6 +41,15 @@ export default (props) => {
 
   const filteredOptions = extendOptions(options);
 
+  // To colorize custom options
+  if (multiple && allowCustomValues && value?.length) {
+    for (const v of value) {
+      if (getOptionIsCustom(v) && !options.find(({value}) => value === v)) {
+        filteredOptions.push(makeCustomListValue(v));
+      }
+    }
+  }
+
   const optionsMaxWidth = useMemo(() => {
     return filteredOptions.reduce((max, option) => {
       return Math.max(max, calcTextWidth(option.title, null));
@@ -55,7 +64,7 @@ export default (props) => {
   const dropdownWidth = optionsMaxWidth && !isNaN(optionsMaxWidth) ? optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT : null;
   const minWidth = width || defaultSelectWidth;
   const isClearAllClicked = React.useRef(false);
-  
+
   const style = {
     width: (multiple ? undefined : minWidth),
     minWidth: minWidth
@@ -64,7 +73,9 @@ export default (props) => {
     width: dropdownWidth,
   };
 
-  const mode = !multiple ? undefined : (allowCustomValues ? "multiple" : "multiple");
+  const mode = !multiple ? undefined : (
+    customProps?.mode || (allowCustomValues && customProps?.tokenSeparators ? "tags" : "multiple")
+  );
   const dynamicPlaceholder = !readonly ? aPlaceholder : "";
 
   const nestByGroup = (opts, fix = false) => {
@@ -99,6 +110,15 @@ export default (props) => {
     return nestedOpts;
   };
 
+  const renderOptionLabel = (option) => {
+    const { tooltip } = option;
+    let label = getOptionLabel(option);
+    if (tooltip) {
+      label = <Tooltip title={tooltip}>{label}</Tooltip>;
+    }
+    return label;
+  };
+
   // rendering special 'Load more' option has side effect: on change rc-select will save its title as internal value in own state
   const optionsToRender = nestByGroup(
     filteredOptions
@@ -106,7 +126,7 @@ export default (props) => {
       .map((option) => ({
         label: getOptionIsCustom(option)
           ? <span className={"customSelectOption"}>{getOptionLabel(option)}</span>
-          : getOptionLabel(option),
+          : renderOptionLabel(option),
         value: option.value,
         groupTitle: option.groupTitle,
         disabled: getOptionDisabled(option)
@@ -119,9 +139,9 @@ export default (props) => {
   };
 
   const specialOptions = filteredOptions?.filter(option => !!option.specialValue).map((option) => (
-    <a 
+    <a
       style={{ padding: "5px 10px", display: "block", cursor: "pointer" }}
-      key={option.specialValue} 
+      key={option.specialValue}
       disabled={getOptionDisabled(option)}
       onClick={onSpecialClick(option.specialValue)}
     >
@@ -132,6 +152,11 @@ export default (props) => {
   const aOnSelect = async (newValue, option) => {
     // For both multiple/single `newValue` is string, `option` is {value, children}
     // ! Custom option is always `{}`
+    const isAutoTokenization = multiple && !!option.props && !(option.value !== undefined || option.label !== undefined);
+    if (isAutoTokenization) {
+      // Ignore, already processed in `aOnChange`
+      return;
+    }
     if (isSpecialValue(option)) {
       await onChange(null, newValue, option);
     } else {
@@ -159,7 +184,8 @@ export default (props) => {
     // - tag removal
     // - option selection (`aOnSelect` is also called after)
     // - trying to add new tag from search input (for mode "tags" - unwanted!)
-    // 
+    // - automatic tokenization (like pasting "1,2,3") - issue #1115
+    //
     // For single called on:
     // - click (x) at right (clear all)
     // - option selection (`aOnSelect` is also called after)
@@ -215,25 +241,45 @@ export default (props) => {
     return matches;
   }, [config]);
 
+  const selectProps = {};
+  const antdMajorVersion = parseInt(antdVersion.split(".")[0]);
+  if (antdMajorVersion >= 5) {
+    selectProps.popupMatchSelectWidth
+      = customProps?.popupMatchSelectWidth
+        || customProps?.dropdownMatchSelectWidth
+        || false;
+  } else {
+    selectProps.dropdownMatchSelectWidth
+      = customProps?.popupMatchSelectWidth
+        || customProps?.dropdownMatchSelectWidth
+        || false;
+  }
+
+  const dropdownProps = {};
+  if (antdMajorVersion >= 5) {
+    dropdownProps.popupStyle
+      = customProps?.popupStyle || customProps?.dropdownStyle || dropdownStyle;
+  } else {
+    dropdownProps.dropdownStyle
+      = customProps?.dropdownStyle || customProps?.popupStyle || dropdownStyle;
+  }
+
   return (
     <Select
       filterOption={useAsyncSearch ? false : filterOption}
       dropdownRender={dropdownRender}
       allowClear={true}
-      notFoundContent={isLoading ? "Loading..." : "Not found"}
+      notFoundContent={isLoading ? (config.settings.loadingLabel ?? "Loading...") : (config.settings.notFoundLabel ?? "Not found")}
       disabled={readonly}
       mode={mode}
       style={customProps?.style || style}
-      dropdownStyle={customProps?.dropdownStyle || dropdownStyle}
       key={"widget-autocomplete"}
-      popupMatchSelectWidth={customProps?.popupMatchSelectWidth || customProps?.dropdownMatchSelectWidth || false}
       placeholder={customProps?.placeholder || dynamicPlaceholder}
       onDropdownVisibleChange={onDropdownVisibleChange}
       onChange={aOnChange}
       onClear={aOnClear}
       onSelect={aOnSelect}
       onSearch={aOnSearch}
-      showArrow
       showSearch
       size={renderSize}
       loading={isLoading}
@@ -241,6 +287,8 @@ export default (props) => {
       searchValue={inputValue}
       open={open}
       options={optionsToRender}
+      {...selectProps}
+      {...dropdownProps}
       {...customProps}
     >
     </Select>

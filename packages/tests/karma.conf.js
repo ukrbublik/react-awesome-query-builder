@@ -1,15 +1,28 @@
-const puppeteer = require("puppeteer");
-const path = require("path");
-if (puppeteer.executablePath().indexOf("/home/ukrbublik/") == 0) {
-  // ignore for my local dev
-} else {
-  process.env.CHROME_BIN = puppeteer.executablePath();
-}
+// Required for date/time tests
+// Works only in ChromeHeadless, not Chrome
 process.env.TZ = "Etc/UTC";
-process.env.BABEL_ENV = "test"; // Set the proper environment for babel
+// Set the proper environment for babel
+process.env.BABEL_ENV = "test";
 
 const isCI = !!process.env.CI;
-const isDebug = !!process.env.TEST_DEBUG;
+const isDebug = process.env.TEST_DEBUG === "1";
+const isWatch = process.env.TEST_WATCH === "1";
+const filterIndex = process.argv.findIndex(arg => arg.includes("--filter"));
+let filterArgs = filterIndex === -1 ? [] : process.argv.slice(filterIndex+1);
+if (filterArgs.length === 1) {
+  filterArgs = filterArgs[0].split(" ").filter(a => !!a);
+}
+const hasFilterArgs = filterArgs?.length > 0;
+const useCoverage = !isDebug && !isWatch; // && !hasFilterArgs
+
+let reporters;
+if (isCI) {
+  reporters = ["mocha", "junit", "coverage"];
+} else if (useCoverage) {
+  reporters = ["coverage", "mocha"]; // "progress"
+} else {
+  reporters = ["mocha"];
+}
 
 module.exports = function(config) {
   config.set({
@@ -17,7 +30,6 @@ module.exports = function(config) {
     plugins: [
       "karma-mocha",
       "karma-chai",
-      //"karma-es6-shim",
       "karma-chrome-launcher",
       "karma-sourcemap-loader",
       "karma-webpack",
@@ -43,7 +55,12 @@ module.exports = function(config) {
       stats: "errors-only"
     },
 
-    reporters: isCI ? ["mocha", "junit", "coverage"] : isDebug ? ["progress"] : ["progress", "coverage"],
+    reporters,
+
+    mochaReporter: {
+      showDiff: true,
+      ignoreSkipped: true,
+    },
 
     junitReporter: {
       outputDir: "junit",
@@ -67,14 +84,15 @@ module.exports = function(config) {
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
-    autoWatch: false,
+    autoWatch: isWatch,
     browsers: isDebug ? ["ChromeWithDebugging"] : ["ChromeHeadlessNoSandbox"],
     customLaunchers: {
       ChromeWithDebugging: {
-        base: 'Chrome',
+        base: "Chrome",
         flags: [
           "--no-sandbox", 
-          "--remote-debugging-port=9333"
+          "--remote-debugging-port=9333",
+          "--auto-open-devtools-for-tabs"
         ],
         debug: true,
       },
@@ -86,11 +104,11 @@ module.exports = function(config) {
         ],
       }
     },
-    singleRun: true,
+    singleRun: !isWatch,
     concurrency: 1,
     // captureTimeout: 60000,
     browserDisconnectTimeout : isDebug ? 1000*60*10 : 1000*20,
     browserDisconnectTolerance : isDebug ? 1 : 0,
-    browserNoActivityTimeout : isDebug ? 1000*60 : 1000*30,
+    browserNoActivityTimeout : isDebug ? 1000*90 : 1000*30,
   });
 };

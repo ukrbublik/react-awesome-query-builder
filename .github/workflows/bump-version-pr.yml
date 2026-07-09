@@ -1,0 +1,60 @@
+name: Bump version & create PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      new_version:
+        description: 'New version name'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.new_version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          #cache: 'pnpm'
+      - run: pnpm i --frozen-lockfile
+      - name: Lerna - bump version
+        id: bump
+        run: npx lerna version ${{ inputs.new_version }} --no-push --no-git-tag-version --yes
+      - name: Git identity
+        run: |
+          git config --global user.name '${GITHUB_ACTOR}'
+          git config --global user.email '${GITHUB_ACTOR}@users.noreply.github.com'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Bump ${{ env.new_version }}"
+          committer: GitHub <noreply@github.com>
+          author: "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
+          signoff: false
+          delete-branch: true
+          draft: false
+          title: 'Bump ${{ inputs.new_version }}'
+          body: |
+            ## Version ${{ inputs.new_version }}
+          branch: "bump_${{ inputs.new_version }}"
+      - name: Check outputs
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          echo "PULL_REQUEST_NUMBER - ${{ env.PULL_REQUEST_NUMBER }}"
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+

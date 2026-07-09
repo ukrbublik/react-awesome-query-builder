@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { TreeSelect } from "antd";
+import { TreeSelect, version as antdVersion } from "antd";
 import { calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../utils/domUtils";
 import { defaultTreeDataMap } from "../../utils/stuff";
 import { Utils } from "@react-awesome-query-builder/ui";
@@ -98,6 +98,14 @@ export default class TreeSelectWidget extends Component {
     const useAutoWidth = true || !this.optionsMaxWidth; //tip: "auto" is good, but width will jump on expand/collapse
     const dropdownWidth = Math.max(dropdownMinWidth, Math.min(dropdownMaxWidth, this.optionsMaxWidth));
 
+    const selectProps = {};
+    const antdMajorVersion = parseInt(antdVersion.split(".")[0]);
+    if (antdMajorVersion >= 5) {
+      selectProps.popupMatchSelectWidth = false;
+    } else {
+      selectProps.dropdownMatchSelectWidth = false;
+    }
+
     return (      
       <TreeSelect
         disabled={readonly}
@@ -112,7 +120,6 @@ export default class TreeSelectWidget extends Component {
         multiple={treeMultiple}
         treeCheckable={treeMultiple}
         key={"widget-treeselect"}
-        popupMatchSelectWidth={false}
         placeholder={placeholder}
         size={renderSize}
         treeData={treeData}
@@ -121,6 +128,7 @@ export default class TreeSelectWidget extends Component {
         value={aValue}
         onChange={this.handleChange}
         treeDefaultExpandAll={treeExpandAll}
+        {...selectProps}
         {...customProps}
       />
     );

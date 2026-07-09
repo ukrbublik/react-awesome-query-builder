@@ -5,7 +5,6 @@ import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
 import {SwitchGroupActions} from "./SwitchGroupActions";
-import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, WithConfirmFn} from "../utils";
 import classNames from "classnames";
 const {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} = Utils.TreeUtils;
@@ -18,11 +17,10 @@ class SwitchGroup extends BasicGroup {
 
   constructor(props) {
     super(props);
-    useOnPropsChanged(this);
-    this.onPropsChanged(props);
   }
 
   onPropsChanged(nextProps) {
+    super.onPropsChanged(nextProps);
   }
 
   childrenClassName = () => "switch_group--children";
@@ -75,6 +73,11 @@ class SwitchGroup extends BasicGroup {
     return cnt;
   }
 
+  showConjs() {
+    // always show line from "If"
+    return true;
+  }
+
   renderHeaderWrapper() {
     return (
       <div key="group-header" className={classNames(
@@ -83,7 +86,7 @@ class SwitchGroup extends BasicGroup {
         this.isOneChild() ? "hide--line" : "",
         this.isNoChildren() ? "no--children" : "",
         this.showDragIcon() ? "with--drag" : "hide--drag",
-        //this.showConjs() && (!this.isOneChild() || this.showNot()) ? "with--conjs" : "hide--conjs"
+        this.showConjs() ? "with--conjs" : "hide--conjs"
       )}>
         {this.renderHeader()}
         {this.renderActions()}

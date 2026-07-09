@@ -15,21 +15,36 @@ const conjunctions = {
     celConj: "and",
     spelConjs: ["and", "&&"],
     reversedConj: "OR",
-    formatConj: (children, conj, not, isForDisplay) => {
-      return children.size > 1
-        ? (not ? "NOT " : "") + "(" + children.join(" " + (isForDisplay ? "AND" : "&&") + " ") + ")"
-        : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
+    formatConj: function (children, conj, not, isForDisplay) {
+      let ret = children.size > 1 ? children.join(" " + (isForDisplay ? "AND" : "&&") + " ") : children.first();
+      if (children.size > 1 || not) {
+        ret = this.utils.wrapWithBrackets(ret);
+      }
+      if (not) {
+        ret = "NOT " + ret;
+      }
+      return ret;
     },
-    sqlFormatConj: (children, conj, not) => {
-      return children.size > 1
-        ? (not ? "NOT " : "") + "(" + children.join(" " + "AND" + " ") + ")"
-        : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
+    sqlFormatConj: function (children, conj, not) {
+      let ret = children.size > 1 ? children.join(" " + "AND" + " ") : children.first();
+      if (children.size > 1 || not) {
+        ret = this.utils.wrapWithBrackets(ret);
+      }
+      if (not) {
+        ret = "NOT " + ret;
+      }
+      return ret;
     },
-    spelFormatConj: (children, conj, not, omitBrackets) => {
+    spelFormatConj: function (children, conj, not, omitBrackets) {
       if (not) omitBrackets = false;
-      return children.size > 1
-        ? (not ? "!" : "") + (omitBrackets ? "" : "(") + children.join(" " + "&&" + " ") + (omitBrackets ? "" : ")")
-        : (not ? "!(" : "") + children.first() + (not ? ")" : "");
+      let ret = children.size > 1 ? children.join(" " + "&&" + " ") : children.first();
+      if ((children.size > 1 || not) && !omitBrackets) {
+        ret = this.utils.wrapWithBrackets(ret);
+      }
+      if (not) {
+        ret = "!" + ret;
+      }
+      return ret;
     },
     celFormatConj: (children, conj, not, omitBrackets) => {
       if (not) omitBrackets = false;
@@ -52,10 +67,15 @@ const conjunctions = {
         ? (not ? "NOT " : "") + "(" + children.join(" " + (isForDisplay ? "OR" : "||") + " ") + ")"
         : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
     },
-    sqlFormatConj: (children, conj, not) => {
-      return children.size > 1
-        ? (not ? "NOT " : "") + "(" + children.join(" " + "OR" + " ") + ")"
-        : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
+    sqlFormatConj: function (children, conj, not) {
+      let ret = (children.size > 1 ? children.join(" " + "OR" + " ") : children.first());
+      if (children.size > 1 || not) {
+        ret = this.utils.wrapWithBrackets(ret);
+      }
+      if (not) {
+        ret = "NOT " + ret;
+      }
+      return ret;
     },
     spelFormatConj: (children, conj, not, omitBrackets) => {
       if (not) omitBrackets = false;
@@ -93,7 +113,14 @@ const operators = {
         return `${field} ${opStr} ${value}`;
     },
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => v, false, ...args); },
-    jsonLogic: "==",
+    jsonLogic2: "==",
+    jsonLogicOps: ["==", "datetime==", "date=="],
+    jsonLogic: (field, op, val, _opDef, _opOpts, _fieldDef, expectedType, settings) => {
+      if (settings?.fixJsonLogicDateCompareOp && ["date", "datetime"].includes(expectedType)) {
+        return { [`${expectedType}==`]: [field, val] };
+      }
+      return { "==": [field, val] };
+    },
     elasticSearchQueryType: "term",
   },
   not_equal: {
@@ -101,6 +128,7 @@ const operators = {
     label: "!=",
     labelForFormat: "!=",
     sqlOp: "<>",
+    sqlOps: ["<>", "!="],
     spelOp: "!=",
     celOp: "!=",
     spelOps: ["!=", "ne"],
@@ -112,7 +140,14 @@ const operators = {
         return `${field} ${opDef.label} ${value}`;
     },
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$ne", v => v, false, ...args); },
-    jsonLogic: "!=",
+    jsonLogic2: "!=",
+    jsonLogicOps: ["!=", "datetime!=", "date!="],
+    jsonLogic: (field, op, val, _opDef, _opOpts, _fieldDef, expectedType, settings) => {
+      if (settings?.fixJsonLogicDateCompareOp && ["date", "datetime"].includes(expectedType)) {
+        return { [`${expectedType}!=`]: [field, val] };
+      }
+      return { "!=": [field, val] };
+    },
   },
   less: {
     label: "<",
@@ -167,13 +202,34 @@ const operators = {
     labelForFormat: "Contains",
     reversedOp: "not_like",
     sqlOp: "LIKE",
+    // tip: this function covers import of 3 operators
+    sqlImport: function (sqlObj, _, sqlDialect) {
+      if (sqlObj?.operator == "LIKE" || sqlObj?.operator == "NOT LIKE") {
+        const not = sqlObj?.operator == "NOT LIKE";
+        const [_left, right] = sqlObj.children || [];
+        if (right?.valueType?.endsWith("_quote_string")) {
+          if (right?.value.startsWith("%") && right?.value.endsWith("%")) {
+            right.value = this.utils.SqlString.unescapeLike(right.value.substring(1, right.value.length - 1), sqlDialect);
+            sqlObj.operator = not ? "not_like" : "like";
+            return sqlObj;
+          } else if (right?.value.startsWith("%")) {
+            right.value = this.utils.SqlString.unescapeLike(right.value.substring(1), sqlDialect);
+            sqlObj.operator = "ends_with";
+            return sqlObj;
+          } else if (right?.value.endsWith("%")) {
+            right.value = this.utils.SqlString.unescapeLike(right.value.substring(0, right.value.length - 1), sqlDialect);
+            sqlObj.operator = "starts_with";
+            return sqlObj;
+          }
+        }
+      }
+    },
     spelOp: "${0}.contains(${1})",
     celOp: "${0}.contains(${1})",
     valueTypes: ["text"],
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) : undefined), false, ...args); },
-    //jsonLogic: (field, op, val) => ({ "in": [val, field] }),
-    jsonLogic: "in",
-    _jsonLogicIsRevArgs: true,
+    jsonLogic: (field, op, val) => ({ "in": [val, field] }),
+    jsonLogic2: "#in",
     valueSources: ["value"],
     elasticSearchQueryType: "regexp",
   },
@@ -184,6 +240,9 @@ const operators = {
     labelForFormat: "Not Contains",
     sqlOp: "NOT LIKE",
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) : undefined), true, ...args); },
+    jsonLogic: (field, op, val) => ({"!": { "in": [val, field] }}),
+    jsonLogic2: "#!in",
+    _jsonLogicIsExclamationOp: true,
     valueSources: ["value"],
   },
   starts_with: {
@@ -219,10 +278,11 @@ const operators = {
       else
         return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
     },
+    // tip: this op can be imported from SpEL manually without using config
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       const valFrom = values[0];
       const valTo = values[1];
-      return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
+      return `(${field} >= ${valFrom} && ${field} <= ${valTo})`;
     },
     celFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       const valFrom = values.get(0);
@@ -242,7 +302,7 @@ const operators = {
     jsonLogic: "<=",
     validateValues: (values) => {
       if (values[0] != undefined && values[1] != undefined) {
-        return values[0] <= values[1] ? null : "Invalid range";
+        return values[0] <= values[1];
       }
       return null;
     },
@@ -284,9 +344,12 @@ const operators = {
       "and"
     ],
     reversedOp: "between",
+    jsonLogic: (field, op, val) => ({"!": { "<=": [Array.isArray(val) ? val[0] : val, field, Array.isArray(val) ? val[1] : val] }}),
+    jsonLogic2: "!<=",
+    _jsonLogicIsExclamationOp: true,
     validateValues: (values) => {
       if (values[0] != undefined && values[1] != undefined) {
-        return values[0] <= values[1] ? null : "Invalid range";
+        return values[0] <= values[1];
       }
       return null;
     },
@@ -303,6 +366,18 @@ const operators = {
       const empty = this.utils.sqlEmptyValue(fieldDef);
       return `COALESCE(${field}, ${empty}) = ${empty}`;
     },
+    // tip: this function covers import of 2 operators
+    sqlImport: function (sqlObj, _, sqlDialect) {
+      if (sqlObj?.operator === "=" || sqlObj?.operator === "<>") {
+        const [left, right] = sqlObj.children || [];
+        if (right?.value === "" && left?.func === "COALESCE" && left?.children?.[1]?.value === "") {
+          sqlObj.operator = sqlObj?.operator === "=" ? "is_empty" : "is_not_empty";
+          sqlObj.children = [ left.children[0] ];
+          return sqlObj;
+        }
+      }
+    },
+    // tip: this op can be imported from SpEL manually without using config
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       //tip: is empty or null
       return `${field} <= ''`;
@@ -339,11 +414,23 @@ const operators = {
     label: "Is null",
     labelForFormat: "IS NULL",
     sqlOp: "IS NULL",
+    // tip: this function covers import of 2 operators
+    sqlImport: function (sqlObj, _, sqlDialect) {
+      if (sqlObj?.operator === "IS" || sqlObj?.operator === "IS NOT") {
+        const [left, right] = sqlObj.children || [];
+        if (right?.valueType == "null") {
+          sqlObj.operator = sqlObj?.operator === "IS" ? "is_null" : "is_not_null";
+          sqlObj.value = left;
+          return sqlObj;
+        }
+      }
+    },
     cardinality: 0,
     reversedOp: "is_not_null",
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS NULL` : `!${field}`;
     },
+    // tip: this op can be imported from SpEL manually without using config
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       return `${field} == null`;
     },
@@ -397,6 +484,7 @@ const operators = {
     label: "!=",
     labelForFormat: "!=",
     sqlOp: "<>", // enum/set
+    sqlOps: ["<>", "!="],
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return `${field} != ${value}`;
     },
@@ -451,11 +539,15 @@ const operators = {
     },
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$nin", v => v, false, ...args); },
     reversedOp: "select_any_in",
+    jsonLogic: (field, op, val) => ({"!": { "in": [field, val] }}),
+    jsonLogic2: "!in",
+    _jsonLogicIsExclamationOp: true,
   },
   // it's not "contains all", but "contains any" operator
   multiselect_contains: {
     label: "Contains",
     labelForFormat: "CONTAINS",
+    valueTypes: ["multiselect"],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       if (valueSrc == "value")
         return `${field} CONTAINS [${values.join(", ")}]`;
@@ -473,6 +565,20 @@ const operators = {
       // "contains any": the multiselect list field shares at least one element with the values list
       return `${field}.exists(_v, _v in ${values})`;
     },
+    spelImportFuncs: [
+      // just for backward compatibility (issue #1007)
+      {
+        obj: {
+          type: "property",
+          val: "CollectionUtils"
+        },
+        methodName: "containsAny",
+        args: [
+          {var: "0"},
+          {var: "1"},
+        ],
+      }
+    ],
     elasticSearchQueryType: "term",
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$in", v => v, false, ...args); },
   },
@@ -480,18 +586,25 @@ const operators = {
     isNotOp: true,
     label: "Not contains",
     labelForFormat: "NOT CONTAINS",
+    valueTypes: ["multiselect"],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       if (valueSrc == "value")
         return `${field} NOT CONTAINS [${values.join(", ")}]`;
       else
         return `${field} NOT CONTAINS ${values}`;
     },
-    reversedOp: "multiselect_contains"
+    reversedOp: "multiselect_contains",
+    jsonLogic2: "!some-in",
+    jsonLogic: (field, op, vals) => ({
+      "!": { "some": [ field, {"in": [{"var": ""}, vals]} ]}
+    }),
+    _jsonLogicIsExclamationOp: true,
   },
   multiselect_equals: {
     label: "Equals",
     labelForFormat: "==",
     sqlOp: "=",
+    valueTypes: ["multiselect"],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       const opStr = isForDisplay ? "=" : "==";
       if (valueSrc == "value")
@@ -522,6 +635,8 @@ const operators = {
     label: "Not equals",
     labelForFormat: "!=",
     sqlOp: "<>",
+    sqlOps: ["<>", "!="],
+    valueTypes: ["multiselect"],
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       if (valueSrc == "value")
         return `${field} != [${values.join(", ")}]`;
@@ -538,6 +653,12 @@ const operators = {
     celOp: "!=",
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$ne", v => v, false, ...args); },
     reversedOp: "multiselect_equals",
+    jsonLogic2: "!all-in",
+    jsonLogic: (field, op, vals) => ({
+      // it's not "equals", but "includes" operator - just for example
+      "!": { "all": [ field, {"in": [{"var": ""}, vals]} ]}
+    }),
+    _jsonLogicIsExclamationOp: true,
   },
   proximity: {
     label: "Proximity search",
@@ -553,7 +674,7 @@ const operators = {
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       const val1 = values.first();
       const val2 = values.get(1);
-      const prox = operatorOptions.get("proximity");
+      const prox = operatorOptions?.get("proximity");
       return `${field} ${val1} NEAR/${prox} ${val2}`;
     },
     sqlFormatOp: function (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) {
@@ -562,8 +683,29 @@ const operators = {
       const val2 = values.get(1);
       const aVal1 = this.utils.SqlString.trim(val1);
       const aVal2 = this.utils.SqlString.trim(val2);
-      const prox = operatorOptions.get("proximity");
+      const prox = operatorOptions?.get("proximity");
       return `CONTAINS(${field}, 'NEAR((${aVal1}, ${aVal2}), ${prox})')`;
+    },
+    sqlImport: function (sqlObj, _, sqlDialect) {
+      if (sqlObj?.func === "CONTAINS") {
+        const [left, right] = sqlObj.children || [];
+        if (right?.value?.includes("NEAR(")) {
+          const m = right.value.match(/NEAR\(\((\w+), (\w+)\), (\d+)\)/);
+          if (m) {
+            delete sqlObj.func;
+            sqlObj.operator = "proximity";
+            sqlObj.children = [
+              left,
+              { value: m[1] },
+              { value: m[2] },
+            ];
+            sqlObj.operatorOptions = {
+              proximity: parseInt(m[3])
+            };
+            return sqlObj;
+          }
+        }
+      }
     },
     mongoFormatOp: undefined, // not supported
     jsonLogic: undefined, // not supported
@@ -585,6 +727,7 @@ const operators = {
     jsonLogic: "some",
     spelFormatOp: (filteredSize) => `${filteredSize} > 0`,
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$gt", v => 0, false, ...args); },
+    // reversedOp: undefined,
   },
   all: {
     label: "All",
@@ -593,6 +736,7 @@ const operators = {
     jsonLogic: "all",
     spelFormatOp: (filteredSize, op, fullSize) => `${filteredSize} == ${fullSize}`,
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => v, false, ...args); },
+    // reversedOp: "none",
   },
   none: {
     label: "None",
@@ -601,6 +745,7 @@ const operators = {
     jsonLogic: "none",
     spelFormatOp: (filteredSize) => `${filteredSize} == 0`,
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => 0, false, ...args); },
+    // reversedOp: "all",
   }
 };
 
@@ -623,9 +768,9 @@ const widgets = {
     celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       return this.utils.celEscape(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
-        return this.utils.SqlString.escapeLike(val, op != "starts_with", op != "ends_with");
+        return this.utils.SqlString.escapeLike(val, op != "starts_with", op != "ends_with", sqlDialect);
       } else {
         return this.utils.SqlString.escape(val);
       }
@@ -642,9 +787,9 @@ const widgets = {
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
       return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
-        return this.utils.SqlString.escapeLike(val, op != "starts_with", op != "ends_with");
+        return this.utils.SqlString.escapeLike(val, op != "starts_with", op != "ends_with", sqlDialect);
       } else {
         return this.utils.SqlString.escape(val);
       }
@@ -666,6 +811,28 @@ const widgets = {
       { label: "Number to", placeholder: "Enter number to" },
     ],
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
+      return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
+    },
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
+      return this.utils.SqlString.escape(val);
+    },
+    spelFormatValue: function (val, fieldDef, wgtDef) {
+      const isFloat = wgtDef.step && !Number.isInteger(wgtDef.step);
+      return this.utils.spelEscape(val, isFloat);
+    },
+    toJS: (val, fieldSettings) => (val),
+    mongoFormatValue: (val, fieldDef, wgtDef) => (val),
+  },
+  price: {
+    type: "number",
+    jsType: "number",
+    valueSrc: "value",
+    valueLabel: "Price",
+    valueLabels: [
+      { label: "Price from", placeholder: "Enter price from" },
+      { label: "Price to", placeholder: "Enter price to" },
+    ],
+    formatValue: function (val, fieldDef, wgtDef, isForDisplay) {      
       return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
@@ -691,7 +858,7 @@ const widgets = {
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
       return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val) { return this.utils.spelEscape(val); },
@@ -709,7 +876,7 @@ const widgets = {
       let valLabel = this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
       return isForDisplay ? this.utils.stringifyForDisplay(valLabel) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val) { return this.utils.spelEscape(val); },
@@ -727,11 +894,11 @@ const widgets = {
       let valsLabels = vals.map(v => this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
       return isForDisplay ? valsLabels.map(this.utils.stringifyForDisplay) : vals.map(JSON.stringify);
     },
-    sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       return vals.map(v => this.utils.SqlString.escape(v));
     },
     spelFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
-      const isCallable = opDef.spelOp && opDef.spelOp.startsWith("${1}");
+      const isCallable = opDef && opDef.spelOp && opDef.spelOp.startsWith("${1}");
       let res = this.utils.spelEscape(vals); // inline list
       if (isCallable) {
         // `{1,2}.contains(1)` NOT works
@@ -762,7 +929,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return isForDisplay ? dateVal.format(wgtDef.dateFormat) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.format("YYYY-MM-DD"));
     },
@@ -814,7 +981,9 @@ const widgets = {
       }
     },
     jsonLogic: function (val, fieldDef, wgtDef) {
-      return this.utils.moment(val, wgtDef.valueFormat).toDate();
+      // tip: we use UTC to return same result as new Date(val)
+      // new Date("2000-01-01") is now the same as new Date("2000-01-01 00:00:00") (first one in UTC)
+      return this.utils.moment.utc(val, wgtDef.valueFormat).toDate();
     },
     toJS: function (val, fieldSettings) {
       const dateVal = this.utils.moment(val, fieldSettings.valueFormat);
@@ -822,7 +991,15 @@ const widgets = {
     },
     mongoFormatValue: function (val, fieldDef, wgtDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
-      return dateVal.isValid() ? dateVal.toDate() : undefined;
+      if (dateVal.isValid()) {
+        return {
+          "$dateFromString": {
+            "dateString": dateVal.format("YYYY-MM-DD"),
+            "format": "%Y-%m-%d"
+          }
+        };
+      }
+      return undefined;
     }
   },
   time: {
@@ -842,7 +1019,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return isForDisplay ? dateVal.format(wgtDef.timeFormat) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.format("HH:mm:ss"));
     },
@@ -921,7 +1098,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return isForDisplay ? dateVal.format(wgtDef.dateFormat + " " + wgtDef.timeFormat) : JSON.stringify(val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.toDate());
     },
@@ -972,16 +1149,53 @@ const widgets = {
         return [undefined, "Invalid date"];
       }
     },
+    // Moved to `sqlImportDate` in `packages/sql/modules/import/conv`
+    // sqlImport: function (sqlObj, wgtDef, sqlDialect) {
+    //   if (["TO_DATE"].includes(sqlObj?.func) && sqlObj?.children?.length >= 1) {
+    //     const [valArg, patternArg] = sqlObj.children;
+    //     if (valArg?.valueType == "single_quote_string") {
+    //       // tip: moment doesn't support SQL date format, so ignore patternArg
+    //       const dateVal = this.utils.moment(valArg.value);
+    //       if (dateVal.isValid()) {
+    //         return {
+    //           value: dateVal.format(wgtDef?.valueFormat),
+    //         };
+    //       } else {
+    //         return {
+    //           value: null,
+    //           error: "Invalid date",
+    //         };
+    //       }
+    //     }
+    //   }
+    // },
     jsonLogic: function (val, fieldDef, wgtDef) {
       return this.utils.moment(val, wgtDef.valueFormat).toDate();
     },
+    // Example of importing and exporting to epoch timestamp (in ms) for JsonLogic:
+    // jsonLogicImport: function(timestamp, wgtDef) {
+    //   const momentVal = this.utils.moment(timestamp, "x");
+    //   return momentVal.isValid() ? momentVal.toDate() : undefined;
+    // },
+    // jsonLogic: function (val, fieldDef, wgtDef) {
+    //   return this.utils.moment(val, wgtDef.valueFormat).format("x");
+    // },
     toJS: function (val, fieldSettings) {
       const dateVal = this.utils.moment(val, fieldSettings.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;
     },
+    // todo: $toDate (works onliny in $expr)
+    // https://www.mongodb.com/docs/manual/reference/operator/aggregation/toDate/
     mongoFormatValue: function (val, fieldDef, wgtDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
-      return dateVal.isValid() ? dateVal.toDate() : undefined;
+      if (dateVal.isValid()) {
+        return {
+          "$dateFromString": {
+            "dateString": dateVal.format("YYYY-MM-DD HH:mm:ss"),
+            "format": "%Y-%m-%d %H:%M:%S"
+          }
+        };
+      }
     }
   },
   boolean: {
@@ -993,7 +1207,7 @@ const widgets = {
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
       return isForDisplay ? (val ? "Yes" : "No") : JSON.stringify(!!val);
     },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
       return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
@@ -1011,7 +1225,7 @@ const widgets = {
     formatValue: (val, fieldDef, wgtDef, isForDisplay, op, opDef, rightFieldDef) => {
       return isForDisplay ? (rightFieldDef.label || val) : val;
     },
-    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef, rightFieldDef) => {
+    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef, rightFieldDef, sqlDialect) => {
       return val;
     },
     spelFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
@@ -1028,6 +1242,9 @@ const widgets = {
     valueLabel: "Function",
     valuePlaceholder: "Select function",
   },
+  /**
+   * @deprecated
+   */
   case_value: {
     valueSrc: "value",
     type: "case_value",
@@ -1042,6 +1259,9 @@ const widgets = {
     },
     celImportValue: (val) => {
       return [val.value, []];
+    },
+    jsonLogic: function (val) {
+      return val === "" ? null : val;
     },
   }
 };
@@ -1101,6 +1321,22 @@ const types = {
     mainWidget: "number",
     widgets: {
       number: {
+        operators: [
+          "equal",
+          "not_equal",
+          "less",
+          "less_or_equal",
+          "greater",
+          "greater_or_equal",
+          "between",
+          "not_between",
+          // "is_empty",
+          // "is_not_empty",
+          "is_null",
+          "is_not_null",
+        ],
+      },
+      price: {
         operators: [
           "equal",
           "not_equal",
@@ -1315,10 +1551,15 @@ const types = {
       }
     }
   },
+  /**
+   * @deprecated
+   */
   "case_value": {
     mainWidget: "case_value",
     widgets: {
-      case_value: {}
+      case_value: {
+        widgetProps: {},
+      }
     }
   },
 };
@@ -1329,9 +1570,10 @@ const settings = {
   ...defaultSettings,
 
   convertableWidgets: {
-    "number": ["slider", "rangeslider"],
-    "slider": ["number", "rangeslider"],
-    "rangeslider": ["number", "slider"],
+    "number": ["slider", "rangeslider", "price"],
+    "slider": ["number", "rangeslider", "price"],
+    "rangeslider": ["number", "slider", "price"],
+    "price": ["number", "slider", "rangeslider"],
     "text": ["textarea"],
     "textarea": ["text"]
   },
@@ -1373,24 +1615,24 @@ const settings = {
     }
     return fieldName;
   },
-  sqlFormatReverse: (q) => {
+  sqlFormatReverse: function (q) {
     if (q == undefined) return undefined;
-    return "NOT(" + q + ")";
+    return "NOT" + this.utils.wrapWithBrackets(q);
   },
-  spelFormatReverse: (q) => {
+  spelFormatReverse: function (q) {
     if (q == undefined) return undefined;
-    return "!(" + q + ")";
+    return "!" + this.utils.wrapWithBrackets(q);
   },
-  celFormatReverse: (q) => {
+  celFormatReverse: function (q) {
     if (q == undefined) return undefined;
-    return "!(" + q + ")";
+    return "!" + this.utils.wrapWithBrackets(q);
   },
-  formatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay) => {
+  formatReverse: function (q, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay) {
     if (q == undefined) return undefined;
     if (isForDisplay)
-      return "NOT (" + q + ")";
+      return "NOT " + this.utils.wrapWithBrackets(q);
     else
-      return "!(" + q + ")";
+      return "!" + this.utils.wrapWithBrackets(q);
   },
   formatAggr: (whereStr, aggrField, operator, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay, aggrFieldDef) => {
     const {labelForFormat, cardinality} = opDef;
@@ -1520,7 +1762,7 @@ const mixinWidgetRangeslider = (config, addMixin = true) => {
       formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
         return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
       },
-      sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+      sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
         return this.utils.SqlString.escape(val);
       },
       celFormatValue: function (val) { return this.utils.celEscape(val); },
@@ -1593,7 +1835,7 @@ const mixinWidgetTreeselect = (config, addMixin = true) => {
         let valLabel = this.utils.getTitleInListValues(treeData, val);
         return isForDisplay ? this.utils.stringifyForDisplay(valLabel) : JSON.stringify(val);
       },
-      sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+      sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
         return this.utils.SqlString.escape(val);
       },
       spelFormatValue: function (val) { return this.utils.spelEscape(val); },
@@ -1659,7 +1901,7 @@ const mixinWidgetTreemultiselect = (config, addMixin = true) => {
         let valsLabels = vals.map(v => this.utils.getTitleInListValues(treeData, v));
         return isForDisplay ? valsLabels.map(this.utils.stringifyForDisplay) : vals.map(JSON.stringify);
       },
-      sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
+      sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
         return vals.map(v => this.utils.SqlString.escape(v));
       },
       spelFormatValue: function (val) { return this.utils.spelEscape(val); },

@@ -1,21 +1,50 @@
 import SqlStringOrig from "sqlstring";
 
+// @deprecated Use dedicated utils instead
+export { mongoEmptyValue } from "./mongoUtils";
+export { spelEscape, spelFixList, spelFormatConcat, spelImportConcat } from "./spelUtils";
+export { celEscape } from "./celUtils";
+
+// todo: move to sqlUtils
 export const SqlString = SqlStringOrig;
 
 SqlString.trim = (val) => {
-  if (val.charAt(0) == "'")
+  if (val?.charAt(0) == "'")
     return val.substring(1, val.length-1);
   else
     return val;
 };
 
-SqlString.escapeLike = (val, any_start = true, any_end = true) => {
+SqlString.unescapeLike = (val, sqlDialect = undefined) => {
+  if (typeof val !== "string") {
+    return val;
+  }
+  let res = val;
+  // unescape % and _
+  if (sqlDialect === "BigQuery") {
+    // https://cloud.google.com/bigquery/docs/reference/standard-sql/operators#like_operator
+    res = res.replace(/\\\\([%_])/g, "$1");
+  } else {
+    res = res.replace(/\\([%_])/g, "$1");
+  }
+  return res;
+};
+
+SqlString.escapeLike = (val, any_start = true, any_end = true, sqlDialect = undefined) => {
+  if (typeof val !== "string") {
+    return val;
+  }
   // normal escape
   let res = SqlString.escape(val);
   // unwrap ''
   res = SqlString.trim(res);
   // escape % and _
-  res = res.replace(/[%_]/g, "\\$&");
+  if (sqlDialect === "BigQuery") {
+    // https://cloud.google.com/bigquery/docs/reference/standard-sql/operators#like_operator
+    res = res.replace(/[%_\\]/g, "\\\\$&");
+  } else {
+    res = res.replace(/[%_]/g, "\\$&");
+  }
   // wrap with % for LIKE
   res = (any_start ? "%" : "") + res + (any_end ? "%" : "");
   // wrap ''
@@ -39,190 +68,14 @@ export const sqlEmptyValue = (fieldDef) => {
   return v;
 };
 
-export const mongoEmptyValue = (fieldDef) => {
-  let v = "";
-  const type = fieldDef?.type;
-  if (type == "number") {
-    v = 0;
-  }
-  return v;
-};
-
-
-const spelEscapeString = (val) => {
-  // Strings are delimited by single quotes. To put a single quote itself in a string, use two single quote characters. 
-  return "'" + val.replace(/'/g, "''") + "'";
-};
-
-const spelInlineList = (vals, toArray = false) => {
-  // find java type of values
-  let javaType;
-  let jt;
-  const numberJavaTypes = ["int", "float"];
-  vals.map(v => {
-    if (v !== undefined && v !== null) {
-      if (typeof v === "string") {
-        jt = "String";
-      } else if (typeof v === "number") {
-        jt = Number.isInteger(v) ? "int" : "float";
-      } else throw new Error(`spelEscape: Can't use value ${v} in array`);
-
-      if (!javaType) {
-        javaType = jt;
-      } else if (javaType != jt) {
-        if (numberJavaTypes.includes(javaType) && numberJavaTypes.includes(jt)) {
-          // found int and float in collecton - use float
-          javaType = "float";
-        } else throw new Error(`spelEscape: Can't use different types in array: found ${javaType} and ${jt}`);
-      }
-    }
-  });
-  if (!javaType) {
-    javaType = "String"; //default if empty array
-  }
-
-  // for floats we should add 'f' to all items
-  let escapedVals;
-  if (javaType == "float") {
-    escapedVals = vals.map(v => spelEscape(v, true));
-  } else {
-    escapedVals = vals.map(v => spelEscape(v));
-  }
-
-  // build inline list or array
-  let res;
-  if (toArray) {
-    res = `new ${javaType}[]{${escapedVals.join(", ")}}`;
-  } else {
-    res = `{${escapedVals.join(", ")}}`;
-  }
-  
-  return res;
-};
-
-export const spelFixList = (val) => {
-  // `{1,2}.contains(1)` NOT works
-  // `{1,2}.?[true].contains(1)` works
-  return `${val}.?[true]`;
-};
-
-export const spelEscape = (val, numberToFloat = false, arrayToArray = false) => {
-  // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions-ref-literal
-  if (val === undefined || val === null) {
-    return "null";
-  }
-  switch (typeof val) {
-  case "boolean":
-    return (val) ? "true" : "false";
-  case "number":
-    if (!Number.isFinite(val) || isNaN(val))
-      return undefined;
-    return val + (!Number.isInteger(val) || numberToFloat ? "f" : "");
-  case "object":
-    if (Array.isArray(val)) {
-      return spelInlineList(val, arrayToArray);
-    } else {
-      // see `spelFormatValue` for Date, LocalTime
-      throw new Error("spelEscape: Object is not supported");
-    }
-  default: return spelEscapeString(val);
-  }
-};
-
-export const spelFormatConcat = (parts) => {
-  if (parts && Array.isArray(parts) && parts.length) {
-    return parts
-      .map(part => {
-        if (part.type == "const") {
-          return spelEscape(part.value);
-        } else if (part.type == "property") {
-          return ""+part.value;
-        } else if (part.type == "variable") {
-          return "#"+part.value;
-        } return undefined;
-      })
-      .filter(r => r != undefined)
-      .join(" + ");
-  } else {
-    return "null";
-  }
-};
-
-// `val` is {value, valueType, valueSrc}
-// If `valueType` == "case_value", `value` is array of such items (to be considered as concatenation)
-export const spelImportConcat = (val) => {
-  if (val == undefined)
-    return [undefined, []];
-  let errors = [];
-  const parts = val.valueType == "case_value" ? val.value : [val];
-  const res = parts.map(child => {
-    if (child.valueSrc == "value") {
-      if (child.value === null) {
-        return undefined;
-      } else {
-        return {
-          type: "const", 
-          value: child.value
-        };
-      }
-    } else if (child.valueSrc == "field") {
-      return {
-        type: (child.isVariable ? "variable" : "property"), 
-        value: child.value
-      };
-    } else {
-      errors.push(`Unsupported valueSrc ${child.valueSrc} in concatenation`);
-    }
-  }).filter(v => v != undefined);
-  return [res, errors];
-};
-
 export const stringifyForDisplay = (v) => (v == null ? "NULL" : v.toString());
 
-
-const celEscapeString = (val) => {
-  // CEL string literals use C-style backslash escaping (unlike SpEL/SQL which double the quote).
-  // https://github.com/google/cel-spec/blob/master/doc/langdef.md#string-and-bytes-values
-  const escaped = ("" + val)
-    .replace(/\\/g, "\\\\")
-    .replace(/'/g, "\\'")
-    .replace(/\n/g, "\\n")
-    .replace(/\r/g, "\\r")
-    .replace(/\t/g, "\\t");
-  return "'" + escaped + "'";
-};
-
-const celInlineList = (vals, numberToFloat = false) => {
-  // CEL list literal: [a, b, c]. Lists are heterogeneous (`dyn`), no per-type wrapper needed.
-  const escapedVals = vals.map((v) => celEscape(v, numberToFloat));
-  return `[${escapedVals.join(", ")}]`;
-};
-
-export const celEscape = (val, numberToFloat = false) => {
-  // https://github.com/google/cel-spec/blob/master/doc/langdef.md#values
-  if (val === undefined || val === null) {
-    return "null";
+export const wrapWithBrackets = (v) => {
+  if (v == undefined)
+    return v;
+  if (v?.[0] === "(" && v?.[v?.length - 1] === ")") {
+    // already wrapped
+    return v;
   }
-  switch (typeof val) {
-  case "boolean":
-    return val ? "true" : "false";
-  case "number":
-    if (!Number.isFinite(val) || isNaN(val)) return undefined;
-    // CEL is strongly typed: int literals have no suffix, doubles must carry a
-    // decimal point (or exponent). `numberToFloat` forces a double literal so an
-    // integer value compared against a double field doesn't become a type error.
-    if (Number.isInteger(val)) {
-      return numberToFloat ? val + ".0" : "" + val;
-    }
-    return "" + val;
-  case "object":
-    if (Array.isArray(val)) {
-      return celInlineList(val, numberToFloat);
-    } else {
-      // see `celFormatValue` for Date, timestamp
-      throw new Error("celEscape: Object is not supported");
-    }
-  default:
-    return celEscapeString(val);
-  }
+  return "(" + v + ")";
 };

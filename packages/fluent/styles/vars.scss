@@ -1,3 +1,6 @@
-$treeline-radius: 2px;
-$item-radius: 2px;
-$seps-offset-bottom: 10px;
+$inactive_conjs: (".ms-Button:not(.is-checked)");
+$active_conjs: (".ms-Button.is-checked");
+
+$default-treeline-radius: 2px;
+$default-item-radius: 2px;
+$default-seps-offset-bottom: 10px;

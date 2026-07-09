@@ -1,12 +1,13 @@
 import React from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
 import {RuleGroupActions} from "./RuleGroupActions";
 import FieldWrapper from "../rule/FieldWrapper";
-import {useOnPropsChanged} from "../../utils/reactUtils";
 import {WithConfirmFn} from "../utils";
+const {getFieldConfig} = Utils.ConfigUtils;
 
 
 class RuleGroup extends BasicGroup {
@@ -17,15 +18,15 @@ class RuleGroup extends BasicGroup {
     parentField: PropTypes.string,
     setField: PropTypes.func,
     setFieldSrc: PropTypes.func,
+    lev: PropTypes.number, // from GroupContainer
   };
 
   constructor(props) {
     super(props);
-    useOnPropsChanged(this);
-    this.onPropsChanged(props);
   }
 
   onPropsChanged(nextProps) {
+    super.onPropsChanged(nextProps);
   }
 
   childrenClassName = () => "rule_group--children";
@@ -56,7 +57,10 @@ class RuleGroup extends BasicGroup {
   }
 
   renderField() {
-    const { config, selectedField, selectedFieldSrc, selectedFieldType, setField, setFieldSrc, parentField, id, groupId, isLocked } = this.props;
+    const {
+      config, selectedField, selectedFieldSrc, selectedFieldType, setField, setFuncValue, setFieldSrc, 
+      parentField, id, groupId, isLocked
+    } = this.props;
     const { immutableFieldsMode } = config.settings;
     
     return <FieldWrapper
@@ -68,6 +72,7 @@ class RuleGroup extends BasicGroup {
       selectedFieldSrc={selectedFieldSrc}
       selectedFieldType={selectedFieldType}
       setField={setField}
+      setFuncValue={setFuncValue}
       setFieldSrc={setFieldSrc}
       parentField={parentField}
       readonly={immutableFieldsMode || isLocked}
@@ -93,8 +98,12 @@ class RuleGroup extends BasicGroup {
   }
 
   extraPropsForItem(_item) {
+    const { selectedField, lev, config } = this.props;
+    const selectedFieldConfig = getFieldConfig(config, selectedField);
     return {
-      parentField: this.props.selectedField
+      parentField: selectedField,
+      parentFieldPathSize: lev + 1,
+      parentFieldCanReorder: selectedFieldConfig?.canReorder ?? config.settings.canReorder,
     };
   }
 }

@@ -4,13 +4,13 @@
     "module": "esnext",
     "jsx": "preserve",
     "lib": [
-      "es2015",
+      "es2020",
       "dom",
       "dom.iterable"
     ],
     "allowJs": true,
     "outDir": "ts_out",
-    "noEmit": true,
+    // "noEmit": false,
 
     "strict": true,
     "alwaysStrict": true,
@@ -18,11 +18,14 @@
 
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "skipLibCheck": true,
+    "skipLibCheck": false,
+    "resolveJsonModule": true,
     
     "paths": {
       "@react-awesome-query-builder/core": ["../core/modules"],
-      "@react-awesome-query-builder/ui": ["../ui/modules"]
+      "@react-awesome-query-builder/ui": ["../ui/modules"],
+      "react": ["./node_modules/@types/react"],
+      "react-dom": ["./node_modules/@types/react-dom"],
     }
   },
   "include": [

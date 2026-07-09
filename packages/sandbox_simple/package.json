@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/sandbox-simple",
-  "version": "6.4.1",
+  "version": "6.7.0-alpha.0",
   "description": "Simple demo for @react-awesome-query-builder",
   "repository": {
     "type": "git",
@@ -11,13 +11,15 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "main": "src/index.jsx",
   "scripts": {
-    "build": "vite build --mode dev --debug",
+    "build": "vite build --mode dev",
+    "build-prod": "vite build --mode production",
     "eslint": "eslint --ext .jsx --ext .js ./src/",
+    "preinstall": "node ./scripts/patch-versions.js",
     "lint": "npm run eslint",
     "lint-fix": "eslint --ext .jsx --ext .js --fix ./src/",
     "preview": "vite preview",
-    "start": "vite",
-    "preinstall": "node ./scripts/patch-versions.js"
+    "start-prod": "npm run build-prod && npm run preview",
+    "start": "vite"
   },
   "browserslist": {
     "production": [
@@ -38,9 +40,9 @@
     "react-dom": "^16.14.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.3",
-    "sass": "^1.35.0",
-    "vite": "^4.4.6"
+    "@vitejs/plugin-react": "^4.3.4",
+    "sass": "^1.77.2",
+    "vite": "^5.4.19"
   },
   "readme": "README.md"
 }

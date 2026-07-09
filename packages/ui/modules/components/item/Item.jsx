@@ -41,7 +41,9 @@ const typeMap = {
       onDragStart={props.onDragStart}
       isDraggingTempo={props.isDraggingTempo}
       parentField={props.parentField}
+      parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
+      parentFieldCanReorder={props.parentFieldCanReorder}
     />
   ),
   group: (props) => (
@@ -57,8 +59,10 @@ const typeMap = {
       onDragStart={props.onDragStart}
       isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
-      parentField={null}
+      parentField={props.parentField}
+      parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
+      parentFieldCanReorder={props.parentFieldCanReorder}
     />
   ),
   rule_group: (props) => (
@@ -75,7 +79,9 @@ const typeMap = {
       isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
       parentField={props.parentField}
+      parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
+      parentFieldCanReorder={props.parentFieldCanReorder}
     />
   ),
   rule_group_ext: (props) => (
@@ -92,7 +98,9 @@ const typeMap = {
       isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
       parentField={props.parentField}
+      parentFieldPathSize={props.parentFieldPathSize}
       parentReordableNodesCnt={props.parentReordableNodesCnt}
+      parentFieldCanReorder={props.parentFieldCanReorder}
     />
   ),
   switch_group: (props) => (
@@ -139,7 +147,7 @@ class Item extends PureComponent {
     groupId: PropTypes.string,
     type: PropTypes.oneOf(types).isRequired,
     path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
-    properties: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
+    properties: PropTypes.any, //instanceOf(Immutable.Map)
     children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
     actions: PropTypes.object.isRequired,
     reordableNodesCnt: PropTypes.number,

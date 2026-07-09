@@ -1,7 +1,7 @@
 import { ElementType } from "react";
 import {
   FieldProps, ConjsProps, ButtonProps, ButtonGroupProps, ProviderProps, ValueSourcesProps, ConfirmFunc,
-  BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps
+  BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, PriceWidgetProps
 } from "@react-awesome-query-builder/ui";
 
 export interface BootstrapWidgets {
@@ -24,8 +24,9 @@ export interface BootstrapWidgets {
   BootstrapMultiSelectWidget: ElementType<SelectWidgetProps>,
   BootstrapSelectWidget: ElementType<SelectWidgetProps>,
   BootstrapNumberWidget: ElementType<NumberWidgetProps>,
+  BootstrapPriceWidget: ElementType<PriceWidgetProps>,
   BootstrapSliderWidget: ElementType<NumberWidgetProps>,
 }
 
-declare const BootstrapWidgets: BootstrapWidgets;
+export declare const BootstrapWidgets: BootstrapWidgets;
 export default BootstrapWidgets;

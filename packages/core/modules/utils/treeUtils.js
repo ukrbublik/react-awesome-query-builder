@@ -1,8 +1,11 @@
-import Immutable  from "immutable";
+import Immutable, { fromJS } from "immutable";
 import {toImmutableList, isImmutable, applyToJS as immutableToJs} from "./stuff";
-import {jsToImmutable} from "../import/tree";
+import {getFieldConfig} from "./configUtils";
+import uuid from "./uuid";
 
-export {toImmutableList, jsToImmutable, immutableToJs, isImmutable};
+export {
+  toImmutableList, immutableToJs, isImmutable,
+};
 
 /**
  * @param {Immutable.List} path
@@ -38,12 +41,33 @@ export const getItemByPath = (tree, path) => {
   let children = new Immutable.OrderedMap({ [tree.get("id")] : tree });
   let res = tree;
   path.forEach((id) => {
-    res = children.get(id);
-    children = res.get("children1");
+    res = children?.get(id);
+    children = res?.get("children1");
   });
   return res;
 };
 
+
+/**
+ * @param {Immutable.Map} tree
+ * @param {Immutable.List} path
+ * @return {field, path}[] ordered by closest
+ */
+export const getAncestorRuleGroups = (tree, path) => {
+  const parentRuleGroups = path
+    .map((_id, i) => path.take(i+1))
+    .reverse()
+    .toJS()
+    .map(path => ({ item: getItemByPath(tree, path), path }))
+    .filter(({ item }) => item?.get("type") === "rule_group");
+  if (parentRuleGroups.length) {
+    return parentRuleGroups.map(({ item, path }) => ({
+      path,
+      field: item.get("properties").get("field"),
+    }));
+  }
+  return [];
+};
 
 /**
  * Remove `path` in every item
@@ -114,7 +138,7 @@ export const fixPathsInTree = (tree) => {
     if (!item) return;
     const currPath = item.get("path");
     const currId = item.get("id");
-    const itemId = currId || nodeId;
+    const itemId = currId || nodeId || uuid();
     const itemPath = path.push(itemId);
     if (!currPath || !currPath.equals(itemPath)) {
       newTree = newTree.setIn(expandTreePath(itemPath, "path"), itemPath);
@@ -125,7 +149,7 @@ export const fixPathsInTree = (tree) => {
 
     const children = item.get("children1");
     if (children) {
-      if (children.constructor.name == "Map") {
+      if (children.constructor.name === "Map") {
         // protect: should be OrderedMap, not Map (issue #501)
         newTree = newTree.setIn(
           expandTreePath(itemPath, "children1"), 
@@ -175,94 +199,183 @@ export const fixEmptyGroupsInTree = (tree) => {
  * @param {Immutable.Map} tree
  * @return {Object} {flat, items}
  */
-export const getFlatTree = (tree) => {
+export const getFlatTree = (tree, config) => {
   let flat = [];
   let items = {};
-  let realHeight = 0;
+  let cases = [];
+  let visibleHeight = 0; // number of non-collapsed nodes
+  let globalLeafCount = 0;
+  let globalAtomicCount = 0;
+  let globalGroupCount = 0;
+  let globalCountByType = {};
+  // rule_group_ext can be counted as group  (group #x)
+  // or by similars (rule-group #x) (NOT both _ext and no ext)
 
-  function _flatizeTree (item, path, insideCollapsed, insideLocked, insideRuleGroup, lev, info, parentType, caseId) {
+  function _flatizeTree (
+    item, path, insideCollapsed, insideLocked, insideRuleGroup, lev, atomicLev, caseId, childNo
+  ) {
+    const isRoot = item === tree;
     const type = item.get("type");
     const collapsed = item.get("collapsed");
     const id = item.get("id");
     const children = item.get("children1");
     const isLocked = item.getIn(["properties", "isLocked"]);
-    const childrenIds = children ? children.map((_child, childId) => childId).toArray() : null;
-    const isRuleGroup = type == "rule_group";
-    // tip: count rule_group as 1 rule
-    const isLeaf = !insideRuleGroup && (!children || isRuleGroup);
+    const childrenIds = children ? children.map((_child, childId) => childId).valueSeq().toArray() : null;
+    const isRuleGroup = type === "rule_group";
+    const isRule = type === "rule";
+    const isGroup = type === "group";
+    const isCaseGroup = type === "case_group";
+    // tip: count rule_group as 1 atomic rule
+    const isAtomicRule = !insideRuleGroup && (!children || isRuleGroup);
     const hasChildren = childrenIds?.length > 0;
+    const parentId = path.length ? path[path.length-1] : null;
+    const closestRuleGroupId = [...path].reverse().find(id => items[id].type == "rule_group");
+    const field = item.getIn(["properties", "field"]);
+    const fieldConfig = field && config && getFieldConfig(config, field);
+    const canRegroup = fieldConfig ? fieldConfig?.canRegroup !== false : undefined;
+    const maxNesting = fieldConfig?.maxNesting;
+    const closestRuleGroupCanRegroup = items?.[closestRuleGroupId]?.canRegroup;
+    const closestRuleGroupMaxNesting = items?.[closestRuleGroupId]?.maxNesting;
+    const closestRuleGroupLev = items?.[closestRuleGroupId]?.lev;
+    const currentCaseId = isCaseGroup ? id : caseId;
 
+    // Calculations before
+    if (isCaseGroup) {
+      cases.push(id);
+      // reset counters
+      globalLeafCount = 0;
+      globalAtomicCount = 0;
+      globalGroupCount = 0;
+      globalCountByType = {};
+    }
+    const caseNo = currentCaseId ? cases.indexOf(currentCaseId) : null;
     const itemsBefore = flat.length;
-    const top = realHeight;
-    flat.push(id);
-    if (!insideCollapsed)
-      realHeight += 1;
-    info.height = (info.height || 0) + 1;
+    const top = visibleHeight;
 
-    items[id] = {
-      type: type,
-      parent: path.length ? path[path.length-1] : null,
-      parentType: parentType,
-      caseId: type == "case_group" ? id : caseId,
-      isDefaultCase: type == "case_group" && !children,
-      path: path.concat(id),
-      lev: lev,
-      leaf: !children,
-      index: itemsBefore,
-      id: id,
-      children: childrenIds,
-      leafsCount: 0,
-      _top: itemsBefore,
-      //_height: (itemsAfter - itemsBefore),
-      top: (insideCollapsed ? null : top),
-      //height: height,
-      //bottom: (insideCollapsed ? null : top) + height,
-      collapsed: collapsed,
-      node: item,
-      isLocked: isLocked || insideLocked,
-    };
-
-    let depth;
-    if (children) {
-      let subinfo = {};
-      children.map((child, _childId) => {
-        _flatizeTree(
-          child, path.concat(id), 
-          insideCollapsed || collapsed, insideLocked || isLocked, insideRuleGroup || isRuleGroup,
-          lev + 1, subinfo, type, type == "case_group" ? id : caseId
-        );
-      });
-      if (!collapsed) {
-        info.height = (info.height || 0) + (subinfo.height || 0);
-        if (hasChildren && !isRuleGroup) { // tip: don't count children of rule_group
-          depth = (subinfo.depth || 0) + 1;
-        }
+    let position;
+    if (!isRoot) {
+      position = {};
+      position.caseNo = caseNo;
+      position.globalNoByType = isCaseGroup ? caseNo : globalCountByType[type] || 0;
+      position.indexPath = [ ...path.slice(1).map(id => items[id].childNo), childNo ];
+      if (isRule) {
+        position.globalLeafNo = globalLeafCount;
+      } else if (isGroup) {
+        position.globalGroupNo = globalGroupCount;
       }
     }
-    
-    if (caseId && isLeaf) {
-      items[caseId].leafsCount++;
+    const nextAtomicLev = insideRuleGroup || isRuleGroup ? atomicLev : atomicLev + 1;
+
+    flat.push(id);
+    items[id] = {
+      node: item,
+      index: itemsBefore, // index in `flat`
+      id: id,
+      type: type,
+      parent: parentId,
+      children: childrenIds,
+      childNo,
+      caseId: currentCaseId,
+      caseNo,
+      closestRuleGroupId,
+      closestRuleGroupLev,
+      closestRuleGroupMaxNesting,
+      closestRuleGroupCanRegroup,
+      maxNesting,
+      canRegroup,
+      path: path.concat(id),
+      lev: lev, // depth level (0 for root node)
+      atomicLev, // same as lev, but rules inside rule_group retains same number
+      nextAtomicLev,
+      isLeaf: !children, // is atomic rule OR rule inside rule_group
+      isAtomicRule, // is atomic (rule or rule_group, but not rules inside rule_group)
+      isLocked: isLocked || insideLocked,
+      // vertical
+      top: (insideCollapsed ? null : top),
+      // for case
+      isDefaultCase: isCaseGroup ? !children : undefined,
+      atomicRulesCountInCase: isCaseGroup ? 0 : undefined,
+      // object with numbers indicating # of item in tree
+      position,
+      // unused
+      collapsed: collapsed,
+      _top: itemsBefore,
+      parentType: parentId ? items[parentId].type : null,
+      // @deprecated use isLeaf instead
+      leaf: !children,
+
+      // will be added later:
+      //  prev
+      //  next
+      //  depth  - for any group (children of rule_group are not counted, collapsed are not counted)
+      //  height  - visible height
+      //  bottom = (insideCollapsed ? null : top + height)
+      //  _height = (itemsAfter - itemsBefore)  - real height (incl. collapsed)
+    };
+
+    // Calculations before traversing children
+    let height = 0;
+    let depth = 0;
+    if (!insideCollapsed) {
+      visibleHeight += 1;
+      height += 1;
+      if (hasChildren && !collapsed && !isRuleGroup) {
+        // tip: don't count children of rule_group
+        depth += 1;
+      }
+      if (!isRoot && !isCaseGroup) {
+        isGroup && globalGroupCount++;
+        isAtomicRule && globalAtomicCount++;
+        isRule && globalLeafCount++;
+        globalCountByType[type] = (globalCountByType[type] || 0) + 1;
+      }
+    }
+    if (caseId && isAtomicRule) {
+      items[caseId].atomicRulesCountInCase++;
     }
 
-    const itemsAfter = flat.length;
-    const _bottom = realHeight;
-    const height = info.height;
-        
-    Object.assign(items[id], {
-      _height: (itemsAfter - itemsBefore),
-      height: height,
-      bottom: (insideCollapsed ? null : top) + height,
-    });
-    if (depth != undefined) {
-      Object.assign(items[id], {
-        depth: depth,
+    // Traverse children deeply
+    let maxChildDepth = 0;
+    let sumHeight = 0;
+    if (hasChildren) {
+      let childCount = 0;
+      children.map((child, childId) => {
+        if (child) {
+          _flatizeTree(
+            child, 
+            path.concat(id), 
+            insideCollapsed || collapsed, insideLocked || isLocked, insideRuleGroup || isRuleGroup,
+            lev + 1, nextAtomicLev,
+            currentCaseId, childCount
+          );
+          const childItem = items[childId];
+          // Calculations after deep traversing 1 child
+          maxChildDepth = Math.max(maxChildDepth, childItem.depth || 0);
+          sumHeight += childItem.height;
+          childCount++;
+        }
       });
-      info.depth = Math.max(info.depth || 0, depth);
     }
+
+    // Calculations after deep traversing ALL children
+    height += sumHeight;
+    depth += maxChildDepth;
+    const itemsAfter = flat.length;
+    const _height = itemsAfter - itemsBefore;
+    const bottom = (insideCollapsed ? null : top + height);
+
+    Object.assign(items[id], {
+      depth: children ? depth : undefined,
+      _height,
+      height,
+      bottom,
+    });
   }
 
-  _flatizeTree(tree, [], false, false, false, 0, {}, null, null);
+  // Start recursion
+  _flatizeTree(tree, [], false, false, false, 0, 0, null, null);
 
+  // Calc after recursion
   for (let i = 0 ; i < flat.length ; i++) {
     const prevId = i > 0 ? flat[i-1] : null;
     const nextId = i < (flat.length-1) ? flat[i+1] : null;
@@ -271,7 +384,7 @@ export const getFlatTree = (tree) => {
     item.next = nextId;
   }
 
-  return {flat, items};
+  return {flat, items, cases};
 };
 
 
@@ -296,12 +409,14 @@ export const getTotalReordableNodesCountInTree = (tree) => {
       children = item.children1;
       type = item.type;
     }
-    const isRuleGroup = type == "rule_group";
     cnt++;
-    //tip: rules in rule-group can be reordered only inside
-    if (children && !isRuleGroup) {
+    if (type == "rule_group" && lev > 0) {
+      //tip: rules in rule-group can be reordered only inside
+    } else if (children) {
       children.map((child, _childId) => {
-        _processNode(child, path.concat(id), lev + 1);
+        if (child) {
+          _processNode(child, path.concat(id), lev + 1);
+        }
       });
     }
   }
@@ -312,7 +427,7 @@ export const getTotalReordableNodesCountInTree = (tree) => {
 };
 
 /**
- * Returns count of rules (leafs, i.e. don't count groups)
+ * Returns count of atomic rules (i.e. don't count groups; count rule_group as 1 atomic rule)
  * @param {Immutable.Map} tree
  * @return {Integer}
  */
@@ -333,12 +448,14 @@ export const getTotalRulesCountInTree = (tree) => {
       type = item.type;
     }
     
-    if (type == "rule" || type == "rule_group") {
+    if (type == "rule" || type == "rule_group" && lev > 0) {
       // tip: count rule_group as 1 rule
       cnt++;
     } else if (children) {
       children.map((child, _childId) => {
-        _processNode(child, path.concat(id), lev + 1);
+        if (child) {
+          _processNode(child, path.concat(id), lev + 1);
+        }
       });
     }
   }
@@ -348,51 +465,32 @@ export const getTotalRulesCountInTree = (tree) => {
   return cnt;
 };
 
-export const getTreeBadFields = (tree) => {
-  let badFields = [];
-
-  function _processNode (item, path, lev) {
-    const id = item.get("id");
-    const children = item.get("children1");
-    const valueError = item.getIn(["properties", "valueError"]);
-    const field = item.getIn(["properties", "field"]);
-    if (valueError && valueError.size > 0 && valueError.filter(v => v != null).size > 0) {
-      badFields.push(field);
-    }
-    if (children) {
-      children.map((child, _childId) => {
-        _processNode(child, path.concat(id), lev + 1);
-      });
-    }
-  }
-
-  if (tree)
-    _processNode(tree, [], 0);
-    
-  return Array.from(new Set(badFields));
-};
-
 
 // Remove fields that can be calced: "id", "path"
 // Remove empty fields: "operatorOptions"
-export const getLightTree = (tree, children1AsArray = false) => {
+export const getLightTree = (tree, deleteExcess = true, children1AsArray = true) => {
   let newTree = tree;
 
   function _processNode (item, itemId) {
-    if (item.path)
+    if (deleteExcess && item.path) {
       delete item.path;
-    if (!children1AsArray && itemId)
+    }
+    if (deleteExcess && !children1AsArray && itemId) {
       delete item.id;
+    }
     let properties = item.properties;
     if (properties) {
-      if (properties.operatorOptions == null)
+      if (properties.operatorOptions == null) {
         delete properties.operatorOptions;
+      }
     }
 
     const children = item.children1;
     if (children) {
       for (let id in children) {
-        _processNode(children[id], id);
+        if (children[id]) {
+          _processNode(children[id], id);
+        }
       }
       if (children1AsArray) {
         item.children1 = Object.values(children);
@@ -430,3 +528,59 @@ export const getSwitchValues = (tree) => {
 export const isEmptyTree = (tree) => (!tree.get("children1") || tree.get("children1").size == 0);
 
 export const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")).size > 0;
+
+
+export const _fixImmutableValue = (v) => {
+  if (v?.toJS) {
+    const vJs = v?.toJS?.();
+    if (vJs?.func) {
+      // `v` is a func, keep Immutable
+      return v.toOrderedMap();
+    } else {
+      // for values of multiselect use Array instead of List
+      return vJs;
+    }
+  } else {
+    return v;
+  }
+};
+
+export function jsToImmutable(tree) {
+  const imm = fromJS(tree, function (key, value, path) {
+    const isFuncArg = path
+      && path.length > 3
+      && path[path.length-1] === "value"
+      && path[path.length-3] === "args";
+    const isRuleValue = path
+      && path.length > 3
+      && path[path.length-1] === "value"
+      && path[path.length-2] === "properties";
+
+    let outValue;
+    if (key == "properties") {
+      outValue = value.toOrderedMap();
+
+      // `value` should be undefined instead of null
+      // JSON doesn't support undefined and replaces undefined -> null
+      // So fix: null -> undefined
+      for (let i = 0 ; i < 2 ; i++) {
+        if (outValue.get("value")?.get?.(i) === null) {
+          outValue = outValue.setIn(["value", i], undefined);
+        }
+      }
+    } else if (isFuncArg) {
+      outValue = _fixImmutableValue(value);
+    } else if ((path ? isRuleValue : key == "value") && Immutable.Iterable.isIndexed(value)) {
+      outValue = value.map(_fixImmutableValue).toList();
+    } else if (key == "asyncListValues") {
+      // keep in JS format
+      outValue = value.toJS();
+    } else if (key == "children1" && Immutable.Iterable.isIndexed(value)) {
+      outValue = new Immutable.OrderedMap(value.map(child => [child?.get("id") || uuid(), child]));
+    } else {
+      outValue = Immutable.Iterable.isIndexed(value) ? value.toList() : value.toOrderedMap();
+    }
+    return outValue;
+  });
+  return imm;
+}

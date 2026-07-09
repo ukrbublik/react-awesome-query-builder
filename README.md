@@ -27,7 +27,8 @@ Now [Fluent UI](https://developer.microsoft.com/en-us/fluentui#/get-started/web)
 
 See [live demo](https://ukrbublik.github.io/react-awesome-query-builder) 
 
-[![Edit in codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/ukrbublik/react-awesome-query-builder/master?file=%2Fpackages%2Fexamples%2Fdemo%2Findex.tsx)
+[![Edit in codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/ukrbublik/react-awesome-query-builder/master?file=%2Fpackages%2Fexamples%2Fsrc%2Fdemo%2Findex.tsx)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/ukrbublik/react-awesome-query-builder)
 
 
 * [Features](#features)
@@ -40,11 +41,20 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [Query](#query-)
   * [Builder](#builder-)
   * [Utils](#utils)
+    * [Save/load tree](#saveload-tree)
+    * [Validation utils](#validation-utils)
+    * [Export](#export-utils)
+    * [Import](#import-utils)
+    * [Save/load config from server](#saveload-config-from-server)
   * [Config format](#config-format)
+  * [Validation](#validation)
+* [i18n](#i18n)
+* [Ternary mode](#ternary-mode)
 * [SSR](#ssr)
   * [ctx](#ctx)
 * [Versions](#versions)
   * [Changelog](#changelog)
+  * [Migration to 6.5.0](#migration-to-650)
   * [Migration to 6.4.0](#migration-to-640)
   * [Migration to 6.3.0](#migration-to-630)
   * [Migration to 6.2.0](#migration-to-620)
@@ -57,35 +67,30 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [Financial Contributing](#financial-contributing)
 
 
+### React-Awesome-Query-Builder AI Bot
+
+[React-Awesome-Query-Builder](https://codeparrot.ai/oracle?owner=ukrbublik&repo=react-awesome-query-builder) Bot will help you understand this repository better. You can ask for code examples, installation guide, debugging help and much more.
+
+
 ### Features
 [![Screenshot](https://user-images.githubusercontent.com/3238637/209590656-f32497be-6b74-4837-8414-4f44d78215ae.png)](https://ukrbublik.github.io/react-awesome-query-builder)
-- Highly configurable
-- Fields can be of type:
-  - simple (string, number, bool, date/time/datetime, list)
-  - structs (will be displayed in selectbox as tree)
-  - custom type (dev should add its own widget component in config for this)
-- Comparison operators can be:
-  - binary (== != < > ..)
-  - unary (is empty, is null)
-  - 'between' (for numbers, dates, times)
-  - complex operators like 'proximity'
-- RHS can be:
-  - values
-  - another fields (of same type)
-  - functions (arguments also can be values/fields/funcs)
-- LHS can be field or function
-- Reordering (drag-n-drop) support for rules and groups of rules
-- Themes:
-  - [Ant Design](https://ant.design/)
-  - [Material-UI](https://mui.com/)
-  - [Bootstrap](https://reactstrap.github.io/)
-  - [Fluent UI](https://developer.microsoft.com/en-us/fluentui)
-  - vanilla
-  (Using another UI framework and custom widgets is possible, see below)
-- Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
-- Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)
-- TypeScript support (see [types](/packages/core/modules/index.d.ts) and [demo in TS](/packages/examples))
-- Query value and config can be saved/loaded from server
+
+* Highly configurable.
+  You can configure fields, types, operators, functions, widgets, behavior settings etc.
+* Fields can have simple type (string, number, bool, date/time, list), custom or complex (structs, arrays)
+* Aggregation is supported (query like "COUNT OF users WHERE (role == 'Manager' AND department == 'Development') > 5")
+* Fields can be compared with other fields
+* Comparison operators can be: binary (== != < >), unary ('is null'), 'between' or complex operators like 'proximity'
+* Functions are supported in both LHS and RHS.
+  Functions nesting is supported (function argument can be a function)
+* [Ternary mode](#ternary-mode) (if-then-else)
+* Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
+* Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), SQL
+* Reordering (drag-n-drop) support for rules and groups of rules
+* Query value and config can be saved/loaded from server
+* Themes: [Ant Design](https://ant.design/), [Material-UI](https://mui.com/), [Bootstrap](https://reactstrap.github.io/), [Fluent UI](https://developer.microsoft.com/en-us/fluentui), vanilla
+  It is possible to use another UI framework of your choice, see [how-to](/CONTRIBUTING.md#other-ui-frameworks)
+* TypeScript support (see [types](/packages/core/modules/index.d.ts) and [demo in TS](/packages/examples))
 
 
 ## Getting started
@@ -100,7 +105,8 @@ From v6 library is divided into packages:
 
 ```mermaid
 graph LR;
-  core((core))-->ui(ui);
+  core-->ui;
+  core-->sql((sql));
   ui-->antd;
   ui-->mui;
   ui-->material;
@@ -112,7 +118,7 @@ graph LR;
 For using this library on frontend you need to install and use only `ui` (for basic widgets) or one of framework-specific packages (`antd` / `mui` / `bootstrap` / `fluent`). 
 
 For using this library on server-side (Node.js) you need only `core`. 
-This is useful if you want to pass query value from frontend to backend in JSON format and perform [export](#utils) eg. to SQL on server-side for security reasons.
+This is useful if you want to pass query value from frontend to backend in JSON format and perform [export](#export-utils) eg. to SQL on server-side for security reasons.
 
 Example of installation if you use [MUI](https://mui.com/):
 ```
@@ -147,7 +153,6 @@ import React, {Component} from 'react';
 // >>>
 import { Utils as QbUtils, Query, Builder, BasicConfig } from '@react-awesome-query-builder/ui';
 import '@react-awesome-query-builder/ui/css/styles.css';
-// or import '@react-awesome-query-builder/ui/css/compact_styles.css';
 const InitialConfig = BasicConfig;
 // <<<
 
@@ -205,7 +210,7 @@ const queryValue = {"id": QbUtils.uuid(), "type": "group"};
 
 class DemoQueryBuilder extends Component {
   state = {
-    tree: QbUtils.checkTree(QbUtils.loadTree(queryValue), config),
+    tree: QbUtils.loadTree(queryValue),
     config: config
   };
   
@@ -239,7 +244,7 @@ class DemoQueryBuilder extends Component {
   )
   
   onChange = (immutableTree, config) => {
-    // Tip: for better performance you can apply `throttle` - see `examples/demo`
+    // Tip: for better performance you can apply `throttle` - see `packages/examples/src/demo`
     this.setState({tree: immutableTree, config: config});
 
     const jsonTree = QbUtils.getTree(immutableTree);
@@ -258,7 +263,6 @@ import React, { useState, useCallback } from "react";
 import type { JsonGroup, Config, ImmutableTree, BuilderProps } from '@react-awesome-query-builder/ui';
 import { Utils as QbUtils, Query, Builder, BasicConfig } from '@react-awesome-query-builder/ui';
 import '@react-awesome-query-builder/ui/css/styles.css';
-// or import '@react-awesome-query-builder/ui/css/compact_styles.css';
 const InitialConfig = BasicConfig;
 // <<<
 
@@ -315,12 +319,12 @@ const queryValue: JsonGroup = { id: QbUtils.uuid(), type: "group" };
 
 const DemoQueryBuilder: React.FC = () => {
   const [state, setState] = useState({
-    tree: QbUtils.checkTree(QbUtils.loadTree(queryValue), config),
+    tree: QbUtils.loadTree(queryValue),
     config: config
   });
 
   const onChange = useCallback((immutableTree: ImmutableTree, config: Config) => {
-    // Tip: for better performance you can apply `throttle` - see `examples/demo`
+    // Tip: for better performance you can apply `throttle` - see `packages/examples/src/demo`
     setState(prevState => ({ ...prevState, tree: immutableTree, config: config }));
 
     const jsonTree = QbUtils.getTree(immutableTree);
@@ -378,13 +382,14 @@ export default DemoQueryBuilder;
 
 
 
-## API
+# API
 
-### `<Query />`
+## `<Query />`
 Props:
 - `{...config}` - destructured [`CONFIG`](/CONFIG.adoc)
 - `value` - query value in internal [Immutable](https://immutable-js.github.io/immutable-js/) format
-- `onChange` - callback when query value changed. Params: `value` (in Immutable format), `config`, `actionMeta` (details about action which led to the change, see `ActionMeta` in [`index.d.ts`](/packages/core/modules/index.d.ts)).
+- `onChange` - callback called when query value changes. Params: `value` (in Immutable format), `config`, `actionMeta` (details about action which led to the change, see `ActionMeta` in [`index.d.ts`](/packages/core/modules/index.d.ts)), `actions` (you can use to run actions programmatically, see `Actions` in [`index.d.ts`](/packages/core/modules/index.d.ts)).
+- `onInit` - callback called before initial render, has same arguments as `onChange` (but `actionMeta` is undefined)
 - `renderBuilder` - function to render query builder itself. Takes 1 param `props` you need to pass into `<Builder {...props} />`.
 
 *Notes*:
@@ -394,9 +399,11 @@ Props:
   - set css `.MuiPopover-root, .MuiDialog-root { z-index: 900 !important; }` (or 1000 for AntDesign v3)
 - If you put query builder component inside [Fluent-UI](https://developer.microsoft.com/en-us/fluentui)'s `<Panel />`, please:
   - set css `.ms-Layer.ms-Layer--fixed.root-119 { z-index: 900 !important; }`
-- `props` arg in `renderBuilder` have `actions` and `dispatch` you can use to run actions programmatically (for list of actions see `Actions` in [`index.d.ts`](/packages/core/modules/index.d.ts)).
+- `props` arg in `renderBuilder` have `actions` and `dispatch` you can use to run actions programmatically
+- For a list of available actions see `Actions` interface in [`index.d.ts`](/packages/core/modules/index.d.ts). See `runActions()` in [examples](/packages/examples/src/demo/index.tsx) as a demonstration of calling actions programmatically.
 
-### `<Builder />`
+## `<Builder />`
+
 Render this component only inside `Query.renderBuilder()` like in example above:
 ```js
   renderBuilder = (props) => (
@@ -407,52 +414,143 @@ Render this component only inside `Query.renderBuilder()` like in example above:
     </div>
   )
 ```
-Wrapping `<Builder />` in `div.query-builder` is necessary.  
-Optionally you can add class `.qb-lite` to it for showing action buttons (like delete rule/group, add, etc.) only on hover, which will look cleaner.  
-Wrapping in `div.query-builder-container` is necessary if you put query builder inside scrollable block.  
 
-### `Utils`
-- Save, load:
-  #### getTree (immutableValue, light = true, children1AsArray = true) -> Object
-  Convert query value from internal Immutable format to JS object. 
+Wrapping `<Builder />` in `div.query-builder` is **necessary** for drag-n-drop support.  
+Optionally you can add class `.qb-lite` to it for showing action buttons (like delete rule/group, add, etc.) only on hover, which will look cleaner.  
+Wrapping in `div.query-builder-container` is necessary for correct drag-n-drop support if you put query builder inside scrollable block.  
+
+## `Utils`
+
+### Save/load tree
+
+  #### `getTree`
+  `Utils.getTree (immutableValue, light = true, children1AsArray = true) -> Object`  
+  Convert query value from internal Immutable format to JS object.  
   You can use it to save value on backend in `onChange` callback of `<Query>`.  
   Tip: Use `light = false` in case if you want to store query value in your state in JS format and pass it as `value` of `<Query>` after applying `loadTree()` (which is not recommended because of double conversion). See issue [#190](https://github.com/ukrbublik/react-awesome-query-builder/issues/190)
-  #### loadTree (jsValue) -> Immutable
-  Convert query value from JS format to internal Immutable format. 
-  You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `checkTree()`).
-  #### checkTree (immutableValue, config) -> Immutable
-  Validate query value corresponding to config. 
-  Invalid parts of query (eg. if field was removed from config) will be always deleted. 
-  Invalid values (values not passing `validateValue` in config, bad ranges) will be deleted if `showErrorMessage` is false OR marked with errors if `showErrorMessage` is true.
-  #### isValidTree (immutableValue) -> Boolean
-  If `showErrorMessage` in config.settings is true, use this method to check is query has bad values.
-- Export:
-  #### queryString (immutableValue, config, isForDisplay = false) -> String
-  Convert query value to custom string representation. `isForDisplay` = true can be used to make string more "human readable".
-  #### mongodbFormat (immutableValue, config) -> Object
+
+  #### `loadTree`
+  `Utils.loadTree (jsValue) -> Immutable`  
+  Convert query value from JS format to internal Immutable format.  
+  You can use it to load saved value from backend and pass as `value` prop to `<Query>`.
+
+### Validation utils
+
+  #### `isValidTree`
+  `Utils.isValidTree (immutableValue, config) -> Boolean`  
+  If `showErrorMessage` in config.settings is true, use this method to check if query has validation errors (presented in UI with red text color under the rule).  
+  Note that incomplete rules or empty groups are not counted as validation errors for this function.  
+  If `showErrorMessage` is false, this function will always return true.
+
+  #### `validateTree`
+  `Utils.validateTree (immutableValue, config, options?) -> Array`  
+  Validates immutable query value to check it corresponds to the config and has no parts that are invalid or incomplete.  
+  Returns array of errors *grouped by item in tree*.  
+  Each array element is `{ itemStr, itemPositionStr, errors, path }` (see type [`ValidationItemErrors`](/packages/core/modules/index.d.ts)).  
+
+  To present item for user you can use `itemStr` (string representation of rule eg. `Number > 55`) and `itemPositionStr` (eg. `Rule #4 (index path: 1, 2)`).  
+  Also you can use `path` to get raw item data with `Utils.TreeUtils.getItemByPath(tree, path)` *(advanced)*.  
+
+  `errors` is an array of objects `{ str, key, args, side, delta }` (see type [`ValidationError`](/packages/core/modules/index.d.ts)).  
+  `str` is an error message translated with [i18next.t(key, args)](https://www.i18next.com/overview/api#t) (namespace is `raqbvalidation`).  
+  `side` can be one of `rhs` or `lhs`.  
+  `delta` can be 0 or 1 for `between` operator.  
+
+  You can override/extend translations with:  
+  `Utils.i18n.addResources("en", "raqbvalidation", { ...yourTranslations })`  
+  See default [validation translations](/packages/core/modules/i18n/validation/translations.js).  
+  See [i18n for validation](#validation-translations).
+
+  #### `sanitizeTree`
+  `Utils.sanitizeTree (immutableValue, config, options?) -> { fixedTree, fixedErrors, nonFixedErrors }`  
+  Validates and modifies immutable query value to ensure it corresponds to the config and has no parts that are invalid or incomplete.  
+  Invalid rules (eg. if field is not found in config) will always be deleted.  
+  Invalid values (eg. value > max or < min, value not passing `validateValue()` in field config) will be either:
+   - always deleted if `showErrorMessage` in config.settings is false
+   - fixed (if possible) or deleted (if can't fix) if `options.forceFix` is true
+   - marked with error if `showErrorMessage` is true.
+
+  `options` is an object with keys:
+  - `removeEmptyGroups` (default: true) - If group has no children, drop it.
+  - `removeEmptyRules` (default: true) - If rule is empty, drop it.
+  - `removeIncompleteRules` (default: true) - If rule is not completed (eg. value in RHS is empty, or required argument for a function is empty), drop it. Cause it can't be exported (will not be present in result of any [export](#export-utils) function call) so can be treated as useless.
+  - `forceFix` (default: false) - If a rule has validation error(s), fix them if it's possible (eg. if value > max, can be reset to max), if not possible - drop it.
+
+  Returns an object with properties:
+  - `fixedTree` is a fixed immutable tree value 
+  - `fixedErrors` is an array of fixed errors grouped by item
+  - `nonFixedErrors` can be present if a `fixedTree` still has validation errors (eg. if `forceFix: false` and there are rules with value > max, or `removeEmptyGroups: false` and there are empty groups). 
+  - `allErrors` is an array of all errors (fixed and non-fixed). 
+
+  The format of errors in `fixedErrors`, `nonFixedErrors`, `allErrors` is the same as returned from [validateTree](#validateTree).  
+  But error objects per item alongside with `str`, `key`, `args`, `side` have also the following keys:  
+  `fixed` (boolean), `fixedFrom`, `fixedTo`.
+
+### Export utils
+
+  #### `queryString`
+  `Utils.Export.queryString (immutableValue, config, isForDisplay = false) -> String`  
+  Convert query value to custom string representation.  
+  `isForDisplay` = true can be used to make string more "human readable".
+
+  #### `mongodbFormat`
+  `Utils.Export.mongodbFormat (immutableValue, config) -> Object`  
   Convert query value to MongoDb query object.
-  #### sqlFormat (immutableValue, config) -> String
+
+  #### `sqlFormat`
+  `Utils.Export.sqlFormat (immutableValue, config) -> String`  
   Convert query value to SQL where string.
-  #### spelFormat (immutableValue, config) -> String
+
+  #### `spelFormat`
+  `Utils.Export.spelFormat (immutableValue, config) -> String`  
   Convert query value to [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html).
-  #### elasticSearchFormat (immutableValue, config) -> Object
+
+  #### `elasticSearchFormat`
+  `Utils.Export.elasticSearchFormat (immutableValue, config) -> Object`  
   Convert query value to ElasticSearch query object.
-  #### jsonLogicFormat (immutableValue, config) -> {logic, data, errors}
-  Convert query value to [JsonLogic](http://jsonlogic.com) format. 
-  If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with null values ("template" data).
-- Import:
-  #### loadFromJsonLogic (jsonLogicObject, config) -> Immutable
-  Convert query value from [JsonLogic](http://jsonlogic.com) format to internal Immutable format. 
-  #### _loadFromJsonLogic (jsonLogicObject, config) -> [Immutable, errors]
-  #### loadFromSpel (string, config) -> [Immutable, errors]
+
+  #### `jsonLogicFormat`
+  `Utils.Export.jsonLogicFormat (immutableValue, config) -> {logic, data, errors}`  
+  Convert query value to [JsonLogic](http://jsonlogic.com) format.  
+  If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with null values ("template" data).  
+  **Note:** You can set `config.settings.fixJsonLogicDateCompareOp = true` to fix the comparison of dates with `==` and `!=` in JsonLogic by using custom ops `date==`, `date!=`, `datetime==`, `datetime!=`.  
+  **Note:** If you import custom version of `json-logic-js` please add [custom operators](/packages/core/modules/utils/jsonLogicUtils.js#L12) with:
+  ```js
+  import JL from "json-logic-js";
+  Utils.JsonLogicUtils.addRequiredJsonLogicOperations(JL);
+  // console.log(JL.apply({ "now": [] }));
+  ```
+
+### Import utils
+
+  #### `loadFromJsonLogic`
+  `Utils.Import.loadFromJsonLogic (jsonLogicObject, config) -> Immutable`  
+  Convert query value from [JsonLogic](http://jsonlogic.com) format to internal Immutable format.
+ 
+  #### `_loadFromJsonLogic`
+  `Utils.Import._loadFromJsonLogic (jsonLogicObject, config) -> [Immutable, errors]`
+
+  #### `loadFromSpel`
+  `Utils.Import.loadFromSpel (string, config) -> [Immutable, errors]`  
   Convert query value from [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html) format to internal Immutable format. 
-- Save/load config from server:
-  #### compressConfig(config, baseConfig) -> ZipConfig
+
+  #### `loadFromSql`
+  `SqlUtils.loadFromSql (string, config) -> {tree: Immutable, errors: string[]}`  
+  Convert query value from SQL format to internal Immutable format.  
+  Requires import of `@react-awesome-query-builder/sql`:  
+  `import { SqlUtils } from "@react-awesome-query-builder/sql"`
+
+### Save/load config from server
+
+  #### `compressConfig`
+  `Utils.ConfigUtils.compressConfig (config, baseConfig) -> ZipConfig`  
   Returns compressed config that can be serialized to JSON and saved on server.  
   `ZipConfig` is a special format that contains only changes agains `baseConfig`.  
   `baseConfig` is a config you used as a base for constructing `config`, like `InitialConfig` in examples above.  
   It depends on UI framework you choose - eg. if you use `@react-awesome-query-builder/mui`, please provide `MuiConfig` to `baseConfig`. 
-  #### decompressConfig(zipConfig, baseConfig, ctx?) -> Config
+
+  #### `decompressConfig`
+  `Utils.ConfigUtils.decompressConfig (zipConfig, baseConfig, ctx?) -> Config`  
   Converts `zipConfig` (compressed config you receive from server) to a full config that can be passed to `<Query />`.  
   `baseConfig` is a config to be used as a base for constructing your config, like `InitialConfig` in examples above.  
   [`ctx`](#ctx) is optional and can contain your custom functions and custom React components used in your config.  
@@ -461,24 +559,141 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Note that you should set `config.settings.useConfigCompress = true` in order for this function to work. 
 
 
-### Config format
+## Config format
 This library uses config-driven aproach. 
 Config defines what value types, operators are supported, how they are rendered, imported, exported. 
 At minimum, you need to provide your own set of fields as in [basic usage](#usage).  
 See [`CONFIG`](/CONFIG.adoc) for full documentation.
 
 
+## Validation
+
+Useful [config settings](/CONFIG.adoc#configsettings) to manage global validation behaviour:
+- `showErrorMessage`: If it's `false`, query builder won't allow user to input incorrect values (like > max or < min or value that doesn't bypass `validateValue()` in field config). If it's `true`, inputs can have invalid values but the appropriate error message will be shown under the rule.
+- `removeIncompleteRulesOnLoad`, `removeEmptyRulesOnLoad`, `removeEmptyGroupsOnLoad`, `removeInvalidMultiSelectValuesOnLoad`: during initial validation of `value` prop passed to `<Query>`.
+
+Useful [field config settings](/CONFIG.adoc#configfields) to manage validation behaviour per field:
+- `fieldSettings.min`, `fieldSettings.max` for numeric fields
+- `fieldSettings.maxLength` for string fields
+- `fieldSettings.validateValue` - Custom JS function to validate value and return null (if value is valid) or object `{error, fixedValue?}`. 
+  `error` can be a string or an object `{key, args}` to use [i18n](#validation-translations)
+- Note that functions and their arguments can also have `fieldSettings`
+
+Use [`Utils.sanitizeTree()`](#sanitizetree) to perform validation on tree value and return validation errors and fixed tree value.
+See the list of [validation utils](#validation-utils).
+
+See [i18n for validation](#validation-translations).
+
+
+## i18n
+:construction:
+
+This library uses [i18next](https://www.i18next.com/overview/getting-started) for translations.  
+
+### Validation translations
+
+  Namespace: `raqbvalidation`.
+  [Default translations resource](/packages/core/modules/i18n/validation/translations.js)
+
+Example of overriding translations for validation error messages:
+```js
+Utils.i18n.addResources("en", "raqbvalidation", {
+  "INCOMPLETE_LHS": "Incomplete left-hand side",
+  "INCOMPLETE_RHS": "Incomplete right-hand side",
+});
+```
+
+Example of using custom translations in `validateValue` in config:
+```js
+Utils.i18n.addResources("en", "mynamespace", {
+  "INVALID_SLIDER_VALUE": "Invalid slider value {{val}}",
+});
+
+const config = {
+  ...MuiConfig,
+  fields: {
+    slider: {
+      type: "number",
+      preferWidgets: ["slider"],
+      fieldSettings: {
+        validateValue: (val) => {
+          return (val < 50 ? null : {
+            error: {
+              // use `key` and `args` for i18next.t()
+              // `key` should have your namespace prefixed with ":"
+              key: "mynamespace:INVALID_SLIDER_VALUE",
+              args: { val }
+            },
+            fixedValue: 49
+          });
+        },
+      }
+    }
+  }
+};
+
+// then use <Query {...config} />
+```
+
+See [example](/packages/examples/src/demo/index.tsx).
+
+
+## Ternary mode
+
+First you need to configure `caseValueField` in `config.settings`. Example to use tags as case values:
+```js
+const config: Config = {
+  ...InitialConfig,
+  fields,
+  settings: {
+    ...InitialConfig.settings,
+    caseValueField: {
+      type: "select",
+      valueSources: ["value"],
+      fieldSettings: {
+        listValues: [
+          { value: "tag1", title: "Tag #1" },
+          { value: "tag2", title: "Tag #2" },
+        ],
+      },
+      mainWidgetProps: {
+        valueLabel: "Then",
+        valuePlaceholder: "Then",
+      },
+    },
+    canRegroupCases: true,
+    maxNumberOfCases: 10,
+  }
+};
+```
+
+You can use other type/widget (including your custom one) to render case values.  
+Also you can use function (action) by specifying `valueSources: ["func"]` in `caseValueField`. 
+You have to add [funcs](/CONFIG.adoc#configfuncs) to the config (with `returnType` equals `type` in case value field).
+
+Load empty tree in ternary mode:
+```js
+import { Utils as QbUtils, JsonSwitchGroup } from '@react-awesome-query-builder/ui';
+const emptyJson: JsonSwitchGroup = { id: QbUtils.uuid(), type: "switch_group", };
+const tree = QbUtils.loadTree(emptyJson);
+```
+
+See [example](/packages/examples/src/demo_switch/index.tsx)
+
+![Screenshot](https://github.com/ukrbublik/react-awesome-query-builder/assets/3238637/4bf87da5-47f2-4a64-b1be-8924a62f96ad)
+
+
 ## SSR
 You can save and load config from server with help of utils:
-- [Utils.compressConfig()](#compressconfigconfig-baseconfig---zipconfig)
-- [Utils.decompressConfig()](#decompressconfigzipconfig-baseconfig-ctx---config)
+- [Utils.ConfigUtils.compressConfig()](#compressconfig)
+- [Utils.ConfigUtils.decompressConfig()](#decompressconfig)
 
 You need these utils because you can't just send config *as-is* to server, as it contains functions that can't be serialized to JSON.  
 Note that you need to set `config.settings.useConfigCompress = true` to enable this feature.  
 
 To put it simple:
 - `ZipConfig` type is a JSON that contains only changes against basic config (differences). At minimum it contains your `fields`. It does not contain [`ctx`](#ctx).
-- `Utils.decompressConfig()` will merge `ZipConfig` to basic config (and add `ctx` if passed). 
+- `Utils.ConfigUtils.decompressConfig()` will merge `ZipConfig` to basic config (and add `ctx` if passed). 
 
 See [sandbox_next demo app](/packages/sandbox_next) that demonstrates server-side features. 
 
@@ -508,6 +723,12 @@ It's recommended to update your version to 6.x. You just need to change your imp
 
 ### Changelog
 See [`CHANGELOG`](/CHANGELOG.md)
+
+### Migration to 6.5.0
+
+Validation API has been changed:
+- `Utils.validateTree()` now returns array of validation errors intead of boolean
+- `Utils.checkTree()` and `Utils.validateAndFixTree()` are deprecated (and removed type defs). Use `Utils.sanitizeTree().fixedTree` instead
 
 ### Migration to 6.4.0
 
@@ -548,6 +769,25 @@ const config = {
 };
 export default config;
 ```
+
+
+**Note:** If you override `render*` function(s) in config setttings and call original `render*` function from imported config, be aware that you should pass `ctx` as 2nd param.
+Example:
+```js
+config = {
+  ...MuiConfig,
+  settings: {
+    ...MuiConfig.settings,
+    renderField: (props) => (
+      <WithTheme theme={theme}>
+        { MuiConfig.settings.renderField?.(props, MuiConfig.ctx) }  // please pass `ctx`
+      </WithTheme>
+    ),
+  }
+};
+```
+See issue [#996](https://github.com/ukrbublik/react-awesome-query-builder/issues/996)
+
 
 ### Migration to 6.2.0
 
@@ -644,7 +884,7 @@ If you used JsonLogic for saving, you need to replace `{"!": {"var": "your_field
 From v2.0 of this lib AntDesign is now optional (peer) dependency, so you need to explicitly include `antd` (4.x) in `package.json` of your project if you want to use AntDesign UI.  
 Please import `AntdConfig` from `react-awesome-query-builder/lib/config/antd` and use it as base for your config (see below in [usage](#usage)).  
 Alternatively you can use `BasicConfig` for simple vanilla UI, which is by default.  
-Support of other UI frameworks (like Bootstrap) are planned for future, see [Other UI frameworks](#other-ui-frameworks).
+Support of other UI frameworks (like Bootstrap) are planned for future, see [Other UI frameworks](CONTRIBUTING.md#other-ui-frameworks).
 
 
 

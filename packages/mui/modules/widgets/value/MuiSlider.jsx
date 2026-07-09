@@ -5,29 +5,34 @@ import FormControl from "@mui/material/FormControl";
 
 export default (props) => {
   const {config, placeholder, customProps, value, setValue, min, max, step, marks, readonly} = props;
-  const {defaultSliderWidth} = config.settings;
+  const {defaultSliderWidth, renderSize} = config.settings;
 
   const handleSliderChange = useCallback((_e, newValue) => {
     setValue(newValue);
-  }, []);
+  }, [setValue]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     let val = e.target.value;
     if (val === "" || val === null)
       val = undefined;
     else
       val = Number(val);
     setValue(val);
-  };
+  }, [setValue]);
 
-  const handleInputBlur = () => {
+  const handleInputBlur = useCallback((e) => {
+    let val = e.target.value;
+    if (val === "" || val === null)
+      val = undefined;
+    else
+      val = Number(val);
     // TIP: Fix if typed value out of range in input
-    if (value < min) {
+    if (val < min) {
       setValue(min);
-    } else if (value > max) {
+    } else if (val > max) {
       setValue(max);
     }
-  };
+  }, [setValue, min, max]);
 
 
   const {width, ...rest} =  customProps || {};
@@ -45,24 +50,32 @@ export default (props) => {
     label: typeof marks[v] === "object" || typeof marks[v] === "undefined" ? marks[v] : <p>{marks[v]}</p>
   })) : false, [marks]);
 
+  const InputProps = useMemo(() => ({
+    readOnly: readonly,
+  }), [
+    readonly
+  ]);
+
+  const inputProps = useMemo(() => ({
+    min,
+    max,
+    step,
+  }), [
+    min, max, step
+  ]);
+
   const InputCmp = (
     <TextField 
       variant="standard"
       type="number"
       value={inputValue}
       placeholder={placeholder}
-      InputProps={{
-        readOnly: readonly,
-      }}
-      inputProps={{
-        min: min,
-        max: max,
-        step: step,
-      }}
+      InputProps={InputProps}
+      inputProps={inputProps}
       disabled={readonly}
       onChange={handleInputChange}
       onBlur={handleInputBlur}
-      size="small"
+      size={renderSize}
       {...customInputProps}
     />
   );
@@ -77,7 +90,7 @@ export default (props) => {
       step={step}
       marks={muiMarks}
       valueLabelDisplay="auto"
-      size="small"
+      size={renderSize}
       {...customSliderProps}
     />
   );
@@ -92,10 +105,11 @@ export default (props) => {
     marginLeft: "5px",
   };
 
+  // todo: css
   const stylesSliderWrapper = {
     marginLeft: "5px", 
     paddingLeft: "12px", 
-    marginBottom: muiMarks && "-16px", 
+    marginBottom: muiMarks && "-24px", 
     width: width || defaultSliderWidth,
   };
 

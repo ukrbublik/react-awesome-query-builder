@@ -4,7 +4,7 @@ import { TextField } from "@fluentui/react";
 const FluentUINumber = (props) => {
   const { value, setValue, readonly, min, max, step, placeholder } = props;
 
-  const onChange = (e, val) => {
+  const onChange = (_e, val) => {
     var newVal;
     if (val === "" || val === null || val === undefined) {
       newVal = undefined;
@@ -19,6 +19,7 @@ const FluentUINumber = (props) => {
       type="number"
       value={value}
       placeholder={placeholder}
+      readOnly={readonly}
       disabled={readonly}
       min={min}
       max={max}

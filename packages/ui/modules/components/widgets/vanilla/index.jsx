@@ -10,6 +10,7 @@ export {default as VanillaDateTimeWidget} from "./value/VanillaDateTime";
 export {default as VanillaMultiSelectWidget} from "./value/VanillaMultiSelect";
 export {default as VanillaSelectWidget} from "./value/VanillaSelect";
 export {default as VanillaNumberWidget} from "./value/VanillaNumber";
+export {default as VanillaPriceWidget} from "./value/VanillaPrice";
 export {default as VanillaSliderWidget} from "./value/VanillaSlider";
 
 // field select widget
@@ -23,5 +24,4 @@ export {default as VanillaButtonGroup} from "./core/VanillaButtonGroup";
 export {default as VanillaValueSources} from "./core/VanillaValueSources";
 export {default as VanillaSwitch} from "./core/VanillaSwitch";
 export {default as vanillaConfirm} from "./core/vanillaConfirm";
-
-export const VanillaProvider = ({config, children}) => children;
+export { VanillaProvider } from "./core/VanillaProvider";

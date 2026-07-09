@@ -1,27 +1,101 @@
 
-import { Utils } from "@react-awesome-query-builder/core";
-const { uuid } = Utils;
 
 export const tree_with_empty_group = {
   type: "group",
-  id: uuid(),
-  children1: {
-    [uuid()]: {
+  children1: [
+    {
       type: "group",
       properties: {
         conjunction: "AND",
         not: false
       },
-      children1: {}
+      children1: []
     },
-  }
+  ]
+};
+
+export const tree_with_incorrect_value_type_in_rule = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      field: "num",
+      operator: "equal",
+      value: ["100"],
+      valueType: ["string"],
+    }
+  }],
+};
+
+export const tree_with_missing_value_type_in_rule = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      field: "num",
+      operator: "equal",
+      value: ["5"],
+    }
+  }],
+};
+
+export const tree_with_empty_groups_and_incomplete_rules = {
+  type: "group",
+  children1: [
+    {
+      type: "group",
+      children1: [
+        {
+          type: "rule",
+          properties: {
+            field: "num",
+            operator: "between",
+          }
+        },
+      ]
+    },
+    {
+      type: "rule",
+      properties: {
+        field: "num",
+        operator: "is_null",
+      }
+    },
+    {
+      type: "group",
+      children1: [
+        {
+          type: "rule",
+          properties: {
+          }
+        },
+      ]
+    },
+    {
+      type: "rule",
+      properties: {
+        field: "num",
+        operator: "greater",
+      }
+    },
+    {
+      type: "rule",
+      properties: {
+        field: "num",
+        operator: "less",
+        value: [100],
+      }
+    },
+    {
+      type: "group"
+    }
+  ]
 };
 
 export const tree_with_number = {
   type: "group",
-  id: uuid(),
-  children1: {
-    [uuid()]: {
+  children1: [
+    {
       type: "rule",
       properties: {
         field: "num",
@@ -31,7 +105,7 @@ export const tree_with_number = {
         valueType: ["number"]
       }
     },
-  },
+  ],
   properties: {
     conjunction: "AND",
     not: false
@@ -50,20 +124,102 @@ export const with_number = {
   }]
 };
 
+export const with_uneven_number = {
+  "and": [{
+    "==": [
+      { "var": "evenNum" },  7
+    ]
+  }]
+};
+
+export const with_uneven_number_bigger_than_max = {
+  "and": [{
+    "==": [
+      { "var": "evenNum" },  13
+    ]
+  }]
+};
+
+export const with_numLess5_eq_7 = {
+  "and": [{
+    "==": [
+      { "var": "numLess5" },  7
+    ]
+  }]
+};
+
+export const with_number_bigger_than_max = {
+  "and": [{
+    "==": [
+      { "var": "num" },  200
+    ]
+  }]
+};
+
+export const with_range_bigger_than_max = {
+  "and": [{
+    "<=": [
+      100,
+      { "var": "num" },
+      200
+    ]
+  }]
+};
+
+export const with_range_from_field_to_big_number = {
+  "and": [{
+    "<=": [
+      { "var": "numField" },
+      { "var": "num" },
+      100
+    ]
+  }]
+};
+
+export const with_bad_range = {
+  "and": [{
+    "<=": [
+      4,
+      { "var": "num" },
+      3
+    ]
+  }]
+};
+
+export const with_bad_range_bigger_than_max = {
+  "and": [{
+    "<=": [
+      400,
+      { "var": "num" },
+      300
+    ]
+  }]
+};
+
 export const with_range_slider = {
   "and": [{
     "<=": [
-      18, 
+      18,
       { "var": "slider" },
       42
     ]
   }]
 };
 
-export const with_range_dates = {
+export const with_bad_date_range = {
   "and": [{
     "<=": [
-      "2020-05-10T21:00:00.000Z", 
+      "2020-05-15T21:00:00.000Z", 
+      { "var": "date" },
+      "2020-05-10T21:00:00.000Z"
+    ]
+  }]
+};
+
+export const with_date_range = {
+  "and": [{
+    "<=": [
+      "2020-05-10T21:00:00.000Z",
       { "var": "date" },
       "2020-05-15T21:00:00.000Z"
     ]
@@ -73,7 +229,7 @@ export const with_range_dates = {
 export const with_range_bad_dates = {
   "and": [{
     "<=": [
-      "2020-05-10TTTT", 
+      "2020-05-10TTTT",
       { "var": "date" },
       "2020-05-15T21:00:00.000Z"
     ]
@@ -124,16 +280,32 @@ export const with_less = {
 
 export const with_date_and_time = {
   "or": [{
-    "==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]
+    "datetime==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]
   }, {
     "and": [{
-      "==": [ {  "var": "date" }, "2020-05-18T21:00:00.000Z" ]
+      "date==": [ {  "var": "date" }, "2020-05-18T21:00:00.000Z" ]
     }, {
       "==": [ { "var": "time" }, 3000 ]
     }]
   }]
 };
-  
+
+export const with_date_epoch = {
+  "and": [
+    {
+      "datetime==": [ { "var": "datetime" }, "1736782768" ]
+    }
+  ]
+};
+
+export const with_date_epoch_ms = {
+  "and": [
+    {
+      "datetime==": [ { "var": "datetime" }, "1736782768000" ]
+    }
+  ]
+};
+
 export const with_select_and_multiselect = {
   "and": [{
     "==": [ { "var": "color" }, "yellow" ]
@@ -144,13 +316,13 @@ export const with_select_and_multiselect = {
     ]
   }]
 };
-  
+
 export const with_struct_and_group = {
   "and": [
     {
       "and": [
         { "==": [ { "var": "results.slider" }, 22 ] },
-        { "<=": [ 13, { "var": "results.slider" }, 36 ] }, // tip: invalid
+        { "<=": [ 13, { "var": "results.slider" }, 36 ] },
         { "==": [ { "var": "results.stock" }, true ] }
       ]
     },
@@ -189,17 +361,78 @@ export const with_bad_subfield_in_group = {
   ]
 };
 
+export const with_nested_and_select_any_in_in_some = {
+  "and": [
+    { "some": [
+      { "var": "vehicles.cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] }
+  ]
+};
+
+export const with_nested_and_like_in_some = {
+  "and": [
+    { "some": [
+      { "var": "vehicles.cars" },
+      { "in": [ "coro", { "var": "model" } ] }
+    ] }
+  ]
+};
+
 export const with_select_not_any_in_in_some = {
   "and": [
     { "some": [
       { "var": "cars" },
-      { "!": 
+      { "!":
         { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
       }
     ] }
   ]
 };
 export const spel_with_select_not_any_in_in_some = "cars.?[!({'Ford', 'Toyota'}.?[true].contains(vendor))].size() > 0";
+
+export const with_empty_group_some = {
+  type: "group",
+  children1: [{
+    type: "rule_group",
+    properties: {
+      mode: "array",
+      operator: "some",
+      field: "cars",
+    }
+  }]
+};
+
+export const spel_with_not_select_not_any_in_in_some = "cars.?[!(!({'Ford', 'Toyota'}.?[true].contains(vendor)))].size() > 0";
+export const with_not_select_not_any_in_in_some = {
+  "and": [
+    {
+      "some": [
+        { "var": "cars" },
+        {
+          "!": {
+            "!": {
+              "in": [
+                { "var": "vendor" },
+                [ "Ford", "Toyota" ]
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+};
+
+export const with_select_any_in_in_some = {
+  "and": [
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] }
+  ]
+};
+export const spel_with_select_any_in_in_some = "cars.?[{'Ford', 'Toyota'}.?[true].contains(vendor)].size() > 0";
 
 export const with_not_and_in_some = {
   "and": [
@@ -213,6 +446,96 @@ export const with_not_and_in_some = {
   ]
 };
 export const spel_with_not_and_in_some = "cars.?[!(year == null && !({'Ford', 'Toyota'}.?[true].contains(vendor)))].size() > 0";
+
+export const with_not_and_neg_in_some = {
+  "and": [
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "and": [ { "<=": [ 1995, { "var": "year" }, 2005 ] } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "in": [ "ggg1", { "var": "model" } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "!": { "in": [ "ggg2", { "var": "model" } ] } } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "and": [ { "!": { "and": [ { "!": { "in": [ "ggg3", { "var": "model" } ] } } ] } } ] }
+    ] },
+    { "all": [
+      { "var": "cars" },
+      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Tesla" ] ] } }
+    ] },
+    { "all": [
+      { "var": "cars" },
+      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "BMW", "Toyota" ] ] } } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "and": [ { "!": { "in": [ { "var": "vendor" }, [ "Tesla", "Toyota" ] ] } } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "!": { "in": [ { "var": "vendor" }, [ "Ford", "BMW" ] ] } } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "!": { "!": { "in": [ { "var": "vendor" }, [ "BMW", "Tesla" ] ] } } } }
+    ] }
+  ]
+};
+
+export const with_not_and_neg_in_some_reversed = {
+  "and": [
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "<=": [ 1995, { "var": "year" }, 2005 ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "in": [ "ggg1", { "var": "model" } ] } }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "in": [ "ggg2", { "var": "model" } ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "in": [ "ggg3", { "var": "model" } ] }
+    ] },
+    { "all": [
+      { "var": "cars" },
+      { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Tesla" ] ] } }
+    ] },
+    { "all": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "BMW", "Toyota" ] ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Tesla", "Toyota" ] ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "BMW" ] ] }
+    ] },
+    { "some": [
+      { "var": "cars" },
+      { "!": { "in": [ { "var": "vendor" }, [ "BMW", "Tesla" ] ] } }
+    ] }
+  ]
+};
 
 export const with_nested_group = {
   "and": [
@@ -248,7 +571,7 @@ export const two_rules_with_nested_group = {
       "some": [
         { "var": "results" },
         { "some": [
-          { "var": "user" }, 
+          { "var": "user" },
           { "==": [ { "var": "name" },  "aaa" ] }
         ] }
       ]
@@ -348,7 +671,7 @@ export const with_two_groups_1 = {
       "and": [
         {
           "==": [ { "var": "results.user.name" },  "ddd" ]
-        }, 
+        },
         {
           "==": [ { "var": "results.score" },  2 ]
         },
@@ -492,6 +815,10 @@ export const with_select = {
   "and": [{  "==": [ { "var": "color" }, "orange" ]  }]
 };
 
+export const with_bad_select_value = {
+  "and": [{  "==": [ { "var": "color" }, "unexisting" ]  }]
+};
+
 export const with_bool = {
   "and": [{  "==": [ { "var": "stock" }, true ]  }]
 };
@@ -515,8 +842,23 @@ export const with_multiselect = {
   ]
 };
 
+export const with_bad_multiselect_value = {
+  "and": [
+    {
+      "all": [
+        { "var": "multicolor" },
+        { "in": [ { "var": "" }, [ "unexisting1", "orange", "unexisting2" ] ] }
+      ]
+    }
+  ]
+};
+
 export const with_treeselect = {
   "and": [{  "==": [ { "var": "selecttree" }, "2" ]  }]
+};
+
+export const with_price = {
+  "and": [{  ">": [ { "var": "price" }, 23.45 ]  }]
 };
 
 export const with_ops = {
@@ -558,6 +900,118 @@ export const with_ops = {
         ]
       }
     }
+  ]
+};
+
+
+export const with_in_ops = {
+  "and": [
+    {
+      "in": [
+        { "var": "color" },
+        { "var": "multicolor" },
+      ]
+    },
+    {
+      "in": [
+        { "var": "text" },
+        { "var": "str" },
+      ]
+    },
+  ]
+};
+
+export const with_in_ops_spel = "(multicolor.contains(color) && str.contains(text))";
+
+export const with_ops_sql = "(text = 'Long\\nText' AND num <> 2 AND str LIKE '%abc%' AND str NOT LIKE '%xyz%' AND num BETWEEN 1 AND 2 AND num NOT BETWEEN 3 AND 4 AND num IS NULL AND color IN ('yellow') AND color NOT IN ('green') AND multicolor != 'yellow')";
+
+export const with_ops_and_negation_groups = {
+  "and": [
+    {
+      "==": [ { "var": "text" },  "Long\nText" ]
+    }, {
+      "!=": [ { "var": "num" },  2 ]
+    }, {
+      "in": [ "abc",  { "var": "str" } ]
+    }, {
+      "!": {
+        "and": [
+          {
+            "in": [ "xyz", { "var": "str" } ]
+          }
+        ]
+      }
+    }, {
+      "<=": [  1,  { "var": "num" },  2  ]
+    }, {
+      "!": {
+        "and": [
+          {
+            "<=": [  3,  { "var": "num" },  4  ]
+          }
+        ]
+      }
+    }, {
+      "!": { "var": "num" }
+    }, {
+      "in": [
+        { "var": "color" },
+        [ "yellow" ]
+      ]
+    }, {
+      "!": {
+        "and": [
+          {
+            "in": [
+              { "var": "color" },  [ "green" ]
+            ]
+          }
+        ]
+      }
+    }, {
+      "!": {
+        "and": [
+          {
+            "all": [
+              { "var": "multicolor" },
+              { "in": [ { "var": "" },  [ "yellow" ] ] }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const exclamation_operators_and_negation_groups = {
+  "and": [
+    {"!": {"and": [{"in": ["abc3", {"var": "str"}]}]}},
+    {"!": {"in": ["xyz", {"var": "str"}]}},
+    {"!": {"and": [{"<=": [1, {"var": "num"}, 2]}]}},
+    {"!": {"<=": [3, {"var": "num"}, 4]}},
+    {"!": {"and": [{"in": [{"var": "color"}, ["yellow"]]}]}},
+    {"!": {"in": [{"var": "color"}, ["green"]]}},
+    {"!": {"and": [{"all": [{"var": "multicolor"}, {"in": [{"var": ""}, ["yellow"]]}]}]}},
+    {"!": {"all": [{"var": "multicolor"}, {"in": [{"var": ""}, ["yellow"]]}]}},
+    {"!": {"and": [{"some": [{"var": "multicolor"}, {"in": [{"var": ""}, ["green"]]}]}]}},
+    {"!": {"some": [{"var": "multicolor"}, {"in": [{"var": ""}, ["green"]]}]}},
+    {"==": [{"var": "str"}, null]}
+  ]
+};
+
+export const exclamation_operators_and_negation_groups_reversed = {
+  "and": [
+    {"!": {"in": ["abc3", {"var": "str"}]}},
+    {"!": {"in": ["xyz", {"var": "str"}]}},
+    {"!": {"<=": [1, {"var": "num"}, 2]}},
+    {"!": {"<=": [3, {"var": "num"}, 4]}},
+    {"!": {"in": [{"var": "color"}, ["yellow"]]}},
+    {"!": {"in": [{"var": "color"}, ["green"]]}},
+    {"!": {"all": [{"var": "multicolor"}, {"in": [{"var": ""}, ["yellow"]]}]}},
+    {"!": {"all": [{"var": "multicolor"}, {"in": [{"var": ""}, ["yellow"]]}]}},
+    {"!": {"some": [{"var": "multicolor"}, {"in": [{"var": ""}, ["green"]]}]}},
+    {"!": {"some": [{"var": "multicolor"}, {"in": [{"var": ""}, ["green"]]}]}},
+    {"==": [{"var": "str"}, null]}
   ]
 };
 
@@ -643,6 +1097,16 @@ export const with_groups = {
   ]
 };
 
+export const with_empty_and_single_rule_groups = {
+  "or": [
+    { "and": [
+      {
+        "==": [ { "var": "num" }, 1 ]
+      }
+    ]}, { "and": []}
+  ]
+};
+
 export const with_nested = {
   "and": [
     { "==": [ { "var": "user.info.firstName" }, "abc" ] },
@@ -662,11 +1126,25 @@ export const with_func_tolower_from_field = {
   ]
 };
 
+export const with_func_tolower_and_contains_op = {
+  "and": [
+    {
+      "in": [
+        "aa",
+        {
+          "toLowerCase": [
+            "AAA"
+          ]
+        }
+      ]
+    }
+  ]
+};
+
 export const with_func_linear_regression_tree = {
   type: "group",
-  id: uuid(),
-  children1: {
-    [uuid()]: {
+  children1: [
+    {
       type: "rule",
       properties: {
         field: "num",
@@ -686,7 +1164,7 @@ export const with_func_linear_regression_tree = {
         valueError: [ null ]
       }
     },
-  },
+  ],
   properties: {
     conjunction: "AND",
     not: false
@@ -707,18 +1185,270 @@ export const with_func_linear_regression = {
 
 export const with_func_relative_datetime = {
   "and": [ {
-    "==": [
+    "datetime==": [
       { "var": "datetime" },
-      { "date_add": [ { "now": [] }, 2, "day" ] }
+      { "datetime_add": [ { "now": [] }, 2, "day" ] }
     ]
   } ]
 };
 
+export const with_func_relative_date = {
+  "and": [ {
+    "date==": [
+      { "var": "date" },
+      { "date_add": [ { "today": [] }, 2, "day" ] }
+    ]
+  } ]
+};
+
+export const with_func_sum_of_multiselect = {
+  "and": [ {
+    "==": [
+      { "var": "num" },
+      { "sumOfMultiselect": [
+        [3, 5]
+      ] }
+    ]
+  } ]
+};
+
+export const with_func_sum_of_multiselect_spel = "num == {5}.sumOfMultiselect()";
+
+export const with_func_sum_of_multiselect_in_lhs = {
+  "and": [
+    {
+      "<=": [
+        { "sumOfMultiselect": [
+          [ 1, 2]
+        ] },
+        { "sumOfMultiselect": [
+          [ 3, 4]
+        ] },
+        { "sumOfMultiselect": [
+          [ 5, 6]
+        ] },
+      ]
+    }
+  ]
+};
+
+export const tree_with_vfunc_in_lhs_with_missing_args = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc1",
+        args: {
+          str1: { valueSrc: "value", value: "aaaaa" },
+          str2: { valueSrc: "value", value: "bbbbb" },
+          // num1 has defaultValue
+          // num2 has NO defaultValue !!!
+        },
+      },
+      operator: "equal",
+      value: ["xxxxxx"],
+      valueSrc: ["value"],
+    },
+  }]
+};
+
+export const tree_with_vfunc_in_lhs_with_invalid_args_and_rhs = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc1",
+        args: {
+          str1: { valueSrc: "value", value: "aaaaaa" },
+          str2: { valueSrc: "value", value: "bbbbbb" },
+          num1: { valueSrc: "value", value: 20 },
+          num2: { valueSrc: "value", value: 4 },
+        },
+      },
+      operator: "equal",
+      value: ["xxxxxx"],
+      valueSrc: ["value"],
+    },
+  }]
+};
+
+export const tree_with_vfunc_in_both_sides_with_invalid_args_in_nested_funcs = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc1",
+        args: {
+          str1: { valueSrc: "value", value: "aaaaaa" },
+          str2: {
+            valueSrc: "func",
+            value: {
+              func: "vld.tfunc1",
+              args: {
+                str1: { valueSrc: "value", value: "_aaaaaa" },
+                // str2 has defaultValue
+                // num1 has defaultValue
+                num2: { valueSrc: "value", value: 4 },
+              }
+            }
+          },
+          num1: { valueSrc: "value", value: 20 },
+          num2: { valueSrc: "value", value: 4 },
+        },
+      },
+      operator: "equal",
+      value: [{
+        func: "vld.tfunc1",
+        args: {
+          // str1 has defaultValue
+          str2: { valueSrc: "value", value: "rbbbbbb" },
+          // num1 has defaultValue
+          num2: { valueSrc: "value", value: 13 },
+        }
+      }],
+      valueSrc: ["func"],
+    },
+  }]
+};
+
+export const tree_with_vfunc_in_both_sides_with_missing_args_in_nested_funcs = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc1",
+        args: {
+          str1: {
+            valueSrc: "func",
+            value: {
+              func: "vld.tfunc2",
+              args: {
+                // num1 has defaultValue
+                num2: { valueSrc: "value", value: 3 },
+                num3: { valueSrc: "value", value: 4 },
+              },
+            }
+          },
+          str2: {
+            valueSrc: "func",
+            value: {
+              func: "vld.tfunc2",
+              args: {
+                num1: { valueSrc: "value", value: -13 },
+                // num2 has NO defaultValue !!!
+                num3: { valueSrc: "value", value: -14 },
+              }
+            }
+          },
+          num1: { valueSrc: "value", value: 20 },
+          num2: { valueSrc: "value", value: 4 },
+        },
+      },
+      operator: "equal",
+      value: [{
+        func: "vld.tfunc1",
+        args: {
+          str1: { valueSrc: "value", value: "raaaaaaa" },
+          str2: { valueSrc: "value", value: "rbbb" },
+          num1: { valueSrc: "value", value: 3 },
+          num2: { valueSrc: "value", value: 4 },
+        }
+      }],
+      valueSrc: ["func"],
+    },
+  }]
+};
+
+export const tree_with_vfunc2_at_lhs = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc2",
+        args: {
+          num1: { valueSrc: "value", value: 7 },
+          num2: { valueSrc: "value", value: 7 },
+          num3: { valueSrc: "value", value: 7 },
+        }
+      },
+      operator: "equal",
+      value: ["xxxxxxx"]
+    }
+  }],
+};
+
+export const tree_with_vfunc2_at_lhs_without_valueSrc = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc2",
+        args: {
+          num1: { value: 7 },
+          num2: { value: 3 },
+          num3: { value: 7 },
+        }
+      },
+      operator: "equal",
+      value: ["xxxxxxx"]
+    }
+  }],
+};
+
+export const tree_with_vfunc2_at_lhs_and_long_rhs = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc2",
+        args: {
+          num1: { valueSrc: "value", value: 7 },
+          num2: { valueSrc: "value", value: 7 },
+          num3: { valueSrc: "value", value: 7 },
+        }
+      },
+      operator: "equal",
+      value: ["xxxxxyyyyyzzz"]
+    }
+  }],
+};
+
+export const tree_with_vfunc2_at_lhs_with_missing_args = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc2",
+        args: {
+          num1: { valueSrc: "value", value: 7 },
+        }
+      },
+      operator: "equal",
+      value: ["xxxxxyyyyyzzz"]
+    }
+  }],
+};
+
 export const with_prox = {
   type: "group",
-  id: uuid(),
-  children1: {
-    [uuid()]: {
+  children1: [
+    {
       type: "rule",
       properties: {
         field: "str",
@@ -731,11 +1461,44 @@ export const with_prox = {
         }
       }
     },
-  },
+  ],
   properties: {
     conjunction: "AND",
     not: false
   }
+};
+
+export const with_prox1 = {
+  type: "group",
+  children1: [
+    {
+      type: "rule",
+      properties: {
+        field: "prox1",
+        operator: "proximity",
+        value: [ "a", "b" ],
+        operatorOptions: {
+          proximity: 3
+        }
+      }
+    },
+  ],
+};
+
+export const with_prox1_no_values = {
+  type: "group",
+  children1: [
+    {
+      type: "rule",
+      properties: {
+        field: "prox1",
+        operator: "proximity",
+        operatorOptions: {
+          proximity: 3
+        }
+      }
+    },
+  ],
 };
 
 export const with_jl_value = {
@@ -766,6 +1529,28 @@ export const with_group_array_cars = {
   ]
 };
 
+export const with_group_array_cars_bad_count_and_year = {
+  "and": [
+    { ">": [
+      { "reduce": [
+        { "filter": [
+          { "var": "cars" },
+          { "and": [
+            {
+              "==": [ { "var": "vendor" }, "Toyota" ]
+            }, {
+              ">=": [ { "var": "year" }, 3000 ]
+            }
+          ] }
+        ] },
+        { "+": [ 1, { "var": "accumulator" } ] },
+        0
+      ] },
+      222
+    ] }
+  ]
+};
+
 export const with_group_count = {
   "and": [
     { "==": [
@@ -782,7 +1567,7 @@ export const spel_with_group_count = "cars.size() == 2";
 
 export const with_not_group_count = {
   "and": [
-    { "!": 
+    { "!":
       { "==": [
         { "reduce": [
           { "var": "cars" },
@@ -890,12 +1675,62 @@ export const spel_with_not_some_not_is_null = "!(cars.?[!(vendor == null)].size(
 export const spel_with_not_some_not_is_null_out = "!(cars.?[vendor != null].size() > 0)";
 
 export const spel_with_not_some_not_contains = "!(results.?[!(grade.contains('Toy'))].size() > 0)";
-export const spel_with_not_some_not_contains_out = "!(results.?[!(grade.contains('Toy'))].size() > 0)";
 
 export const with_group_array_custom_operator = {
   "and": [
     { "custom_group_operator": [
       { "var": "cars" },
+      { "and": [
+        {
+          "==": [ { "var": "vendor" }, "Toyota" ]
+        }, {
+          ">=": [ { "var": "year" }, 2010 ]
+        }
+      ] }
+    ] }
+  ]
+};
+
+export const with_group_array_custom_operator2 = {
+  "and": [
+    { "custom2": [
+      "--some-extra-data-1--",
+      { "var": "cars" },
+      { "and": [
+        {
+          "==": [ { "var": "vendor" }, "Toyota" ]
+        }, {
+          ">=": [ { "var": "year" }, 2010 ]
+        }
+      ] }
+    ] }
+  ]
+};
+
+export const with_group_array_custom_operator3 = {
+  "and": [
+    { "custom3": [
+      "--some-extra-data-1--",
+      "cars",
+      123,
+      { "and": [
+        {
+          "==": [ { "var": "vendor" }, "Toyota" ]
+        }, {
+          ">=": [ { "var": "year" }, 2010 ]
+        }
+      ] }
+    ] }
+  ]
+};
+
+export const with_group_array_custom_operator4 = {
+  "and": [
+    { "custom4": [
+      "--some-extra-data-1--",
+      "cars",
+      123,
+      456,
       { "and": [
         {
           "==": [ { "var": "vendor" }, "Toyota" ]
@@ -971,7 +1806,7 @@ export const with_fieldName = {
   }]
 };
 
-export const spel_with_fieldName = "state.input.num == 2";
+export const spel_with_fieldName = "state.input.num == -2";
 
 export const with_fieldName_in_group = {
   "and": [
@@ -1019,10 +1854,55 @@ export const with_groupVarKey = {
 
 export const spel_with_number = "num == 2";
 export const spel_with_between = "num >= 1 && num <= 2";
+export const spel_with_not_between = "(num < 1 || num > 2)";
 export const spel_with_not = "!(num == 2)";
 export const spel_with_not_not = "!(num == 2 || !(num == 3))";
-export const spel_with_cases = "(str == '222' ? is_string : (num == 222 ? is_number : unknown))";
+export const spel_with_cases = "(str == '222' ? is_string : (num == 4 ? is_number : unknown))";
+export const spel_with_cases_simple = "(str == '222' ? foo : bar)";
+export const spel_with_cases_vars = "(str == '222' ? str : str2)";
 export const spel_with_cases_and_concat = "(str == '222' ? foo : foo + bar)";
+export const spel_with_default_case_field = "str2";
+export const spel_with_default_case_func = "str2.toLowerCase()";
+
+export const sql_with_cases = "IF(str = '222', 'is_string', IF(num = 4, 'is_number', 'unknown'))";
+
+export const with_cases = {"if": [
+  {"==":[{"var":"str"},"222"]},
+  "is_string",
+  {"if": [
+    {"==":[{"var":"num"},4]},
+    "is_number",
+    "unknown"
+  ]}
+]};
+
+export const with_cases_simple = {
+  "if": [
+    {"==": [{"var": "str"}, "222"]},
+    "foo",
+    "bar"
+  ]
+};
+
+export const with_cases_vars = {
+  "if": [
+    {"==": [{"var": "str"}, "222"]},
+    {"var": "str"},
+    {"var": "str2"}
+  ]
+};
+
+export const with_default_case_field = {
+  "var": "str2"
+};
+
+export const with_default_case_func = {
+  "toLowerCase": [
+    { "var": "str2" }
+  ]
+};
+
+export const sql_with_lhs_toLowerCase = "LOWER(str) LIKE 'aaa%'";
 
 export const spel_with_lhs_toLowerCase = "str.toLowerCase().startsWith('aaa')";
 export const spel_with_lhs_toLowerCase_toUpperCase = "str.toLowerCase().toUpperCase() == str.toUpperCase()";
@@ -1030,18 +1910,142 @@ export const spel_with_lhs_toLowerCase_toUpperCase = "str.toLowerCase().toUpperC
 //export const spel_with_SimpleDateFormat = "datetime == new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-15')";
 export const spel_with_LocalTime = "time == T(java.time.LocalTime).parse('02:03:00')";
 export const spel_with_new_String = "str == new String('hello world').toUpperCase()";
-export const spel_with_lhs_compareTo = "datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(6)) < 0";
-export const spel_with_lhs_compareTo_parse = "datetime.compareTo(T(java.time.LocalDateTime).parse('2005-11-12 11:11:12', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss'))) == 0";
-export const spel_with_lhs_compareTo_parse_plusDays = "datetime.compareTo(T(java.time.LocalDateTime).parse('2023-01-01 00:00:00', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss')).plusDays(7)) > 0";
+export const spel_with_datetime_compareTo = "datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(6)) < 0";
+export const spel_with_date_compareTo = "date.compareTo(T(java.time.LocalDate).now().plusDays(6)) < 0";
+export const spel_with_datetime_compareTo_parse = "datetime.compareTo(T(java.time.LocalDateTime).parse('2005-11-12 11:11:12', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss'))) == 0";
+export const spel_with_datetime_compareTo_parse_plusDays = "datetime.compareTo(T(java.time.LocalDateTime).parse('2023-01-01 00:00:00', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss')).plusDays(7)) > 0";
+
+export const spel_with_date_funcs_in_lhs_and_rhs = "(T(java.time.LocalDate).now().compareTo(T(java.time.LocalDate).now().plusDays(1)) == 0 && T(java.time.LocalDateTime).now().compareTo(T(java.time.LocalDateTime).now().plusDays(2)) == 0)";
+export const spel_with_now_funcs_in_lhs_and_rhs = "(T(java.time.LocalDate).now().compareTo(T(java.time.LocalDate).now()) == 0 && T(java.time.LocalDateTime).now().compareTo(T(java.time.LocalDateTime).now()) == 0)";
+export const spel_with_date_func_in_lhs_and_value_in_rhs = "T(java.time.LocalDate).now().plusDays(1).compareTo(T(java.time.LocalDate).parse('2025-05-01', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd'))) == 0";
+export const spel_with_datetime_func_in_lhs_and_value_in_rhs = "T(java.time.LocalDateTime).now().plusDays(2).compareTo(T(java.time.LocalDateTime).parse('2025-05-01 10:04:06', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss'))) == 0";
+export const spel_with_field_in_lhs_and_date_func_in_rhs = "(date.compareTo(T(java.time.LocalDate).now().plusDays(1)) == 0 && datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(2)) == 0)";
+export const spel_with_field_in_lhs_and_date_func_in_rhs_2 = "(date.compareTo(date.plusDays(3)) == 0 && datetime.compareTo(datetime.plusDays(4)) == 0)";
+export const spel_with_start_of_today_in_rhs = "datetime.compareTo(T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).DAYS)) > 0";
+
+export const sql_with_date_funcs_in_lhs_and_rhs = "(CURDATE() = DATE_ADD(CURDATE(), INTERVAL 1 day) AND NOW() = DATE_ADD(NOW(), INTERVAL 2 day))";
+export const sql_with_now_funcs_in_lhs_and_rhs = "(CURDATE() = CURDATE() AND NOW() = NOW())";
+export const sql_with_date_func_in_lhs_and_value_in_rhs = "DATE_ADD(CURDATE(), INTERVAL 1 day) = '2025-05-01'";
+export const sql_with_datetime_func_in_lhs_and_value_in_rhs = "DATE_ADD(NOW(), INTERVAL 2 day) = '2025-05-01 10:04:06.000'";
+export const sql_with_field_in_lhs_and_date_func_in_rhs = "(date = DATE_ADD(CURDATE(), INTERVAL 1 day) AND datetime = DATE_ADD(NOW(), INTERVAL 2 day))";
+export const sql_with_field_in_lhs_and_date_func_in_rhs_2 = "(date = DATE_ADD(date, INTERVAL 3 day) AND datetime = DATE_ADD(datetime, INTERVAL 4 day))";
+export const sql_with_start_of_today_in_rhs = "datetime > DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00')";
+
+export const jl_with_date_funcs_in_lhs_and_rhs = {
+  "and": [
+    {
+      "date==": [
+        { "today": [] },
+        { "date_add": [ { "today": [] }, 1, "day" ] }
+      ]
+    },
+    {
+      "datetime==": [
+        { "now": [] },
+        { "datetime_add": [ { "now": [] }, 2, "day" ] }
+      ]
+    }
+  ]
+};
+
+export const jl_with_now_funcs_in_lhs_and_rhs = {
+  "and": [
+    {
+      "date==": [
+        { "today": [] },
+        { "today": [] },
+      ]
+    },
+    {
+      "datetime==": [
+        { "now": [] },
+        { "now": [] },
+      ]
+    }
+  ]
+};
+
+export const jl_with_date_func_in_lhs_and_value_in_rhs = {
+  "and": [
+    {
+      "date==": [
+        { "date_add": [
+          { "today": [] },
+          1,
+          "day"
+        ] },
+        "2025-05-01T00:00:00.000Z"
+      ]
+    }
+  ]
+};
+
+export const jl_with_datetime_func_in_lhs_and_value_in_rhs = {
+  "and": [
+    {
+      "datetime==": [
+        { "datetime_add": [
+          { "now": [] },
+          2,
+          "day"
+        ] },
+        "2025-05-01T10:04:06.000Z"
+      ]
+    }
+  ]
+};
+
+export const jl_with_field_in_lhs_and_date_func_in_rhs = {
+  "and": [
+    {
+      "date==": [
+        { "var": "date" },
+        { "date_add": [ { "today": [] }, 1, "day" ] }
+      ]
+    },
+    {
+      "datetime==": [
+        { "var": "datetime" },
+        { "datetime_add": [ { "now": [] }, 2, "day" ] }
+      ]
+    },
+  ]
+};
+
+export const jl_with_field_in_lhs_and_date_func_in_rhs_2 = {
+  "and": [
+    {
+      "date==": [
+        { "var": "date" },
+        { "date_add": [ { "var": "date" }, 3, "day" ] }
+      ]
+    },
+    {
+      "datetime==": [
+        { "var": "datetime" },
+        { "datetime_add": [ { "var": "datetime" }, 4, "day" ] }
+      ]
+    },
+  ]
+};
+
+export const jl_with_start_of_today_in_rhs = {
+  "and": [
+    {
+      ">": [
+        { "var": "datetime" },
+        { "start_of_today": [] }
+      ]
+    }
+  ]
+};
 
 export const spel_with_lhs_toLowerCase2 = "str.toLowerCase2() == 'aaa'";
 export const tree_with_lhs_toLowerCase2 = {
   "type": "group",
-  "id": uuid(),
   "children1": [
     {
       "type": "rule",
-      "id": uuid(),
       "properties": {
         //"fieldSrc": "func", //should be determined
         "field": {
@@ -1076,3 +2080,120 @@ export const with_dot_in_field = {
 };
 
 export const spel_with_dot_in_field = "number.one == 11";
+
+export const tree_with_case__with_invalid_rules__without_default_case = {
+  type: "switch_group",
+  children1: [
+    {
+      type: "case_group",
+      properties: {
+        value: ["aa"],
+        valueType: ["case_value"],
+        valueSrc: ["value"],
+      },
+      children1: [{
+        type: "rule",
+        properties: {
+          field: "evenNum",
+          operator: "equal",
+          value: [7]
+        }
+      }]
+    },
+  ]
+};
+
+export const tree_with_case__without_case_value__without_default_case = {
+  type: "switch_group",
+  children1: [
+    {
+      type: "case_group",
+      children1: [{
+        type: "rule",
+        properties: {
+          field: "evenNum",
+          operator: "equal",
+          value: [6]
+        }
+      }]
+    },
+  ]
+};
+
+export const tree_with_empty_cases = {
+  type: "switch_group",
+  children1: [
+    {
+      type: "case_group",
+      children1: []
+    },
+    {
+      type: "case_group",
+    },
+  ]
+};
+
+export const with_html_injections = {
+  "and": [{
+    "==": [
+      { "var": "num" }, "",
+    ],
+  }, {
+    "==": [
+      { "var": "color" },
+      "yellow",
+    ],
+  }, {
+    "all": [
+      { "var": "multicolor" },
+      { "in": [
+        { "var": "" },
+        [ "yellow" ]
+      ] }
+    ]
+  }, {
+    "==": [
+      { "var": "selecttree" },
+      "8",
+    ],
+  }, {
+    "all": [
+      { "var": "multiselecttree" },
+      { "in": [
+        { "var": "" },
+        [ "8", "7" ]
+      ] }
+    ]
+  }]
+};
+
+
+export const tree_with_html_injections = {
+  "type": "group",
+  "children1": [
+    {
+      "type": "rule",
+      "properties": {
+        "field": "prox1",
+        "operator": "proximity",
+        "value": [
+          "",
+          "<img src=0 onerror=alert('xss@proximity_value')>",
+        ],
+        // "operatorOptions": {
+        //   "proximity": 3
+        // }
+      }
+    },
+    {
+      "type": "rule",
+      "properties": {
+        "field": "str",
+        "operator": "equal",
+        "value": [
+          "<img src=0 onerror=alert('xss@string_value')>",
+        ],
+      }
+    }
+  ]
+};

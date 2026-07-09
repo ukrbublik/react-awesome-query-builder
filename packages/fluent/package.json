@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/fluent",
-  "version": "6.4.1",
+  "version": "6.7.0-alpha.0",
   "description": "User-friendly query builder for React. Fluent 8 widgets",
   "keywords": [
     "query-builder",
@@ -24,56 +24,59 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "exports": {
     ".": {
-      "types": "./modules/index.d.ts",
+      "types": "./types/index.d.ts",
       "import": "./esm/index.js",
       "require": "./cjs/index.js"
     },
     "./package.json": "./package.json",
     "./css/styles.css": "./css/styles.css",
-    "./css/compact_styles.css": "./css/compact_styles.css",
-    "./css/styles.scss": "./css/styles.scss",
-    "./css/compact_styles.scss": "./css/compact_styles.scss"
+    "./css/styles.scss": "./css/styles.scss"
   },
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
-  "types": "./modules/index.d.ts",
+  "types": "./types/index.d.ts",
   "scripts": {
-    "build": "sh ./scripts/build-npm.sh",
-    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
+    "build": "node ./scripts/build-npm.js",
+    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --ext .d.ts  ./modules/",
     "lint": "npm run eslint && npm run tsc",
-    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/",
+    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --ext .d.ts --fix  ./modules/",
     "prepare": "npm run build",
-    "tsc": "tsc -p . --noEmit"
+    "tsc": "tsc -p . --noEmit",
+    "tsc-emit-types": "tsc -p . --declaration --emitDeclarationOnly --allowJs false --declarationDir types"
   },
   "dependencies": {
-    "@react-awesome-query-builder/ui": "workspace:^"
+    "@babel/runtime": "^7.27.0",
+    "@react-awesome-query-builder/ui": "workspace:^",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@babel/cli": "^7.22.5",
-    "@babel/core": "^7.22.5",
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/plugin-proposal-private-methods": "^7.18.6",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@babel/plugin-transform-modules-commonjs": "^7.22.5",
-    "@babel/plugin-transform-runtime": "^7.22.5",
-    "@babel/preset-env": "^7.22.5",
-    "@babel/preset-react": "^7.22.5",
-    "@babel/preset-typescript": "^7.22.5",
-    "@babel/runtime": "^7.22.5",
-    "@fluentui/font-icons-mdl2": "^8.2.0",
-    "@fluentui/react": "^8.110.10",
-    "@fluentui/react-icons": "^2.0.175",
+    "@babel/cli": "^7.27.0",
+    "@babel/core": "^7.26.10",
+    "@babel/plugin-transform-class-properties": "^7.25.9",
+    "@babel/plugin-transform-modules-commonjs": "^7.26.3",
+    "@babel/plugin-transform-private-methods": "^7.25.9",
+    "@babel/plugin-transform-private-property-in-object": "^7.25.9",
+    "@babel/plugin-transform-runtime": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
+    "@babel/preset-typescript": "^7.27.0",
+    "@babel/runtime": "^7.27.0",
+    "@fluentui/font-icons-mdl2": "^8.5.39",
+    "@fluentui/react": "^8.118.3",
+    "@fluentui/react-icons": "^2.0.240",
+    "@types/lodash": "^4.14.170",
     "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.18",
+    "@types/react-dom": "^17.0.11",
+    "globby": "^14.1.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "sass": "^1.35.0"
+    "sass": "^1.77.2"
   },
   "peerDependencies": {
     "@fluentui/font-icons-mdl2": "^8.4.2",
     "@fluentui/react": "^8.1.0",
     "@fluentui/react-icons": "^2.0.175",
-    "react": "^16.8.4 || ^17.0.1 || ^18.0.0",
-    "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0"
+    "react": "^16.8.4 || ^17.0.1 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0 || ^19.0.0"
   }
 }

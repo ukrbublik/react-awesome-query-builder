@@ -1,8 +1,7 @@
 import { Utils } from "@react-awesome-query-builder/ui";
 const { getItemInListValues, listValuesToArray } = Utils.ListUtils;
+const { isObjectOrArray } = Utils.OtherUtils;
 
-
-const isObject = (v) => (typeof v == "object" && v !== null); // object or array
 
 export const defaultTreeDataMap = {id: "value", pId: "parent", rootPId: undefined};
 
@@ -39,7 +38,7 @@ const flatizeTreeData = (treeData) => {
     len = treeData.length;
     for (rind = 0 ; rind < len ; rind++) {
       const c = treeData[rind];
-      if (!isObject(c))
+      if (!isObjectOrArray(c))
         continue;
       if (c[tdm.pId] !== undefined && c[tdm.pId] != tdm.rootPId)
         continue; //not lev 1

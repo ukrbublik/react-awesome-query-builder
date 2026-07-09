@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/sandbox",
-  "version": "6.4.1",
+  "version": "6.7.0-alpha.0",
   "description": "Demo for @react-awesome-query-builder",
   "repository": {
     "type": "git",
@@ -11,14 +11,16 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "main": "src/index.tsx",
   "scripts": {
-    "build": "tsc && vite build --mode dev --debug",
+    "build": "tsc && vite build --mode dev",
+    "build-prod": "tsc && vite build --mode production",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts ./src/",
+    "preinstall": "node ./scripts/patch-versions.js",
     "lint": "npm run eslint && npm run tsc",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix ./src/",
     "preview": "vite preview",
+    "start-prod": "npm run build-prod && npm run preview",
     "start": "vite",
-    "tsc": "tsc -p . --noEmit",
-    "preinstall": "node ./scripts/patch-versions.js"
+    "tsc": "tsc -p . --noEmit"
   },
   "browserslist": {
     "production": [
@@ -33,30 +35,31 @@
     ]
   },
   "dependencies": {
-    "@ant-design/icons": "^4.7.0",
-    "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.6.0",
-    "@mui/base": "^5.0.0-beta.0",
-    "@mui/icons-material": "^5.11.16",
-    "@mui/material": "^5.12.3",
-    "@mui/system": "^5.12.3",
-    "@mui/x-date-pickers": "^6.3.1",
+    "@ant-design/icons": "^5.5.2",
+    "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/base": "^5.0.0-beta.68",
+    "@mui/icons-material": "^6.3.1",
+    "@mui/material": "^6.3.1",
+    "@mui/system": "^6.3.1",
+    "@mui/x-date-pickers": "^7.23.6",
     "@react-awesome-query-builder/antd": "workspace:^",
     "@react-awesome-query-builder/mui": "workspace:^",
-    "antd": "^5.7.2",
+    "antd": "^5.24.5",
     "lodash": "^4.17.21",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.5",
+    "@babel/core": "^7.26.10",
     "@types/lodash": "^4.14.170",
-    "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.18",
-    "@vitejs/plugin-react": "^4.0.3",
-    "sass": "^1.35.0",
-    "typescript": "~4.9.4",
-    "vite": "^4.4.6"
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "sass": "^1.77.2",
+    "typescript": "~5.4.5",
+    "vite": "^5.4.19"
   },
   "readme": "README.md"
 }

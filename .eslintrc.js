@@ -13,13 +13,14 @@ module.exports = {
         "bundle.js",
         "*.bundle.js",
         "webpack.config.js",
-        "vite.config.ts"
+        "vite.config.ts",
+        ".eslintrc.js"
     ],
     "extends": [
         "eslint:recommended",
         "plugin:import/recommended",
         // "plugin:import/typescript", // not needed for JS
-        "plugin:react/recommended",
+        // "plugin:react/recommended", // not needed for core
         // "plugin:@typescript-eslint/eslint-recommended", // not needed for JS
     ],
     "globals": {
@@ -51,7 +52,7 @@ module.exports = {
         ],
         "import/parsers": {
             "@typescript-eslint/parser": [
-                ".ts", ".tsx"
+                ".ts", ".tsx", ".d.ts"
             ],
         },
         "import/resolver": {
@@ -67,9 +68,11 @@ module.exports = {
             "react" // for import `react` in `core/modules/index.d.ts`
         ],
         "import/ignore": [
-            /\.(scss|less|css)$/
+            "\.scss$",
+            "\.less$",
+            "\.css$",
         ],
-        "import/internal-regex": /^@react-awesome-query-builder/
+        "import/internal-regex": "^@react-awesome-query-builder"
     },
     "rules": {
         "indent": [
@@ -133,70 +136,100 @@ module.exports = {
         ]
     },
     "overrides": [
-      {
-        "files": ["packages/tests/**/*"],
-        "env": {
-            "mocha": true,
-            "jasmine": true,
+        {
+            "files": ["packages/sql/**/*"],
+            "settings": {
+                "import/resolver": {
+                    "typescript": {
+                        "project": [
+                            "packages/sql/tsconfig.json",
+                        ],
+                    },
+                },
+            },
         },
-        "settings": {
-            "import/core-modules": [
-                "sinon",
-                "chai"
-            ],
-            // "import/resolver": {
-            //     "webpack": {
-            //         "config": "./webpack.config.js"
-            //     }
-            // },
-        },
-      },
-      {
-        "files": ["packages/sandbox_simple/**/*"],
-        "parser": "@babel/eslint-parser",
-        "parserOptions": {
-            "requireConfigFile": false,
-            "babelOptions": {
-                "presets": [
-                    "@babel/preset-env",
-                    "@babel/preset-react"
+
+        {
+            "files": ["packages/sandbox_simple/**/*"],
+            "parser": "@babel/eslint-parser",
+            "parserOptions": {
+                "requireConfigFile": false,
+                "babelOptions": {
+                    "presets": [
+                        "@babel/preset-env",
+                        "@babel/preset-react"
+                    ],
+                },
+                "sourceType": "module",
+            },
+            "settings": {
+                "import/core-modules": [
+                    "react",
+                    "@react-awesome-query-builder/ui/css/styles.css"
                 ],
             },
-            "sourceType": "module",
         },
-        "settings": {
-            "import/core-modules": [
-                "react",
-                "@react-awesome-query-builder/ui/css/styles.css"
-            ],
-        },
-      },
 
-      {
-        "files": ["**/*.ts", "**/*.tsx"],
-        "extends": [
-            "eslint:recommended",
-            "plugin:import/recommended",
-            "plugin:import/typescript",
-            "plugin:react/recommended",
-            "plugin:@typescript-eslint/eslint-recommended",
-            "plugin:@typescript-eslint/recommended",
-            "plugin:@typescript-eslint/recommended-requiring-type-checking"
-        ],
-        "rules": {
-            //todo
-            "@typescript-eslint/no-unused-vars": 0,
-            "@typescript-eslint/ban-types": 0,
-            "@typescript-eslint/explicit-module-boundary-types": 0,
-            "@typescript-eslint/no-explicit-any": 0,
-            "@typescript-eslint/no-empty-interface": 0,
-            "@typescript-eslint/unbound-method": 0,
-            "@typescript-eslint/prefer-regexp-exec": 0,
-            "@typescript-eslint/no-empty-function": 0,
-            "@typescript-eslint/ban-ts-comment": 0,
-            "@typescript-eslint/no-floating-promises": 0,
-            "@typescript-eslint/no-non-null-assertion": 0,
-        }
-      },
+        {
+            "files": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
+            "extends": [
+                "eslint:recommended",
+                "plugin:import/recommended",
+                "plugin:import/typescript",
+                "plugin:@typescript-eslint/eslint-recommended",
+                "plugin:@typescript-eslint/recommended",
+                "plugin:@typescript-eslint/recommended-requiring-type-checking"
+            ],
+            "rules": {
+                "@typescript-eslint/no-unnecessary-type-assertion": 0,
+                //todo
+                "@typescript-eslint/no-unused-vars": 0,
+                "@typescript-eslint/ban-types": 0,
+                "@typescript-eslint/explicit-module-boundary-types": 0,
+                "@typescript-eslint/no-explicit-any": 0,
+                "@typescript-eslint/no-empty-interface": 0,
+                "@typescript-eslint/unbound-method": 0,
+                "@typescript-eslint/prefer-regexp-exec": 0,
+                "@typescript-eslint/no-empty-function": 0,
+                "@typescript-eslint/ban-ts-comment": 0,
+                "@typescript-eslint/no-floating-promises": 0,
+                "@typescript-eslint/no-non-null-assertion": 0,
+                "@typescript-eslint/no-non-null-asserted-optional-chain": 0,
+            }
+        },
+        {
+            "files": ["**/*.jsx", "**/*.tsx"],
+            "extends": [
+                "plugin:react/recommended",
+            ],
+            "rules": {
+                //todo
+                "react/display-name": 0,
+                "react/prop-types": 0,
+            }
+        },
+
+        {
+            "files": ["packages/tests/**/*"],
+            "env": {
+                "mocha": true,
+                // "jasmine": true,
+            },
+            "settings": {
+                "import/core-modules": [
+                    "sinon",
+                    "chai",
+                    "mocha"
+                ],
+                // "import/resolver": {
+                //     "webpack": {
+                //         "config": "./webpack.config.js"
+                //     }
+                // },
+            },
+            "rules": {
+                "@typescript-eslint/no-unused-expressions": 0,
+            },
+        },
     ],
 }

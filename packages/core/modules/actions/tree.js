@@ -1,7 +1,7 @@
-import Immutable from "immutable";
+import Immutable, {fromJS} from "immutable";
 import {toImmutableList} from "../utils/stuff";
 import * as constants from "../stores/constants";
-import { defaultRuleProperties, defaultGroupProperties } from "../utils/defaultUtils";
+import { defaultRuleProperties, defaultGroupProperties } from "../utils/defaultRuleUtils";
 import uuid from "../utils/uuid";
 
 
@@ -20,14 +20,17 @@ export const setTree = (config, tree) => ({
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-export const addRule = (config, path, properties, ruleType = "rule", children = null, parentRuleGroupPath = null) => ({
+export const addRule = (config, path, properties, ruleType = "rule", children = null, parentRuleGroupField = null) => ({
   type: constants.ADD_RULE,
   ruleType: ruleType,
   children: children,
   path: toImmutableList(path),
   id: uuid(),
-  properties: defaultRuleProperties(config, parentRuleGroupPath).merge(properties || {}),
-  config: config
+  properties: defaultRuleProperties(config, parentRuleGroupField).merge(fromJS(properties) || {}),
+  config: config,
+  meta: {
+    parentRuleGroupField,
+  },
 });
 
 /**
@@ -50,7 +53,7 @@ export const addDefaultCaseGroup = (config, path, properties, children = null) =
   path: toImmutableList(path),
   children: children,
   id: uuid(),
-  properties: defaultGroupProperties(config).merge(properties || {}),
+  properties: defaultGroupProperties(config).merge(fromJS(properties) || {}),
   config: config,
   meta: {
     isDefaultCase: true
@@ -67,7 +70,7 @@ export const addCaseGroup = (config, path, properties, children = null) => ({
   path: toImmutableList(path),
   children: children,
   id: uuid(),
-  properties: defaultGroupProperties(config).merge(properties || {}),
+  properties: defaultGroupProperties(config).merge(fromJS(properties) || {}),
   config: config
 });
 
@@ -76,13 +79,16 @@ export const addCaseGroup = (config, path, properties, children = null) => ({
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-export const addGroup = (config, path, properties, children = null) => ({
+export const addGroup = (config, path, properties, children = null, parentRuleGroupField = null) => ({
   type: constants.ADD_GROUP,
   path: toImmutableList(path),
   children: children,
   id: uuid(),
-  properties: defaultGroupProperties(config).merge(properties || {}),
-  config: config
+  properties: defaultGroupProperties(config, parentRuleGroupField).merge(fromJS(properties) || {}),
+  config: config,
+  meta: {
+    parentRuleGroupField,
+  },
 });
 
 /**
@@ -91,6 +97,16 @@ export const addGroup = (config, path, properties, children = null) => ({
  */
 export const removeGroup = (config, path) => ({
   type: constants.REMOVE_GROUP,
+  path: toImmutableList(path),
+  config: config
+});
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
+ */
+export const removeGroupChildren = (config, path) => ({
+  type: constants.REMOVE_GROUP_CHILDREN,
   path: toImmutableList(path),
   config: config
 });

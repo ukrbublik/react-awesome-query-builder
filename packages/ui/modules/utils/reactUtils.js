@@ -47,7 +47,7 @@ export const liteShouldComponentUpdate = (self, config) => (nextProps, nextState
           else if (config[k] == "shallow")
             changed = !shallowEqual(nextProps[k], prevProps[k]);
           else if (typeof config[k] == "function")
-            changed = config[k](nextProps[k], prevProps[k], nextState);
+            changed = config[k](nextProps[k], prevProps[k], nextProps, prevProps);
         }
         if (changed)
           chs.push(k);

@@ -1,11 +1,11 @@
 import merge from "lodash/merge";
 import pick from "lodash/pick";
-import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual} from "./stuff";
+import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual, isObject, hasSafeOwnProperty} from "./stuff";
 import clone from "clone";
 import JL from "json-logic-js";
-import { addRequiredJsonLogicOperations, applyJsonLogic } from "./jsonLogic";
-import { BasicFuncs } from "..";
-import { getFieldRawConfig } from "./configUtils";
+import { addRequiredJsonLogicOperations, applyJsonLogic } from "./jsonLogicUtils";
+import * as BasicFuncs from "../config/funcs";
+import { getFieldRawConfig, configKeys } from "./configUtils";
 
 // Add new operations for JsonLogic
 addRequiredJsonLogicOperations();
@@ -34,7 +34,6 @@ function callContextFn(_this, fn, args, path) {
   return ret;
 }
 
-export const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs", "ctx"];
 
 // type: 
 //  x - iterate (with nesting `subfields`)
@@ -53,7 +52,7 @@ export const configKeys = ["conjunctions", "fields", "types", "operators", "widg
 //    Will be compiled with compileJsonLogic() into function with any args and `this` should be `ctx`
 
 const compileMetaFieldSettings = {
-  asyncFetch: { type: "f", args: ["search", "offset"] },
+  asyncFetch: { type: "f", args: ["searchOrValues", "offset"] },
   labelYes: { type: "r" },
   labelNo: { type: "r" },
   marks: { type: "r", isArr: true },
@@ -64,12 +63,14 @@ const compileMetaWidget = {
   ...compileMetaFieldSettings,
   factory: { type: "rf" },
   formatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "isForDisplay", "op", "opDef", "rightFieldDef"] },
-  sqlFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef", "rightFieldDef"] },
+  sqlFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef", "rightFieldDef", "sqlDialect"] },
   spelFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef", "rightFieldDef"] },
   spelImportValue: { type: "f", args: ["val", "wgtDef", "args"] },
+  sqlImport: { type: "f", args: ["sqlObj", "wgtDef", "sqlDialect"] },
   mongoFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef"] },
   elasticSearchFormatValue: { type: "f", args: ["queryType", "val", "op", "field", "config"] },
   jsonLogic: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef"] },
+  jsonLogicImport: { type: "f", args: ["val", "wgtDef"] },
   validateValue: { type: "f", args: ["val", "fieldSettings", "op", "opDef", "rightFieldDef"] }, // obsolete
   toJS: { type: "f", args: ["val"] },
 };
@@ -82,7 +83,8 @@ const compileMetaOperator = {
   mongoFormatOp: { type: "f", args: ["field", "op", "vals", "useExpr", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
   sqlFormatOp: { type: "f", args: ["field", "op", "vals", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
   spelFormatOp: { type: "f", args: ["field", "op", "vals", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
-  jsonLogic: { type: "f", ignore: "string", args: ["field", "op", "vals", "opDef", "operatorOptions", "fieldDef"] },
+  jsonLogic: { type: "f", ignore: "string", args: ["field", "op", "vals", "opDef", "operatorOptions", "fieldDef", "expectedType", "settings"] },
+  sqlImport: { type: "f", args: ["sqlObj", "_", "sqlDialect"] },
   elasticSearchQueryType: { type: "f", ignore: "string", args: ["valueType"] },
   textSeparators: { type: "r", isArr: true },
 };
@@ -105,16 +107,45 @@ const compileMetaFunc = {
   jsonLogic: { type: "f", ignore: "string", args: ["formattedArgs"] },
   jsonLogicImport: { type: "f", args: ["val"] },
   spelImport: { type: "f", args: ["spel"] },
+  sqlImport: { type: "f", args: ["sqlObj", "_", "sqlDialect"] },
   formatFunc: { type: "f", args: ["formattedArgs", "isForDisplay"] },
-  sqlFormatFunc: { type: "f", args: ["formattedArgs"] },
+  sqlFormatFunc: { type: "f", args: ["formattedArgs", "sqlDialect"] },
   mongoFormatFunc: { type: "f", args: ["formattedArgs"] },
   spelFormatFunc: { type: "f", args: ["formattedArgs"] },
+};
+
+const compileMetaFieldLike = {
+  ...compileMetaFieldSettings,
+  fieldSettings: compileMetaFieldSettings,
+};
+
+const compileMetaField = {
+  ...compileMetaFieldSettings,
+  fieldSettings: compileMetaFieldSettings,
+  widgets: {
+    x: compileMetaWidgetForType
+  },
+  mainWidgetProps: compileMetaWidget
 };
 
 const compileMetaSettings = {
   locale: {
     mui: { type: "f", args: [], invokeWith: [], ignore: "jl" },
+    material: { type: "f", args: [], invokeWith: [], ignore: "jl" },
+    antd: { type: "f", args: [], invokeWith: [], ignore: "jl" },
   },
+
+  designSettings: {
+    generateCssVars: {
+      antd: { type: "f", args: ["theme", "config"] },
+      mui: { type: "f", args: ["theme", "config"] },
+      material: { type: "f", args: ["theme", "config"] },
+      fluent: { type: "f", args: ["theme", "config"] },
+      bootstrap: { type: "f", args: ["theme", "config"] },
+    },
+  },
+
+  caseValueField: compileMetaField,
 
   canCompareFieldWithField: { type: "f", args: ["leftField", "leftFieldConfig", "rightField", "rightFieldConfig", "op"] },
   formatReverse: { type: "f", args: ["q", "op", "reversedOp", "operatorDefinition", "revOperatorDefinition", "isForDisplay"] },
@@ -137,7 +168,6 @@ const compileMetaSettings = {
   renderIcon: { type: "rf" },
   renderButtonGroup: { type: "rf" },
   renderValueSources: { type: "rf" },
-  renderFieldSources: { type: "rf" },
   renderProvider: { type: "rf" },
   renderSwitch: { type: "rf" },
   renderSwitchPrefix: { type: "r" },
@@ -147,18 +177,14 @@ const compileMetaSettings = {
   renderAfterWidget: { type: "rf" },
   renderBeforeActions: { type: "rf" },
   renderAfterActions: { type: "rf" },
+  renderBeforeCaseValue: { type: "rf" },
+  renderAfterCaseValue: { type: "rf" },
   renderRuleError: { type: "rf" },
 };
 
 const compileMeta = {
   fields: {
-    x: {
-      fieldSettings: compileMetaFieldSettings,
-      widgets: {
-        x: compileMetaWidgetForType
-      },
-      mainWidgetProps: compileMetaWidget
-    },
+    x: compileMetaField,
   },
   widgets: {
     x: compileMetaWidget
@@ -177,12 +203,18 @@ const compileMeta = {
     }
   },
   funcs: {
-    x: compileMetaFunc
+    x: {
+      ...compileMetaFieldLike,
+      ...compileMetaFunc,
+      args: {
+        x: {
+          ...compileMetaFieldLike,
+        }
+      }
+    }
   },
   settings: compileMetaSettings,
 };
-
-const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
 /////////////
 
@@ -293,7 +325,7 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
         target = {};
       }
       for (let k in mixin) {
-        if (Object.prototype.hasOwnProperty.call(mixin, k)) {
+        if (hasSafeOwnProperty(mixin, k)) {
           if (mixin[k] === "$$deleted") {
             delete target[k];
           } else {

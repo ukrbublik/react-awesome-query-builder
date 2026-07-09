@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { Dropdown } from "@fluentui/react";
 import { Utils } from "@react-awesome-query-builder/ui";
+import SearchableDropdown from "../SearchableDropdown";
 const { mapListValues } = Utils.ListUtils;
 
 export default ({
@@ -11,13 +12,15 @@ export default ({
   readonly,
   customProps,
   placeholder,
+  searchPlaceholder,
+  showSearch,
 }) => {
-  var onChange = function onChange(_, option) {
+  const onChange = useCallback((_, option) => {
     if (option.key === undefined) return;
     setValue(option.key.toString());
-  };
+  }, [setValue]);
 
-  var renderOptions = function renderOptions(fields) {
+  const renderOptions = (listValues) => {
     var options = [];
     mapListValues(listValues, ({ title, value }) => {
       options.push({
@@ -28,15 +31,26 @@ export default ({
     return options;
   };
 
+  const DropdownType = showSearch ? SearchableDropdown : Dropdown;
+
+  const searchProps = useMemo(() => ({
+    placeholder: searchPlaceholder, // || "Search option"
+  }), [searchPlaceholder]);
+
+  const otherProps = {
+    ...(customProps ?? {}),
+    ...(showSearch ? {searchProps} : {}),
+  };
+
   return (
-    <Dropdown
-      placeholder={placeholder}
+    <DropdownType
+      placeholder={placeholder || "Select option"}
       options={renderOptions(listValues)}
       selectedKey={value}
       onChange={onChange}
       dropdownWidth={"auto"}
       disabled={readonly}
-      {...customProps}
+      {...otherProps}
     />
   );
 };

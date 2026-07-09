@@ -39,6 +39,17 @@ const fields = {
       }
     }
   },
+  price: {
+    label: "Price",
+    type: "number",
+    preferWidgets: ["price"],
+    fieldSettings: {
+      valuePlaceholder: "Enter your Price",
+      thousandSeparator:",",
+      prefix:"﷼",
+      suffix:"$",
+    },
+  },
   num: {
     label: "Number",
     type: "number",
@@ -225,6 +236,7 @@ const localeSettings = {
   addGroupLabel: "Add group",
   addRuleLabel: "Add rule",
   addSubRuleLabel: "Add sub rule",
+  addSubGroupLabel: "Add sub group",
   delGroupLabel: null,
   notLabel: "Not",
   fieldSourcesPopupTitle: "Select source",

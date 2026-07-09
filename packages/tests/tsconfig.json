@@ -4,9 +4,12 @@
     "module": "esnext",
     "jsx": "preserve",
     "lib": [
-      "es2015",
+      "es2020",
       "dom",
       "dom.iterable"
+    ],
+    "types": [
+      "mocha"
     ],
     "allowJs": true,
     "outDir": "ts_out",
@@ -20,12 +23,15 @@
     "baseUrl": ".",
     "paths": {
       "@react-awesome-query-builder/core": ["../core/modules"],
+      "@react-awesome-query-builder/sql": ["../sql/modules"],
       "@react-awesome-query-builder/ui": ["../ui/modules"],
       "@react-awesome-query-builder/antd": ["../antd/modules"],
       "@react-awesome-query-builder/mui": ["../mui/modules"],
       "@react-awesome-query-builder/material": ["../material/modules"],
       "@react-awesome-query-builder/bootstrap": ["../bootstrap/modules"],
       "@react-awesome-query-builder/fluent": ["../fluent/modules"],
+      "react": ["./node_modules/@types/react"],
+      "react-dom": ["./node_modules/@types/react-dom"],
     },
     "skipLibCheck": true,
   },

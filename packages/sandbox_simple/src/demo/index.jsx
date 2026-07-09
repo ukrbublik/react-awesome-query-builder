@@ -7,7 +7,7 @@ import loadedConfig from "./config";
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
 const stringify = JSON.stringify;
-const {jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic} = Utils;
+const {jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, sanitizeTree, loadTree, uuid, loadFromJsonLogic} = Utils;
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
@@ -15,11 +15,11 @@ const emptyInitValue = {"id": uuid(), "type": "group"};
 
 // get init value in JsonTree format:
 const initValue = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue : emptyInitValue;
-const initTree = checkTree(loadTree(initValue), loadedConfig);
+const initTree = sanitizeTree(loadTree(initValue), loadedConfig).fixedTree;
 
 // -OR- alternativaly get init value in JsonLogic format:
 //const initLogic = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
-//const initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig);
+//const initTree = sanitizeTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig).fixedTree;
 
 
 export default class DemoQueryBuilder extends Component {
@@ -90,21 +90,21 @@ export default class DemoQueryBuilder extends Component {
         <div>
           stringFormat: 
           <pre style={preStyle}>
-            {stringify(queryString(immutableTree, config), undefined, 2)}
+            {queryString(immutableTree, config)}
           </pre>
         </div>
         <hr/>
         <div>
           humanStringFormat: 
           <pre style={preStyle}>
-            {stringify(queryString(immutableTree, config, true), undefined, 2)}
+            {queryString(immutableTree, config, true)}
           </pre>
         </div>
         <hr/>
         <div>
           sqlFormat: 
           <pre style={preStyle}>
-            {stringify(sqlFormat(immutableTree, config), undefined, 2)}
+            {sqlFormat(immutableTree, config)}
           </pre>
         </div>
         <hr/>

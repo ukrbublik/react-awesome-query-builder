@@ -10,7 +10,11 @@ import * as CustomOperators from "./components/operators";
 import Utils from "./utils";
 
 // re-export
+// Ignore "Multiple exports of name 'Utils'"
+// eslint-disable-next-line import/export
 export * from "@react-awesome-query-builder/core";
 
+// Ignore "Multiple exports of name 'Utils'"
+// eslint-disable-next-line import/export
 export {Query, Builder, BasicConfig, VanillaWidgets, CustomOperators, Hooks, Utils};
 

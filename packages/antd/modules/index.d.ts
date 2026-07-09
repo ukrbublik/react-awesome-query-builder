@@ -1,8 +1,10 @@
 import {BasicConfig} from "@react-awesome-query-builder/ui";
-import {AntdWidgets} from "./widgets";
+export {default as AntdWidgets} from "./widgets";
+export { generateCssVars } from "./utils/theming";
 
-export declare const AntdConfig: BasicConfig;
-export declare const AntdWidgets: AntdWidgets;
+import type { AntdConfig as AntdConfigType} from "./config";
+export declare const AntdConfig: AntdConfigType;
+export type AntdConfig = AntdConfigType;
 
 // re-export
 export * from "@react-awesome-query-builder/ui";

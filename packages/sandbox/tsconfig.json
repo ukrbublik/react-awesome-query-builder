@@ -4,7 +4,7 @@
     "module": "esnext",
     "jsx": "react-jsx",
     "lib": [
-      "es2015",
+      "es2020",
       "dom",
       "dom.iterable"
     ],
@@ -17,6 +17,7 @@
     "noImplicitReturns": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
+    // there is 1 null check issue with rc-picker
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -26,11 +27,14 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@react-awesome-query-builder/core": ["../core/modules"],
+      "@react-awesome-query-builder/sql": ["../sql/modules"],
       "@react-awesome-query-builder/ui": ["../ui/modules"],
       "@react-awesome-query-builder/antd": ["../antd/modules"],
       "@react-awesome-query-builder/mui": ["../mui/modules"],
       "@react-awesome-query-builder/material": ["../material/modules"],
       "@react-awesome-query-builder/bootstrap": ["../bootstrap/modules"],
+      "react": ["./node_modules/@types/react"],
+      "react-dom": ["./node_modules/@types/react-dom"],
     },
   },
   "include": [

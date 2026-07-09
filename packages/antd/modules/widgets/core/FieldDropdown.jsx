@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import omit from "lodash/omit";
-import { Menu, Dropdown, Tooltip, Button } from "antd";
+import { Menu, Dropdown, Tooltip, Button, version as antdVersion } from "antd";
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 import { DownOutlined } from "@ant-design/icons";
@@ -31,43 +31,93 @@ export default class FieldDropdown extends PureComponent {
   };
 
   renderMenuItems(fields) {
-    return fields.map(field => {
-      const {items, key, path, label, fullLabel, altLabel, tooltip, disabled, matchesType} = field;
-      const pathKey = path || key;
-      const optionText = matchesType ? <b>{label}</b> : label;
-      const option = tooltip ? <Tooltip title={tooltip}>{optionText}</Tooltip> : optionText;
+    const antdMajorVersion = parseInt(antdVersion.split(".")[0]);
 
-      if (items) {
-        return <SubMenu
-          key={pathKey}
-          title={<span>{option} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
-        >
-          {this.renderMenuItems(items)}
-        </SubMenu>;
-      } else {
-        return <MenuItem
-          key={pathKey}
-          disabled={disabled}
-        >
-          {option}
-        </MenuItem>;
-      }
-    });
+    if (antdMajorVersion >= 5) {
+      // Convert to items array format for Ant Design v5
+      return fields.map((field) => {
+        const {
+          items,
+          key,
+          path,
+          label,
+          fullLabel,
+          altLabel,
+          tooltip,
+          disabled,
+          matchesType,
+        } = field;
+        const pathKey = path || key;
+        const optionText = matchesType ? <b>{label}</b> : label;
+        const option = tooltip ? (
+          <Tooltip title={tooltip}>{optionText}</Tooltip>
+        ) : (
+          optionText
+        );
+
+        if (items) {
+          return {
+            key: pathKey,
+            label: <span>{option} &nbsp;&nbsp;&nbsp;&nbsp;</span>,
+            children: this.renderMenuItems(items),
+          };
+        } else {
+          return {
+            key: pathKey,
+            label: option,
+            disabled: disabled,
+          };
+        }
+      });
+    } else {
+      // Original implementation for Ant Design v4
+      return fields.map((field) => {
+        const {
+          items,
+          key,
+          path,
+          label,
+          fullLabel,
+          altLabel,
+          tooltip,
+          disabled,
+          matchesType,
+        } = field;
+        const pathKey = path || key;
+        const optionText = matchesType ? <b>{label}</b> : label;
+        const option = tooltip ? <Tooltip title={tooltip}>{optionText}</Tooltip> : optionText;
+
+        if (items) {
+          return <SubMenu
+            key={pathKey}
+            title={<span>{option} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
+          >
+            {this.renderMenuItems(items)}
+          </SubMenu>;
+        } else {
+          return <MenuItem
+            key={pathKey}
+            disabled={disabled}
+          >
+            {option}
+          </MenuItem>;
+        }
+      });
+    }
   }
-
   renderMenuToggler(togglerLabel, tooltipText, config, readonly, errorText) {
     let toggler
-          = <Button
-            size={config.settings.renderSize}
-            disabled={readonly}
-            danger={!!errorText}
-          >
-            {togglerLabel} <DownOutlined />
-          </Button>;
+      = <Button
+        size={config.settings.renderSize}
+        disabled={readonly}
+        danger={!!errorText}
+      >
+        {togglerLabel} <DownOutlined />
+      </Button>;
 
     if (tooltipText) {
       toggler 
-              = <Tooltip
+        = <Tooltip
           placement="top"
           title={tooltipText}
         >
@@ -85,8 +135,14 @@ export default class FieldDropdown extends PureComponent {
     } = this.props;
 
     const fieldMenuItems = this.renderMenuItems(items);
+    const antdMajorVersion = parseInt(antdVersion.split(".")[0]);
 
-    const fieldMenu = (
+    const fieldMenu = antdMajorVersion >= 5 ? {
+      items: fieldMenuItems,
+      selectedKeys: selectedKeys,
+      onClick: this.onChange,
+      ...omit(customProps, ["showSearch"])
+    } : (
       <Menu
         //size={config.settings.renderSize}
         selectedKeys={selectedKeys}
@@ -102,7 +158,8 @@ export default class FieldDropdown extends PureComponent {
 
     return readonly ? fieldToggler : (
       <Dropdown
-        overlay={fieldMenu}
+        menu={antdMajorVersion >= 5 ? fieldMenu : undefined}
+        overlay={antdMajorVersion >= 5 ? undefined : fieldMenu}
         trigger={["click"]}
         placement={config.settings.dropdownPlacement}
       >

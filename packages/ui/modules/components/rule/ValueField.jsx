@@ -5,9 +5,9 @@ import {truncateString} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
-const {clone} = Utils;
-const {getFieldConfig, getFieldParts, getFieldPathParts} = Utils.ConfigUtils;
-const {getFieldPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
+const {clone} = Utils.OtherUtils;
+const {getFieldConfig, getFieldParts, getFieldPathParts, getWidgetForFieldOp} = Utils.ConfigUtils;
+const {getFieldPathLabels} = Utils.RuleUtils;
 
 //tip: this.props.value - right value, this.props.field - left value
 
@@ -53,7 +53,7 @@ export default class ValueField extends Component {
 
   getItems({config, field, fieldType, operator, parentField, isFuncArg, fieldDefinition}) {
     const {canCompareFieldWithField} = config.settings;
-    const fieldSeparator = config.settings.fieldSeparator;
+    // const fieldSeparator = config.settings.fieldSeparator;
     const parentFieldPath = getFieldParts(parentField, config);
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
     const sourceFields = parentField ? parentFieldConfig?.subfields : config.fields;
@@ -83,7 +83,7 @@ export default class ValueField extends Component {
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
     if (selectedFullLabel == selectedLabel || parentField)
       selectedFullLabel = null;
-    const selectedAltLabel = selectedOpts.label2;
+    const selectedAltLabel = selectedOpts.label2 || selectedOpts.tooltip;
 
     return {
       placeholder,
@@ -98,9 +98,12 @@ export default class ValueField extends Component {
     const _relyOnWidgetType = false; //TODO: remove this, see issue #758
     const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
     const widgetConfig = config.widgets[widget];
+    const opConfig = config.operators[operator];
     let expectedType;
     if (isFuncArg) {
       expectedType = fieldDefinition?.type;
+    } else if (opConfig?.valueTypes) {
+      expectedType = opConfig?.valueTypes[0];
     } else if (_relyOnWidgetType && widgetConfig) {
       expectedType = widgetConfig.type;
     } else if (leftFieldConfig) {
@@ -140,7 +143,7 @@ export default class ValueField extends Component {
     return fields;
   }
 
-  buildOptions(parentFieldPath, config, fields, path = null, optGroupLabel = null) {
+  buildOptions(parentFieldPath, config, fields, path = null, optGroup = null) {
     if (!fields)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
@@ -168,7 +171,12 @@ export default class ValueField extends Component {
           fullLabel,
           altLabel,
           tooltip,
-          items: this.buildOptions(parentFieldPath, config, field.subfields, fullFieldPath, label)
+          items: this.buildOptions(parentFieldPath, config, field.subfields, fullFieldPath, {
+            label,
+            tooltip,
+          }),
+          grouplabel: optGroup?.label,
+          group: optGroup,
         };
       } else {
         return {
@@ -178,7 +186,8 @@ export default class ValueField extends Component {
           fullLabel,
           altLabel,
           tooltip,
-          grouplabel: optGroupLabel
+          grouplabel: optGroup?.label,
+          group: optGroup,
         };
       }
     }).filter(o => !!o);

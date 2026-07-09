@@ -3,7 +3,7 @@ import merge from "lodash/merge";
 import {
   BasicFuncs, CoreConfig,
   // types:
-  Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs, OperatorProximity, Func,
+  Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs, OperatorProximity, Func, SerializedFunction, PriceFieldSettings,
 } from "@react-awesome-query-builder/core";
 
 // Create a config for demo app based on CoreConfig - add fields, funcs, some overrides.
@@ -15,7 +15,6 @@ import {
 //   Or use JsonLogic functions, see `validateValue` for `login` field (advanced usage, but doesn't change `ctx`).
 
 function createConfig(InitialConfig: CoreConfig): Config {
-
   const fields: Fields = {
     user: {
       label: "User",
@@ -31,7 +30,8 @@ function createConfig(InitialConfig: CoreConfig): Config {
             valuePlaceholder: "Enter name",
           },
           fieldSettings: {
-            validateValue: "validateFirstName",
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            validateValue: "validateFirstName" as SerializedFunction as any,
             // -or-
             // validateValue: {
             //   "<": [ {strlen: {var: "val"}}, 10 ]
@@ -46,15 +46,16 @@ function createConfig(InitialConfig: CoreConfig): Config {
           type: "text",
           excludeOperators: ["proximity"],
           fieldSettings: {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             validateValue: {
               and: [
-                { "<": [ {strlen: {var: "val"}}, 10 ] },
+                { "<": [{ strlen: { var: "val" } }, 10] },
                 { or: [
-                  { "===": [ {var: "val"}, "" ] },
+                  { "===": [{ var: "val" }, ""] },
                   { regexTest: [ {var: "val"}, "^[A-Za-z0-9_-]+$" ] }
                 ]}
               ]
-            }
+            } as SerializedFunction as any
             // -incorrect-
             // (val: string) => {
             //   return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
@@ -66,6 +67,16 @@ function createConfig(InitialConfig: CoreConfig): Config {
           },
         }
       }
+    },
+    price: {
+      label: "Price",
+      type: "number",
+      preferWidgets: ["price"],
+      fieldSettings: {
+        valuePlaceholder: "Enter your Price",
+        prefix: "$",
+        allowNegative: false,
+      } as PriceFieldSettings,
     },
     prox1: {
       label: "prox",
@@ -249,6 +260,14 @@ function createConfig(InitialConfig: CoreConfig): Config {
     text: {
       ...InitialConfig.widgets.text,
     },
+    price: {
+      ...InitialConfig.widgets.price,
+      // prefix: "$",
+      // allowNegative: false,
+      thousandSeparator: ",",
+      decimalSeparator: ".",
+      decimalScale: 2,
+    },
     slider: {
       ...InitialConfig.widgets.slider,
       customProps: {
@@ -322,6 +341,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
     addSubRuleLabel: "Add sub rule",
+    addSubGroupLabel: "Add sub group",
     delGroupLabel: null,
     notLabel: "Not",
     fieldSourcesPopupTitle: "Select source",
@@ -397,4 +417,6 @@ function createConfig(InitialConfig: CoreConfig): Config {
   return config;
 }
 
-export default createConfig(CoreConfig);
+const createdConfig = createConfig(CoreConfig);
+
+export default createdConfig;

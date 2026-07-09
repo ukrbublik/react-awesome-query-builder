@@ -10,7 +10,7 @@ import loadedInitValue from "../../data/init_value";
 import loadedInitLogic from "../../data/init_logic";
 import { decompressSavedConfig } from "./config";
 const {
-  uuid, checkTree, loadFromJsonLogic, loadTree,
+  uuid, loadFromJsonLogic, loadTree,
   jsonLogicFormat, queryString, sqlFormat, mongodbFormat, getTree
 } = Utils;
 
@@ -23,7 +23,7 @@ interface ConvertResult {
   qs?: string;
   qsh?: string;
   sql?: string;
-  mongo?: Object;
+  mongo?: Record<string, any>;
 }
 export type PostTreeQuery = {
   saveTree?: string;
@@ -44,7 +44,7 @@ function getEmptyTree(): JsonTree {
 }
 
 export function getInitialTree(fromLogic = true): JsonTree {
-  const config = serverConfig;
+  const config = serverConfig as Config;
   let tree: JsonTree;
   if (fromLogic) {
     const logicTree: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;

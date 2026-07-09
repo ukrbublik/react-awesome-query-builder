@@ -5,6 +5,7 @@ import {
   Utils, BasicConfig, BasicFuncs,
   // types:
   Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
+  PriceFieldSettings,
 } from "@react-awesome-query-builder/mui";
 const { simulateAsyncFetch } = Utils.Autocomplete;
 
@@ -63,6 +64,15 @@ export function createConfig(InitialConfig: BasicConfig): Config {
         }
       }
     },
+    price: {
+      label: "Price",
+      type: "number",
+      preferWidgets: ["price"],
+      fieldSettings: {
+        valuePlaceholder: "Enter your Price",
+        thousandSeparator:",",
+      } as PriceFieldSettings,
+    },
     prox1: {
       label: "prox",
       tooltip: "Proximity search",
@@ -89,8 +99,8 @@ export function createConfig(InitialConfig: BasicConfig): Config {
         max: 100,
         step: 1,
         marks: {
-          0: <strong>0%</strong>,
-          100: <strong>100%</strong>
+          0: "0%", //<strong>0%</strong>,
+          100: "100%" //<strong>100%</strong>
         },
       },
       //overrides
@@ -393,6 +403,7 @@ export function createConfig(InitialConfig: BasicConfig): Config {
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
     addSubRuleLabel: "Add sub rule",
+    addSubGroupLabel: "Add sub group",
     delGroupLabel: undefined,
     notLabel: "Not",
     fieldSourcesPopupTitle: "Select source",

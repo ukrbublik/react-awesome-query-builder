@@ -1,1 +1,3 @@
-$seps-offset-bottom: 8px;
+$inactive_conjs: (".btn.btn-secondary");
+$active_conjs: (".btn:not(.btn-secondary)");
+$default-seps-offset-bottom: 8px;

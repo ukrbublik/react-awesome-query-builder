@@ -9,15 +9,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          version: 7
-      - uses: actions/setup-node@v3
+          version: 9
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 18
           #cache: 'pnpm'
-      - run: pnpm i
+      - run: pnpm i --frozen-lockfile
       - run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - run: pnpm lint
       - run: pnpm test
@@ -26,18 +26,16 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          ref: master
-      - uses: pnpm/action-setup@v2
+          version: 9
+      - uses: actions/setup-node@v4
         with:
-          version: 7
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
+          node-version: 18
           #cache: 'pnpm'
           registry-url: https://registry.npmjs.org/
-      - run: pnpm i
-      - run: pnpm -r publish --access public
+      - run: pnpm i --frozen-lockfile
+      - run: pnpm -r publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

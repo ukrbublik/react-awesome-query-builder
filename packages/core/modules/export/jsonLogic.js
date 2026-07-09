@@ -1,11 +1,11 @@
-import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, getWidgetForFieldOp
 } from "../utils/configUtils";
-import {getWidgetForFieldOp, formatFieldName, completeValue} from "../utils/ruleUtils";
+import { extendConfig } from "../utils/configExtend";
+import {formatFieldName, completeValue, getOneChildOrDescendant} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
-import omit from "lodash/omit";
 import pick from "lodash/pick";
 
 // http://jsonlogic.com/
@@ -17,10 +17,10 @@ export const jsonLogicFormat = (item, config) => {
     usedFields: [],
     errors: []
   };
-  
+
   const extendedConfig = extendConfig(config, undefined, false);
-  const logic = formatItem(item, extendedConfig, meta, true);
-  
+  const logic = formatItem(item, extendedConfig, meta, false, true);
+
   // build empty data
   const {errors, usedFields} = meta;
   const {fieldSeparator} = extendedConfig.settings;
@@ -49,7 +49,7 @@ export const jsonLogicFormat = (item, config) => {
       }
     }
   }
-    
+
   return {
     errors,
     logic,
@@ -58,7 +58,7 @@ export const jsonLogicFormat = (item, config) => {
 };
 
 
-const formatItem = (item, config, meta, isRoot, parentField = null) => {
+const formatItem = (item, config, meta, _not = false, isRoot = false, parentField = null) => {
   if (!item) return undefined;
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
@@ -66,9 +66,13 @@ const formatItem = (item, config, meta, isRoot, parentField = null) => {
   const {lockedOp} = config.settings.jsonLogic;
   let ret;
   if (type === "group" || type === "rule_group") {
-    ret = formatGroup(item, config, meta, isRoot, parentField);
+    ret = formatGroup(item, config, meta, _not, isRoot, parentField);
   } else if (type === "rule") {
-    ret = formatRule(item, config, meta, parentField);
+    ret = formatRule(item, config, meta, _not, parentField);
+  } else if (type == "switch_group") {
+    ret = formatSwitch(item, config, meta, _not);
+  } else if (type == "case_group") {
+    ret = formatCase(item, config, meta, _not, parentField);
   }
   if (isLocked && ret && lockedOp) {
     ret = { [lockedOp] : ret };
@@ -76,90 +80,171 @@ const formatItem = (item, config, meta, isRoot, parentField = null) => {
   return ret;
 };
 
-
-const formatGroup = (item, config, meta, isRoot, parentField = null) => {
+const formatGroup = (item, config, meta, _not = false, isRoot = false, parentField = null) => {
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const mode = properties.get("mode");
   const children = item.get("children1") || new List();
   const field = properties.get("field");
-  
+  const fieldDefinition = getFieldConfig(config, field);
+
   let conjunction = properties.get("conjunction");
   if (!conjunction)
     conjunction = defaultConjunction(config);
   const conjunctionDefinition = config.conjunctions[conjunction];
-  const conj = conjunctionDefinition.jsonLogicConj || conjunction.toLowerCase();
-  const not = properties.get("not");
+  const conj = conjunctionDefinition?.jsonLogicConj || conjunction.toLowerCase();
+  const origNot = !!properties.get("not");
 
   const isRuleGroup = (type === "rule_group" && !isRoot);
-  const groupField = isRuleGroup && mode != "struct" ? field : parentField;
-  const groupOperator = properties.get("operator");
-  const groupOperatorDefinition = groupOperator && getOperatorConfig(config, groupOperator, field) || null;
+  const isRuleGroupArray = isRuleGroup && mode != "struct";
+  const groupField = isRuleGroupArray ? field : parentField;
+  let groupOperator = properties.get("operator");
+  let groupOperatorDef = groupOperator && getOperatorConfig(config, groupOperator, field) || null;
   const formattedValue = formatItemValue(config, properties, meta, groupOperator, parentField);
-  const isGroup0 = isRuleGroup && (!groupOperator || groupOperatorDefinition.cardinality == 0);
+  // Tip: for demo app isGroup0 is true for "Results" and "Cars" with group op in "some", "all", "none"
+  // If isGroup0 is false, we should use "reduce"
+  const isGroup0 = isRuleGroup && (!groupOperator || groupOperatorDef?.cardinality == 0);
+  const isRuleGroupWithChildren = isRuleGroup && children?.size > 0;
+  const isRuleGroupWithoutChildren = isRuleGroup && !children?.size;
+
+  // rev
+  let not = origNot;
+  let filterNot = false;
+  if (isRuleGroupWithChildren) {
+    // for rule_group `not` there should be 2 NOTs: from properties (for children) and from parent group (_not)
+    filterNot = origNot;
+    not = _not;
+  } else {
+    if (_not) {
+      not = !not;
+    }
+  }
+  let revChildren = false;
+  let reversedGroupOp = groupOperatorDef?.reversedOp;
+  let reversedGroupOpDef = getOperatorConfig(config, reversedGroupOp, field);
+  const groupOpNeedsReverse = !groupOperatorDef?.jsonLogic && !!reversedGroupOpDef?.jsonLogic;
+  const groupOpCanReverse = !!reversedGroupOpDef?.jsonLogic;
+  const oneChildType = getOneChildOrDescendant(item)?.get("type");
+  const canRevChildren = !!config.settings.reverseOperatorsForNot
+    && (!isRuleGroup && not && oneChildType === "rule" || filterNot && children?.size === 1);
+  if (canRevChildren) {
+    if (isRuleGroupWithChildren) {
+      filterNot = !filterNot;
+    } else {
+      not = !not;
+    }
+    revChildren = true;
+  }
+  let canRevGroupOp = not && isRuleGroup && groupOpCanReverse && (!!config.settings.reverseOperatorsForNot || groupOpNeedsReverse);
+  if (canRevGroupOp) {
+    not = !not;
+    [groupOperator, reversedGroupOp] = [reversedGroupOp, groupOperator];
+    [groupOperatorDef, reversedGroupOpDef] = [reversedGroupOpDef, groupOperatorDef];
+  }
 
   const list = children
-    .map((currentChild) => formatItem(currentChild, config, meta, false, groupField))
+    .map((currentChild) => formatItem(currentChild, config, meta, revChildren, false, groupField))
     .filter((currentChild) => typeof currentChild !== "undefined");
-  
-  if (isRuleGroup && mode != "struct" && !isGroup0) {
+
+  // allows for unnecessary (ie. empty or only one rule) groups to be exported
+  const shouldPreserveGroups = !!config.settings.exportPreserveGroups;
+  if (isRuleGroupArray && !isGroup0) {
     // "count" rule can have no "having" children, but should have number value
     if (formattedValue == undefined)
       return undefined;
   } else {
-    if (!list.size)
+    if (!list.size && !shouldPreserveGroups)
       return undefined;
   }
 
-  let resultQuery = {};
-  if (list.size == 1 && !isRoot)
-    resultQuery = list.first();
-  else
-    resultQuery[conj] = list.toList().toJS();
+  // I any of these conditions are true then we cannot remove group
+  let preserveSingleRuleGroup = isRoot || shouldPreserveGroups || list.size != 1;
+
+  // If preserveSingleRuleGroup is already true then there is no point to even check also if its not a negation group 
+  // then this does not matter
+  if (!preserveSingleRuleGroup && origNot && !revChildren) {
+    // We check all children even thuogh there should be only one in case the formatting of one of them failed.
+    // From config we see if exclamation is part of reverse operator definition and if so then we cannot ever remove a negation single 
+    // rule group because then this combination would be identical to that reverse operator. see issue #1084
+    preserveSingleRuleGroup = children.some((currentChild) => {
+      const op = currentChild.get("properties")?.get("operator");
+      const revOp  = config["operators"]?.[op]?.reversedOp;
+      return config.operators?.[revOp]?._jsonLogicIsExclamationOp ?? false;
+    });
+  }
   
-  // revert
-  if (not) {
-    resultQuery = { "!": resultQuery };
+  let filterQuery = {};
+  if (preserveSingleRuleGroup)
+    filterQuery[conj] = list.toList().toJS();
+  else
+    filterQuery = list.first();
+
+  // reverse filter
+  if (filterNot) {
+    filterQuery = { "!": filterQuery };
   }
 
+  let resultQuery = filterQuery;
+
   // rule_group (issue #246)
-  if (isRuleGroup && mode != "struct") {
+  if (isRuleGroupArray) {
     const formattedField = formatField(meta, config, field, parentField);
-    if (isGroup0) {
-      // config.settings.groupOperators
-      const op = groupOperator || "some";
-      resultQuery = {
-        [op]: [
-          formattedField,
-          resultQuery
-        ]
-      };
-    } else {
+    let reduceQuery;
+    if (!isGroup0) {
       // there is rule for count
-      const filter = !list.size 
+      const filter = !list.size
         ? formattedField
         : {
           "filter": [
             formattedField,
-            resultQuery
+            filterQuery
           ]
         };
-      const count = {
+      reduceQuery = {
         "reduce": [
           filter,
           { "+": [1, { var: "accumulator" }] },
           0
         ]
       };
-      resultQuery = formatLogic(config, properties, count, formattedValue, groupOperator);
+    }
+    const formattedLhs = reduceQuery ?? formattedField;
+    const optionsMap = new Map({
+      having: filterQuery,
+      reduce: reduceQuery,
+      groupField: field,
+      groupFieldFormatted: formattedField,
+    });
+    // if groupOperator defines its own jsonLogic function, then we should use it (issue #1241)
+    if (typeof groupOperatorDef?.jsonLogic === "function") {
+      // we should use optionsMap here
+      resultQuery = formatLogic(config, properties, formattedLhs, formattedValue, groupOperator, optionsMap, fieldDefinition);
+    } else {
+      if (isGroup0) {
+        // config.settings.groupOperators
+        const op = groupOperator || "some";
+        resultQuery = {
+          [op]: [
+            formattedField,
+            filterQuery
+          ]
+        };
+      } else {
+        resultQuery = formatLogic(config, properties, formattedLhs, formattedValue, groupOperator, null, fieldDefinition);
+      }
     }
   }
-  
+
+  // reverse
+  if (not) {
+    resultQuery = { "!": resultQuery };
+  }
+
   return resultQuery;
 };
 
 
-const formatRule = (item, config, meta, parentField = null) => {
+const formatRule = (item, config, meta, _not = false, parentField = null) => {
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
   const fieldSrc = properties.get("fieldSrc");
@@ -173,19 +258,25 @@ const formatRule = (item, config, meta, parentField = null) => {
   if (field == null || operator == null)
     return undefined;
 
-  const fieldDefinition = getFieldConfig(config, field) || {};
-  let operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  let reversedOp = operatorDefinition.reversedOp;
-  let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
+  const fieldDefinition = getFieldConfig(config, field);
+  let operatorDefinition = getOperatorConfig(config, operator, field);
+  let reversedOp = operatorDefinition?.reversedOp;
+  let revOperatorDefinition = getOperatorConfig(config, reversedOp, field);
 
   // check op
-  let isRev = false;
-  if (!operatorDefinition.jsonLogic && !revOperatorDefinition.jsonLogic) {
+  if (!operatorDefinition?.jsonLogic && !revOperatorDefinition?.jsonLogic) {
     meta.errors.push(`Operator ${operator} is not supported`);
     return undefined;
   }
-  if (!operatorDefinition.jsonLogic && revOperatorDefinition.jsonLogic) {
-    isRev = true;
+
+  // try reverse
+  let not = _not;
+  const opNeedsReverse = !operatorDefinition?.jsonLogic && !!revOperatorDefinition?.jsonLogic;
+  const opCanReverse = !!revOperatorDefinition?.jsonLogic;
+  let canRev = opCanReverse && (!!config.settings.reverseOperatorsForNot || opNeedsReverse);
+  const needRev = not && canRev || opNeedsReverse;
+  if (needRev) {
+    not = !not;
     [operator, reversedOp] = [reversedOp, operator];
     [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
   }
@@ -201,22 +292,96 @@ const formatRule = (item, config, meta, parentField = null) => {
   if (formattedField === undefined)
     return undefined;
 
-  return formatLogic(config, properties, formattedField, formattedValue, operator, operatorOptions, fieldDefinition, isRev);
+  return formatLogic(config, properties, formattedField, formattedValue, operator, operatorOptions, fieldDefinition, not);
 };
 
+const formatSwitch = (item, config, meta, _not = false) => {
+  const children = item.get("children1");
+  if (!children)
+    return undefined;
+  const cases = children
+    .map((currentChild) => formatCase(currentChild, config, meta, _not, null))
+    .filter((currentChild) => typeof currentChild !== "undefined")
+    .valueSeq().toArray();
 
-const formatItemValue = (config, properties, meta, operator, parentField) => {
-  const field = properties.get("field");
+  let filteredCases = [];
+  for (let i = 0 ; i < cases.length ; i++) {
+    if (i !== (cases.length - 1) && !cases[i][0]) {
+      meta.errors.push(`No condition for case ${i}`);
+    } else {
+      filteredCases.push(cases[i]);
+      if (i === (cases.length - 1) && cases[i][0]) {
+        // no default - add null as default
+        filteredCases.push([undefined, null]);
+      }
+    }
+  }
+
+  if (!filteredCases.length)
+    return undefined;
+
+  if (filteredCases.length === 1) {
+    // only 1 case without condition
+    let [_cond, defVal] = filteredCases[0];
+    if (defVal == undefined)
+      defVal = null;
+    return defVal;
+  }
+
+  const ret = { if: [] };
+  let ifArgs = ret.if;
+  const [_, defVal] = filteredCases[filteredCases.length - 1];
+  for (let i = 0 ; i < filteredCases.length - 1 ; i++) {
+    const isLastIf = i === (filteredCases.length - 2);
+    let [cond, value] = filteredCases[i];
+    if (value == undefined)
+      value = null;
+    if (cond == undefined)
+      cond = true;
+    ifArgs.push(cond); // if
+    ifArgs.push(value); // then
+    if (isLastIf) {
+      ifArgs.push(defVal); // else
+    } else {
+      // elif..
+      ifArgs.push({ if: [] });
+      ifArgs = ifArgs[ifArgs.length - 1].if;
+    }
+  }
+  return ret;
+};
+
+const formatCase = (item, config, meta, _not = false, parentField = null) => {
+  const type = item.get("type");
+  if (type != "case_group") {
+    meta.errors.push(`Unexpected child of type ${type} inside switch`);
+    return undefined;
+  }
+  const properties = item.get("properties") || new Map();
+
+  const cond = formatGroup(item, config, meta, _not, parentField);
+
+  const formattedItem = formatItemValue(
+    config, properties, meta, null, parentField, "!case_value"
+  );
+  return [cond, formattedItem];
+};
+
+const formatItemValue = (config, properties, meta, operator, parentField, expectedValueType = null) => {
+  let field = properties.get("field");
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
-  const fieldDefinition = getFieldConfig(config, field) || {};
-  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  if (expectedValueType == "!case_value" || iValueType && iValueType.get(0) == "case_value") {
+    field = "!case_value";
+  }
+  const fieldDefinition = getFieldConfig(config, field);
+  const operatorDefinition = getOperatorConfig(config, operator, field);
+  const cardinality = getOpCardinality(operatorDefinition);
   const iValue = properties.get("value");
   const asyncListValues = properties.get("asyncListValues");
   if (iValue == undefined)
     return undefined;
-  
+
   let valueSrcs = [];
   let valueTypes = [];
   let oldUsedFields = meta.usedFields;
@@ -225,7 +390,7 @@ const formatItemValue = (config, properties, meta, operator, parentField) => {
     const valueType = iValueType ? iValueType.get(ind) : null;
     const cValue = completeValue(currentValue, valueSrc, config);
     const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDef = omit( getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"] );
+    const fieldWidgetDef = getFieldWidgetConfig(config, field, operator, widget, valueSrc, { forExport: true });
     const fv = formatValue(
       meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDefinition, operator, operatorDefinition, parentField, asyncListValues
     );
@@ -252,12 +417,12 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
     ret = formatField(meta, config, currentValue, parentField);
   } else if (valueSrc == "func") {
     ret = formatFunc(meta, config, currentValue, parentField);
-  } else if (typeof fieldWidgetDef.jsonLogic === "function") {
+  } else if (typeof fieldWidgetDef?.jsonLogic === "function") {
     const fn = fieldWidgetDef.jsonLogic;
     const args = [
       currentValue,
       {
-        ...pick(fieldDef, ["fieldSettings", "listValues"]),
+        ...(fieldDef ? pick(fieldDef, ["fieldSettings", "listValues"]) : {}),
         asyncListValues
       },
       //useful options: valueFormat for date/time
@@ -276,8 +441,8 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
 
 
 const formatFunc = (meta, config, currentValue, parentField = null) => {
-  const funcKey = currentValue.get("func");
-  const args = currentValue.get("args");
+  const funcKey = currentValue.get?.("func");
+  const args = currentValue.get?.("args");
   const funcConfig = getFuncConfig(config, funcKey);
   const funcParts = getFieldParts(funcKey, config);
   const funcLastKey = funcParts[funcParts.length-1];
@@ -299,28 +464,32 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     const {defaultValue, isOptional} = argConfig;
     const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
-    const argValue = argVal ? argVal.get("value") : undefined;
+    let argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    if (argValueSrc !== "func" && argValue?.toJS) {
+      // value should not be Immutable
+      argValue = argValue.toJS();
+    }
     const operator = null;
     const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
-    const fieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc), ["factory"] );
+    const fieldWidgetDef = getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc, { forExport: true });
     const formattedArgVal = formatValue(
       meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, null, null, parentField
     );
     if (argValue != undefined && formattedArgVal === undefined) {
-      if (argValueSrc != "func") // don't triger error if args value is another uncomplete function
+      if (argValueSrc != "func") // don't triger error if args value is another incomplete function
         meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
     }
     let formattedDefaultVal;
     if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
       const defaultWidget = getWidgetForFieldOp(config, argConfig, operator, defaultValueSrc);
-      const defaultFieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc), ["factory"] );
+      const defaultFieldWidgetDef = getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc, { forExport: true });
       formattedDefaultVal = formatValue(
         meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, null, null, parentField
       );
       if (formattedDefaultVal === undefined) {
-        if (defaultValueSrc != "func") // don't triger error if args value is another uncomplete function
+        if (defaultValueSrc != "func") // don't triger error if args value is another incomplete function
           meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
         return undefined;
       }
@@ -343,7 +512,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   }
   if (missingArgKeys.length) {
     //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
-    return undefined; // uncomplete
+    return undefined; // incomplete
   }
 
   const formattedArgsArr = Object.values(formattedArgs);
@@ -390,27 +559,26 @@ const formatField = (meta, config, field, parentField = null) => {
   return ret;
 };
 
-const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formattedValue) => {
-  let formatteOp = operator;
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-  const isReverseArgs = defaultValue(operatorDefinition._jsonLogicIsRevArgs, false);
+const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formattedValue, expectedType) => {
+  let formattedOp = operator;
+  const cardinality = getOpCardinality(operatorDefinition);
   if (typeof operatorDefinition.jsonLogic == "string")
-    formatteOp = operatorDefinition.jsonLogic;
+    formattedOp = operatorDefinition.jsonLogic;
   const rangeOps = ["<", "<=", ">", ">="];
   const eqOps = ["==", "!="];
   const fn = (field, op, val, opDef, opOpts) => {
-    if (cardinality == 0 && eqOps.includes(formatteOp))
-      return { [formatteOp]: [formattedField, null] };
+    if (cardinality == 0 && eqOps.includes(formattedOp))
+      return { [formattedOp]: [formattedField, null] };
     else if (cardinality == 0)
-      return { [formatteOp]: formattedField };
-    else if (cardinality == 1 && isReverseArgs)
-      return { [formatteOp]: [formattedValue, formattedField] };
+      return { [formattedOp]: formattedField };
+    // else if (cardinality == 1 && eqOps.includes(formattedOp) && ["date", "datetime"].includes(expectedType))
+    //   return { [expectedType+formattedOp]: [formattedField, formattedValue] };
     else if (cardinality == 1)
-      return { [formatteOp]: [formattedField, formattedValue] };
-    else if (cardinality == 2 && rangeOps.includes(formatteOp))
-      return { [formatteOp]: [formattedValue[0], formattedField, formattedValue[1]] };
+      return { [formattedOp]: [formattedField, formattedValue] };
+    else if (cardinality == 2 && rangeOps.includes(formattedOp))
+      return { [formattedOp]: [formattedValue[0], formattedField, formattedValue[1]] };
     else
-      return { [formatteOp]: [formattedField, ...formattedValue] };
+      return { [formattedOp]: [formattedField, ...formattedValue] };
   };
   return fn;
 };
@@ -418,10 +586,12 @@ const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formatt
 const formatLogic = (config, properties, formattedField, formattedValue, operator, operatorOptions = null, fieldDefinition = null, isRev = false) => {
   const field = properties.get("field");
   //const fieldSrc = properties.get("fieldSrc");
+  const firstValueType = properties.get("valueType")?.get(0);
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  let fn = typeof operatorDefinition.jsonLogic == "function" 
-    ? operatorDefinition.jsonLogic 
-    : buildFnToFormatOp(operator, operatorDefinition, formattedField, formattedValue);
+  const expectedType = fieldDefinition?.type ?? firstValueType;
+  let fn = typeof operatorDefinition.jsonLogic == "function"
+    ? operatorDefinition.jsonLogic
+    : buildFnToFormatOp(operator, operatorDefinition, formattedField, formattedValue, expectedType);
   const args = [
     formattedField,
     operator,
@@ -429,6 +599,8 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
     omit(operatorDefinition, opDefKeysToOmit),
     operatorOptions,
     fieldDefinition,
+    expectedType,
+    config.settings,
   ];
   let ruleQuery = fn.call(config.ctx, ...args);
 

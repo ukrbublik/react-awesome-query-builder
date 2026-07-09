@@ -1,6 +1,128 @@
 # Changelog
+- 6.7.0
+  - Added `price` widget based on `react-number-format` (PR #1206) (issue #1025)
+  - Improved theming (PR #1188) (issues #892 #970 #599)
+  - Dropped `compact_styles.scss`. Use class `.qb-compact` instead if you need. See new `vars_compact.scss` (PR #1188)
+  - Added customized modals to confirm item deleteion for Fluent, Bootstrap (PR #1188)
+  - Added some missing type declarations. Restored support of AntDesign v4 (PR #1264)
+  - Added `showSelectedValueSourceLabel` to config settings (PR #1272) (issue #1144)
+- 6.6.15
+  - Fixed support of AntDesign 4.x DatePicker (PR #1239) (issue #1238)
+  - Prevent potential prototype pollution in `OtherUtils.mergeIn` and `OtherUtils.setIn` (PR #1240)
+  - Fix XSS vulnerability in antd package (PR #1243) (issue #1009)
+  - Updated dependencies. `@babel/runtime` is now dep for all packages (PR #1246) (issue #964)
+  - Fix group operator's custom jsonLogic function not being called (PR #1242) (issue #1241)
+  - Fix import switch from JsonLogic (PR #1235) (issue #1230)
+  - Fix incorrect using of "$not" as top-level operator in output to MongoDb (PR #1254) (issue #1250)
+  - Fix using incorrect date format in output to MongoDb (PR #1254)
+  - Added date/datetime functions: `TODAY`, `START_OF_TODAY`, `RELATIVE_DATE`, `TRUNCATE_DATETIME` (PR #1256) (issue #1237)
+  - Fixed datetime functions `NOW`, `RELATIVE_DATETIME` for MongoDb (PR #1256)
+  - Fixed comparing of dates with `==` and `!=` in JsonLogic by using new ops `date==`, `date!=`, `datetime==`, `datetime!=`. Added `fixJsonLogicDateCompareOp` to `config.setings` (false by default) (PR #1256)
+  - Now `Utils.JsonLogicUtils.addRequiredJsonLogicOperations(jl)` can be used for instance of `json-logic-js` to add custom operators (PR #1256)
+- 6.6.14
+  - Fixed import from JsonLogic when like op is used inside group with some group op (PR #1225) (issue #1221)
+  - Support React 19 (PR #1229) (issue #1205)
+- 6.6.13
+  - Fix selecting func/args at RHS at delta 1 (PR #1211) (issue #1207)
+  - Fix fetchSelectedValuesOnInit for func arguments (PR #1210) (issue #1198)
+  - Fix SpEL import/export for between op (PR #1212) (issue #1203)
+- 6.6.12
+  - Fix issue with getting field config for func arg signature object (PR #1193) (issue #1192)
+- 6.6.11
+  - Fix issue with updating both config & tree value (PR #1190) (issue #1187)
+- 6.6.10
+  - Fix escape/unescape for LIKE operator (PR #1177) (issue #982)
+  - Fix tags tokenization (antd) (PR #1182) (issue #1115)
+  - Added `fieldSettings.fetchSelectedValuesOnInit` (see description in [`CONFIG.adoc`](/CONFIG.adoc)) (PR #1184)
+- 6.6.9
+  - Force autocomplete widget when `fieldSettings.allowCustomValues` is true (MIU/antd) (PR #1176) (issue #1150)
+  - Fix disabling !struct (PR #1178) (issue #1121)
+- 6.6.8
+  - Support safe navigation operator in SpEL operators/functions (PR #1172) (issue #1010)
+  - SpEL: backward compatibility for import of `CollectionUtils.containsAny` (PR #1174) (issue #1007)
+  - Support MUI 6 (PR #1175) (issue #1113)
+- 6.6.7
+  - Fix import of ambiguous operators (like, select_any_in) (PR #1168) (issue #1159)
+  - Allow import of epoch for date/datetime widgets from JsonLogic (PR #1171) (issue #1154)
+- 6.6.6
+  - Fix issue with process global (PR #1166) (issue #1165)
+- 6.6.5
+  - Support import fom SQL (`SqlUtils.loadFromSql`) (PR #1103) (issue #911, #593)
+  - Fixed type issue with SerializedFunction (PR #1103) (issue #1024)
+- 6.6.4
+  - Support groups inside rule-group (PR #1111) (issue #1108)
+  - Fixed cardinality issue (PR #1136) (issue #1118)
+  - Fixed types (PR #1131, #1132, #1130, #1129, #1127, #1128, #1126)
+- 6.6.4-alpha.0
+  - Support groups inside rule-group (PR #1111) (issue #1108)
+- 6.6.3
+  - Fixed `Utils.isValidTree` for prod build.
+    Removed `checkTree`, `isValidTree` from `Utils.Import` and `getTreeBadFields` from `Utils.TreeUtils`. (PR #1091) (issue #1075)
+  - Use pnpm 8 (to support CodeSandbox and StackBlitz) (PR #1093)
+  - Added tasks for VSCode (PR #1095)
+  - Refactored examples demo app (PR #1097)
+  - JsonLogic roundtrip fix (issue #1084) (PR #1092)
+  - Fixed lagging state of multiselect FluentUI component and added searchable options to select and multiselect (PR #1090)
+  - Added `customOperatorSelectProps` (issue #1094) (PR #1098)
+- 6.6.2
+  - Fixed issue with rendering func select inside func (PR #1086) (issue #1085)
+  - Added `DefaultUtils` typings to `index.d.ts` (PR #1078) (issue #1079)
+  - Added config option `exportPreserveGroups` (PR #1077) (issue #1074)
+  - Support `@mui/x-date-pickers` v7 (PR #1088) (issue #1087)
+- 6.6.1
+  - Operators reverse on "NOT" is now optional, disabled by default to preserve orignal query (PR #1068) (issue #1059).  
+    Added settings `reverseOperatorsForNot` and `canShortMongoQuery`
+  - Scope CSS classes to `.query-builder` (PR #1070) (issue #1018)
+  - Update packages (PR #1071)
+  - Fixed issue with `excludeOperators` (affects `prox1` at example) (PR #1072)
+  - Use pnpm 9 (PR #1073)
+- 6.6.0
+  - Optimizations for rendering and export utils (PR #1054) (issue #342)
+  - Added support of JsonLogic export for ternary mode (PR #1013) (issue #978)
+  - Added support of JsonLogic import for ternary mode (PR #1062) (issue #978)
+  - Added support of `tooltip` for operator config (PR #1011) (issue #261)
+  - Removed `optimizeRenderWithInternals` from `settings` (PR #1054)
+  - Fixed `TreeStore` - 2nd arg `action` can be undefined (PR #1054) (issue #1056)
+  - Fixed import of negative number in SpEL (PR #1054) (issue #1055)
+  - Fixed validation error message for min/max (PR #1058) (issue #1057)
+  - (Ternary mode) Added to `config.settings`: `caseValueField`, `renderBeforeCaseValue`, `renderAfterCaseValue`, `renderSwitchPrefix`, `defaultCaseLabel`, `addCaseLabel`, `addDefaultCaseLabel` (PR #1062)
+  - Use icon button label as the aria-label to improve accessibility (PR #1066) (issue #1038)
+  - Show imported value initially in MUI autocomplete inputs (PR #1065)
+  - Make getOptionLabel always return a string (PR #1064)
+- 6.5.2
+  - Updated dependencies. `@babel/runtime` is now dep for core package (PR #1051) (issue #964)
+- 6.5.1
+  - Fix missing config file in antd moment date widgets (PR #1046) (issue #1048)
+  - Fix SpEL import not_between (PR #1050) (issue #1047)
+- 6.5.0
+  - Breaking: `Utils.validateTree` returns array of errors (PR #1034)
+  - Breaking: `Utils.sanitizeTree` returns object `{fixedTree, fixedErrors}` (PR #1034)
+  - Breaking: `removeIncompleteRulesOnLoad` by default is false
+  - Added config `removeEmptyRulesOnLoad` (default true) (PR #1034)
+  - Deprecated `Utils.validateAndFixTree` and `Utils.checkTree` (and removed type defs).  
+    Use `Utils.sanitizeTree().fixedTree` instead (PR #1034)
+  - `Utils.validateTree` now checks LHS and RHS are completed (issues #977, #781) (PR #1034)
+  - Fixed import of `select_any_in` operator from JsonLogic (issue #1005) (PR #1034)
+  - Fixed issue #1036 (PR #1034)
+  - Fixed validation of date ranges (issue #374) (PR #1034)
+  - Function `validateValue` in `fieldSettings` config can now return object `{error, fixedValue}`, error can be `{key, args}` for i18n (PR #1034)
+  - Added `optimizeRenderWithInternals` to `settings`, default is `false` (PR #1034)
+  - Updated type `RuleGroupExtProperties` (issue #1021) (PR #1034)
+  - Fixed typedef errors (issue #1016) (PR #1034)
+  - Fixed issue with antd and date/time pickers (issue #1033) (PR #1034)
+  - Added `onInit` prop to `<Query>`. Added 4th argument `actions` to `onInit` and `onChange` (PR #1034)
+  - Now `pnpm i` requires Node 18+
+- 6.4.3
+  - Fixed the issue when using func with arg of type `multiselect` (PR #997)
+  - Updated `immutable` from v3 to v4 (PR #997)
+  - Fixed issue with "[object Object]" in MUI field autocomplete when item should be bold (PR #997)
+  - Respect `funcs` in field/arg config during validation of function value (PR #997)
 - 6.4.2
-  - Allow override icons with `renderIcon` (issues #319, #872) (PR #xxx)
+  - Allow override icons with `renderIcon` (issues #319, #872) (PR #962)
+  - Support tooltips for MUI (issues #965, #684) (PR #973)
+  - Fixed issue with `FieldCascader` (issue #969) (PR #973)
+  - Fixed issue with date/time pickers for MUI 6 (issue #986) (PR #973)
+  - Allow use of antd icons 5 (issue #992) (PR #973)
 - 6.4.1
   - Fixed import of rule_group in rule_group from SpEL (PR #959)
   - Updated type `ItemBuilderProps` (PR #959)
@@ -9,7 +131,7 @@
   - Fixed import of fields with dot from JsonLogic (issue #786) (PR #960)
   - Fixes export to SpEL to respect `fieldSeparator` (issue #958) (PR #960)
 - 6.4.0
-  - Functions can be used in LHS with `fieldSources: ["field", "func"]` in `settings`
+  - Functions can be used in LHS with `fieldSources: ["field", "func"]` in `settings`  
     Thanks @rhallerman1 (PR #900, #896) (issues #287, #250, #344, #336)
   - Support import/export of functions for SpEL (PR #900) (issue #754)
   - Fix issue with `fieldName` (PR #900) (issues #929, #609)
@@ -39,7 +161,7 @@
 - 6.2.0
   - Fixed type `Config`: should have render settings like `renderSize` (PR #909) (issue #879)
   - Fixed type for `renderBeforeWidget`: `RuleProps` instead of wrong `FieldProps` (PR #909) (issue #879)
-  - Breaking change in types: `listValues` renamed to `treeValues` in `TreeSelectFieldSettings`
+  - Breaking change in types: `listValues` renamed to `treeValues` in `TreeSelectFieldSettings`  
     But old `listValues` is still supported in JS (PR #909)
   - Add support for ElasticSearch 7 term syntax (PR #906) (issue #904)
   - Fix mongodbFormat to work with mode = array (PR #908) (issue #907)
@@ -63,7 +185,7 @@
     - Breaking: Removed icon in "Add sub rule" button
   - Added `@react-awesome-query-builder/fluent` package (PR #727)
   - Fix import of `is_null` and `is_not_null` ops from SpEL (PR #831) (issue #794)
-  - Fix import of NOT from SpEL (PR #852) (issue #834)
+  - Fix import of NOT from SpEL (PR #852) (issue #834)  
     Also fixes export of aggregation expression w/o children filter like `cars.size() == 2`
   - Support antd 5 (PR #853) (issue #812)
 - 6.0.0
@@ -87,14 +209,14 @@
   - ES: Fix `greater` op (PR #749) (issue #744)
   - ES: Fix NOT (PR #750) (issue #723)
 - 5.2.0
-  - ! Breaking change: `children1` is now array in result of `getTree()` to preserve items order (PR #672) (issues #589, #670)
+  - ! Breaking change: `children1` is now array in result of `getTree()` to preserve items order (PR #672) (issues #589, #670)  
     `Utils.getTree(tree, true, false)` will behave same as before this change.
   - Support React 18. Migrate to x-date-pickers. (PR #734) (issues #710, #732)
   - Add path property at `index.d.ts` (PR #671) (issue #669)
   - Fixed `getTotalRulesCountInTree()` == 1 (should be 0) for clear tree (PR #673) (issue #583)
-  - Handle validation of bad multiselect value correctly (PR #733) (issue #674)
-    Remove bad values from list, don't unset whole value.
-    Added config `removeInvalidMultiSelectValuesOnLoad` (true by default, false for AntDesign)
+  - Handle validation of bad multiselect value correctly (PR #733) (issue #674)  
+    Remove bad values from list, don't unset whole value.  
+    Added config `removeInvalidMultiSelectValuesOnLoad` (true by default, false for AntDesign)  
     ! Breaking change: `removeIncompleteRulesOnLoad` and `removeEmptyGroupsOnLoad` now default to `true`, set them to `false` in your `settings` to preserve the current behaviour
   - Fix `loadFromSpel` for `select_equals` op (PR #740) (issue #704)
   - Fix `loadFromSpel` for `is_empty` and `is_not_empty` ops (PR #713) (issues #714, #699)
@@ -113,7 +235,7 @@
   - Fix validation of multiselect func arg (PR #656) (issue #587)
 - 5.0.0
   - Support of SpEL for import and export. See `loadFromSpel` and `spelFormat` in `Utils` (PR #613)
-  - Added `excludeOperators` for type config (PR #613)
+  - Added `excludeOperators` for type config (PR #613)  
     See `excludeOperators: ["proximity"]` in demo
   - Changed export of `not_between` op for text format (`!(num >= 3 && num <= 4)` -> `(num < 3 || num > 4)`) (PR #613)
   - Rename `Like` -> `Contains`. Moved `is_empty`, `is_null` to end of operators list (PR #613)
@@ -124,13 +246,18 @@
   - Support Bootstrap (via `reactstrap`) (PR #604)
 - 4.9.0
   - Added `is_null` and `is_not_null` operators (issue #494) (PR #522)
-  - ! Breaking change for operators `is_empty` and `is_not_empty`. Left for text type only, for other types will be auto converted to `is_null`/`is_not_null`. Changed meaning of `is_empty` - now it's just strict comparing with empty string. Before change meaning was similar to `is_null` (and export to SQL was wrong because of non-existent operator `IS EMPTY`). (issue #494) (PR #573)
+  - ! Breaking change for operators `is_empty` and `is_not_empty` (issue #494) (PR #573)  
+    Left for text type only, for other types will be auto converted to `is_null`/`is_not_null`.  
+    Changed meaning of `is_empty` - now it's just strict comparing with empty string.  
+    Before change meaning was similar to `is_null` (and export to SQL was wrong because of non-existent operator `IS EMPTY`).
   - Fixed order of operators for field when merging operators from 2+ widgets (PR #573)
   - Added last param `fieldDef` for functions to format operators (PR #573)
   - Added `jsonLogic` to widget TS def (PR #572)
   - Export `TreeUtils` (PR #597)
 - 4.8.0
-  - Added read-only mode switch for rules and groups. See `showLock` and `canDeleteLocked` config options, custom JsonLogic op `locked`, `setLock` action, `lockLabel` and `lockedLabel`. Added Switch components, see `renderSwitch`. (issue #377) (PR #490)
+  - Added read-only mode switch for rules and groups.  
+    See `showLock` and `canDeleteLocked` config options, custom JsonLogic op `locked`, `setLock` action, `lockLabel` and `lockedLabel`.  
+    Added Switch components, see `renderSwitch`. (issue #377) (PR #490)
   - Fixed issue with frozen config (`Object.freeze`) by using `clone` (issue #345) (PR #490)
   - Fix: Filter value sources for func args correctly. LHS field can be used as arg in RHS function. (PR #490)
   - MUI - Support showSearch (autocomplete) for field select widget (issue #479 #521) (PR #563)

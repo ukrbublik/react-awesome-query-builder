@@ -10,8 +10,9 @@ const typeToIcon = {
   "delGroup": <DeleteIcon />,
   "delRuleGroup": <DeleteIcon />,
   "delRule": <DeleteIcon />,
-  "addRuleGroup": <AddIcon />,
-  "addRuleGroupExt": <AddIcon />,
+  "addSubRuleSimple": <AddIcon />,
+  "addSubRule": <AddIcon />,
+  "addSubGroup": <AddIcon />,
   "addRule": <AddIcon />,
   "addGroup": <AddIcon />,
   "drag": <DragHandle />,
@@ -27,7 +28,7 @@ const typeToColor = {
 };
 
 export default ({type, readonly}) => {
-  let icon = typeToIcon[type];
+  let icon = typeToIcon[type] || null;
   if (!icon && type === "drag") {
     return <DragIcon />;
   }

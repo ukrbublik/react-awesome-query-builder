@@ -4,24 +4,24 @@ import {
   getFieldWidgetConfig,
   getFuncConfig,
   getFieldParts,
-  extendConfig,
-} from "../utils/configUtils";
-import {
-  getFieldPartsConfigs,
   getWidgetForFieldOp,
+  getFieldPartsConfigs,
+} from "../utils/configUtils";
+import { extendConfig } from "../utils/configExtend";
+import {
   formatFieldName,
   completeValue,
 } from "../utils/ruleUtils";
-import omit from "lodash/omit";
 import pick from "lodash/pick";
 import {
-  defaultValue,
+  getOpCardinality,
   widgetDefKeysToOmit,
   opDefKeysToOmit,
+  omit,
 } from "../utils/stuff";
 import { defaultConjunction } from "../utils/defaultUtils";
 import { List, Map } from "immutable";
-import { celEscape } from "../utils/export";
+import { celEscape } from "../utils/celUtils";
   
 export const celFormat = (tree, config) => {
   return _celFormat(tree, config, false);
@@ -91,7 +91,7 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
   if (!celOp) return undefined;
   // `${N}` placeholders => callable/templated op, e.g. "${0}.contains(${1})"
   const isSign = celOp.includes("${0}");
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDefinition);
   let fn;
   if (isSign) {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
@@ -134,7 +134,7 @@ const formatRule = (item, config, meta) => {
   let opDef = getOperatorConfig(config, operator, field) || {};
   let reversedOp = opDef.reversedOp;
   let revOpDef = getOperatorConfig(config, reversedOp, field) || {};
-  const cardinality = defaultValue(opDef.cardinality, 1);
+  const cardinality = getOpCardinality(opDef);
   
   // check op
   let isRev = false;
