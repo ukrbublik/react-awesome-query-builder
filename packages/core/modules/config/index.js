@@ -168,7 +168,7 @@ const operators = {
     reversedOp: "not_like",
     sqlOp: "LIKE",
     spelOp: "${0}.contains(${1})",
-    celOp: "${1} in ${0}",
+    celOp: "${0}.contains(${1})",
     valueTypes: ["text"],
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) : undefined), false, ...args); },
     //jsonLogic: (field, op, val) => ({ "in": [val, field] }),
@@ -225,8 +225,8 @@ const operators = {
       return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
     },
     celFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
-      const valFrom = values?._tail?.array[0];
-      const valTo = values?._tail?.array[1];
+      const valFrom = values.get(0);
+      const valTo = values.get(1);
       return `(${field} >= ${valFrom} && ${field} <= ${valTo})`;
     },
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp2(["$gte", "$lte"], false, ...args); },
@@ -270,8 +270,8 @@ const operators = {
       return `(${field} < ${valFrom} || ${field} > ${valTo})`;
     },
     celFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
-      const valFrom = values?._tail?.array[0];
-      const valTo = values?._tail?.array[1];
+      const valFrom = values.get(0);
+      const valTo = values.get(1);
       return `(${field} < ${valFrom} || ${field} > ${valTo})`;
     },
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp2(["$gte", "$lte"], true, ...args); },
@@ -423,7 +423,8 @@ const operators = {
       } else return undefined; // not supported
     },
     celFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
-      return `${values} in ${field}`;
+      // single-select field is present in the list of allowed values
+      return `${field} in ${values}`;
     },
     valueTypes: ["multiselect"],
     spelOp: "${1}.contains(${0})",
@@ -469,7 +470,8 @@ const operators = {
     //spelOp: "${0}.containsAll(${1})",
     spelOp: "T(CollectionUtils).containsAny(${0}, ${1})",
     celFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
-      return `${values} in ${field}`;
+      // "contains any": the multiselect list field shares at least one element with the values list
+      return `${field}.exists(_v, _v in ${values})`;
     },
     elasticSearchQueryType: "term",
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$in", v => v, false, ...args); },
@@ -739,9 +741,7 @@ const widgets = {
       return res;
     },
     celFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
-      const isCallable = opDef.spelOp && opDef.spelOp.startsWith("${1}");
-      let res = this.utils.celEscape(vals); // inline list
-      return res;
+      return this.utils.celEscape(vals); // inline list
     },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
@@ -767,8 +767,11 @@ const widgets = {
       return this.utils.SqlString.escape(dateVal.format("YYYY-MM-DD"));
     },
     celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+      // CEL has no date type; use a google.protobuf.Timestamp via timestamp() with an RFC3339 string
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
-      return dateVal.isValid() ? dateVal.format(wgtDef.dateFormat) : undefined;
+      return dateVal.isValid()
+        ? `timestamp(${this.utils.celEscape(dateVal.format("YYYY-MM-DDTHH:mm:ssZ"))})`
+        : undefined;
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
@@ -844,8 +847,9 @@ const widgets = {
       return this.utils.SqlString.escape(dateVal.format("HH:mm:ss"));
     },
     celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+      // CEL has no time-only type; emit the time as a string literal
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
-      return dateVal.isValid() ?dateVal.format(wgtDef.timeFormat): undefined;
+      return dateVal.isValid() ? this.utils.celEscape(dateVal.format("HH:mm:ss")) : undefined;
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
@@ -922,8 +926,11 @@ const widgets = {
       return this.utils.SqlString.escape(dateVal.toDate());
     },
     celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+      // CEL datetime => google.protobuf.Timestamp via timestamp() with an RFC3339 string
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
-      return dateVal.isValid() ? dateVal.format(wgtDef.dateFormat + " " + wgtDef.timeFormat) : undefined;
+      return dateVal.isValid()
+        ? `timestamp(${this.utils.celEscape(dateVal.format("YYYY-MM-DDTHH:mm:ssZ"))})`
+        : undefined;
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);

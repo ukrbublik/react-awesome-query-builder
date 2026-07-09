@@ -15,9 +15,9 @@ import {
   BuilderProps
 } from "@react-awesome-query-builder/ui";
 const {
-  uuid, 
-  checkTree, loadTree, _loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
-  queryString, sqlFormat, _sqlFormat, spelFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
+  uuid,
+  checkTree, loadTree, _loadFromJsonLogic, loadFromSpel, loadFromCel, isJsonLogic, elasticSearchFormat,
+  queryString, sqlFormat, _sqlFormat, spelFormat, celFormat, _celFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
 } = Utils;
 import { AntdConfig } from "@react-awesome-query-builder/antd";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
@@ -51,6 +51,7 @@ interface ExtectedExports {
   queryHuman?: string;
   sql?: string | [string, string[]];
   spel?: string;
+  cel?: string | [string, string[]];
   mongo?: Object;
   elasticSearch?: Object;
   elasticSearch7?: Object;
@@ -286,6 +287,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
       queryHuman: queryString(tree, config, true),
       sql: sqlFormat(tree, config),
       spel: spelFormat(tree, config),
+      cel: celFormat(tree, config),
       mongo: mongodbFormat(tree, config),
       logic: logic,
       elasticSearch: elasticSearchFormat(tree, config),
@@ -323,7 +325,18 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
         expect(res).to.equal(expects["spel"]);
       });
     }
-    
+
+    if (expects["cel"] !== undefined) {
+      doIt("should work to CEL", () => {
+        const [expectedRes, expectedErrors] = Array.isArray(expects["cel"])
+          ? expects["cel"]
+          : [expects["cel"], []];
+        const [res, errors] = _celFormat(tree, config);
+        expect(res).to.equal(expectedRes);
+        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedErrors || []));
+      });
+    }
+
     if (expects["mongo"] !== undefined) {
       doIt("should work to MongoDb", () => {
         const res = mongodbFormat(tree, config);

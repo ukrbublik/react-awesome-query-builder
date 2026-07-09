@@ -180,60 +180,26 @@ export const spelImportConcat = (val) => {
 export const stringifyForDisplay = (v) => (v == null ? "NULL" : v.toString());
 
 
-const celInlineList = (vals, toArray = false) => {
-  // find java type of values
-  let javaType;
-  let jt;
-  const numberJavaTypes = ["int", "float"];
-  vals.map((v) => {
-    if (v !== undefined && v !== null) {
-      if (typeof v === "string") {
-        jt = "String";
-      } else if (typeof v === "number") {
-        jt = Number.isInteger(v) ? "int" : "float";
-      } else throw new Error(`celEscape: Can't use value ${v} in array`);
-
-      if (!javaType) {
-        javaType = jt;
-      } else if (javaType != jt) {
-        if (
-          numberJavaTypes.includes(javaType)
-          && numberJavaTypes.includes(jt)
-        ) {
-          // found int and float in collecton - use float
-          javaType = "float";
-        } else
-          throw new Error(
-            `celEscape: Can't use different types in array: found ${javaType} and ${jt}`
-          );
-      }
-    }
-  });
-  if (!javaType) {
-    javaType = "String"; //default if empty array
-  }
-
-  // for floats we should add 'f' to all items
-  let escapedVals;
-  if (javaType == "float") {
-    escapedVals = vals.map((v) => celEscape(v, true));
-  } else {
-    escapedVals = vals.map((v) => celEscape(v));
-  }
-
-  // build inline list or array
-  let res;
-  if (toArray) {
-    res = `new ${javaType}[][${escapedVals.join(", ")}]`;
-  } else {
-    res = `[${escapedVals.join(", ")}]`;
-  }
-
-  return res;
+const celEscapeString = (val) => {
+  // CEL string literals use C-style backslash escaping (unlike SpEL/SQL which double the quote).
+  // https://github.com/google/cel-spec/blob/master/doc/langdef.md#string-and-bytes-values
+  const escaped = ("" + val)
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r")
+    .replace(/\t/g, "\\t");
+  return "'" + escaped + "'";
 };
 
-export const celEscape = (val, numberToFloat = false, arrayToArray = false) => {
-  // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions-ref-literal
+const celInlineList = (vals, numberToFloat = false) => {
+  // CEL list literal: [a, b, c]. Lists are heterogeneous (`dyn`), no per-type wrapper needed.
+  const escapedVals = vals.map((v) => celEscape(v, numberToFloat));
+  return `[${escapedVals.join(", ")}]`;
+};
+
+export const celEscape = (val, numberToFloat = false) => {
+  // https://github.com/google/cel-spec/blob/master/doc/langdef.md#values
   if (val === undefined || val === null) {
     return "null";
   }
@@ -242,15 +208,21 @@ export const celEscape = (val, numberToFloat = false, arrayToArray = false) => {
     return val ? "true" : "false";
   case "number":
     if (!Number.isFinite(val) || isNaN(val)) return undefined;
-    return val + (!Number.isInteger(val) || numberToFloat ? "f" : "");
+    // CEL is strongly typed: int literals have no suffix, doubles must carry a
+    // decimal point (or exponent). `numberToFloat` forces a double literal so an
+    // integer value compared against a double field doesn't become a type error.
+    if (Number.isInteger(val)) {
+      return numberToFloat ? val + ".0" : "" + val;
+    }
+    return "" + val;
   case "object":
     if (Array.isArray(val)) {
-      return celInlineList(val, arrayToArray);
+      return celInlineList(val, numberToFloat);
     } else {
-      // see `spelFormatValue` for Date, LocalTime
+      // see `celFormatValue` for Date, timestamp
       throw new Error("celEscape: Object is not supported");
     }
   default:
-    return spelEscapeString(val);
+    return celEscapeString(val);
   }
 };

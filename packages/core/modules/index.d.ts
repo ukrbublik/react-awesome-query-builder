@@ -313,6 +313,7 @@ interface Import {
   _loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): [ImmutableTree | undefined, Array<string>];
   // spel
   loadFromSpel(spelStr: string, config: Config): [ImmutableTree | undefined, Array<string>];
+  loadFromCel(celStr: string, config: Config): [ImmutableTree | undefined, Array<string>];
 }
 interface Export {
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
@@ -630,6 +631,7 @@ export interface FieldProps<C = Config> {
 /////////////////
 
 type SpelImportValue = (val: any, wgtDef?: Widget, args?: TypedMap<any>) => [any, string[] | string | undefined];
+type CelImportValue = (val: any, wgtDef?: Widget, args?: TypedMap<any>) => [any, string[] | string | undefined];
 
 type FormatValue =                  (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type SqlFormatValue =               (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
@@ -1045,6 +1047,11 @@ type SpelFieldMeta = {
   parent: "map" | "class" | "[class]" | "[map]" | null,
   isSpelVariable?: boolean,
 };
+type CelFieldMeta = {
+  key: string,
+  parent?: string,
+  fieldSeparator: string,
+};
 type ValueSourcesInfo = {[vs in ValueSource]?: {label: string, widget?: string}};
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
 type AntdSize = "small" | "large" | "medium";
@@ -1055,6 +1062,7 @@ type CelFormatReverse = (q: string) => string;
 type SpelFormatReverse = (q: string) => string;
 type FormatField = (field: FieldPath, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
 type FormatSpelField = (field: FieldPath, parentField: FieldPath | null, parts: Array<string>, partsExt: Array<SpelFieldMeta>, fieldDefinition: Field, config: Config) => string;
+type FormatCelField = (field: FieldPath, parentField: FieldPath | null, parts: Array<string>, partsExt: Array<CelFieldMeta>, fieldDefinition: Field, config: Config) => string;
 type CanCompareFieldWithField = (leftField: FieldPath, leftFieldConfig: Field, rightField: FieldPath, rightFieldConfig: Field, op: string) => boolean;
 type FormatAggr = (whereStr: string, aggrField: FieldPath, operator: string, value: string | ImmutableList<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: AnyObject, isForDisplay: boolean, aggrFieldDef: Field) => string;
 
@@ -1149,7 +1157,8 @@ export interface OtherSettings {
   fieldSeparatorDisplay?: string,
   formatReverse?: FormatReverse | SerializedFunction,
   sqlFormatReverse?: SqlFormatReverse | SerializedFunction,
-  celFormatReverse?: SqlFormatReverse | SerializedFunction,
+  celFormatReverse?: CelFormatReverse | SerializedFunction,
+  formatCelField?: FormatCelField | SerializedFunction,
   spelFormatReverse?: SpelFormatReverse | SerializedFunction,
   formatField?: FormatField | SerializedFunction,
   formatSpelField?: FormatSpelField | SerializedFunction,

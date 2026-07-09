@@ -7,7 +7,7 @@ import {
   extendConfig,
 } from "../utils/configUtils";
 import {
-  getFieldPathLabels,
+  getFieldPartsConfigs,
   getWidgetForFieldOp,
   formatFieldName,
   completeValue,
@@ -87,50 +87,32 @@ const formatGroup = (item, config, meta) => {
 };
   
 const buildFnToFormatOp = (operator, operatorDefinition) => {
-  const celOp = operatorDefinition.celOp || operator;
+  const celOp = operatorDefinition.celOp;
+  if (!celOp) return undefined;
+  // `${N}` placeholders => callable/templated op, e.g. "${0}.contains(${1})"
+  const isSign = celOp.includes("${0}");
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
   let fn;
-  if (cardinality == 0) {
-    fn = (
-      field,
-      op,
-      values,
-      valueSrc,
-      valueType,
-      opDef,
-      operatorOptions,
-      fieldDef
-    ) => {
+  if (isSign) {
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      return celOp.replace(/\${(\w+)}/g, (_, k) =>
+        (k == 0 ? field : (cardinality > 1 ? values.get(k - 1) : values))
+      );
+    };
+  } else if (cardinality == 0) {
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       return `${field} ${celOp}`;
     };
   } else if (cardinality == 1) {
-    fn = (
-      field,
-      op,
-      value,
-      valueSrc,
-      valueType,
-      opDef,
-      operatorOptions,
-      fieldDef
-    ) => {
+    fn = (field, op, value, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       return `${field} ${celOp} ${value}`;
     };
   } else if (cardinality == 2) {
     // between
-    fn = (
-      field,
-      op,
-      values,
-      valueSrc,
-      valueType,
-      opDef,
-      operatorOptions,
-      fieldDef
-    ) => {
-      const valFrom = values.first();
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      const valFrom = values.get(0);
       const valTo = values.get(1);
-      return `${field} ${celOp} ${valFrom} && ${valTo}`;
+      return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
     };
   }
   return fn;
@@ -299,18 +281,20 @@ const formatField = (meta, config, field) => {
   const { fieldSeparator } = config.settings;
   const fieldDefinition = getFieldConfig(config, field) || {};
   const fieldParts = getFieldParts(field, config);
-  const fieldPartsLabels = getFieldPathLabels(field, config);
-  const fieldFullLabel = fieldPartsLabels
-    ? fieldPartsLabels.join(fieldSeparator)
-    : null;
-  const formatFieldFn = config.settings.formatField;
+  const fieldPartsConfigs = getFieldPartsConfigs(field, config);
+  const formatFieldFn = config.settings.formatCelField;
   const fieldName = formatFieldName(field, config, meta, null, {
     useTableName: true,
   });
-  const formattedField = formatFieldFn(
+  const fieldPartsMeta = fieldPartsConfigs.map(([key, cnf, parentCnf]) => {
+    return { key, parent: undefined, fieldSeparator };
+  });
+  const formattedField = formatFieldFn.call(
+    config.ctx,
     fieldName,
+    null,
     fieldParts,
-    fieldFullLabel,
+    fieldPartsMeta,
     fieldDefinition,
     config
   );
