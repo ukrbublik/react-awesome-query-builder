@@ -22,12 +22,10 @@ import { defaultConjunction } from "../utils/defaultUtils";
 let _celParsePromise;
 const getCelParse = () => {
   if (!_celParsePromise) {
-    // Indirect specifier: cel-js ships broken type declarations (helper.d.ts
-    // references a missing ./cst-definitions.js), and core builds with
-    // `skipLibCheck: false`. Loading via a variable keeps TS from resolving —
-    // and type-checking — cel-js's .d.ts, while the runtime import is unchanged.
-    const pkg = "cel-js";
-    _celParsePromise = import(pkg).then((m) => m.parse || (m.default && m.default.parse));
+    // Literal specifier so bundlers (webpack/Next) can statically resolve and
+    // code-split cel-js — a variable here triggers a "Critical dependency"
+    // warning that fails CI builds run with CI=true.
+    _celParsePromise = import("cel-js").then((m) => m.parse || (m.default && m.default.parse));
   }
   return _celParsePromise;
 };
