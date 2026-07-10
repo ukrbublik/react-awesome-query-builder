@@ -2,7 +2,7 @@ import { Utils, CoreConfig } from "@react-awesome-query-builder/core";
 import { expect } from "chai";
 
 const {
-  loadFromJsonLogic, loadFromCel, checkTree, celFormat,
+  loadFromJsonLogic, loadFromCel, checkTree, loadTree, celFormat,
 } = Utils;
 
 const config = {
@@ -21,8 +21,30 @@ const config = {
       label: "Tags", type: "multiselect",
       fieldSettings: { listValues: [{ value: "a", title: "A" }, { value: "b", title: "B" }, { value: "c", title: "C" }] },
     },
+    cars: {
+      label: "Cars", type: "!group", mode: "array",
+      subfields: {
+        vendor: { label: "Vendor", type: "select", fieldSettings: { listValues: [{ value: "Toyota" }, { value: "BMW" }] } },
+        year: { label: "Year", type: "number" },
+      },
+    },
+    results: {
+      label: "Results", type: "!struct",
+      subfields: {
+        product: { label: "Product", type: "select", fieldSettings: { listValues: [{ value: "abc" }, { value: "def" }] } },
+        score: { label: "Score", type: "number" },
+      },
+    },
   },
 };
+
+const uuid = Utils.uuid;
+const rule = (field, operator, value = [], valueType) => ({
+  type: "rule", id: uuid(),
+  properties: { field, operator, value, valueSrc: value.map(() => "value"), valueType: valueType || value.map(() => null) },
+});
+const celFromTree = (children, props = { conjunction: "AND" }) =>
+  celFormat(checkTree(loadTree({ id: uuid(), type: "group", properties: { conjunction: "AND" }, children1: children }), config), config);
 
 const celFromJsonLogic = (jl) => {
   const tree = checkTree(loadFromJsonLogic(jl, config), config);
@@ -74,6 +96,31 @@ describe("export to CEL", () => {
   });
   it("NOT group and nested OR", () => {
     expect(celFromJsonLogic({ "!": { and: [{ ">": [{ var: "num" }, 0] }] } })).to.equal("!(num > 0)");
+  });
+
+  it("struct group qualifies child fields (no aggregation)", () => {
+    const g = {
+      id: uuid(), type: "rule_group", properties: { conjunction: "AND", field: "results" },
+      children1: [rule("results.product", "select_equals", ["abc"], ["select"]), rule("results.score", "greater", [8], ["number"])],
+    };
+    expect(celFromTree([g])).to.equal("(results.product == 'abc' && results.score > 8)");
+  });
+
+  it("array group aggregates with size(filter) and a count comparison", () => {
+    const g = {
+      id: uuid(), type: "rule_group",
+      properties: { mode: "array", operator: "greater", value: [2], valueSrc: ["value"], valueType: ["number"], conjunction: "AND", field: "cars" },
+      children1: [rule("cars.vendor", "select_equals", ["Toyota"], ["select"]), rule("cars.year", "greater_or_equal", [2010], ["number"])],
+    };
+    expect(celFromTree([g])).to.equal("size(cars.filter(_cars, (_cars.vendor == 'Toyota' && _cars.year >= 2010))) > 2");
+  });
+
+  it("array group with 'some' mode uses exists()", () => {
+    const g = {
+      id: uuid(), type: "rule_group", properties: { mode: "some", conjunction: "AND", field: "cars" },
+      children1: [rule("cars.year", "greater_or_equal", [2010], ["number"])],
+    };
+    expect(celFromTree([g])).to.equal("cars.exists(_cars, _cars.year >= 2010)");
   });
 });
 
