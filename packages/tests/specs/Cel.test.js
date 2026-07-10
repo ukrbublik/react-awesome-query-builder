@@ -9,7 +9,9 @@ const config = {
   ...CoreConfig,
   fields: {
     num: { label: "Num", type: "number" },
+    num2: { label: "Num2", type: "number" },
     str: { label: "Str", type: "text" },
+    flag: { label: "Flag", type: "boolean" },
     born: { label: "Born", type: "date" },
     sel: {
       label: "Sel", type: "select",
@@ -55,6 +57,24 @@ describe("export to CEL", () => {
   it("is null", () => {
     expect(celFromJsonLogic({ "==": [{ var: "num" }, null] })).to.equal("num == null");
   });
+  it("not_between", () => {
+    expect(celFromJsonLogic({ "!": { "<=": [1, { var: "num" }, 10] } })).to.equal("(num < 1 || num > 10)");
+  });
+  it("negated (reverse) operators wrap with !()", () => {
+    expect(celFromJsonLogic({ "!": { in: ["ab", { var: "str" }] } })).to.equal("!(str.contains('ab'))");
+  });
+  it("booleans", () => {
+    expect(celFromJsonLogic({ "==": [{ var: "flag" }, true] })).to.equal("flag == true");
+  });
+  it("negative numbers", () => {
+    expect(celFromJsonLogic({ "==": [{ var: "num" }, -3] })).to.equal("num == -3");
+  });
+  it("field-to-field comparison", () => {
+    expect(celFromJsonLogic({ "==": [{ var: "num" }, { var: "num2" }] })).to.equal("num == num2");
+  });
+  it("NOT group and nested OR", () => {
+    expect(celFromJsonLogic({ "!": { and: [{ ">": [{ var: "num" }, 0] }] } })).to.equal("!(num > 0)");
+  });
 });
 
 // -------------------------------------------------- import (round-trip)
@@ -88,8 +108,33 @@ describe("import from CEL", () => {
     });
   }
 
+  // hand-written CEL that isn't in canonical export form still imports, and
+  // re-exports to the canonical string
+  const normalizations = [
+    ["num==5", "num == 5"],
+    ["str == \"hi\"", "str == 'hi'"],
+    ["((num > 5))", "num > 5"],
+    ["  num   ==   5  ", "num == 5"],
+    ["!(!(num == 5))", "num == 5"],
+    ["num > 1 && num < 9 && num != 5", "(num > 1 && num < 9 && num != 5)"],
+  ];
+  for (const [input, expected] of normalizations) {
+    it(`normalizes ${JSON.stringify(input)} -> ${JSON.stringify(expected)}`, async () => {
+      const [tree, errors] = await loadFromCel(input, config);
+      expect(JSON.stringify(errors)).to.equal("[]");
+      const out = celFormat(checkTree(tree, config), config);
+      expect(out).to.equal(expected);
+    });
+  }
+
   it("reports errors for unparseable CEL", async () => {
     const [tree, errors] = await loadFromCel("num === ", config);
+    expect(errors.length).to.be.greaterThan(0);
+    expect(tree).to.equal(undefined);
+  });
+
+  it("rejects arithmetic instead of silently dropping terms", async () => {
+    const [tree, errors] = await loadFromCel("num + 1 == 5", config);
     expect(errors.length).to.be.greaterThan(0);
     expect(tree).to.equal(undefined);
   });

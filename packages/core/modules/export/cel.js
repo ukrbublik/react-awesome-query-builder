@@ -213,7 +213,7 @@ const formatRule = (item, config, meta) => {
   let ret;
   ret = fn.call(config.ctx, ...args);
   if (isRev) {
-    ret = config.settings.celFormatReverse(ret);
+    ret = config.settings.celFormatReverse.call(config.ctx, ret);
   }
   if (ret === undefined) {
     meta.errors.push(

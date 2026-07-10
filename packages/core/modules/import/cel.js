@@ -134,6 +134,12 @@ const convertRelation = (node, config, meta) => {
   const rhs = firstChild(node, "rhs");
   const celOp = opTok.image; // ==, !=, <, <=, >, >=, in
 
+  // arithmetic operands can't map to a field/value — error rather than drop terms
+  if (hasArithmetic(lhs) || hasArithmetic(rhs)) {
+    meta.errors.push("Arithmetic expressions are not supported");
+    return undefined;
+  }
+
   // Left side is normally a field, right side a value.
   const leftField = extractFieldPath(lhs, config);
   const rightValue = evalLiteral(rhs, config, meta);
@@ -174,14 +180,20 @@ const convertRelation = (node, config, meta) => {
 };
 
 const convertAddition = (node, config, meta) => {
-  // export never emits +/-, so addition/multiplication are transparent
-  const mult = firstChild(node, "lhs");
-  return convertMultiplication(mult, config, meta);
+  // arithmetic isn't representable in a RAQB rule — error instead of silently dropping it
+  if (childList(node, "AdditionOperator").length) {
+    meta.errors.push("Arithmetic expressions are not supported");
+    return undefined;
+  }
+  return convertMultiplication(firstChild(node, "lhs"), config, meta);
 };
 
 const convertMultiplication = (node, config, meta) => {
-  const unary = firstChild(node, "lhs");
-  return convertUnary(unary, config, meta);
+  if (childList(node, "MultiplicationOperator").length) {
+    meta.errors.push("Arithmetic expressions are not supported");
+    return undefined;
+  }
+  return convertUnary(firstChild(node, "lhs"), config, meta);
 };
 
 const convertUnary = (node, config, meta) => {
@@ -263,11 +275,22 @@ const firstRelation = (exprNode) => {
 // -----------------------------------------------------------------------------
 // Value & field extraction
 
+// Descend transparently to the single unaryExpression under an addition node.
+const unaryOf = (additionNode) => {
+  const mult = firstChild(additionNode, "lhs");
+  return firstChild(mult, "lhs");
+};
+
+// True if an addition-level node actually performs +/-/*// arithmetic.
+const hasArithmetic = (additionNode) => {
+  if (!additionNode) return false;
+  if (childList(additionNode, "AdditionOperator").length) return true;
+  return childList(firstChild(additionNode, "lhs"), "MultiplicationOperator").length > 0;
+};
+
 // Descend transparently to the single atomicExpression under an addition node.
 const atomicOf = (additionNode) => {
-  let mult = firstChild(additionNode, "lhs");
-  let unary = firstChild(mult, "lhs");
-  return firstChild(unary, "atomicExpression");
+  return firstChild(unaryOf(additionNode), "atomicExpression");
 };
 
 const extractFieldPath = (additionNode, config) => {
@@ -303,17 +326,23 @@ const resolveField = (name, config) => {
 // Evaluate an `addition` (or `expr` for call args) node as a literal value.
 const evalLiteral = (node, config, meta) => {
   if (!node) return undefined;
-  // unwrap expr → conditionalOr → ... down to atomicExpression
-  let atomic;
+  // unwrap expr → conditionalOr → ... down to the addition-level node
+  let addNode;
   if (node.name === "expr") {
     const or = firstChild(node, "conditionalOr");
     const and = firstChild(or, "lhs");
     const rel = firstChild(and, "lhs");
-    atomic = atomicOf(firstChild(rel, "lhs"));
+    addNode = firstChild(rel, "lhs");
   } else {
-    atomic = atomicOf(node);
+    addNode = node;
   }
-  return atomicToValue(atomic, config, meta);
+  let val = atomicToValue(atomicOf(addNode), config, meta);
+  // apply a leading unary minus (e.g. `-3`) to numeric literals
+  const minusCount = childList(unaryOf(addNode), "UnaryOperator").filter((t) => t.image === "-").length;
+  if (minusCount % 2 === 1 && typeof val === "number") {
+    val = -val;
+  }
+  return val;
 };
 
 const atomicToValue = (atomic, config, meta) => {
