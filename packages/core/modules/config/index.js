@@ -49,7 +49,7 @@ const conjunctions = {
     celFormatConj: (children, conj, not, omitBrackets) => {
       if (not) omitBrackets = false;
       return children.size > 1
-        ? (not ? "!" : "") + "(" + children.join(" " + "&&" + " ") + ")"
+        ? (not ? "!" : "") + "(" + children.join(" && ") + ")"
         : (not ? "!(" : "") + children.first() + (not ? ")" : "");
     },
   },
@@ -86,7 +86,7 @@ const conjunctions = {
     celFormatConj: (children, conj, not, omitBrackets) => {
       if (not) omitBrackets = false;
       return children.size > 1
-        ? (not ? "!" : "") + "(" + children.join(" " + "||" + " ") + ")"
+        ? (not ? "!" : "") + "(" + children.join(" || ") + ")"
         : (not ? "!(" : "") + children.first() + (not ? ")" : "");
     },
   },
@@ -225,7 +225,7 @@ const operators = {
       }
     },
     spelOp: "${0}.contains(${1})",
-    celOp: "${0}.contains(${1})",
+    celFormatOp: (field, op, value) => `${field}.contains(${value})`,
     valueTypes: ["text"],
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) : undefined), false, ...args); },
     jsonLogic: (field, op, val) => ({ "in": [val, field] }),
@@ -250,7 +250,7 @@ const operators = {
     labelForFormat: "Starts with",
     sqlOp: "LIKE",
     spelOp: "${0}.startsWith(${1})",
-    celOp: "${0}.startsWith(${1})",
+    celFormatOp: (field, op, value) => `${field}.startsWith(${value})`,
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? "^" + this.utils.escapeRegExp(v) : undefined), false, ...args); },
     jsonLogic: undefined, // not supported
     valueSources: ["value"],
@@ -260,7 +260,7 @@ const operators = {
     labelForFormat: "Ends with",
     sqlOp: "LIKE",
     spelOp: "${0}.endsWith(${1})",
-    celOp: "${0}.endsWith(${1})",
+    celFormatOp: (field, op, value) => `${field}.endsWith(${value})`,
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) + "$" : undefined), false, ...args); },
     jsonLogic: undefined, // not supported
     valueSources: ["value"],
@@ -765,7 +765,7 @@ const widgets = {
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       return this.utils.spelEscape(val);
     },
-    celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    celFormatValue(val, fieldDef, wgtDef, op, opDef) {
       return this.utils.celEscape(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
@@ -795,7 +795,7 @@ const widgets = {
       }
     },
     spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-    celFormatValue: function (val) { return this.utils.celEscape(val); },
+    celFormatValue(val) { return this.utils.celEscape(val); },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
     fullWidth: true,
@@ -842,7 +842,7 @@ const widgets = {
       const isFloat = wgtDef.step && !Number.isInteger(wgtDef.step);
       return this.utils.spelEscape(val, isFloat);
     },
-    celFormatValue: function (val, fieldDef, wgtDef) {
+    celFormatValue(val, fieldDef, wgtDef) {
       const isFloat = wgtDef.step && !Number.isInteger(wgtDef.step);
       return this.utils.celEscape(val, isFloat);
     },
@@ -862,7 +862,7 @@ const widgets = {
       return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-    celFormatValue: function (val) { return this.utils.celEscape(val); },
+    celFormatValue(val) { return this.utils.celEscape(val); },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
@@ -880,7 +880,7 @@ const widgets = {
       return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-    celFormatValue: function (val) { return this.utils.celEscape(val); },
+    celFormatValue(val) { return this.utils.celEscape(val); },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
@@ -907,7 +907,7 @@ const widgets = {
       }
       return res;
     },
-    celFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
+    celFormatValue(vals, fieldDef, wgtDef, op, opDef) {
       return this.utils.celEscape(vals); // inline list
     },
     toJS: (val, fieldSettings) => (val),
@@ -933,7 +933,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.format("YYYY-MM-DD"));
     },
-    celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    celFormatValue(val, fieldDef, wgtDef, op, opDef) {
       // CEL has no date type; use a google.protobuf.Timestamp via timestamp() with an RFC3339 string
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return dateVal.isValid()
@@ -1023,7 +1023,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.format("HH:mm:ss"));
     },
-    celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    celFormatValue(val, fieldDef, wgtDef, op, opDef) {
       // CEL has no time-only type; emit the time as a string literal
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return dateVal.isValid() ? this.utils.celEscape(dateVal.format("HH:mm:ss")) : undefined;
@@ -1102,7 +1102,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.toDate());
     },
-    celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    celFormatValue(val, fieldDef, wgtDef, op, opDef) {
       // CEL datetime => google.protobuf.Timestamp via timestamp() with an RFC3339 string
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return dateVal.isValid()
@@ -1213,7 +1213,7 @@ const widgets = {
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       return this.utils.spelEscape(val);
     },
-    celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+    celFormatValue(val, fieldDef, wgtDef, op, opDef) {
       return this.utils.celEscape(val);
     },
     defaultValue: false,
@@ -1254,7 +1254,7 @@ const widgets = {
     spelImportValue: (val) => {
       return [val.value, []];
     },
-    celFormatValue: function (val) {
+    celFormatValue(val) {
       return this.utils.celEscape(val === "" ? null : val);
     },
     celImportValue: (val) => {
@@ -1765,7 +1765,7 @@ const mixinWidgetRangeslider = (config, addMixin = true) => {
       sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
         return this.utils.SqlString.escape(val);
       },
-      celFormatValue: function (val) { return this.utils.celEscape(val); },
+      celFormatValue(val) { return this.utils.celEscape(val); },
       spelFormatValue: function (val) { return this.utils.spelEscape(val); },
       singleWidget: "slider",
       toJS: (val, fieldSettings) => (val),
@@ -1839,7 +1839,7 @@ const mixinWidgetTreeselect = (config, addMixin = true) => {
         return this.utils.SqlString.escape(val);
       },
       spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-      celFormatValue: function (val) { return this.utils.celEscape(val); },
+      celFormatValue(val) { return this.utils.celEscape(val); },
       toJS: (val, fieldSettings) => (val),
       ...widgets.treeselect,
     };
@@ -1905,7 +1905,7 @@ const mixinWidgetTreemultiselect = (config, addMixin = true) => {
         return vals.map(v => this.utils.SqlString.escape(v));
       },
       spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-      celFormatValue: function (val) { return this.utils.celEscape(val); },
+      celFormatValue(val) { return this.utils.celEscape(val); },
       toJS: (val, fieldSettings) => (val),
       ...widgets.treemultiselect,
     };
