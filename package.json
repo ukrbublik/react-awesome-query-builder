@@ -153,7 +153,8 @@
       "micromatch@4.0.4": "^4.0.8",
       "on-headers@1.0.2": "^1.1.0",
       "brace-expansion@1.1.11": "^1.1.12",
-      "brace-expansion@2.0.1": "^2.0.2"
+      "brace-expansion@2.0.1": "^2.0.2",
+      "sass": "1.77.2"
     }
   }
 }
