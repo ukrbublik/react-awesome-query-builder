@@ -765,7 +765,7 @@ const widgets = {
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       return this.utils.spelEscape(val);
     },
-    celFormatValue(val, fieldDef, wgtDef, op, opDef) {
+    celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       return this.utils.celEscape(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
@@ -795,7 +795,7 @@ const widgets = {
       }
     },
     spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-    celFormatValue(val) { return this.utils.celEscape(val); },
+    celFormatValue: function (val) { return this.utils.celEscape(val); },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
     fullWidth: true,
@@ -842,7 +842,7 @@ const widgets = {
       const isFloat = wgtDef.step && !Number.isInteger(wgtDef.step);
       return this.utils.spelEscape(val, isFloat);
     },
-    celFormatValue(val, fieldDef, wgtDef) {
+    celFormatValue: function (val, fieldDef, wgtDef) {
       const isFloat = wgtDef.step && !Number.isInteger(wgtDef.step);
       return this.utils.celEscape(val, isFloat);
     },
@@ -862,7 +862,7 @@ const widgets = {
       return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-    celFormatValue(val) { return this.utils.celEscape(val); },
+    celFormatValue: function (val) { return this.utils.celEscape(val); },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
@@ -880,7 +880,7 @@ const widgets = {
       return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-    celFormatValue(val) { return this.utils.celEscape(val); },
+    celFormatValue: function (val) { return this.utils.celEscape(val); },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
@@ -907,7 +907,7 @@ const widgets = {
       }
       return res;
     },
-    celFormatValue(vals, fieldDef, wgtDef, op, opDef) {
+    celFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
       return this.utils.celEscape(vals); // inline list
     },
     toJS: (val, fieldSettings) => (val),
@@ -933,7 +933,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.format("YYYY-MM-DD"));
     },
-    celFormatValue(val, fieldDef, wgtDef, op, opDef) {
+    celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       // CEL has no date type; use a google.protobuf.Timestamp via timestamp() with an RFC3339 string
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return dateVal.isValid()
@@ -1023,7 +1023,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.format("HH:mm:ss"));
     },
-    celFormatValue(val, fieldDef, wgtDef, op, opDef) {
+    celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       // CEL has no time-only type; emit the time as a string literal
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return dateVal.isValid() ? this.utils.celEscape(dateVal.format("HH:mm:ss")) : undefined;
@@ -1102,7 +1102,7 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return this.utils.SqlString.escape(dateVal.toDate());
     },
-    celFormatValue(val, fieldDef, wgtDef, op, opDef) {
+    celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       // CEL datetime => google.protobuf.Timestamp via timestamp() with an RFC3339 string
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return dateVal.isValid()
@@ -1213,7 +1213,7 @@ const widgets = {
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       return this.utils.spelEscape(val);
     },
-    celFormatValue(val, fieldDef, wgtDef, op, opDef) {
+    celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       return this.utils.celEscape(val);
     },
     defaultValue: false,
@@ -1254,7 +1254,7 @@ const widgets = {
     spelImportValue: (val) => {
       return [val.value, []];
     },
-    celFormatValue(val) {
+    celFormatValue: function (val) {
       return this.utils.celEscape(val === "" ? null : val);
     },
     celImportValue: (val) => {
@@ -1765,7 +1765,7 @@ const mixinWidgetRangeslider = (config, addMixin = true) => {
       sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef, _, sqlDialect) {
         return this.utils.SqlString.escape(val);
       },
-      celFormatValue(val) { return this.utils.celEscape(val); },
+      celFormatValue: function (val) { return this.utils.celEscape(val); },
       spelFormatValue: function (val) { return this.utils.spelEscape(val); },
       singleWidget: "slider",
       toJS: (val, fieldSettings) => (val),
@@ -1839,7 +1839,7 @@ const mixinWidgetTreeselect = (config, addMixin = true) => {
         return this.utils.SqlString.escape(val);
       },
       spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-      celFormatValue(val) { return this.utils.celEscape(val); },
+      celFormatValue: function (val) { return this.utils.celEscape(val); },
       toJS: (val, fieldSettings) => (val),
       ...widgets.treeselect,
     };
@@ -1905,7 +1905,7 @@ const mixinWidgetTreemultiselect = (config, addMixin = true) => {
         return vals.map(v => this.utils.SqlString.escape(v));
       },
       spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-      celFormatValue(val) { return this.utils.celEscape(val); },
+      celFormatValue: function (val) { return this.utils.celEscape(val); },
       toJS: (val, fieldSettings) => (val),
       ...widgets.treemultiselect,
     };
