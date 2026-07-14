@@ -174,6 +174,11 @@ const convertRelation = (node, config, meta) => {
     // field-to-field comparison
     return mkRule(leftField, operator, [rightField], config, meta, "field");
   }
+  if (rightValue === undefined) {
+    // unsupported/unparseable RHS (map, ternary, unknown literal) — don't silently drop
+    meta.errors.push("Can't resolve right-hand value of comparison");
+    return undefined;
+  }
   return mkRule(leftField, operator, [rightValue], config, meta);
 };
 
@@ -348,6 +353,8 @@ const atomicToValue = (atomic, config, meta) => {
   const c = atomic.children || {};
   if (c.StringLiteral) return unquoteCelString(c.StringLiteral[0].image);
   if (c.Integer) return parseInt(c.Integer[0].image, 10);
+  if (c.UnsignedInteger) return parseInt(c.UnsignedInteger[0].image.replace(/[uU]$/, ""), 10);
+  if (c.HexInteger) return parseInt(c.HexInteger[0].image, 16);
   if (c.Float || c.FloatLiteral) return parseFloat((c.Float || c.FloatLiteral)[0].image);
   if (c.BooleanLiteral) return c.BooleanLiteral[0].image === "true";
   if (c.Null || c.NullLiteral) return null;

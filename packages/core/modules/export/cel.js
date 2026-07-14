@@ -108,9 +108,12 @@ const formatAggregation = (item, config, meta, parentField, list, conjunction, n
   const formattedField = formatField(meta, config, field, parentField);
   if (formattedField == undefined) return undefined;
 
+  // `not` negates the whole aggregation, not the inner predicate
   const predicate = list.size
-    ? conjunctionDefinition.celFormatConj.call(config.ctx, list, conjunction, not, true)
+    ? conjunctionDefinition.celFormatConj.call(config.ctx, list, conjunction, false, true)
     : null;
+  const negate = (expr) =>
+    (expr !== undefined && not) ? config.settings.celFormatReverse.call(config.ctx, expr) : expr;
 
   let groupOperator = properties.get("operator");
   if (!groupOperator && (!properties.get("mode") || properties.get("mode") === "some")) {
@@ -120,7 +123,7 @@ const formatAggregation = (item, config, meta, parentField, list, conjunction, n
   // "some"/existence: `field.exists(v, pred)`
   if (groupOperator === "some" || groupOperator == null) {
     if (!predicate) return undefined;
-    return `${formattedField}.exists(${iterVar}, ${predicate})`;
+    return negate(`${formattedField}.exists(${iterVar}, ${predicate})`);
   }
 
   // count comparison: `size(field.filter(v, pred)) <op> value`
@@ -139,7 +142,7 @@ const formatAggregation = (item, config, meta, parentField, list, conjunction, n
     { celFormatValue: (v) => celEscape(v) }, {}, groupOperator, opDef, null
   );
   if (groupValue === undefined) return undefined;
-  return fn.call(config.ctx, countExpr, groupOperator, groupValue, "value", "number", omit(opDef, opDefKeysToOmit), null, {});
+  return negate(fn.call(config.ctx, countExpr, groupOperator, groupValue, "value", "number", omit(opDef, opDefKeysToOmit), null, {}));
 };
   
 const buildFnToFormatOp = (operator, operatorDefinition) => {
