@@ -22,14 +22,11 @@ import { defaultConjunction } from "../utils/defaultUtils";
 let _celParsePromise;
 const getCelParse = () => {
   if (!_celParsePromise) {
-    // Load via a computed specifier: cel-js ships a broken type declaration
-    // (helper.d.ts references a missing ./cst-definitions.js) and core lints with
-    // `tsc --noEmit` (allowJs, skipLibCheck:false), which would fail on it. A
-    // variable specifier keeps TS from resolving/type-checking cel-js while the
-    // runtime import still works. webpackInclude pins the resolved module so the
-    // bundler can still statically bundle it (no "Critical dependency" warning).
-    const pkg = "cel-js";
-    _celParsePromise = import(pkg).then((m) => m.parse || (m.default && m.default.parse));
+    // Literal specifier so bundlers (webpack/Next) statically resolve and bundle
+    // cel-js. cel-js ships a broken type declaration (helper.d.ts references a
+    // missing ./cst-definitions.js); a `cel-js` module shim + tsconfig `paths`
+    // mapping keeps `tsc --noEmit` (skipLibCheck:false) from loading those types.
+    _celParsePromise = import("cel-js").then((m) => m.parse || (m.default && m.default.parse));
   }
   return _celParsePromise;
 };
