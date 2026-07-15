@@ -1257,9 +1257,6 @@ const widgets = {
     celFormatValue: function (val) {
       return this.utils.celEscape(val === "" ? null : val);
     },
-    celImportValue: (val) => {
-      return [val.value, []];
-    },
     jsonLogic: function (val) {
       return val === "" ? null : val;
     },

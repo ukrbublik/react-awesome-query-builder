@@ -1010,7 +1010,6 @@ export interface FieldProps<C = Config> {
 /////////////////
 
 type SpelImportValue = (this: ConfigContext, val: any, wgtDef?: Widget, args?: TypedMap<any>) => [any, string[] | string | undefined];
-type CelImportValue = (this: ConfigContext, val: any, wgtDef?: Widget, args?: TypedMap<any>) => [any, string[] | string | undefined];
 type JsonLogicImportValue = (this: ConfigContext, val: any, wgtDef?: Widget, args?: TypedMap<any>) => any | undefined; // can throw
 
 // tip: for multiselect widget `val` is Array, and return type is also Array
@@ -1038,8 +1037,6 @@ export interface BaseWidget<C = Config, CTX = ConfigContext, WP = WidgetProps<C>
   spelImportFuncs?: Array<string | object>;
   spelImportValue?: SerializableType<SpelImportValue>;
   celFormatValue?: SerializableType<CelFormatValue>;
-  celImportFuncs?: Array<string | object>;
-  celImportValue?: SerializableType<CelImportValue>;
   sqlImport?: SerializableType<SqlImportFunc>;
   mongoFormatValue?: SerializableType<MongoFormatValue>;
   elasticSearchFormatValue?: SerializableType<ElasticSearchFormatValue>;
