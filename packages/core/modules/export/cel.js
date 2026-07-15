@@ -1,0 +1,482 @@
+import {
+  getFieldConfig,
+  getOperatorConfig,
+  getFieldWidgetConfig,
+  getFuncConfig,
+  getFieldParts,
+  getWidgetForFieldOp,
+  getFieldPartsConfigs,
+} from "../utils/configUtils";
+import { extendConfig } from "../utils/configExtend";
+import {
+  formatFieldName,
+  completeValue,
+} from "../utils/ruleUtils";
+import pick from "lodash/pick";
+import {
+  getOpCardinality,
+  widgetDefKeysToOmit,
+  opDefKeysToOmit,
+  omit,
+} from "../utils/stuff";
+import { defaultConjunction } from "../utils/defaultUtils";
+import { List, Map } from "immutable";
+import { celEscape } from "../utils/celUtils";
+  
+export const celFormat = (tree, config) => {
+  return _celFormat(tree, config, false);
+};
+  
+export const _celFormat = (tree, config, returnErrors = true) => {
+  //meta is mutable
+  let meta = {
+    errors: [],
+  };
+  
+  const extendedConfig = extendConfig(config, undefined, false);
+  const res = formatItem(tree, extendedConfig, meta);
+  
+  if (returnErrors) {
+    return [res, meta.errors];
+  } else {
+    if (meta.errors.length)
+      console.warn("Errors while exporting to CEL:", meta.errors);
+    return res;
+  }
+};
+  
+const formatItem = (item, config, meta, parentField = null) => {
+  if (!item) return undefined;
+  const type = item.get("type");
+
+  if (type === "group" || type === "rule_group") {
+    return formatGroup(item, config, meta, parentField);
+  } else if (type === "rule") {
+    return formatRule(item, config, meta, parentField);
+  }
+
+  return undefined;
+};
+
+// Iteration variable used to bind a collection inside `.filter()`/`.exists()`.
+// Derived from the field so sibling/nested aggregations don't collide.
+const aggrVar = (field, config) => {
+  const parts = getFieldParts(field, config);
+  return "_" + parts[parts.length - 1];
+};
+  
+const formatGroup = (item, config, meta, parentField = null) => {
+  const type = item.get("type");
+  const properties = item.get("properties") || new Map();
+  const children = item.get("children1") || new List();
+  const field = properties.get("field");
+  const mode = properties.get("mode");
+
+  const not = properties.get("not");
+  let conjunction = properties.get("conjunction");
+  if (!conjunction) conjunction = defaultConjunction(config);
+  const conjunctionDefinition = config.conjunctions[conjunction];
+
+  const isRuleGroup = type === "rule_group" && field;
+  // `!group` fields are collections (aggregate with filter/exists); `!struct`
+  // fields and struct-mode groups just qualify child field names
+  const groupFieldDef = getFieldConfig(config, field) || {};
+  const groupMode = mode || groupFieldDef.mode;
+  const isRuleGroupArray = isRuleGroup && groupFieldDef.type === "!group" && groupMode !== "struct";
+  const childParentField = isRuleGroupArray ? field : parentField;
+
+  const list = children
+    .map((currentChild) => formatItem(currentChild, config, meta, childParentField))
+    .filter((currentChild) => typeof currentChild !== "undefined");
+
+  if (isRuleGroupArray) {
+    return formatAggregation(item, config, meta, parentField, list, conjunction, not);
+  }
+
+  if (!list.size) return undefined;
+  return conjunctionDefinition.celFormatConj.call(config.ctx, list, conjunction, not);
+};
+
+// Array-mode rule_group => aggregation over a collection field.
+//   count comparison:  size(cars.filter(_cars, <pred>)) > 2
+//   "some" (any match): cars.exists(_cars, <pred>)
+const formatAggregation = (item, config, meta, parentField, list, conjunction, not) => {
+  const properties = item.get("properties") || new Map();
+  const field = properties.get("field");
+  const conjunctionDefinition = config.conjunctions[conjunction];
+  const iterVar = aggrVar(field, config);
+  const formattedField = formatField(meta, config, field, parentField);
+  if (formattedField == undefined) return undefined;
+
+  // `not` negates the whole aggregation, not the inner predicate
+  const predicate = list.size
+    ? conjunctionDefinition.celFormatConj.call(config.ctx, list, conjunction, false, true)
+    : null;
+  const negate = (expr) =>
+    (expr !== undefined && not) ? config.settings.celFormatReverse.call(config.ctx, expr) : expr;
+
+  let groupOperator = properties.get("operator");
+  if (!groupOperator && (!properties.get("mode") || properties.get("mode") === "some")) {
+    groupOperator = "some";
+  }
+
+  // "some"/existence: `field.exists(v, pred)`
+  if (groupOperator === "some" || groupOperator == null) {
+    if (!predicate) return undefined;
+    return negate(`${formattedField}.exists(${iterVar}, ${predicate})`);
+  }
+
+  // count comparison: `size(field.filter(v, pred)) <op> value`
+  const opDef = getOperatorConfig(config, groupOperator, field) || {};
+  const fn = opDef.celFormatOp || buildFnToFormatOp(groupOperator, opDef);
+  if (!fn) {
+    meta.errors.push(`Aggregation operator ${groupOperator} is not supported`);
+    return undefined;
+  }
+  const countExpr = predicate
+    ? `size(${formattedField}.filter(${iterVar}, ${predicate}))`
+    : `size(${formattedField})`;
+  const groupValue = formatValue(
+    meta, config, properties.get("value")?.get(0), "value",
+    (properties.get("valueType")?.get(0)) || "number",
+    { celFormatValue: (v) => celEscape(v) }, {}, groupOperator, opDef, null
+  );
+  if (groupValue === undefined) return undefined;
+  return negate(fn.call(config.ctx, countExpr, groupOperator, groupValue, "value", "number", omit(opDef, opDefKeysToOmit), null, {}));
+};
+  
+const buildFnToFormatOp = (operator, operatorDefinition) => {
+  const celOp = operatorDefinition.celOp;
+  if (!celOp) return undefined;
+  // `${N}` placeholders => callable/templated op, e.g. "${0}.contains(${1})"
+  const isSign = celOp.includes("${0}");
+  const cardinality = getOpCardinality(operatorDefinition);
+  let fn;
+  if (isSign) {
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      return celOp.replace(/\${(\w+)}/g, (_, k) =>
+        (k == 0 ? field : (cardinality > 1 ? values.get(k - 1) : values))
+      );
+    };
+  } else if (cardinality == 0) {
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      return `${field} ${celOp}`;
+    };
+  } else if (cardinality == 1) {
+    fn = (field, op, value, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      return `${field} ${celOp} ${value}`;
+    };
+  } else if (cardinality == 2) {
+    // between
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      const valFrom = values.get(0);
+      const valTo = values.get(1);
+      return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
+    };
+  }
+  return fn;
+};
+  
+const formatRule = (item, config, meta, parentField = null) => {
+  const properties = item.get("properties") || new Map();
+  const field = properties.get("field");
+  const fieldSrc = properties.get("fieldSrc");
+  let operator = properties.get("operator");
+  const operatorOptions = properties.get("operatorOptions");
+  const iValueSrc = properties.get("valueSrc");
+  const iValueType = properties.get("valueType");
+  const iValue = properties.get("value");
+  const asyncListValues = properties.get("asyncListValues");
+  if (field == null || operator == null) return undefined;
+  
+  const fieldDefinition = getFieldConfig(config, field) || {};
+  let opDef = getOperatorConfig(config, operator, field) || {};
+  let reversedOp = opDef.reversedOp;
+  let revOpDef = getOperatorConfig(config, reversedOp, field) || {};
+  const cardinality = getOpCardinality(opDef);
+  
+  // check op
+  let isRev = false;
+  const canFormatOp = opDef.celOp || opDef.celFormatOp;
+  const canFormatRevOp = revOpDef.celOp || revOpDef.celFormatOp;
+  if (!canFormatOp && !canFormatRevOp) {
+    meta.errors.push(`Operator ${operator} is not supported`);
+    return undefined;
+  }
+  if (!canFormatOp && canFormatRevOp) {
+    isRev = true;
+    [operator, reversedOp] = [reversedOp, operator];
+    [opDef, revOpDef] = [revOpDef, opDef];
+  }
+  
+  //format value
+  let valueSrcs = [];
+  let valueTypes = [];
+  const fvalue = iValue.map((currentValue, ind) => {
+    const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
+    const valueType = iValueType ? iValueType.get(ind) : null;
+    const cValue = completeValue(currentValue, valueSrc, config);
+    const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+    const fieldWidgetDefinition = omit(
+      getFieldWidgetConfig(config, field, operator, widget, valueSrc),
+      ["factory"]
+    );
+    let fv = formatValue(
+      meta,
+      config,
+      cValue,
+      valueSrc,
+      valueType,
+      fieldWidgetDefinition,
+      fieldDefinition,
+      operator,
+      opDef,
+      asyncListValues,
+      parentField
+    );
+    if (fv !== undefined) {
+      valueSrcs.push(valueSrc);
+      valueTypes.push(valueType);
+    }
+    return fv;
+  });
+  const hasUndefinedValues = fvalue.filter((v) => v === undefined).size > 0;
+  if (hasUndefinedValues || fvalue.size < cardinality) return undefined;
+  const formattedValue = cardinality == 1 ? fvalue.first() : fvalue;
+  
+  //find fn to format expr
+  const fn = opDef.celFormatOp || buildFnToFormatOp(operator, opDef);
+  if (!fn) {
+    meta.errors.push(`Operator ${operator} is not supported`);
+    return undefined;
+  }
+  
+  //format field
+  const formattedField
+      = fieldSrc == "func"
+        ? formatFunc(meta, config, field, parentField)
+        : formatField(meta, config, field, parentField);
+  if (formattedField == undefined) return undefined;
+  
+  //format expr
+  const args = [
+    formattedField,
+    operator,
+    formattedValue,
+    valueSrcs.length > 1 ? valueSrcs : valueSrcs[0],
+    valueTypes.length > 1 ? valueTypes : valueTypes[0],
+    omit(opDef, opDefKeysToOmit),
+    operatorOptions,
+    fieldDefinition,
+  ];
+  
+  let ret;
+  ret = fn.call(config.ctx, ...args);
+  if (isRev) {
+    ret = config.settings.celFormatReverse.call(config.ctx, ret);
+  }
+  if (ret === undefined) {
+    meta.errors.push(
+      `Operator ${operator} is not supported for value source ${valueSrcs.join(
+        ", "
+      )}`
+    );
+    return undefined;
+  }
+  return ret;
+};
+  
+const formatValue = (
+  meta,
+  config,
+  currentValue,
+  valueSrc,
+  valueType,
+  fieldWidgetDef,
+  fieldDef,
+  operator,
+  operatorDef,
+  asyncListValues,
+  parentField = null
+) => {
+  if (currentValue === undefined) return undefined;
+  let ret;
+  if (valueSrc == "field") {
+    ret = formatField(meta, config, currentValue, parentField);
+  } else if (valueSrc == "func") {
+    ret = formatFunc(meta, config, currentValue, parentField);
+  } else {
+    if (typeof fieldWidgetDef.celFormatValue === "function") {
+      const fn = fieldWidgetDef.celFormatValue;
+      const args = [
+        currentValue,
+        {
+          ...pick(fieldDef, ["fieldSettings", "listValues"]),
+          asyncListValues,
+        },
+        //useful options: valueFormat for date/time
+        omit(fieldWidgetDef, widgetDefKeysToOmit),
+      ];
+      if (operator) {
+        args.push(operator);
+        args.push(operatorDef);
+      }
+      if (valueSrc == "field") {
+        const valFieldDefinition = getFieldConfig(config, currentValue) || {};
+        args.push(valFieldDefinition);
+      }
+      ret = fn.call(config.ctx, ...args);
+    } else {
+      if (Array.isArray(currentValue)) {
+        ret = currentValue.map((v) => celEscape(v));
+      } else {
+        ret = celEscape(currentValue);
+      }
+    }
+  }
+  return ret;
+};
+  
+const formatField = (meta, config, field, parentField = null) => {
+  if (!field) return;
+  const { fieldSeparator } = config.settings;
+  const sep = fieldSeparator || ".";
+
+  // Inside an array-mode aggregation, child fields are relative to the bound
+  // iteration variable: `cars.vendor` => `_cars.vendor`.
+  if (parentField && (field === parentField || field.startsWith(parentField + sep))) {
+    const iterVar = aggrVar(parentField, config);
+    if (field === parentField) return iterVar;
+    return iterVar + sep + field.slice(parentField.length + sep.length);
+  }
+
+  const fieldDefinition = getFieldConfig(config, field) || {};
+  const fieldParts = getFieldParts(field, config);
+  const fieldPartsConfigs = getFieldPartsConfigs(field, config);
+  const formatFieldFn = config.settings.formatCelField;
+  const fieldName = formatFieldName(field, config, meta, null, {
+    useTableName: true,
+  });
+  const fieldPartsMeta = fieldPartsConfigs.map(([key, cnf, parentCnf]) => {
+    return { key, parent: undefined, fieldSeparator };
+  });
+  const formattedField = formatFieldFn.call(
+    config.ctx,
+    fieldName,
+    null,
+    fieldParts,
+    fieldPartsMeta,
+    fieldDefinition,
+    config
+  );
+  return formattedField;
+};
+  
+const formatFunc = (meta, config, currentValue, parentField = null) => {
+  const funcKey = currentValue.get("func");
+  const args = currentValue.get("args");
+  const funcConfig = getFuncConfig(config, funcKey);
+  if (!funcConfig) {
+    meta.errors.push(`Func ${funcKey} is not defined in config`);
+    return undefined;
+  }
+  const funcParts = getFieldParts(funcKey, config);
+  const funcLastKey = funcParts[funcParts.length - 1];
+  const funcName = funcConfig.celFunc || funcLastKey;
+  
+  let formattedArgs = {};
+  let gaps = [];
+  let missingArgKeys = [];
+  for (const argKey in funcConfig.args) {
+    const argConfig = funcConfig.args[argKey];
+    const fieldDef = getFieldConfig(config, argConfig);
+    const { defaultValue, isOptional } = argConfig;
+    const defaultValueSrc = defaultValue?.func ? "func" : "value";
+    const argVal = args ? args.get(argKey) : undefined;
+    const argValue = argVal ? argVal.get("value") : undefined;
+    const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    const argAsyncListValues = argVal
+      ? argVal.get("asyncListValues")
+      : undefined;
+    const formattedArgVal = formatValue(
+      meta,
+      config,
+      argValue,
+      argValueSrc,
+      argConfig.type,
+      fieldDef,
+      argConfig,
+      null,
+      null,
+      argAsyncListValues,
+      parentField
+    );
+    if (argValue != undefined && formattedArgVal === undefined) {
+      if (argValueSrc != "func")
+      // don't triger error if args value is another uncomplete function
+        meta.errors.push(
+          `Can't format value of arg ${argKey} for func ${funcKey}`
+        );
+      return undefined;
+    }
+    let formattedDefaultVal;
+    if (
+      formattedArgVal === undefined
+        && !isOptional
+        && defaultValue != undefined
+    ) {
+      formattedDefaultVal = formatValue(
+        meta,
+        config,
+        defaultValue,
+        defaultValueSrc,
+        argConfig.type,
+        fieldDef,
+        argConfig,
+        null,
+        null,
+        argAsyncListValues,
+        parentField
+      );
+      if (formattedDefaultVal === undefined) {
+        if (defaultValueSrc != "func")
+        // don't triger error if args value is another uncomplete function
+          meta.errors.push(
+            `Can't format default value of arg ${argKey} for func ${funcKey}`
+          );
+        return undefined;
+      }
+    }
+  
+    const finalFormattedVal = formattedArgVal ?? formattedDefaultVal;
+    if (finalFormattedVal !== undefined) {
+      if (gaps.length) {
+        for (const missedArgKey of argKey) {
+          formattedArgs[missedArgKey] = undefined;
+        }
+        gaps = [];
+      }
+      formattedArgs[argKey] = finalFormattedVal;
+    } else {
+      if (!isOptional) missingArgKeys.push(argKey);
+      gaps.push(argKey);
+    }
+  }
+  if (missingArgKeys.length) {
+    //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
+    return undefined; // uncomplete
+  }
+  
+  let ret;
+  if (typeof funcConfig.celFormatFunc === "function") {
+    const fn = funcConfig.celFormatFunc;
+    const args = [formattedArgs];
+    ret = fn.call(config.ctx, ...args);
+  } else {
+    const argsStr = Object.entries(formattedArgs)
+      .map(([k, v]) => v)
+      .join(", ");
+    ret = `${funcName}(${argsStr})`;
+  }
+  return ret;
+};

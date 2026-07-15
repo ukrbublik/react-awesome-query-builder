@@ -393,6 +393,7 @@ const RELATIVE_DATETIME = {
   // MySQL
   //todo: other SQL dialects?
   sqlFormatFunc: ({date, op, val, dim}) => `DATE_ADD(${date}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, "")})`,
+  celFormatFunc: null,
   sqlImport: function (sqlObj, _, sqlDialect) {
     if (["DATE_ADD", "DATE_SUB"].includes(sqlObj?.func) && sqlObj.children?.length === 2) {
       const [date, interval] = sqlObj.children;

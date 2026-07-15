@@ -18,6 +18,7 @@ export const useBlocksSwitcher = (
         <button onClick={switchRenderBlock.bind(null, "jsTree")}>Tree: {state.renderBocks.jsTree ? "on" : "off"}</button>
         <button onClick={switchRenderBlock.bind(null, "jsonlogic")}>JsonLogic: {state.renderBocks.jsonlogic ? "on" : "off"}</button>
         <button onClick={switchRenderBlock.bind(null, "spel")}>SpEL: {state.renderBocks.spel ? "on" : "off"}</button>
+        <button onClick={switchRenderBlock.bind(null, "cel")}>CEL: {state.renderBocks.cel ? "on" : "off"}</button>
         <button onClick={switchRenderBlock.bind(null, "strings")}>Strings: {state.renderBocks.strings ? "on" : "off"}</button>
         <button onClick={switchRenderBlock.bind(null, "sql")}>SQL: {state.renderBocks.sql ? "on" : "off"}</button>
         <button onClick={switchRenderBlock.bind(null, "mongo")}>Mongo: {state.renderBocks.mongo ? "on" : "off"}</button>

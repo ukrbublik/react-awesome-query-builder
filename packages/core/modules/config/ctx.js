@@ -9,6 +9,9 @@ import {
 import {
   spelFixList, spelEscape,
 } from "../utils/spelUtils";
+import {
+  celEscape,
+} from "../utils/celUtils";
 import {escapeRegExp} from "../utils/stuff";
 import {getTitleInListValues} from "../utils/listValues";
 
@@ -24,6 +27,7 @@ const ctx = {
     sqlEmptyValue,
     stringifyForDisplay,
     getTitleInListValues,
+    celEscape,
     spelEscape,
     spelFixList,
     wrapWithBrackets,

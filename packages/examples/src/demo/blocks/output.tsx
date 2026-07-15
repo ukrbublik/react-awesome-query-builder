@@ -113,6 +113,27 @@ const SpelOutput = memo(({tree, config}: PropsForFormat) => {
   );
 });
 
+const CelOutput = memo(({tree, config}: PropsForFormat) => {
+  const [cel, celErrors] = Utils._celFormat(tree, config);
+
+  return (
+    <>
+      <div>
+        celFormat:
+        { celErrors.length > 0
+          && <pre className="qb-demo-error-pre">
+            {stringify(celErrors, undefined, 2)}
+          </pre>
+        }
+        <pre className="qb-demo-pre">
+          {cel}
+        </pre>
+      </div>
+      <hr/>
+    </>
+  );
+});
+
 const SqlOutput = memo(({tree, config}: PropsForFormat) => {
   const [sql, sqlErrors] = Utils._sqlFormat(tree, config);
 
@@ -172,6 +193,7 @@ export const useOutput = (
       <div>
         <hr/>
         {renderBocks.spel && <SpelOutput tree={tree} config={config} />}
+        {renderBocks.cel && <CelOutput tree={tree} config={config} />}
         {renderBocks.strings && <StringsOutput tree={tree} config={config} />}
         {renderBocks.sql && <SqlOutput tree={tree} config={config} />}
         {renderBocks.jsonlogic && <JsonLogicOutput tree={tree} config={config} />}

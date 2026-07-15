@@ -21,9 +21,9 @@ import {
   ActionMeta, OnInit, OnChange,
 } from "@react-awesome-query-builder/ui";
 const {
-  uuid, 
+  uuid,
   sanitizeTree, loadTree, _loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
-  queryString, sqlFormat, _sqlFormat, spelFormat, _spelFormat, mongodbFormat, _mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
+  queryString, sqlFormat, _sqlFormat, spelFormat, _spelFormat, celFormat, _celFormat, mongodbFormat, _mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
 } = Utils;
 import { AntdConfig } from "@react-awesome-query-builder/antd";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
@@ -95,6 +95,7 @@ interface ExtectedExports {
   queryHuman?: string;
   sql?: string | [string, string[]];
   spel?: string;
+  cel?: string | [string, string[]];
   mongo?: Record<string, any>;
   elasticSearch?: Record<string, any>;
   elasticSearch7?: Record<string, any>;
@@ -636,6 +637,7 @@ const do_export_checks = async (config: Config, tree: ImmutableTree, expects?: E
       queryHuman: queryString(tree, config, true),
       sql: sqlFormat(tree, config),
       spel: spelFormat(tree, config),
+      cel: celFormat(tree, config),
       mongo: mongodbFormat(tree, config),
       logic: logic,
       elasticSearch: elasticSearchFormat(tree, config),
@@ -684,7 +686,18 @@ const do_export_checks = async (config: Config, tree: ImmutableTree, expects?: E
         expect_objects_equal(errors, expectedExportErrors || []);
       });
     }
-    
+
+    if (expects["cel"] !== undefined) {
+      doIt("should work to CEL", () => {
+        const [expectedRes, expectedErrors] = Array.isArray(expects["cel"])
+          ? expects["cel"]
+          : [expects["cel"], []];
+        const [res, errors] = _celFormat(tree, config);
+        expect(res).to.equal(expectedRes);
+        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedErrors || []));
+      });
+    }
+
     if (expects["mongo"] !== undefined) {
       doIt("should work to MongoDb", () => {
         const [expectedRes, expectedExportErrors] = Array.isArray(expects["mongo"])

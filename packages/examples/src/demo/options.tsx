@@ -19,6 +19,7 @@ export const defaultRenderBlocks: DemoQueryBuilderState["renderBocks"] = {
   mongo: true,
   jsTree: true,
   spel: true,
+  cel: true,
   strings: true,
   sql: true,
   actions: false,

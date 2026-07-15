@@ -15,7 +15,14 @@
 
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "skipLibCheck": false
+    "skipLibCheck": false,
+
+    // cel-js ships a broken .d.ts; use a local shim for type-checking only
+    // (bundlers/runtime still resolve the real package)
+    "baseUrl": ".",
+    "paths": {
+      "cel-js": ["./modules/celjs.d.ts"]
+    }
   },
   "include": [
     "modules/**/*"

@@ -3,6 +3,7 @@ import SqlStringOrig from "sqlstring";
 // @deprecated Use dedicated utils instead
 export { mongoEmptyValue } from "./mongoUtils";
 export { spelEscape, spelFixList, spelFormatConcat, spelImportConcat } from "./spelUtils";
+export { celEscape } from "./celUtils";
 
 // todo: move to sqlUtils
 export const SqlString = SqlStringOrig;

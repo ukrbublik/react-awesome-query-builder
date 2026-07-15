@@ -84,8 +84,8 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
 * Functions are supported in both LHS and RHS.
   Functions nesting is supported (function argument can be a function)
 * [Ternary mode](#ternary-mode) (if-then-else)
-* Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
-* Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), SQL
+* Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), [CEL](https://github.com/google/cel-spec), ElasticSearch or your custom format
+* Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), [CEL](https://github.com/google/cel-spec), SQL
 * Reordering (drag-n-drop) support for rules and groups of rules
 * Query value and config can be saved/loaded from server
 * Themes: [Ant Design](https://ant.design/), [Material-UI](https://mui.com/), [Bootstrap](https://reactstrap.github.io/), [Fluent UI](https://developer.microsoft.com/en-us/fluentui), vanilla
@@ -505,6 +505,10 @@ Wrapping in `div.query-builder-container` is necessary for correct drag-n-drop s
   `Utils.Export.spelFormat (immutableValue, config) -> String`  
   Convert query value to [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html).
 
+  #### `celFormat`
+  `Utils.Export.celFormat (immutableValue, config) -> String`  
+  Convert query value to [Google Common Expression Language (CEL)](https://github.com/google/cel-spec).
+
   #### `elasticSearchFormat`
   `Utils.Export.elasticSearchFormat (immutableValue, config) -> Object`  
   Convert query value to ElasticSearch query object.
@@ -533,6 +537,11 @@ Wrapping in `div.query-builder-container` is necessary for correct drag-n-drop s
   #### `loadFromSpel`
   `Utils.Import.loadFromSpel (string, config) -> [Immutable, errors]`  
   Convert query value from [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html) format to internal Immutable format. 
+
+  #### `loadFromCel`
+  `Utils.Import.loadFromCel (string, config) -> Promise<[Immutable, errors]>`  
+  Convert query value from [Google Common Expression Language (CEL)](https://github.com/google/cel-spec) format to internal Immutable format.  
+  **Note:** async (returns a `Promise`) because the `cel-js` parser is loaded lazily.
 
   #### `loadFromSql`
   `SqlUtils.loadFromSql (string, config) -> {tree: Immutable, errors: string[]}`  
