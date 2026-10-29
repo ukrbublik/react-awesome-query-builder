@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from "react";
 import Slider from "@mui/material/Slider";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
+import { textFieldInputProps } from "../../utils/versions";
 
 export default (props) => {
   const {config, placeholder, customProps, value, setValue, min, max, step, marks, readonly} = props;
@@ -47,21 +48,17 @@ export default (props) => {
   // marks example: { 0: "0%", 100: React.createElement('strong', null, "100%") }
   const muiMarks = useMemo(() => marks ? Object.keys(marks).map(v => ({
     value: Number(v),
-    label: typeof marks[v] === "object" || typeof marks[v] === "undefined" ? marks[v] : <p>{marks[v]}</p>
+    label: marks[v]
   })) : false, [marks]);
 
-  const InputProps = useMemo(() => ({
+  const inputProps = useMemo(() => textFieldInputProps({
     readOnly: readonly,
-  }), [
-    readonly
-  ]);
-
-  const inputProps = useMemo(() => ({
+  }, {
     min,
     max,
     step,
   }), [
-    min, max, step
+    readonly, min, max, step
   ]);
 
   const InputCmp = (
@@ -70,8 +67,7 @@ export default (props) => {
       type="number"
       value={inputValue}
       placeholder={placeholder}
-      InputProps={InputProps}
-      inputProps={inputProps}
+      {...inputProps}
       disabled={readonly}
       onChange={handleInputChange}
       onBlur={handleInputBlur}
@@ -95,9 +91,11 @@ export default (props) => {
     />
   );
 
+  // tip: align to top (not center), so the slider rail is on the same level as the input,
+  //      and mark labels (if any) are placed below without overflowing the rule
   const stylesWrapper = {
     display: "inline-flex", 
-    alignItems: "center",
+    alignItems: "flex-start",
     flexWrap: "wrap"
   };
 
@@ -109,7 +107,6 @@ export default (props) => {
   const stylesSliderWrapper = {
     marginLeft: "5px", 
     paddingLeft: "12px", 
-    marginBottom: muiMarks && "-24px", 
     width: width || defaultSliderWidth,
   };
 

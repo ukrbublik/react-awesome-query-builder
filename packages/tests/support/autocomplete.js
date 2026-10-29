@@ -281,9 +281,7 @@ export const getAutocompleteUtils = (uif, uifv) => {
       const targetOption = options.filterWhere(o => {
         return o.text().trim() == targetTitle.trim();
       });
-      const isSelected = uifv == 5
-        ? targetOption.last().getDOMNode().className.includes("Mui-selected")
-        : targetOption.last().getDOMNode().getAttribute("aria-selected") == "true";
+      const isSelected = targetOption.last().getDOMNode().getAttribute("aria-selected") == "true";
       if (expectedIsSelected != undefined)
         expect(isSelected, `${step} - ${targetTitle} isSelected`).to.eq(expectedIsSelected);
       targetOption.last().simulate("click");

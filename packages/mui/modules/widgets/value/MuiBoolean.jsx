@@ -1,7 +1,6 @@
 import React from "react";
 import Switch from "@mui/material/Switch";
 import FormControl from "@mui/material/FormControl";
-import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 
 export default (props) => {
@@ -15,9 +14,10 @@ export default (props) => {
   return (
     <FormControl size={renderSize}>
       <Typography component="div">
-        <Grid component="label" container alignItems="center" spacing={0}>
-          <Grid item component="span">{labelNo}</Grid>
-          <Grid item component="span">
+        {/* tip: don't use Grid here - `item` prop of legacy Grid is removed in v7+ */}
+        <label style={{ display: "flex", flexWrap: "wrap", alignItems: "center" }}>
+          <span>{labelNo}</span>
+          <span>
             <Switch
               checked={!!value}
               onChange={onChange}
@@ -25,9 +25,9 @@ export default (props) => {
               size={renderSize}
               {...customProps}
             />
-          </Grid>
-          <Grid item component="span">{labelYes}</Grid>
-        </Grid>
+          </span>
+          <span>{labelYes}</span>
+        </label>
       </Typography>
     </FormControl>
   );

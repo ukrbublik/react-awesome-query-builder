@@ -1,6 +1,7 @@
 import React from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
+import { textFieldInputProps } from "../../utils/versions";
 
 export default (props) => {
   const {value, setValue, config, readonly, placeholder, customProps, maxLength, maxRows, fullWidth} = props;
@@ -24,12 +25,11 @@ export default (props) => {
         multiline={true}
         value={textValue}
         placeholder={!readonly ? placeholder : ""}
-        InputProps={{
+        {...textFieldInputProps({
           readOnly: readonly,
-        }}
-        inputProps={{
+        }, {
           maxLength: maxLength,
-        }}
+        })}
         disabled={readonly}
         onChange={onChange}
         size={renderSize}

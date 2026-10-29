@@ -3,9 +3,8 @@ import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import { Utils } from "@react-awesome-query-builder/ui";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import xdpPackage from "@mui/x-date-pickers/package.json"; // to determine version
+import { xdpVersion } from "../../utils/versions";
 const { moment } = Utils;
-const xdpVersion = parseInt(xdpPackage?.version?.split(".")?.[0] ?? "0");
 
 export default (props) => {
   const {value, setValue, use12Hours, readonly, placeholder, timeFormat, valueFormat, customProps, config} = props;

@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
+import { textFieldInputProps } from "../../utils/versions";
 
 export default (props) => {
   const {value, setValue, config, readonly, min, max, step, placeholder, customProps} = props;
@@ -17,18 +18,14 @@ export default (props) => {
 
   const numberValue = value == undefined ? "" : value;
 
-  const InputProps = useMemo(() => ({
+  const inputProps = useMemo(() => textFieldInputProps({
     readOnly: readonly,
-  }), [
-    readonly
-  ]);
-
-  const inputProps = useMemo(() => ({
+  }, {
     min,
     max,
     step,
   }), [
-    min, max, step
+    readonly, min, max, step
   ]);
   
   return (
@@ -38,8 +35,7 @@ export default (props) => {
         type="number"
         value={numberValue}
         placeholder={!readonly ? placeholder : ""}
-        InputProps={InputProps}
-        inputProps={inputProps}
+        {...inputProps}
         disabled={readonly}
         onChange={onChange}
         size={renderSize}

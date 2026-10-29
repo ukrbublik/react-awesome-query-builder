@@ -1,5 +1,6 @@
 import moment from "moment";
 import { expect } from "chai";
+import { ReactWrapper } from "enzyme";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_mui, hexToRgbString } from "../support/utils";
@@ -10,6 +11,13 @@ const {
   with_all_types,
   with_theme_mui,
 } = configs;
+
+// v5-7: input.MuiInput-input
+// v8+: hidden input.MuiPickersInputBase-input (accessible DOM structure is used by default)
+const findPickerInput = (qb: ReactWrapper, widgetSelector: string) => {
+  const input = qb.find(`${widgetSelector} input.MuiInput-input`);
+  return input.length ? input : qb.find(`${widgetSelector} input.MuiPickersInputBase-input`);
+};
 
 const ignoreLogDatePicker = (errText: string) => {
   return errText.includes("The `anchorEl` prop provided to the component is invalid");
@@ -49,7 +57,7 @@ describe("mui core widgets", () => {
       await openSelect();
       expectOptions("login;firstName", {withValues: false});
       expectVisibleOptions("  login;    firstName", {withValues: false});
-      await selectOption("firstName");
+      await selectOption("firstName", true); // already selected
       expectInput("firstName");
       await openSelect();
       await selectOption("login");
@@ -89,7 +97,7 @@ describe("mui widgets interactions", () => {
     await with_qb_mui(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", (qb, {expect_jlogic}) => {
       // open date picker for '2020-05-18'
       const openPickerBtn = qb.find(".rule--widget--DATE button.MuiIconButton-root");
-      const dateInput = qb.find(".rule--widget--DATE input.MuiInput-input");
+      const dateInput = findPickerInput(qb, ".rule--widget--DATE");
       expect(dateInput, "dateInput").to.have.length(1);
       if (openPickerBtn.length) {
         // desktop mode
@@ -102,13 +110,22 @@ describe("mui widgets interactions", () => {
 
       // click on 3rd week, 2nd day of week (should be sunday, 10 day for default US locale)
       let dayBtn;
-      // v6
+      // v9 (`PickersDay` was renamed to `PickerDay`)
       dayBtn = document.querySelector<HTMLElement>(
         ".MuiDateCalendar-root" 
         + " .MuiDayCalendar-monthContainer"
         + " .MuiDayCalendar-weekContainer:nth-child(3)" 
-        + " > .MuiPickersDay-root:nth-child(2)" 
+        + " > .MuiPickerDay-root:nth-child(2)" 
       );
+      // v6-8
+      if (!dayBtn) {
+        dayBtn = document.querySelector<HTMLElement>(
+          ".MuiDateCalendar-root" 
+          + " .MuiDayCalendar-monthContainer"
+          + " .MuiDayCalendar-weekContainer:nth-child(3)" 
+          + " > .MuiPickersDay-root:nth-child(2)" 
+        );
+      }
       // v5
       if (!dayBtn) {
         dayBtn = document.querySelector<HTMLElement>(
@@ -146,7 +163,7 @@ describe("mui widgets interactions", () => {
 
   it("change time value", async function() {
     await with_qb_mui(configs.with_all_types, inits.with_time, "JsonLogic", (qb, {expect_jlogic}) => {
-      const timeInput = qb.find(".rule--widget--TIME input.MuiInput-input");
+      const timeInput = findPickerInput(qb, ".rule--widget--TIME");
       expect(timeInput, "timeInput").to.have.length(1);
       timeInput.simulate("click");
       const clockPicker = document.querySelector<HTMLElement>(".MuiClockPicker-root");
@@ -160,7 +177,7 @@ describe("mui widgets interactions", () => {
         }
         this.skip();
       } else if (clockBtn.length) {
-        // v6-7 desktop mode
+        // v6+ desktop mode
         clockBtn.last().simulate("click");
         const dclockPicker = document.querySelector<HTMLElement>(".MuiMultiSectionDigitalClock-root");
         expect(dclockPicker, "dclockPicker").to.exist;
@@ -183,11 +200,12 @@ describe("mui widgets interactions", () => {
         expect(minBtn?.innerText, "minBtn").to.eq("30");
         minBtn?.click();
 
-        const okBtn = document.querySelector<HTMLElement>(
+        // tip: since v9 there is also "Cancel" button before "OK" button
+        const okBtn = Array.from(document.querySelectorAll<HTMLElement>(
           ".MuiPickersLayout-root"
           + " .MuiDialogActions-root" 
           + " .MuiButton-root" 
-        );
+        )).pop();
         expect(okBtn, "okBtn").to.exist;
         okBtn?.click();
 

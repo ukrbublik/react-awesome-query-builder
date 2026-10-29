@@ -5,13 +5,13 @@ import FormControl from "@mui/material/FormControl";
 import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
-import MenuItem from "@mui/material/MenuItem";
 import Check from "@mui/icons-material/Check";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Tooltip from "@mui/material/Tooltip";
 import { Hooks } from "@react-awesome-query-builder/ui";
 import { useTheme } from "@mui/material/styles";
+import { muiVersion } from "../../utils/versions";
 const { useListValuesAutocomplete } = Hooks;
 const emptyArray = [];
 
@@ -103,25 +103,42 @@ export default (props) => {
     const selectedTitle = selectedListValue?.title ?? value?.toString() ?? "";
     const shouldHide = multiple && !open;
     const renderValue = shouldRenderSelected ? selectedTitle : (shouldHide ? "" : inputValue ?? value?.toString() ?? "");
+    // since v9 `params` contains `slotProps` (`input`, `htmlInput`) instead of `InputProps`, `inputProps`
+    const useSlotProps = !!params.slotProps;
+    const paramsInputProps = (useSlotProps ? params.slotProps.input : params.InputProps) ?? {};
+    const paramsHtmlInputProps = (useSlotProps ? params.slotProps.htmlInput : params.inputProps) ?? {};
+    const htmlInputProps = {
+      "aria-label": ariaLabel,
+      ...paramsHtmlInputProps,
+      value: renderValue,
+    };
+    const inputProps = {
+      ...paramsInputProps,
+      readOnly: readonly,
+      endAdornment: (
+        <React.Fragment>
+          {isLoading ? <CircularProgress color="inherit" size={20}  /> : null}
+          {paramsInputProps.endAdornment}
+        </React.Fragment>
+      ),
+    };
     return (
       <TextField 
         variant="standard"
         {...params}
-        inputProps={{
-          "aria-label": ariaLabel,
-          ...params.inputProps,
-          value: renderValue,
-        }}
-        InputProps={{
-          ...params.InputProps,
-          readOnly: readonly,
-          endAdornment: (
-            <React.Fragment>
-              {isLoading ? <CircularProgress color="inherit" size={20}  /> : null}
-              {params.InputProps.endAdornment}
-            </React.Fragment>
-          ),
-        }}
+        // since v9 `params.fullWidth` reflects `fullWidth` of Autocomplete (was always true before),
+        // but input should always fill Autocomplete (its width is controlled by `style`)
+        fullWidth={true}
+        {...(useSlotProps ? {
+          slotProps: {
+            ...params.slotProps,
+            input: inputProps,
+            htmlInput: htmlInputProps,
+          },
+        } : {
+          inputProps: htmlInputProps,
+          InputProps: inputProps,
+        })}
         size={renderSize}
         disabled={readonly}
         placeholder={placeholder}
@@ -181,21 +198,30 @@ export default (props) => {
     return res;
   };
 
-  const renderTags = (value, getTagProps) => value.map((option, index) => {
+  const renderTags = (value, getItemProps) => value.map((option, index) => {
+    // tip: `option` can be a primitive value, so use `key` provided by MUI (should not be spread into JSX)
+    const { key, ...itemProps } = getItemProps({ index });
     return <Chip
-      key={option.value}
+      key={key ?? index}
       label={getOptionLabel(option)}
       size={"small"}
       variant={getOptionIsCustom(option) ? "outlined" : "filled"}
-      {...getTagProps({ index })}
+      {...itemProps}
     />;
   });
+  // `renderTags` is deprecated since v7 and removed in v9 in favor of `renderValue`
+  // (note: `renderValue` is also applied for single value, so use it only for multiple)
+  const renderTagsProps = multiple ? (
+    muiVersion >= 7 ? { renderValue: renderTags } : { renderTags }
+  ) : {};
 
   const isOptionEqualToValue = (option, value) => {
     return option?.value == value;
   };
 
-  const renderOption = (props, option) => {
+  const renderOption = (optionProps, option) => {
+    // `key` should not be spread into JSX
+    const { key, ...props } = optionProps;
     const { title, renderTitle, value, isHidden, tooltip, group, groupTitle } = option;
     const isGrouped = groupTitle || group;
     const isSelected = multiple ? (selectedValue || []).includes(value) : selectedValue == value;
@@ -215,22 +241,19 @@ export default (props) => {
     if (isHidden)
       return null;
     if (option.specialValue) {
-      return <div {...props}>{finalTitle}</div>;
+      return <div key={key} {...props}>{finalTitle}</div>;
     } else if (multiple) {
       const itemContent = isSelected ? (
         <><ListItemIcon><Check /></ListItemIcon>{titleSpan}</>
       ) : (
         <ListItemText inset>{titleSpan}</ListItemText>
       );
+      // tip: don't use MenuItem here - since v9 it throws error if rendered outside of Menu or MenuList
       return (
-        <MenuItem
-          {...props}
-          size={"small"}
-          selected={isSelected}
-        >{itemContent}</MenuItem>
+        <li key={key} {...props}>{itemContent}</li>
       );
     } else {
-      return <div {...props}>{titleSpan}</div>;
+      return <div key={key} {...props}>{titleSpan}</div>;
     }
   };
   
@@ -259,7 +282,7 @@ export default (props) => {
       getOptionDisabled={getOptionDisabled}
       renderInput={renderInput}
       renderGroup={renderGroup}
-      renderTags={renderTags}
+      {...renderTagsProps}
       renderOption={renderOption}
       filterOptions={filterOptions}
       isOptionEqualToValue={isOptionEqualToValue}

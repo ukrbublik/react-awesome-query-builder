@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
+import { textFieldInputProps } from "../../utils/versions";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { NumericFormat, getNumberFormatProps } = Utils.NumberFormat;
 
@@ -30,13 +31,13 @@ export default (props) => {
 
   const formattedValue = value == undefined ? "" : value;
 
-  const InputProps = useMemo(
-    () => ({
+  const inputProps = useMemo(
+    () => textFieldInputProps({
       readOnly: readonly,
       startAdornment: (prefix != undefined ? <InputAdornment position="start">{prefix}</InputAdornment> : undefined),
       endAdornment: (suffix != undefined ? <InputAdornment position="end">{suffix}</InputAdornment> : undefined),
     }),
-    [readonly]
+    [readonly, prefix, suffix]
   );
 
   // will not work without prop type="number"
@@ -55,7 +56,7 @@ export default (props) => {
         customInput={TextField}
         value={formattedValue}
         placeholder={!readonly ? placeholder : ""}
-        InputProps={InputProps}
+        {...inputProps}
         //inputProps={inputProps}
         disabled={readonly}
         onValueChange={handleChange}

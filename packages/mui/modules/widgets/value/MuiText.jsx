@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
+import { textFieldInputProps } from "../../utils/versions";
 
 export default (props) => {
   const {value, setValue, config, readonly, placeholder, customProps, maxLength, errorMessage} = props;
@@ -21,12 +22,11 @@ export default (props) => {
         variant="standard"
         value={textValue}
         placeholder={!readonly ? placeholder : ""}
-        InputProps={{
+        {...textFieldInputProps({
           readOnly: readonly,
-        }}
-        inputProps={{
+        }, {
           maxLength: maxLength,
-        }}
+        })}
         disabled={readonly}
         onChange={onChange}
         size={renderSize}
